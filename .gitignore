@@ -1,0 +1,7 @@
+*.class
+*.log
+*~
+*.temp
+dist
+build
+src/tests
