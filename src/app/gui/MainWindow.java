@@ -8,6 +8,7 @@ package app.gui;
 import app.Main;
 import app.gui.svgComponents.Canvas;
 import app.utils.MyFileFilter;
+import app.utils.SVGLoader;
 import config.Configuration;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -31,6 +32,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -174,6 +176,10 @@ public class MainWindow extends JFrame implements ItemListener{
 	if(retour == JFileChooser.APPROVE_OPTION) {
 	    try {
 		    File f =chooser.getSelectedFile();
+		    SVGDocument doc = SVGLoader.getSVGDocumentFromPath(f);
+		    if(doc !=null)
+			canvas.setDocument(doc);
+		    
 	    } catch (Exception e1) {
 		    e1.printStackTrace();
 	    }
@@ -187,7 +193,7 @@ public class MainWindow extends JFrame implements ItemListener{
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
 	    putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.CTRL_MASK));
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
         public void actionPerformed(ActionEvent e) {
 	    openFileChoserWindow();
@@ -201,7 +207,7 @@ public class MainWindow extends JFrame implements ItemListener{
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
 	    putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.CTRL_MASK));
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
         public void actionPerformed(ActionEvent e) {
 	              
@@ -215,7 +221,7 @@ public class MainWindow extends JFrame implements ItemListener{
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
 	    putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.CTRL_MASK));
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
         public void actionPerformed(ActionEvent e) {
 	              
