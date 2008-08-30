@@ -5,8 +5,13 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.util.logging.Level;
 import java.util.logging.Logger;
+import org.apache.batik.bridge.BridgeContext;
+import org.apache.batik.bridge.DynamicGVTBuilder;
+import org.apache.batik.bridge.GVTBuilder;
+import org.apache.batik.bridge.UserAgentAdapter;
 import org.apache.batik.dom.svg.SAXSVGDocumentFactory;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.gvt.GraphicsNode;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -54,6 +59,15 @@ public class SVGLoader {
 			return null;
 		    }
 		}
+		
+		
+  //UserAgentAdapter mUserAgent = new UserAgentAdapter(); 
+  //BridgeContext mCtx = new BridgeContext(mUserAgent); 
+  //mCtx.setDynamicState(BridgeContext.DYNAMIC);
+  //GVTBuilder mBuilder = new DynamicGVTBuilder();
+
+  //GraphicsNode mGVTElement = mBuilder.build(mCtx, element);
+		
 		return null;
 		
 	}

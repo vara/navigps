@@ -200,7 +200,7 @@ public class MainWindow extends JFrame implements ItemListener{
 	
 	getContentPane().add(canvas,BorderLayout.CENTER);
 	//line only for accelerate tests
-	canvas.setURI("file:./MapWorld.svg");
+	//canvas.setURI("file:./MapWorld.svg");
     }
     
     private void openFileChoserWindow(){
