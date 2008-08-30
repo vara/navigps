@@ -5,12 +5,14 @@
 
 package app.gui.svgComponents;
 
+import app.gui.StatusPanel;
 import app.utils.Utils;
 import config.MainConfiguration;
 import config.SVGConfiguration;
-import java.awt.Color;
+import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
@@ -23,10 +25,7 @@ import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
-import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGDocument;
-import org.w3c.dom.svg.SVGLocatable;
-import org.w3c.dom.svg.SVGMatrix;
 
 /**
  *
@@ -62,154 +61,60 @@ import org.w3c.dom.svg.SVGMatrix;
 
 public class Canvas extends JSVGCanvas{
 
-    private LabelStatusDocument labStatusDocument= new LabelStatusDocument("Chose Document");
     private JLabel labelViewMousePosyton = new JLabel("");
     private SVGConfiguration svgConfig = new SVGConfiguration();
     
-    private boolean rendering = true;
+    private SVGBridgeListeners listeners;
+    private ZoomAndMove zoomListener;
+        
     
-    public Canvas(){	
-	
+    public Canvas(SVGBridgeListeners listeners){
+		
 	//setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
 	setDocumentState(Canvas.ALWAYS_STATIC);
-	addSVGDocumentLoaderListener(new SVGDocumentLoaderAdapter() {
-		@Override
-		public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
-		    String currentStatus = "Document Loading...";
-		    labStatusDocument.setText(currentStatus);
-		    if(MainConfiguration.getMode()){			
-			System.out.println(currentStatus);
-		    }
-		}
-		@Override
-		public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
-		    String currentStatus = "Document Loading Completed";
-		    labStatusDocument.setText(currentStatus);
-		    if(MainConfiguration.getMode()){			
-			System.out.println(currentStatus);
-		    }
-		}
-	    });
-	    
-	addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
-	    @Override
-	    public void gvtBuildStarted(GVTTreeBuilderEvent e) {
-		    
-		    String currentStatus = "Document Build Started...";
-		    labStatusDocument.setText(currentStatus);
-		    if(MainConfiguration.getMode()){			
-			System.out.println(currentStatus);
-		    }
-	    }
-	    @Override
-	    public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-		    String currentStatus = "Document Build Completed";
-		    labStatusDocument.setText(currentStatus);
-		    if(MainConfiguration.getMode()){			
-			System.out.println(currentStatus);
-		    }
-	    }
-	});
-	addGVTTreeRendererListener(new GVTTreeRendererAdapter() {
-	    @Override
-	    public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
-		    setRendering(true);
-		    String currentStatus = "Document Rendering Prepare ...";
-		    labStatusDocument.setText(currentStatus);
-		    if(MainConfiguration.getMode()){			
-			System.out.println(currentStatus);
-		    }
-
-	    }
-	    @Override
-	    public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
-
-		    String currentStatus = "Document Rendering Completed";
-		    labStatusDocument.setText(currentStatus);
-		    if(MainConfiguration.getMode()){			
-			System.out.println(currentStatus);
-		    }
-		    setRendering(false);
-	    }
-	});
+	setDoubleBuffered(true);
 	
-	ZoomAndMoveMouseListener listener=new  ZoomAndMoveMouseListener();
-        addMouseListener(listener);
-        addMouseMotionListener(listener);
-	
+	addSVGDocumentLoaderListener(listeners);	    
+	addGVTTreeBuilderListener(listeners);
+	addGVTTreeRendererListener(listeners);
+		
+	zoomListener=new  ZoomAndMove();
+        addMouseListener(zoomListener);
+        addMouseMotionListener(zoomListener);
+	this.listeners = listeners;
+    }
+    @Override
+    public void setURI(String uri){
+	listeners.setAbsoluteFilePath(uri);
+	super.setURI(uri);
     }
     public boolean isDocumentSet(){ return (getSVGDocument() != null);}
     
-    protected void setTextforLabStatusDocument(String str){
-	labStatusDocument.setText(str);
-    }
-    
-    public LabelStatusDocument getLabStatusDocument(){
-	return labStatusDocument;
-    }
-
     public JLabel getLabelViewMousePosyton() {
 	return labelViewMousePosyton;
     }
-
-    public boolean isRendering() {
-	return rendering;
-    }
-
-    public void setRendering(boolean rendering) {
-	this.rendering = rendering;
-    }
     
-    protected class LabelStatusDocument extends JLabel implements MouseMotionListener{
-
-	public LabelStatusDocument(String str){
-	    super(str);
-	    //setForeground(Color.BLUE);
-	    addMouseMotionListener(this);
-	    setVerticalAlignment(0);
-	    setBorder(Utils.createSimpleBorder(1,1,1,1,Color.BLUE));
-	    
-	}
-	public void mouseDragged(MouseEvent e) {
-	    
-	}
-
-	public void mouseMoved(MouseEvent e) {
-	    setToolTipText(getText());
-	    //System.out.println("mouseMoved");
-	}
-    }//class LabelStatusDocument
-    
-    private final class ZoomAndMoveMouseListener extends MouseAdapter
+    public class ZoomAndMove extends MouseAdapter
     {
+	private String flag;
+	
 	@Override
 	public void mouseClicked(MouseEvent evt) {
-	    AffineTransform at;
-
-	    at = getRenderingTransform();
-	    if (at != null) {
-		    Point2D p2d = new Point2D.Double(evt.getX(),evt.getY());
-		    at.preConcatenate(AffineTransform.getTranslateInstance(-p2d.getX(),-p2d.getY()));
-
-		if(evt.getButton()==3){
-
-		    at.preConcatenate(AffineTransform.getScaleInstance(svgConfig.getZoomOutRateX(),
-								       svgConfig.getZoomOutRateY()));
-		    if(MainConfiguration.getMode())
-			System.out.println("zoomout");
-		}
-		else {
-
-		    at.preConcatenate(AffineTransform.getScaleInstance(svgConfig.getZoomInRateX(),
-								       svgConfig.getZoomInRateX()));
-		    if(MainConfiguration.getMode())
-			System.out.println("zoomin");
-		}
-
-		at.preConcatenate(AffineTransform.getTranslateInstance(p2d.getX(),p2d.getY()));
-		setRenderingTransform(at);
+	    
+	    Point2D p2d = new Point2D.Double(evt.getX(),evt.getY());
+	    if(evt.getButton()==1){
+	    
+		zoomIn(p2d);
+		if(MainConfiguration.getMode())
+		    System.out.println("zoomout");
+	    }
+	    else {
+		zoomOut(p2d);
+		if(MainConfiguration.getMode())
+		    System.out.println("zoomin");
 	    }
 	}
+	
 	@Override
 	public void mouseDragged(MouseEvent e) {
 	    //throw new UnsupportedOperationException("Not supported yet.");
@@ -219,21 +124,68 @@ public class Canvas extends JSVGCanvas{
 	@Override
 	public void mouseMoved(MouseEvent e) {
 	    SVGDocument doc = getSVGDocument();	    
-	    if(doc != null && !isRendering()){
-		SVGOMPoint svgp =getLocalPoint(doc.getRootElement(),e.getX() ,e.getY());
-		String str = "source comp. ("+e.getX()+","+e.getY()+") "+
-			     "screen ("+e.getXOnScreen()+","+e.getYOnScreen()+") "+
-			     "root Elemnt ("+svgp.getX()+","+svgp.getY()+")";
-		labelViewMousePosyton.setText(str);
+	    if(doc != null && !listeners.isRedering()){
+		SVGOMPoint svgp =Utils.getLocalPointFromDomElement(doc.getRootElement(),e.getX() ,e.getY());
+		//1.position on source component 2.positon on screen 3. posytion on svg doc (root element)
+		String str = e.getX()+","+e.getY()+";"+
+			     e.getXOnScreen()+","+e.getYOnScreen()+";"+
+			     svgp.getX()+","+svgp.getY();
+		//System.out.println(""+str);
+		listeners.setLabelInformationPosytion(str);		
 	    }	    
 	}
+	
+	private void zoomIn(Point2D p2d){
+	    AffineTransform at;
+	    at = getRenderingTransform();
+	    if (at != null) {
+		at.preConcatenate(AffineTransform.getTranslateInstance(-p2d.getX(),-p2d.getY()));
+		at.preConcatenate(AffineTransform.getScaleInstance(svgConfig.getZoomInRateX(),
+								       svgConfig.getZoomInRateY()));
+		at.preConcatenate(AffineTransform.getTranslateInstance(p2d.getX(),p2d.getY()));
+		setRenderingTransform(at);
+	    }
+	}
+	
+	private void zoomOut(Point2D p2d){
+	    AffineTransform at;
+	    at = getRenderingTransform();
+	    if (at != null) {
+		
+		at.preConcatenate(AffineTransform.getTranslateInstance(-p2d.getX(),-p2d.getY()));
+		at.preConcatenate(AffineTransform.getScaleInstance(svgConfig.getZoomOutRateX(),
+								   svgConfig.getZoomOutRateX()));
+		at.preConcatenate(AffineTransform.getTranslateInstance(p2d.getX(),p2d.getY()));
+		setRenderingTransform(at);
+	    }
+	}
+	
+	public void zoomFromCenterDocumnet(boolean zoomIn){
+		    
+	    Point2D p2d = new Point(getSize().width/2,getSize().height/2);
+	    if(zoomIn)
+		zoomIn(p2d);
+	    else
+		zoomOut(p2d);
+	}
+	
+    }//class ZoomAndMoveMouseListener
+    
+    
+    public void zoomFromCenterDocumnet(boolean zoomIn){
+	zoomListener.zoomFromCenterDocumnet(zoomIn);
+    }
+    public void zoomFromMouseCoordinationEnable(boolean setZoom){
+	resetRenderingTransform();
+	MouseListener[] ml = getMouseListeners();
+	if(setZoom){
+	    
+	    if(ml.length == 0)
+		addMouseListener(listener);
+	}
+	else
+	    if(ml.length > 0)
+		removeMouseListener(listener);
     }
     
-    static protected SVGOMPoint getLocalPoint(Element element, int x, int y) 
-    {	    
-	    SVGMatrix mat = ((SVGLocatable) element).getScreenCTM();
-	    SVGMatrix imat = mat.inverse(); // screen -> elem
-	    SVGOMPoint pt = new SVGOMPoint(x, y);
-	    return (SVGOMPoint) pt.matrixTransform(imat);
-    }    
 }
