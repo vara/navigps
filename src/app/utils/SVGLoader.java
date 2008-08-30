@@ -21,7 +21,7 @@ public class SVGLoader {
 	public static SVGDocument getSVGDocumentFromPath(String path)
 	{
 		File file = new File(path);
-		return getSVGDocumentFromPath(file);
+		return getSVGDocumentFromFile(file);
 	}
 
 	public static SVGDocument getSVGDocumentFromInputStream(InputStream in)
@@ -41,7 +41,7 @@ public class SVGLoader {
 		return null;
 	}
 	
-	public static SVGDocument getSVGDocumentFromPath(File file)
+	public static SVGDocument getSVGDocumentFromFile(File file)
 	{
 		if(file.isFile()){		    
 		    try {

@@ -8,11 +8,14 @@ package app.gui;
 import app.Main;
 import app.gui.svgComponents.Canvas;
 import app.utils.MyFileFilter;
-import app.utils.SVGLoader;
-import config.Configuration;
+import app.utils.Utils;
+import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.FlowLayout;
+import java.awt.GridBagConstraints;
+import java.awt.GridBagLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -20,6 +23,8 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.net.URI;
+import java.net.URISyntaxException;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
@@ -32,7 +37,6 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -42,7 +46,7 @@ public class MainWindow extends JFrame implements ItemListener{
 
     private Main core;
     
-    private JPanel panelWithToolBars;
+    private JPanel panelWithToolBars,statusPanel;
     private Action openSVGFiletAction,zoomOutAction,zoomInAction;
     private Canvas canvas;
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
@@ -52,11 +56,12 @@ public class MainWindow extends JFrame implements ItemListener{
     public MainWindow(Main c)
     {
 	core = c;
-	setSize(Configuration.getScreenSize());	
+	setSize(MainConfiguration.getScreenSize());	
 	setLayout(new BorderLayout());
 	
 	initComponents();
 	
+	setTitle("NaviGPS ver. 0.2");
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setVisible(true);
 	
@@ -75,10 +80,24 @@ public class MainWindow extends JFrame implements ItemListener{
 				    createNavigationIcon("zoomOut16"), 
 				    "Zoom out from center document", 
 				    KeyEvent.VK_MINUS);
-	creatToolBars();
+	
+	creatToolBars(); //must be before creatMenuBar()
 	creatMenuBar();
-	createCanvas();
+	createCanvas();	//must be before createStatusPanel() because -> canvas.getLabStatus();
+	createStatusPanel();
     }
+    
+    public void add(Component c,GridBagConstraints guidelines,
+                    int x, int y, int s,int w)
+    {
+        //okreslenie pozycji komponentu na arkuszu 
+        guidelines.gridx = x;         //kolumna i rzad lewego gornego naroznika komponentu
+        guidelines.gridy = y; 
+        guidelines.gridwidth = s;     //ilosc rzedow i kolumn zajmujaca przez komponent 
+        guidelines.gridheight = w;
+        getContentPane().add(c,guidelines);
+    }
+    
     protected static ImageIcon createNavigationIcon(String imageName) {
         String imgLocation = "resources/graphics/icons/"
                              + imageName
@@ -92,6 +111,37 @@ public class MainWindow extends JFrame implements ItemListener{
         } else {
             return new ImageIcon(imageURL);
         }
+    }
+    
+    public void createStatusPanel(){
+	
+	GridBagLayout layout = new GridBagLayout();
+	statusPanel = new JPanel(layout);		
+	//statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));
+	
+	GridBagConstraints guidelines = new GridBagConstraints();
+	
+	guidelines.fill = GridBagConstraints.BOTH;        
+        guidelines.weightx = 10;     
+        guidelines.weighty = 100;
+	//okreslenie pozycji komponentu na arkuszu 
+        guidelines.gridx = 0;         //kolumna i rzad lewego gornego naroznika komponentu
+        guidelines.gridy = 0; 
+        guidelines.gridwidth = 0;     //ilosc rzedow i kolumn zajmujaca przez komponent 
+        guidelines.gridheight = 0;	        
+	statusPanel.add(canvas.getLabStatusDocument(),guidelines);
+	
+	guidelines.fill = GridBagConstraints.BOTH;        
+        guidelines.weightx = 10;     
+        guidelines.weighty = 100;
+	//okreslenie pozycji komponentu na arkuszu 
+        guidelines.gridx = 2;         //kolumna i rzad lewego gornego naroznika komponentu
+        guidelines.gridy = 1; 
+        guidelines.gridwidth = 1;     //ilosc rzedow i kolumn zajmujaca przez komponent 
+        guidelines.gridheight = 1;	        
+	statusPanel.add(canvas.getLabelViewMousePosyton(),guidelines);
+	
+	getContentPane().add(statusPanel,BorderLayout.PAGE_END);
     }
     
     public void creatToolBars(){
@@ -160,7 +210,7 @@ public class MainWindow extends JFrame implements ItemListener{
     public void createCanvas(){
 	
 	canvas = new Canvas();
-	canvas.setBackground(Color.RED);
+	canvas.setBackground(Color.white);
 	
 	getContentPane().add(canvas,BorderLayout.CENTER);
     }
@@ -169,16 +219,25 @@ public class MainWindow extends JFrame implements ItemListener{
 	JFileChooser chooser = new JFileChooser();
 	String fileFilter = "svg";
 	chooser.addChoosableFileFilter(new MyFileFilter(new String[]{"svg"},fileFilter));
-	chooser.setAcceptAllFileFilterUsed(false);
-	chooser.setCurrentDirectory(new File(""));
-	int retour = chooser.showOpenDialog(this);
-	
+	chooser.setAcceptAllFileFilterUsed(false);	
+	if(canvas.isDocumentSet()){
+	    
+	    try {
+		String lastPath = canvas.getSVGDocument().getDocumentURI();
+		URI uri = new URI(lastPath);
+		chooser.setCurrentDirectory(new File(uri));
+	    } catch (URISyntaxException ex) {
+		System.err.println(""+ex);
+	    }	    
+	}	
+	int retour = chooser.showOpenDialog(this);	
 	if(retour == JFileChooser.APPROVE_OPTION) {
 	    try {
 		    File f =chooser.getSelectedFile();
-		    SVGDocument doc = SVGLoader.getSVGDocumentFromPath(f);
-		    if(doc !=null)
-			canvas.setDocument(doc);
+		    //SVGDocument doc = SVGLoader.getSVGDocumentFromFile(f);
+		    //if(doc !=null)
+			//canvas.setDocument(doc);
+		    canvas.setURI(f.toURI().toString());
 		    
 	    } catch (Exception e1) {
 		    e1.printStackTrace();

@@ -6,6 +6,7 @@
 package app;
 
 import app.gui.MainWindow;
+import config.MainConfiguration;
 import javax.swing.SwingUtilities;
 
 /**
@@ -21,7 +22,7 @@ public class Main {
     
     public static void main(String[] args) {
         
-	
+	MainConfiguration.setMode(true);
 	Main.initGui(new Main());
     }
 
