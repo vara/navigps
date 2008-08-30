@@ -5,26 +5,23 @@
 
 package app.gui.svgComponents;
 
-import app.gui.StatusPanel;
 import app.utils.Utils;
 import config.MainConfiguration;
 import config.SVGConfiguration;
+import java.awt.AWTException;
+import java.awt.Cursor;
+import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.JLabel;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
-import org.apache.batik.swing.gvt.GVTTreeRendererAdapter;
-import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
-import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
-import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
-import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
-import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -79,7 +76,7 @@ public class Canvas extends JSVGCanvas{
 	addGVTTreeRendererListener(listeners);
 		
 	zoomListener=new  ZoomAndMove();
-        addMouseListener(zoomListener);
+        //addMouseListener(zoomListener);
         addMouseMotionListener(zoomListener);
 	this.listeners = listeners;
     }
@@ -96,7 +93,7 @@ public class Canvas extends JSVGCanvas{
     
     public class ZoomAndMove extends MouseAdapter
     {
-	private String flag;
+	private boolean zoomAtMousePoit = false;
 	
 	@Override
 	public void mouseClicked(MouseEvent evt) {
@@ -106,12 +103,12 @@ public class Canvas extends JSVGCanvas{
 	    
 		zoomIn(p2d);
 		if(MainConfiguration.getMode())
-		    System.out.println("zoomout");
+		    System.out.println("zoomIn");
 	    }
 	    else {
 		zoomOut(p2d);
 		if(MainConfiguration.getMode())
-		    System.out.println("zoomin");
+		    System.out.println("zoomOut");
 	    }
 	}
 	
@@ -129,7 +126,7 @@ public class Canvas extends JSVGCanvas{
 		//1.position on source component 2.positon on screen 3. posytion on svg doc (root element)
 		String str = e.getX()+","+e.getY()+";"+
 			     e.getXOnScreen()+","+e.getYOnScreen()+";"+
-			     svgp.getX()+","+svgp.getY();
+			     (int)svgp.getX()+","+(int)svgp.getY();
 		//System.out.println(""+str);
 		listeners.setLabelInformationPosytion(str);		
 	    }	    
@@ -176,16 +173,23 @@ public class Canvas extends JSVGCanvas{
 	zoomListener.zoomFromCenterDocumnet(zoomIn);
     }
     public void zoomFromMouseCoordinationEnable(boolean setZoom){
-	resetRenderingTransform();
+	//resetRenderingTransform();
+	
 	MouseListener[] ml = getMouseListeners();
-	if(setZoom){
-	    
-	    if(ml.length == 0)
-		addMouseListener(listener);
+	for (MouseListener mouseListener : ml) {
+	    System.out.println(""+mouseListener);	    
 	}
-	else
-	    if(ml.length > 0)
-		removeMouseListener(listener);
+	
+	if(setZoom){
+	    addMouseListener(zoomListener);
+	    //System.out.println("Dodano listenera");	    
+	    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+	}
+	else{
+	    setCursor(Cursor.getDefaultCursor());
+	    removeMouseListener(zoomListener);
+	    //System.out.println("Usunieto listenera");		
+	}
     }
     
 }
