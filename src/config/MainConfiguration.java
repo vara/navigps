@@ -12,13 +12,13 @@ import java.awt.Toolkit;
  *
  * @author vara
  */
-public class Configuration {
+public class MainConfiguration {
     private static boolean modeVerbose = false;
     public static final String OS_WINDOWS = "WINDOWS";
     public static final String OS_LINUX = "LINUX";
     public static final String OS_OTHER = "OTHER";
     
-    public Configuration()
+    public MainConfiguration()
     {}
 
     public static Dimension getScreenSize()
@@ -29,12 +29,12 @@ public class Configuration {
     public static String getOSName()
     {
 	String osname = System.getProperty("os.name");
-	if (osname.toUpperCase().indexOf(Configuration.OS_WINDOWS) != -1) {	
-	    return Configuration.OS_WINDOWS;
-	}else if(osname.toUpperCase().indexOf(Configuration.OS_LINUX) != -1){
-	    return Configuration.OS_LINUX;
+	if (osname.toUpperCase().indexOf(MainConfiguration.OS_WINDOWS) != -1) {	
+	    return MainConfiguration.OS_WINDOWS;
+	}else if(osname.toUpperCase().indexOf(MainConfiguration.OS_LINUX) != -1){
+	    return MainConfiguration.OS_LINUX;
 	}else
-	    return Configuration.OS_OTHER;
+	    return MainConfiguration.OS_OTHER;
     }
     
     public static void setMode(boolean verbose)
