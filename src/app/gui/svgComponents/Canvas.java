@@ -66,6 +66,8 @@ public class Canvas extends JSVGCanvas{
     private JLabel labelViewMousePosyton = new JLabel("");
     private SVGConfiguration svgConfig = new SVGConfiguration();
     
+    private boolean rendering = true;
+    
     public Canvas(){	
 	
 	//setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
@@ -111,7 +113,7 @@ public class Canvas extends JSVGCanvas{
 	addGVTTreeRendererListener(new GVTTreeRendererAdapter() {
 	    @Override
 	    public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
-
+		    setRendering(true);
 		    String currentStatus = "Document Rendering Prepare ...";
 		    labStatusDocument.setText(currentStatus);
 		    if(MainConfiguration.getMode()){			
@@ -127,7 +129,7 @@ public class Canvas extends JSVGCanvas{
 		    if(MainConfiguration.getMode()){			
 			System.out.println(currentStatus);
 		    }
-
+		    setRendering(false);
 	    }
 	});
 	
@@ -148,6 +150,14 @@ public class Canvas extends JSVGCanvas{
 
     public JLabel getLabelViewMousePosyton() {
 	return labelViewMousePosyton;
+    }
+
+    public boolean isRendering() {
+	return rendering;
+    }
+
+    public void setRendering(boolean rendering) {
+	this.rendering = rendering;
     }
     
     protected class LabelStatusDocument extends JLabel implements MouseMotionListener{
@@ -208,8 +218,8 @@ public class Canvas extends JSVGCanvas{
 
 	@Override
 	public void mouseMoved(MouseEvent e) {
-	    SVGDocument doc = getSVGDocument();
-	    if(doc != null){
+	    SVGDocument doc = getSVGDocument();	    
+	    if(doc != null && !isRendering()){
 		SVGOMPoint svgp =getLocalPoint(doc.getRootElement(),e.getX() ,e.getY());
 		String str = "source comp. ("+e.getX()+","+e.getY()+") "+
 			     "screen ("+e.getXOnScreen()+","+e.getYOnScreen()+") "+
