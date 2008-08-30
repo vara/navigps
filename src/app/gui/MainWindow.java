@@ -7,15 +7,16 @@ package app.gui;
 
 import app.Main;
 import app.gui.svgComponents.Canvas;
+import app.gui.svgComponents.SVGBridgeListeners;
 import app.utils.MyFileFilter;
-import app.utils.Utils;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.FlowLayout;
-import java.awt.GridBagConstraints;
-import java.awt.GridBagLayout;
+import java.awt.GradientPaint;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -46,12 +47,13 @@ public class MainWindow extends JFrame implements ItemListener{
 
     private Main core;
     
-    private JPanel panelWithToolBars,statusPanel;
-    private Action openSVGFiletAction,zoomOutAction,zoomInAction;
+    private JPanel panelWithToolBars;
+    private StatusPanel statusPanel;
+    private Action openSVGFiletAction,zoomOutAction,zoomInAction,zoomAction;
     private Canvas canvas;
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
-    private JToolBar toolBarFile,toolbarZoom;
-    
+    private JToolBar toolBarFile,toolBarZoom;
+    private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
     
     public MainWindow(Main c)
     {
@@ -80,24 +82,18 @@ public class MainWindow extends JFrame implements ItemListener{
 				    createNavigationIcon("zoomOut16"), 
 				    "Zoom out from center document", 
 				    KeyEvent.VK_MINUS);
+	zoomAction = new ZoomAction("Zoom", 
+				    createNavigationIcon("zoom16"), 
+				    "Zoom from svg coordinate (in/out Left/Right Mouse Key)", 
+				    KeyEvent.VK_Z);
 	
-	creatToolBars(); //must be before creatMenuBar()
+		
+	creatToolBars();	//must be before creatMenuBar()
 	creatMenuBar();
-	createCanvas();	//must be before createStatusPanel() because -> canvas.getLabStatus();
-	createStatusPanel();
+	createStatusPanel();	//must be before createCanvasPanel() 
+	createCanvas();
     }
-    
-    public void add(Component c,GridBagConstraints guidelines,
-                    int x, int y, int s,int w)
-    {
-        //okreslenie pozycji komponentu na arkuszu 
-        guidelines.gridx = x;         //kolumna i rzad lewego gornego naroznika komponentu
-        guidelines.gridy = y; 
-        guidelines.gridwidth = s;     //ilosc rzedow i kolumn zajmujaca przez komponent 
-        guidelines.gridheight = w;
-        getContentPane().add(c,guidelines);
-    }
-    
+  
     protected static ImageIcon createNavigationIcon(String imageName) {
         String imgLocation = "resources/graphics/icons/"
                              + imageName
@@ -114,52 +110,42 @@ public class MainWindow extends JFrame implements ItemListener{
     }
     
     public void createStatusPanel(){
-	
-	GridBagLayout layout = new GridBagLayout();
-	statusPanel = new JPanel(layout);		
+		
+	statusPanel = new StatusPanel(svgListeners);		
 	//statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));
 	
-	GridBagConstraints guidelines = new GridBagConstraints();
-	
-	guidelines.fill = GridBagConstraints.BOTH;        
-        guidelines.weightx = 10;     
-        guidelines.weighty = 100;
-	//okreslenie pozycji komponentu na arkuszu 
-        guidelines.gridx = 0;         //kolumna i rzad lewego gornego naroznika komponentu
-        guidelines.gridy = 0; 
-        guidelines.gridwidth = 0;     //ilosc rzedow i kolumn zajmujaca przez komponent 
-        guidelines.gridheight = 0;	        
-	statusPanel.add(canvas.getLabStatusDocument(),guidelines);
-	
-	guidelines.fill = GridBagConstraints.BOTH;        
-        guidelines.weightx = 10;     
-        guidelines.weighty = 100;
-	//okreslenie pozycji komponentu na arkuszu 
-        guidelines.gridx = 2;         //kolumna i rzad lewego gornego naroznika komponentu
-        guidelines.gridy = 1; 
-        guidelines.gridwidth = 1;     //ilosc rzedow i kolumn zajmujaca przez komponent 
-        guidelines.gridheight = 1;	        
-	statusPanel.add(canvas.getLabelViewMousePosyton(),guidelines);
-	
-	getContentPane().add(statusPanel,BorderLayout.PAGE_END);
+	getContentPane().add(getStatusPanel(),BorderLayout.PAGE_END);
     }
     
     public void creatToolBars(){
     
-	panelWithToolBars = new JPanel(new FlowLayout(0,0,0));
+	panelWithToolBars = new JPanel(new FlowLayout(0,0,0)){
+	    public void paintComponent(Graphics g){
+		super.paintComponent(g);
+		final Graphics2D g2 = (Graphics2D) g;	    
+		GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight(),Color.white, 
+							    0.0f, 8.5f, new Color(235,245,255));			    
+		Rectangle rec1 = new Rectangle(0, 0, getWidth(), getHeight());
+		g2.setPaint(gradient1);
+		g2.fill(rec1);
+	    }
+	};
 	
 	toolBarFile = new JToolBar("ToolBar File");
-	toolbarZoom = new JToolBar("ToolBar Zoom");
+	toolBarZoom = new JToolBar("ToolBar Zoom");
 	
 	toolBarFile.add(new ToolBarButton(openSVGFiletAction, 
 					  createNavigationIcon("open32")));
-	toolbarZoom.add(new ToolBarButton(zoomInAction, 
+	toolBarZoom.add(new ToolBarButton(zoomInAction, 
 					  createNavigationIcon("zoomIn32")));
-	toolbarZoom.add(new ToolBarButton(zoomOutAction, 
+	toolBarZoom.add(new ToolBarButton(zoomOutAction, 
 					  createNavigationIcon("zoomOut32")));
+		
+	toolBarZoom.add(new ToolBarButton(zoomAction, 
+					  createNavigationIcon("zoom32"),true));
 	
 	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);
-	panelWithToolBars.add(toolbarZoom,FlowLayout.LEFT);
+	panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
 	
 	getContentPane().add(panelWithToolBars,BorderLayout.PAGE_START);
     }
@@ -209,10 +195,12 @@ public class MainWindow extends JFrame implements ItemListener{
     }
     public void createCanvas(){
 	
-	canvas = new Canvas();
+	canvas = new Canvas(svgListeners);
 	canvas.setBackground(Color.white);
 	
 	getContentPane().add(canvas,BorderLayout.CENTER);
+	//line only for accelerate tests
+	canvas.setURI("file:./MapWorld.svg");
     }
     
     private void openFileChoserWindow(){
@@ -234,15 +222,22 @@ public class MainWindow extends JFrame implements ItemListener{
 	if(retour == JFileChooser.APPROVE_OPTION) {
 	    try {
 		    File f =chooser.getSelectedFile();
+		    //we have 2 ways to loading svg documnets
+		    //1.
 		    //SVGDocument doc = SVGLoader.getSVGDocumentFromFile(f);
 		    //if(doc !=null)
-			//canvas.setDocument(doc);
+		    //canvas.setDocument(doc);
+		    //2.
 		    canvas.setURI(f.toURI().toString());
 		    
 	    } catch (Exception e1) {
 		    e1.printStackTrace();
 	    }
 	}
+    }
+
+    protected StatusPanel getStatusPanel() {
+	return statusPanel;
     }
     
     public class OpenSVGFiletAction extends AbstractAction {
@@ -269,7 +264,7 @@ public class MainWindow extends JFrame implements ItemListener{
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
         public void actionPerformed(ActionEvent e) {
-	              
+	    canvas.zoomFromCenterDocumnet(true);      
         }
     }
     
@@ -283,7 +278,35 @@ public class MainWindow extends JFrame implements ItemListener{
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
         public void actionPerformed(ActionEvent e) {
-	              
+	    canvas.zoomFromCenterDocumnet(false);
+        }
+    }
+    
+    public class ZoomAction extends AbstractAction {
+        public ZoomAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+	    putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
+        }
+        public void actionPerformed(ActionEvent e) {
+	    ToolBarButton button = (ToolBarButton)e.getSource();
+	    boolean selected = button.isSelectedButton();	    
+	    System.out.println(""+selected);
+	    if(selected){
+		canvas.zoomFromMouseCoordinationEnable(!selected);
+		button.setSelected(!selected);
+		if(MainConfiguration.getMode())
+		    System.out.println("Zoom Disabled");		    
+	    }else{
+		canvas.zoomFromMouseCoordinationEnable(!selected);
+		button.setSelected(!selected);
+		if(MainConfiguration.getMode())
+		    System.out.println("Zoom Enabled");
+	    }
+	    
         }
     }
     
@@ -308,7 +331,7 @@ public class MainWindow extends JFrame implements ItemListener{
         if (mi == cbmOptionsForToolBars[0]) {
             toolBarFile.setVisible(selected);
         } else if (mi == cbmOptionsForToolBars[1]) {
-            toolbarZoom.setVisible(selected);
+            toolBarZoom.setVisible(selected);
         } else if (mi == cbmOptionsForToolBars[2]) {
             panelWithToolBars.setVisible(selected);
 	    cbmOptionsForToolBars[0].setEnabled(selected);
