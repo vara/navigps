@@ -71,7 +71,7 @@ public class MainWindow extends JFrame implements ItemListener{
     
     private void initComponents()
     {
-	openSVGFiletAction = new OpenSVGFiletAction("Open SVG document ...", 
+	openSVGFiletAction = new OpenSVGFileAction("Open SVG document ...", 
 				    createNavigationIcon("open16"), "Open SVG Document",
 				    KeyEvent.VK_O);
 	zoomInAction = new ZoomInAction("Zoom In", 
@@ -240,8 +240,8 @@ public class MainWindow extends JFrame implements ItemListener{
 	return statusPanel;
     }
     
-    public class OpenSVGFiletAction extends AbstractAction {
-        public OpenSVGFiletAction(String text, ImageIcon icon,
+    public class OpenSVGFileAction extends AbstractAction {
+        public OpenSVGFileAction(String text, ImageIcon icon,
                            String desc, Integer mnemonic) {
             super(text, icon);
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
