@@ -5,7 +5,7 @@
 
 package app;
 
-import app.gui.MainWindow;
+import app.gui.MainWindowIWD;
 import config.MainConfiguration;
 import javax.swing.SwingUtilities;
 
@@ -29,8 +29,8 @@ public class Main {
     public static void initGui(final Main m)
     {
 	SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {		
-		new MainWindow(m);		
+	    public void run() {			
+		new MainWindowIWD(m);
 	    }
 	});
     }

@@ -12,10 +12,13 @@ import app.utils.MyFileFilter;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -24,27 +27,60 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
+import java.io.IOException;
+import java.io.ObjectInputStream;
+import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
+import java.net.URL;
+import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
+import javax.swing.BoxLayout;
+import javax.swing.Icon;
 import javax.swing.ImageIcon;
+import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
+import javax.swing.JScrollPane;
+import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import net.infonode.docking.DockingWindow;
+import net.infonode.docking.DockingWindowAdapter;
+import net.infonode.docking.FloatingWindow;
+import net.infonode.docking.OperationAbortedException;
+import net.infonode.docking.RootWindow;
+import net.infonode.docking.SplitWindow;
+import net.infonode.docking.TabWindow;
+import net.infonode.docking.View;
+import net.infonode.docking.ViewSerializer;
+import net.infonode.docking.WindowBar;
+import net.infonode.docking.mouse.DockingWindowActionMouseButtonListener;
+import net.infonode.docking.properties.RootWindowProperties;
+import net.infonode.docking.theme.DockingWindowsTheme;
+import net.infonode.docking.theme.ShapedGradientDockingTheme;
+import net.infonode.docking.util.DockingUtil;
+import net.infonode.docking.util.MixedViewHandler;
+import net.infonode.docking.util.ViewMap;
+import net.infonode.util.Direction;
+import org.apache.batik.swing.JSVGCanvas;
 
 /**
  *
  * @author vara
  */
-public class MainWindow extends JFrame implements ItemListener{
+public class MainWindowIWD extends JFrame implements ItemListener{
 
+    
     private Main core;
     
     private JPanel panelWithToolBars;
@@ -55,18 +91,43 @@ public class MainWindow extends JFrame implements ItemListener{
     private JToolBar toolBarFile,toolBarZoom;
     private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
     
-    public MainWindow(Main c)
-    {
+    private RootWindow rootWindow;
+    private ViewMap viewMap = new ViewMap();//key -int i object -View
+    private DockingWindowsTheme currentTheme = new ShapedGradientDockingTheme();
+    private RootWindowProperties properties = new RootWindowProperties();
+    
+    private View[] views = new View[3];
+    private static int ICON_SIZE = 8;
+    private HashMap dynamicViews = new HashMap();
+    private JMenuItem[] viewItems = new JMenuItem[views.length];
+    
+    
+    
+    private static class DynamicView extends View {
+	
+	private int id;
+	
+	DynamicView(String title, Icon icon, Component component, int id) {
+	  super(title, icon, component);
+	  this.id = id;
+	}
+	
+	public int getId() {
+	  return id;
+	}
+    }
+    
+    public MainWindowIWD(Main c){
+	
 	core = c;
 	setSize(MainConfiguration.getScreenSize());	
 	setLayout(new BorderLayout());
 	
 	initComponents();
 	
-	setTitle("NaviGPS ver. 0.2");
+	setTitle("NaviGPS ver. 0.3");
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setVisible(true);
-	
     }
     
     private void initComponents()
@@ -87,18 +148,115 @@ public class MainWindow extends JFrame implements ItemListener{
 				    "Zoom from svg coordinate (in/out Left/Right Mouse Key)", 
 				    KeyEvent.VK_Z);
 	
-		
+	//init docking RootWindow
+	createRootWindow();
+	setDefaultLayout();
+	
+	 
+	getContentPane().add(rootWindow, BorderLayout.CENTER);    
+    
+	
 	creatToolBars();	//must be before creatMenuBar()
 	creatMenuBar();
 	createStatusPanel();	//must be before createCanvasPanel() 
-	createCanvas();
+	//createCanvas();
     }
-  
+    
+    private void setDefaultLayout() {
+	TabWindow tabWindow = new TabWindow(views);
+	
+	SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(new View[]{views[1]}),views[2]);
+	rootWindow.setWindow(new SplitWindow(true,0.2f,splitWindow,tabWindow));
+	
+	WindowBar windowBar = rootWindow.getWindowBar(Direction.DOWN);
+
+	while (windowBar.getChildWindowCount() > 0)
+	  windowBar.getChildWindow(0).close();
+
+	windowBar.addTab(views[2]);
+    }
+    private void createRootWindow() {
+    
+	views[0] = new View("SVG Document", VIEW_ICON, createCanvas());
+	views[1] = new View("Properties " + 1, VIEW_ICON, createViewComponent("View " + 1));
+	views[2] = new View("Result return by funktions (only admin users)",VIEW_ICON,createViewComponent("View " + 2));
+	
+	viewMap.addView(0, views[0]);
+	viewMap.addView(1, views[1]);
+	viewMap.addView(2, views[2]);
+	
+	JButton button = new JButton(BUTTON_ICON);
+	button.setOpaque(false);
+	button.setBorder(null);
+	button.setFocusable(false);
+	button.addActionListener(new ActionListener() {
+	  public void actionPerformed(ActionEvent e) {
+	    
+	      JOptionPane.showMessageDialog(getOwner(),
+					  "You clicked the custom view button.",
+					  "Custom View Button",
+					  JOptionPane.INFORMATION_MESSAGE);
+	    }
+	});
+	views[2].getCustomTabComponents().add(button);
+	
+	// The mixed view map makes it easy to mix static and dynamic views inside the same root window
+	//MixedViewHandler handler = new MixedViewHandler(viewMap, new ViewSerializer() {
+	//  public void writeView(View view, ObjectOutputStream out) throws IOException {
+	//    out.writeInt(((DynamicView) view).getId());
+	//  }
+
+	//  public View readView(ObjectInputStream in) throws IOException {
+	//    return getDynamicView(in.readInt());
+	//  }
+	//});
+	//rootWindow = DockingUtil.createRootWindow(viewMap,handler,true);
+	
+	rootWindow = DockingUtil.createRootWindow(viewMap,true);
+	//rootWindow.add(createCanvas(),BorderLayout.CENTER);
+	// Set gradient theme. The theme properties object is the super object of our properties object, which
+	// means our property value settings will override the theme values
+	properties.addSuperObject(currentTheme.getRootWindowProperties());	
+	
+	// Our properties object is the super object of the root window properties object, so all property values of the
+	// theme and in our property object will be used by the root window
+	rootWindow.getRootWindowProperties().addSuperObject(properties);
+	
+	//Enable the bottom window bar
+	rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
+
+	rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
+	freezeLayout(true);
+    }
+    
+    private void freezeLayout(boolean freeze) {
+	// Freeze window operations
+	properties.getDockingWindowProperties().setDragEnabled(!freeze);
+	properties.getDockingWindowProperties().setCloseEnabled(!freeze);
+	properties.getDockingWindowProperties().setMinimizeEnabled(!freeze);
+	properties.getDockingWindowProperties().setRestoreEnabled(!freeze);
+	properties.getDockingWindowProperties().setMaximizeEnabled(!freeze);
+	properties.getDockingWindowProperties().setUndockEnabled(!freeze);
+	properties.getDockingWindowProperties().setDockEnabled(!freeze);
+
+    }
+    
+    //only for test
+    private static JComponent createViewComponent(String text) {
+	StringBuffer sb = new StringBuffer();
+
+	for (int j = 0; j < 100; j++)
+	  sb.append(text + ". This is line " + j + "\n");
+	JTextArea jta = new JTextArea(sb.toString());
+	jta.setEditable(false);
+	return new JScrollPane(jta);
+    }//only for test
+    
     protected static ImageIcon createNavigationIcon(String imageName) {
         String imgLocation = "resources/graphics/icons/"
                              + imageName
                              + ".png";
-        java.net.URL imageURL = MainWindow.class.getResource(imgLocation);
+        URL imageURL = MainWindowIWD.class.getResource(imgLocation);
 
         if (imageURL == null) {
             System.err.println("Resource not found: "
@@ -120,6 +278,7 @@ public class MainWindow extends JFrame implements ItemListener{
     public void creatToolBars(){
     
 	panelWithToolBars = new JPanel(new FlowLayout(0,0,0)){
+	    @Override
 	    public void paintComponent(Graphics g){
 		super.paintComponent(g);
 		final Graphics2D g2 = (Graphics2D) g;	    
@@ -193,14 +352,15 @@ public class MainWindow extends JFrame implements ItemListener{
 	jmb.add(menuView);
 	setJMenuBar(jmb);	
     }
-    public void createCanvas(){
+    public JSVGCanvas createCanvas(){
 	
 	canvas = new Canvas(svgListeners);
 	canvas.setBackground(Color.white);
 	
-	getContentPane().add(canvas,BorderLayout.CENTER);
+	//getContentPane().add(canvas,BorderLayout.CENTER);
 	//line only for accelerate tests
 	//canvas.setURI("file:./MapWorld.svg");
+	return canvas;
     }
     
     private void openFileChoserWindow(){
@@ -240,75 +400,7 @@ public class MainWindow extends JFrame implements ItemListener{
 	return statusPanel;
     }
     
-    public class OpenSVGFileAction extends AbstractAction {
-        public OpenSVGFileAction(String text, ImageIcon icon,
-                           String desc, Integer mnemonic) {
-            super(text, icon);
-            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
-            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-        }
-        public void actionPerformed(ActionEvent e) {
-	    openFileChoserWindow();
-	}
-    }
     
-    public class ZoomInAction extends AbstractAction {
-        public ZoomInAction(String text, ImageIcon icon,
-                           String desc, Integer mnemonic) {
-            super(text, icon);
-            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
-            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-        }
-        public void actionPerformed(ActionEvent e) {
-	    canvas.zoomFromCenterDocumnet(true);      
-        }
-    }
-    
-    public class ZoomOutAction extends AbstractAction {
-        public ZoomOutAction(String text, ImageIcon icon,
-                           String desc, Integer mnemonic) {
-            super(text, icon);
-            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
-            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-        }
-        public void actionPerformed(ActionEvent e) {
-	    canvas.zoomFromCenterDocumnet(false);
-        }
-    }
-    
-    public class ZoomAction extends AbstractAction {
-        public ZoomAction(String text, ImageIcon icon,
-                           String desc, Integer mnemonic) {
-            super(text, icon);
-            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
-            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-        }
-        public void actionPerformed(ActionEvent e) {
-	    ToolBarButton button = (ToolBarButton)e.getSource();
-	    boolean selected = button.isSelectedButton();	    
-	    System.out.println(""+selected);
-	    if(selected){
-		canvas.zoomFromMouseCoordinationEnable(!selected);
-		button.setSelected(!selected);
-		if(MainConfiguration.getMode())
-		    System.out.println("Zoom Disabled");		    
-	    }else{
-		canvas.zoomFromMouseCoordinationEnable(!selected);
-		button.setSelected(!selected);
-		if(MainConfiguration.getMode())
-		    System.out.println("Zoom Enabled");
-	    }
-	    
-        }
-    }
     
     public void exitApp(){
 	System.exit(0);
@@ -338,5 +430,116 @@ public class MainWindow extends JFrame implements ItemListener{
 	    cbmOptionsForToolBars[1].setEnabled(selected);
 	
 	}
+    }
+    
+    private static final Icon BUTTON_ICON = new Icon() {
+	public int getIconHeight() {
+	  return ICON_SIZE;
+	}
+
+	public int getIconWidth() {
+	  return ICON_SIZE;
+	}
+
+	public void paintIcon(Component c, Graphics g, int x, int y) {
+	  Color oldColor = g.getColor();
+
+	  g.setColor(Color.BLACK);
+	  g.fillOval(x, y, ICON_SIZE, ICON_SIZE);
+
+	  g.setColor(oldColor);
+	}
+    };
+    
+    private static final Icon VIEW_ICON = new Icon() {
+	public int getIconHeight() {
+	  return ICON_SIZE;
+	}
+
+	public int getIconWidth() {
+	  return ICON_SIZE;
+	}
+
+	public void paintIcon(Component c, Graphics g, int x, int y) {
+	  Color oldColor = g.getColor();
+
+	  g.setColor(new Color(70, 70, 70));
+	  g.fillRect(x, y, ICON_SIZE, ICON_SIZE);
+
+	  g.setColor(new Color(100, 230, 100));
+	  g.fillRect(x + 1, y + 1, ICON_SIZE - 2, ICON_SIZE - 2);
+
+	  g.setColor(oldColor);
+	}
+    };
+    
+    private class OpenSVGFileAction extends AbstractAction {
+        public OpenSVGFileAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+	    putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
+        }
+        public void actionPerformed(ActionEvent e) {
+	    openFileChoserWindow();
+	}
+    }
+    
+    private class ZoomInAction extends AbstractAction {
+        public ZoomInAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+	    putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
+        }
+        public void actionPerformed(ActionEvent e) {
+	    canvas.zoomFromCenterDocumnet(true);      
+        }
+    }
+    
+    private class ZoomOutAction extends AbstractAction {
+        public ZoomOutAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+	    putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
+        }
+        public void actionPerformed(ActionEvent e) {
+	    canvas.zoomFromCenterDocumnet(false);
+        }
+    }
+    
+    private class ZoomAction extends AbstractAction {
+        public ZoomAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+	    putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
+        }
+        public void actionPerformed(ActionEvent e) {
+	    ToolBarButton button = (ToolBarButton)e.getSource();
+	    boolean selected = button.isSelectedButton();	    
+	    System.out.println(""+selected);
+	    if(selected){
+		canvas.zoomFromMouseCoordinationEnable(!selected);
+		button.setSelected(!selected);
+		if(MainConfiguration.getMode())
+		    System.out.println("Zoom Disabled");		    
+	    }else{
+		canvas.zoomFromMouseCoordinationEnable(!selected);
+		button.setSelected(!selected);
+		if(MainConfiguration.getMode())
+		    System.out.println("Zoom Enabled");
+	    }
+	    
+        }
     }
 }
