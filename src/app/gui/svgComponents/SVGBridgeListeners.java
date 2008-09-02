@@ -25,7 +25,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     private String absoluteFilePath="";
     
     public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
-	
+	setRederingStatus(true);
 	setTextToCurrentStatus("Document Loading Started ...");
     }
 
