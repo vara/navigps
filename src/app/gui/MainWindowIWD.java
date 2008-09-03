@@ -8,17 +8,16 @@ package app.gui;
 import app.Main;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGBridgeListeners;
+import app.gui.svgComponents.SVGScrollPane;
 import app.utils.MyFileFilter;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -27,16 +26,11 @@ import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
 import java.io.File;
-import java.io.IOException;
-import java.io.ObjectInputStream;
-import java.io.ObjectOutputStream;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
-import java.util.HashMap;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.BoxLayout;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -44,7 +38,6 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
-import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
@@ -54,22 +47,16 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import net.infonode.docking.DockingWindow;
-import net.infonode.docking.DockingWindowAdapter;
-import net.infonode.docking.FloatingWindow;
-import net.infonode.docking.OperationAbortedException;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
 import net.infonode.docking.View;
-import net.infonode.docking.ViewSerializer;
 import net.infonode.docking.WindowBar;
 import net.infonode.docking.mouse.DockingWindowActionMouseButtonListener;
 import net.infonode.docking.properties.RootWindowProperties;
 import net.infonode.docking.theme.DockingWindowsTheme;
 import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.util.DockingUtil;
-import net.infonode.docking.util.MixedViewHandler;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
 import org.apache.batik.swing.JSVGCanvas;
@@ -85,7 +72,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     private JPanel panelWithToolBars;
     private StatusPanel statusPanel;
-    private Action openSVGFiletAction,zoomOutAction,zoomInAction,zoomAction;
+    private Action openSVGFiletAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction;
     private Canvas canvas;
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
     private JToolBar toolBarFile,toolBarZoom;
@@ -98,8 +85,6 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     private View[] views = new View[3];
     private static int ICON_SIZE = 8;
-    private HashMap dynamicViews = new HashMap();
-    private JMenuItem[] viewItems = new JMenuItem[views.length];
     
     
     
@@ -147,6 +132,11 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 				    createNavigationIcon("zoom16"), 
 				    "Zoom from svg coordinate (in/out Left/Right Mouse Key)", 
 				    KeyEvent.VK_Z);
+	fitToPanelAction = new FitToPanelAction("Fit to Panel",
+				    createNavigationIcon("fitToPanel16"),
+				    "Center your svg map",
+				    KeyEvent.VK_F);
+	
 	
 	//init docking RootWindow
 	createRootWindow();
@@ -177,7 +167,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     }
     private void createRootWindow() {
     
-	views[0] = new View("SVG Document", VIEW_ICON, createCanvas());
+	views[0] = new View("SVG Document", VIEW_ICON, createCanvasWithScrollPane());
 	views[1] = new View("Properties " + 1, VIEW_ICON, createViewComponent("View " + 1));
 	views[2] = new View("Result return by funktions (only admin users)",VIEW_ICON,createViewComponent("View " + 2));
 	
@@ -264,6 +254,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             return null;
         } else {
             return new ImageIcon(imageURL);
+	   
         }
     }
     
@@ -302,9 +293,11 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		
 	toolBarZoom.add(new ToolBarButton(zoomAction, 
 					  createNavigationIcon("zoom32"),true));
-	
-	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);
+	toolBarZoom.add(new ToolBarButton(zoomAction, 
+					  createNavigationIcon("fitToPanel32")));
+		
 	panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
+	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);
 	
 	getContentPane().add(panelWithToolBars,BorderLayout.PAGE_START);
     }
@@ -322,6 +315,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	});
 	JMenuItem itemZoomIn = new JMenuItem(zoomInAction);
 	JMenuItem itemZoomOut = new JMenuItem(zoomOutAction);
+	JMenuItem itemfitToPanel = new JMenuItem(fitToPanelAction);
 	
 	JMenu menuFile = new JMenu("File");
 	JMenu menuView = new JMenu("View");
@@ -344,6 +338,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	menuFile.add(itemExit);
 	menuView.add(itemZoomIn);
 	menuView.add(itemZoomOut);
+	menuView.add(itemfitToPanel);
 	menuView.addSeparator();
 	menuView.add(subMenuForToolBarOptions);
 	
@@ -352,7 +347,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	jmb.add(menuView);
 	setJMenuBar(jmb);	
     }
-    public JSVGCanvas createCanvas(){
+    public Canvas createCanvas(){
 	
 	canvas = new Canvas(svgListeners);
 	canvas.setBackground(Color.white);
@@ -361,6 +356,12 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	//line only for accelerate tests
 	//canvas.setURI("file:./MapWorld.svg");
 	return canvas;
+    }
+    
+    public SVGScrollPane createCanvasWithScrollPane(){
+	if(canvas == null)
+	    return new SVGScrollPane(createCanvas());
+	return new SVGScrollPane(canvas);
     }
     
     private void openFileChoserWindow(){
@@ -540,6 +541,20 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		    System.out.println("Zoom Enabled");
 	    }
 	    
+        }	
+    }
+    
+    private class FitToPanelAction extends AbstractAction {
+        public FitToPanelAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+	    putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
+        public void actionPerformed(ActionEvent e) {
+	    	    
+        }	
     }
 }
