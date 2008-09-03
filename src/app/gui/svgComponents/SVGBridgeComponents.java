@@ -11,7 +11,7 @@ import javax.swing.JLabel;
  *
  * @author vara
  */
-public class SVGBridgeComponents implements LetComponetsOfLoadingDoc{
+public class SVGBridgeComponents implements LetComponentsOfChangedDoc{
 
     private JLabel currentStatus = new JLabel("Choose Documnet");
     private JLabel mousePosOnSvgComponent = new JLabel("no documnet",JLabel.CENTER);

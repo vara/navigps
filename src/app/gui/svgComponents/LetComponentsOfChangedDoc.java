@@ -11,7 +11,7 @@ import javax.swing.JLabel;
  *
  * @author vara
  */
-public interface LetComponetsOfLoadingDoc {
+public interface LetComponentsOfChangedDoc {
 
     JLabel getLabelWithCurrentStatus();
     JLabel getLabelWithPosOnSvgComponent();
