@@ -6,7 +6,10 @@
 package app;
 
 import app.gui.MainWindowIWD;
+import app.utils.MyLogger;
 import config.MainConfiguration;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -17,6 +20,9 @@ public class Main {
  
     
     public Main(){	
+	MyLogger mlogger = new MyLogger();
+	Logger log = mlogger.getLogger();
+	log.log(Level.FINE,"test log");
 	
     }
     
