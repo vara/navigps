@@ -9,6 +9,7 @@ import app.Main;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGBridgeListeners;
 import app.gui.svgComponents.SVGScrollPane;
+import app.utils.JTextPaneForVerboseInfo;
 import app.utils.MyFileFilter;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
@@ -29,13 +30,14 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.ListIterator;
+import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -43,10 +45,10 @@ import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import net.infonode.docking.DockingWindow;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
@@ -59,7 +61,6 @@ import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
-import org.apache.batik.swing.JSVGCanvas;
 
 /**
  *
@@ -77,13 +78,14 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
     private JToolBar toolBarFile,toolBarZoom;
     private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
+    private JTextPaneForVerboseInfo verbosePane = new JTextPaneForVerboseInfo();
     
     private RootWindow rootWindow;
     private ViewMap viewMap = new ViewMap();//key -int i object -View
     private DockingWindowsTheme currentTheme = new ShapedGradientDockingTheme();
     private RootWindowProperties properties = new RootWindowProperties();
     
-    private View[] views = new View[3];
+    private Vector <View> views = new Vector<View>();
     private static int ICON_SIZE = 8;
     
     
@@ -153,42 +155,64 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     }
     
     private void setDefaultLayout() {
-	TabWindow tabWindow = new TabWindow(views);
 	
-	SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(new View[]{views[1]}),views[2]);
+	View[] viewsTabDockingWindow = new View[views.size()];
+	for (int i = 0; i < viewsTabDockingWindow.length; i++) {
+	    viewsTabDockingWindow[i] = views.get(i);	    
+	}
+	
+	TabWindow tabWindow = new TabWindow(viewsTabDockingWindow);
+	int minus=0;
+	if(MainConfiguration.getMode())
+	    minus =2;//first and last window (CanvasWindow and DebugWindow)
+	else
+	    minus=1; //only first window
+	
+	View [] splitTab = new View[views.size()-minus];
+	
+	//only windows on left side
+	for (int i = 0; i < viewsTabDockingWindow.length-minus; i++) {
+	    splitTab[i]= viewsTabDockingWindow[i+1];	    
+	}
+	
+	SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(splitTab),views.lastElement());
 	rootWindow.setWindow(new SplitWindow(true,0.2f,splitWindow,tabWindow));
+	rootWindow.setPopupMenuFactory(null);
+	if(MainConfiguration.getMode()){
+	    WindowBar windowBar = rootWindow.getWindowBar(Direction.DOWN);
+	    windowBar.addTab(views.lastElement());
+	}
 	
-	WindowBar windowBar = rootWindow.getWindowBar(Direction.DOWN);
-
-	while (windowBar.getChildWindowCount() > 0)
-	  windowBar.getChildWindow(0).close();
-
-	windowBar.addTab(views[2]);
     }
     private void createRootWindow() {
     
-	views[0] = new View("SVG Document", VIEW_ICON, createCanvasWithScrollPane());
-	views[1] = new View("Properties " + 1, VIEW_ICON, createViewComponent("View " + 1));
-	views[2] = new View("Result return by funktions (only admin users)",VIEW_ICON,createViewComponent("View " + 2));
-	
-	viewMap.addView(0, views[0]);
-	viewMap.addView(1, views[1]);
-	viewMap.addView(2, views[2]);
-	
-	JButton button = new JButton(BUTTON_ICON);
-	button.setOpaque(false);
-	button.setBorder(null);
-	button.setFocusable(false);
-	button.addActionListener(new ActionListener() {
-	  public void actionPerformed(ActionEvent e) {
+	//main window should always be first
+	views.add(new View("SVG Document", VIEW_ICON, createCanvasWithScrollPane()) );
+	views.add(new View("Properties " + 1, VIEW_ICON, new JTextArea()));
+	//views.add(new View("Properties " + 2, VIEW_ICON, new JTextArea()));
+
+	if(MainConfiguration.getMode()){
+	    View vv = new View("Result return by functions",VIEW_ICON,verbosePane);
+	    JButton button = new JButton(BUTTON_ICON);
+	    button.setOpaque(false);
+	    button.setBorder(null);
+	    button.setFocusable(false);
+	    button.addActionListener(new ActionListener() {
+	    public void actionPerformed(ActionEvent e) {
 	    
-	      JOptionPane.showMessageDialog(getOwner(),
+		JOptionPane.showMessageDialog(getOwner(),
 					  "You clicked the custom view button.",
 					  "Custom View Button",
 					  JOptionPane.INFORMATION_MESSAGE);
-	    }
-	});
-	views[2].getCustomTabComponents().add(button);
+		}
+	    });
+	    
+	    vv.getCustomTabComponents().add(button);
+	    views.add(vv);
+	}
+	for(int i=0;i<views.size();i++){
+	    viewMap.addView(i, views.get(i));
+	}	
 	
 	// The mixed view map makes it easy to mix static and dynamic views inside the same root window
 	//MixedViewHandler handler = new MixedViewHandler(viewMap, new ViewSerializer() {
@@ -230,17 +254,6 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	properties.getDockingWindowProperties().setDockEnabled(!freeze);
 
     }
-    
-    //only for test
-    private static JComponent createViewComponent(String text) {
-	StringBuffer sb = new StringBuffer();
-
-	for (int j = 0; j < 100; j++)
-	  sb.append(text + ". This is line " + j + "\n");
-	JTextArea jta = new JTextArea(sb.toString());
-	jta.setEditable(false);
-	return new JScrollPane(jta);
-    }//only for test
     
     protected static ImageIcon createNavigationIcon(String imageName) {
         String imgLocation = "resources/graphics/icons/"
