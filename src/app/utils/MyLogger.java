@@ -17,7 +17,7 @@ import java.util.logging.SimpleFormatter;
  */
 public class MyLogger{
 
-    private Logger log = Logger.getLogger("navigps");
+    public static Logger log = Logger.getLogger("navigps");
     private FileHandler fh;
     
     public MyLogger(){
@@ -27,7 +27,7 @@ public class MyLogger{
 	    fh = new FileHandler("./navigps.log", true);	   
 	    log.addHandler(fh);
 	    log.setLevel(Level.ALL);
-	    SimpleFormatter formatter = new SimpleFormatter();
+	    SimpleFormatter formatter = new SimpleFormatter();	    
 	    fh.setFormatter(formatter);
 	    
 	} catch (IOException ex) {
@@ -36,6 +36,5 @@ public class MyLogger{
 	    ex.printStackTrace();
 	}
 	
-    }
-    public Logger getLogger(){ return log;}
+    }    
 }

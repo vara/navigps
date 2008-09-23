@@ -5,8 +5,9 @@
 
 package app.utils;
 
+import app.gui.svgComponents.UpdateComponentsAdapter;
+import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.text.BadLocationException;
@@ -30,6 +31,8 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
     
     private SimpleAttributeSet attributes;
     
+    private DocumentStatus pipe = new DocumentStatus();
+    
     public JTextPaneForVerboseInfo(){
 	StyleContext context = new StyleContext();
 	doc = new DefaultStyledDocument(context);
@@ -52,18 +55,30 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
 	add(text);	
 	text.setEditable(false);	
 	setViewportView(text);	
+	setAutoscrolls(true);
     }
     public JTextPane getTextEditor(){return text;}
     
-    public void addEndTextnl(String str){
+    public synchronized void addEndTextnl(String str){
+	
 	try {
-
-	    //Logger.getLogger("navigps").log(Level.SEVERE, null, str);
+	    
 	    doc.setParagraphAttributes(doc.getLength(), 1, attributes, false);
 	    doc.insertString(doc.getLength(), str+"\n", attributes);
+	    
 	} catch (BadLocationException ex) {
-	    Logger.getLogger("navigps").log(Level.SEVERE, null, ex);
+	    MyLogger.log.logp(Level.WARNING,getClass().getName(),"addEndTextnl(String str)","str \""+str+"\"",ex);
+	    
+	}	
+    }
+    public DocumentStatus getInforamtionPipe()
+    {
+	return pipe;
+    }
+    protected class DocumentStatus extends UpdateComponentsAdapter{
+	@Override
+	public void currentStatusChanged(String str){
+	    addEndTextnl(str);
 	}
-	
     }
 }

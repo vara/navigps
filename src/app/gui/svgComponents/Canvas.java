@@ -8,20 +8,17 @@ package app.gui.svgComponents;
 import app.utils.Utils;
 import config.MainConfiguration;
 import config.SVGConfiguration;
-import java.awt.AWTException;
 import java.awt.Cursor;
-import java.awt.HeadlessException;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JLabel;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
+import org.apache.batik.swing.JSVGScrollPane;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -69,6 +66,7 @@ public class Canvas extends JSVGCanvas{
 		
 	//setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
 	setDocumentState(Canvas.ALWAYS_STATIC);
+	setRecenterOnResize(false);
 	setDoubleBuffered(true);
 	
 	addSVGDocumentLoaderListener(listeners);	    
@@ -80,10 +78,11 @@ public class Canvas extends JSVGCanvas{
         addMouseMotionListener(zoomListener);
 	this.listeners = listeners;
     }
+
     @Override
     public void setURI(String uri){
 	listeners.setAbsoluteFilePath(uri);
-	super.setURI(uri);
+	super.setURI(uri);	
     }
     public boolean isDocumentSet(){ return (getSVGDocument() != null);}
     
@@ -173,8 +172,7 @@ public class Canvas extends JSVGCanvas{
 	zoomListener.zoomFromCenterDocumnet(zoomIn);
     }
     public void zoomFromMouseCoordinationEnable(boolean setZoom){
-	//resetRenderingTransform();
-	
+		
 	MouseListener[] ml = getMouseListeners();
 	for (MouseListener mouseListener : ml) {
 	    System.out.println(""+mouseListener);	    
@@ -189,7 +187,7 @@ public class Canvas extends JSVGCanvas{
 	    setCursor(Cursor.getDefaultCursor());
 	    removeMouseListener(zoomListener);
 	    //System.out.println("Usunieto listenera");		
-	}
+	}	
     }
     
 }

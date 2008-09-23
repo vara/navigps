@@ -32,9 +32,9 @@ public class ToolBarButton extends JButton implements MouseListener{
 	setIcon(i);
 	setText("");
 	setFocusPainted(false);
-	setBorderPainted(false);	
-	addMouseListener(this);
-	
+	setBorderPainted(false);
+	if(a.isEnabled())
+	    addMouseListener(this);	
     }
     public ToolBarButton(Action a,ImageIcon i,boolean clickable){
 	this(a,i);
@@ -43,32 +43,34 @@ public class ToolBarButton extends JButton implements MouseListener{
     @Override
     public void paintComponent(Graphics g){
 	
-	final Graphics2D g2 = (Graphics2D) g;	
-	int w = getWidth();
-	int h = getHeight();
-	if(isMouseOnButton() || isSelectedButton()){
+	if(isEnabled()){
+	    final Graphics2D g2 = (Graphics2D) g;	
+	    int w = getWidth();
+	    int h = getHeight();
+	    if(isMouseOnButton() || isSelectedButton()){
+
+		GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight()/4,Color.white, 
+							    0.0f, 0.0f, new Color(224,234,255));			    
+		Rectangle rec1 = new Rectangle(0, 0, getWidth(), getHeight()/3);
+		g2.setPaint(gradient1);
+		g2.fill(rec1);
+		// paint lower gradient
+		GradientPaint gradient2 = new GradientPaint(0.0f, (float) getHeight()/3, Color.WHITE,
+							    0.0f, (float) getHeight(), new Color(174,201,255));
+		Rectangle rec2 = new Rectangle(0, getHeight()/3, getWidth(), getHeight());
+		g2.setPaint(gradient2);
+		g2.fill(rec2);
+
+	    }else{
+		g2.setColor(getBackground());
+		g2.fillRect(0, 0, w, h);
+	    }
+	    //g2.fillRect(0, 0, w, h);
+
+	    getIcon().paintIcon(this, g2,(w-getIcon().getIconWidth())/2, (h-getIcon().getIconHeight())/2);
 	    
-	    GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight()/4,Color.white, 
-							0.0f, 0.0f, new Color(224,234,255));			    
-	    Rectangle rec1 = new Rectangle(0, 0, getWidth(), getHeight()/3);
-	    g2.setPaint(gradient1);
-	    g2.fill(rec1);
-	    // paint lower gradient
-	    GradientPaint gradient2 = new GradientPaint(0.0f, (float) getHeight()/3, Color.WHITE,
-							0.0f, (float) getHeight(), new Color(174,201,255));
-	    Rectangle rec2 = new Rectangle(0, getHeight()/3, getWidth(), getHeight());
-	    g2.setPaint(gradient2);
-	    g2.fill(rec2);
-	    
-	}else{
-	    g2.setColor(getBackground());
-	    g2.fillRect(0, 0, w, h);
-	}
-	//g2.fillRect(0, 0, w, h);
-	
-	getIcon().paintIcon(this, g2,(w-getIcon().getIconWidth())/2, (h-getIcon().getIconHeight())/2);
-			
-	//super.paintComponent(g);
+	}else			
+	    super.paintComponent(g);
     }
 
     public void mouseClicked(MouseEvent e) {
@@ -126,5 +128,15 @@ public class ToolBarButton extends JButton implements MouseListener{
 
     protected void setClickableButton(boolean clickableButton) {
 	this.clickableButton = clickableButton;
+    }
+    @Override
+    public void setEnabled(boolean b){
+	super.setEnabled(b);
+	if(b)
+	    addMouseListener(this);
+	else
+	    removeMouseListener(this);
+	
+	System.out.println(getAction().getValue(Action.NAME)+" isEnabled "+b);
     }
 }

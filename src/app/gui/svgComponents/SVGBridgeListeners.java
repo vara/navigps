@@ -11,7 +11,6 @@ import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 import org.apache.batik.swing.svg.GVTTreeBuilderListener;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
-import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -21,8 +20,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
 				SVGDocumentLoaderListener,
 				GVTTreeBuilderListener,
 				GVTTreeRendererListener	{
-    
-    private String absoluteFilePath="";
+            
     
     public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
 	setRederingStatus(true);
@@ -41,12 +39,11 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
 	setTextToCurrentStatus("Document Loading Failed !");
     }
-
-    public void documentLoadingCompleted(GVTTreeBuilderEvent e) {
-	setTextToCurrentStatus("Document Loading Completed");
-    }
-
+    
+    
+    
     public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
+	documentBuildCompleted();
 	setTextToCurrentStatus("Document Build Completed");
     }
 
@@ -58,6 +55,12 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
 	setTextToCurrentStatus("Document Build Failed !");
     }
 
+    public void gvtBuildStarted(GVTTreeBuilderEvent e) {
+	setTextToCurrentStatus("Documnet Build Started");
+    }
+    
+    
+    
     public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
 	setTextToCurrentStatus("Document Rendering Prepare ...");	
     }
@@ -69,7 +72,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
 
     public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
 	
-	setTextToCurrentStatus(absoluteFilePath);
+	setTextToCurrentStatus("Document Rendering Completed");
 	setRederingStatus(false);
     }
 
@@ -81,10 +84,5 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
 	setTextToCurrentStatus("Documnet Rendering Failed !");
     }
 
-    public void gvtBuildStarted(GVTTreeBuilderEvent e) {
-	setTextToCurrentStatus("Documnet Build Started");
-    }
-    public void setAbsoluteFilePath(String path){
-	absoluteFilePath = path;
-    }
+           
 }

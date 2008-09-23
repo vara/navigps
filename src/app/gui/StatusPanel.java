@@ -5,7 +5,7 @@
 
 package app.gui;
 
-import app.gui.svgComponents.LetComponetsOfLoadingDoc;
+import app.gui.svgComponents.LetComponentsOfChangedDoc;
 import app.utils.Utils;
 import java.awt.Color;
 import java.awt.Component;
@@ -29,7 +29,7 @@ public class StatusPanel extends JPanel {
     private JLabel mousePosOnSvgComponent;
     private JLabel pointInSvgDoc;
     
-    public StatusPanel(LetComponetsOfLoadingDoc listeners){
+    public StatusPanel(LetComponentsOfChangedDoc listeners){
 	
 	currentStatus = listeners.getLabelWithCurrentStatus();
 	mousePosOnSvgComponent = listeners.getLabelWithPosOnSvgComponent();

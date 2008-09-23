@@ -7,6 +7,7 @@ package app;
 
 import app.gui.MainWindowIWD;
 import app.utils.MyLogger;
+import app.utils.Utils;
 import config.MainConfiguration;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -17,18 +18,17 @@ import javax.swing.SwingUtilities;
  * @author vara
  */
 public class Main {
- 
     
-    public Main(){	
-	MyLogger mlogger = new MyLogger();
-	Logger log = mlogger.getLogger();
-	log.log(Level.FINE,"test log");
+    public final MyLogger logger = new MyLogger();
+    public Main(){
 	
+	MyLogger.log.log(Level.FINE,"start application");	
     }
     
     public static void main(String[] args) {
         
 	MainConfiguration.setMode(true);
+	//MainConfiguration.setMode(false);
 	Main.initGui(new Main());
     }
 
@@ -37,13 +37,13 @@ public class Main {
 	SwingUtilities.invokeLater(new Runnable() {
 	    public void run() {			
 		new MainWindowIWD(m);
+	
 	    }
 	});
     }
     
     public void reload()
-    {	
-	System.out.println("Reload application ...");
+    {		 
 	initGui(this);
     }
 }

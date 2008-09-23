@@ -16,4 +16,5 @@ public interface LetComponentsOfChangedDoc {
     JLabel getLabelWithCurrentStatus();
     JLabel getLabelWithPosOnSvgComponent();
     JLabel getLabelWithPointInSvgDoc();
+    String getStringWithCurrentStatus();
 }
