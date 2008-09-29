@@ -80,7 +80,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     private JPanel panelWithToolBars;
     private StatusPanel statusPanel;
-    private Action openSVGFiletAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction;
+    private Action openSVGFileAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction;
     private Canvas canvas;
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
     private JToolBar toolBarFile,toolBarZoom;
@@ -114,7 +114,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     private void initComponents()
     {
-	openSVGFiletAction = new OpenSVGFileAction("Open SVG document ...", 
+	openSVGFileAction = new OpenSVGFileAction("Open SVG document ...", 
 				    createNavigationIcon("open16"), "Open SVG Document",
 				    KeyEvent.VK_O);
 	zoomInAction = new ZoomInAction("Zoom In", 
@@ -286,7 +286,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	toolBarFile = new JToolBar("ToolBar File");
 	toolBarZoom = new JToolBar("ToolBar Zoom");
 	
-	toolBarFile.add(new ToolBarButton(openSVGFiletAction, 
+	toolBarFile.add(new ToolBarButton(openSVGFileAction, 
 					  createNavigationIcon("open32")));
 	toolBarZoom.add(new ToolBarButton(zoomInAction, 
 					  createNavigationIcon("zoomIn32")));
@@ -309,7 +309,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	
 	JMenuBar jmb = new JMenuBar();
 	
-	JMenuItem itemFile = new JMenuItem(openSVGFiletAction);
+	JMenuItem itemFile = new JMenuItem(openSVGFileAction);
 	JMenuItem itemExit = new JMenuItem("Exit");
 	itemExit.addActionListener(new ActionListener() {
 	    public void actionPerformed(ActionEvent e) {

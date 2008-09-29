@@ -1,0 +1,96 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+package app.utils.coordinates;
+
+/**
+ *
+ * @author vara
+ */
+public class Ellipsoid implements EllipsedMethods{
+ 
+    /* 
+     * Ellipsoid's name
+     */
+    private String name;
+    
+    /*
+     * Big half axis (semi-major axis)
+     */
+    private double a;
+    
+    /*
+     * Small half axis (semi-minor axis)
+     */
+    private double b;
+    
+    /*
+     * Pin flattening elipsoidy (Reciprocal of flattening)
+     * (pl) Biegunowe spłaszczenie elipsoidy
+     */
+    private double f;
+    
+    /*
+     * first eccentricity 
+     * (pl)(mimosród)
+     */    
+    private double e1;
+    
+    /*
+     * second eccentricity
+     */
+    private double e2;
+    
+    public Ellipsoid(String name,double a,double b)  {
+	this.name = name;
+	this.a = a;
+	this.b = b;
+	this.f = (a-b)/a;	
+	
+	double a2 = Math.pow(a,2);
+	double b2 = Math.pow(b,2);
+	e1 = (a2-b2)/a2;
+	e2 = (a2-b2)/b2;
+	
+	System.out.println("f = "+f+"\n1/f = "+1/f+"\ne1 = "+e1+"\ne2 = "+e2+"\ne1^2 = "+getSquareFirstEccentricity());
+    }
+
+    public String getName() {
+	return name;
+    }
+    
+    public double getInvF() {
+	return 1/getPinFlatteningElipsoidy();
+    }
+
+    public double getSemiMinorAxis() {
+	return b;
+    }
+    
+    public double getSemiMajorAxis() {
+	return a;
+    }
+
+    public double getPinFlatteningElipsoidy() {
+	return f;
+    }
+
+    public double getFirstEccentricity() {
+	return e1;
+    }
+
+    public double getSecondEccentricity() {
+	return e2;
+    }
+
+    public double getSquareFirstEccentricity() {
+	return ( (getPinFlatteningElipsoidy()*2) - Math.pow(getPinFlatteningElipsoidy(),2) );
+    }
+
+    public double getSquareSecondEccentricity() {
+	return ( Math.pow(getSecondEccentricity(),2) / (1-Math.pow(getSecondEccentricity(),2)) );
+    }
+
+}

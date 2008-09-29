@@ -40,7 +40,7 @@ public class MainConfiguration {
     public static void setMode(boolean verbose)
     {
 	if(verbose)
-	   System.out.println("Mode Set loudly ! aaaaaa");
+	   System.out.println("Mode Set loud ! aaaaaa");
 	else
 	    System.out.println("set to silent mode");
 	
