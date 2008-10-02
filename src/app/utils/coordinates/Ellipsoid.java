@@ -51,10 +51,23 @@ public class Ellipsoid implements EllipsedMethods{
 	
 	double a2 = Math.pow(a,2);
 	double b2 = Math.pow(b,2);
-	e1 = (a2-b2)/a2;
-	e2 = (a2-b2)/b2;
 	
-	System.out.println("f = "+f+"\n1/f = "+1/f+"\ne1 = "+e1+"\ne2 = "+e2+"\ne1^2 = "+getSquareFirstEccentricity());
+	e1 = Math.sqrt(a2-b2)/a;
+	e2 = Math.sqrt(a2-b2)/b;
+	
+	/*
+	
+	double e11 = (1-Math.pow((b/a),2));
+	
+	System.out.println("Name "+getName());
+	System.out.println("1. FirstEccentricity "+e1);
+	System.out.println("----------");	
+	System.out.println("1. SquareFirstEccentricity "+getSquareFirstEccentricity());		
+	System.out.println("2. SquareFirstEccentricity "+e11);//1−(b/a)2
+	System.out.println("----------");
+	
+	System.out.println("Name "+getName()+"\nf = "+f+"\n1/f = "+getInvF()+"\ne1 = "+e1+"\ne2 = "+e2+"\ne1^2 = "+getSquareFirstEccentricity());
+	*/
     }
 
     public String getName() {
