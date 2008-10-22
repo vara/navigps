@@ -83,7 +83,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     private Action openSVGFileAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction;
     private Canvas canvas;
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
-    private JToolBar toolBarFile,toolBarZoom;
+    private JToolBar toolBarFile,toolBarZoom,toolBarSerch,toolBarMemMonitor;
     private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
     private JTextPaneForVerboseInfo verbosePane = new JTextPaneForVerboseInfo();
     
@@ -285,6 +285,8 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	
 	toolBarFile = new JToolBar("ToolBar File");
 	toolBarZoom = new JToolBar("ToolBar Zoom");
+	//toolBarSerch = new JToolBar("ToolBar Serch");
+	toolBarMemMonitor = new JToolBar("Memory Monitor");
 	
 	toolBarFile.add(new ToolBarButton(openSVGFileAction, 
 					  createNavigationIcon("open32")));
@@ -297,9 +299,15 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 					  createNavigationIcon("zoom32"),true));
 	toolBarZoom.add(new ToolBarButton(fitToPanelAction, 
 					  createNavigationIcon("fitToPanel32")));
-		
+	
+	//toolBarMemMonitor.setLayout(null);
+	toolBarMemMonitor.add(new MemoryGui());
+	
+	
 	panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
 	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);
+	//panelWithToolBars.add(toolBarSerch,FlowLayout.LEFT);
+	panelWithToolBars.add(toolBarMemMonitor,FlowLayout.LEFT);
 	
 	getContentPane().add(panelWithToolBars,BorderLayout.PAGE_START);
 	
@@ -416,6 +424,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		    //if(doc !=null)
 		    //canvas.setDocument(doc);
 		    //2.
+		    canvas.setDocument(null);		    
 		    canvas.setURI(f.toURI().toString());
 		    views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
 		    	    
@@ -435,6 +444,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	System.exit(0);
     }
     
+    //unused function !!!
     private void reloadMainWindow()
     {
 	setVisible(false);
