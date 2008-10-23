@@ -23,7 +23,13 @@ import org.w3c.dom.svg.SVGMatrix;
  * @author vara
  */
 public class Utils {
-
+    
+    private static final Runtime runtime = Runtime.getRuntime();
+    
+    public static final Runtime getRuntime(){
+	return runtime;
+    }
+    
     public static Border createOutsiderBorder(int top,int left,int bottom,int right,Color colFrame)
     {     
         return BorderFactory.createCompoundBorder(

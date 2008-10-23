@@ -12,6 +12,7 @@ import app.gui.svgComponents.SVGDOMTreeModel;
 import app.gui.svgComponents.SVGDOMTreeRenderer;
 import app.gui.svgComponents.SVGScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
+import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
 import app.utils.JTextPaneForVerboseInfo;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
@@ -19,10 +20,12 @@ import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -38,7 +41,6 @@ import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
-import javax.swing.DebugGraphics;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -86,6 +88,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     private JToolBar toolBarFile,toolBarZoom,toolBarSerch,toolBarMemMonitor;
     private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
     private JTextPaneForVerboseInfo verbosePane = new JTextPaneForVerboseInfo();
+    private UpdateComponentsWhenChangedDoc verboseStream = null;
     
     private RootWindow rootWindow;
     private ViewMap viewMap = new ViewMap();//key -int i object -View
@@ -114,6 +117,8 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     private void initComponents()
     {
+	verboseStream = verbosePane.getInforamtionPipe();
+	
 	openSVGFileAction = new OpenSVGFileAction("Open SVG document ...", 
 				    createNavigationIcon("open16"), "Open SVG Document",
 				    KeyEvent.VK_O);
@@ -135,7 +140,8 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 				    KeyEvent.VK_F);
 	
 	tree.setModel(null);
-	svgListeners.addUpdateComponents(verbosePane.getInforamtionPipe());
+	
+	//svgListeners.addUpdateComponents(getVerboseStream());
 	svgListeners.addUpdateComponents(new UpdateMenuAndToolBars());
 	
 	//init docking RootWindow
@@ -150,6 +156,10 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	creatMenuBar();
 	createStatusPanel();	//must be before createCanvasPanel() 
 	//createCanvas();
+    }
+    
+    public UpdateComponentsWhenChangedDoc getVerboseStream(){
+	return verboseStream;
     }
     
     private void setDefaultLayout() {
@@ -194,8 +204,9 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	if(MainConfiguration.getMode()){
 	    
 	    View vv = new View("Result return by functions",VIEW_ICON,verbosePane);
-	    JButtonActionForDebugWindow button = new JButtonActionForDebugWindow(BUTTON_ICON);	    
-	    vv.getCustomTabComponents().add(button);
+	    vv.getWindowProperties().setRestoreEnabled(false);
+	    JButtonActionForDebugWindow button = new JButtonActionForDebugWindow(BUTTON_ICON);
+	    vv.getCustomTabComponents().add(button);	    
 	    views.add(vv);
 	}
 	for(int i=0;i<views.size();i++){
@@ -286,23 +297,37 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	toolBarFile = new JToolBar("ToolBar File");
 	toolBarZoom = new JToolBar("ToolBar Zoom");
 	//toolBarSerch = new JToolBar("ToolBar Serch");
-	toolBarMemMonitor = new JToolBar("Memory Monitor");
+	toolBarMemMonitor = new JToolBar("Memory Monitor"){
+	    @Override
+	    public void setVisible(boolean b){
+		super.setVisible(b);
+		Component[] comp = getComponents();		
+		for (Component component : comp) {
+		    component.setVisible(b);		    
+		}
+	    }
+	};
 	
 	toolBarFile.add(new ToolBarButton(openSVGFileAction, 
-					  createNavigationIcon("open32")));
+					  createNavigationIcon("open32"),
+					  getVerboseStream()));
 	toolBarZoom.add(new ToolBarButton(zoomInAction, 
-					  createNavigationIcon("zoomIn32")));
+					  createNavigationIcon("zoomIn32"),
+					  getVerboseStream()));
 	toolBarZoom.add(new ToolBarButton(zoomOutAction, 
-					  createNavigationIcon("zoomOut32")));
+					  createNavigationIcon("zoomOut32"),
+					  getVerboseStream()));
 		
 	toolBarZoom.add(new ToolBarButton(zoomAction, 
-					  createNavigationIcon("zoom32"),true));
+					  createNavigationIcon("zoom32"),
+					  getVerboseStream(),true));
 	toolBarZoom.add(new ToolBarButton(fitToPanelAction, 
-					  createNavigationIcon("fitToPanel32")));
-	
+					  createNavigationIcon("fitToPanel32"),
+					  getVerboseStream()));
+	System.out.println(""+toolBarZoom.getInsets());
 	//toolBarMemMonitor.setLayout(null);
-	toolBarMemMonitor.add(new MemoryGui());
-	
+	toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
+	toolBarMemMonitor.setMargin(new Insets(4,0,4,1));
 	
 	panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
 	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);
@@ -332,11 +357,12 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	JMenu menuView = new JMenu("View");
 	JMenu subMenuForToolBarOptions = new JMenu("ToolBars");
 	
-	cbmOptionsForToolBars = new JCheckBoxMenuItem[3];
+	cbmOptionsForToolBars = new JCheckBoxMenuItem[4];
 	
-	cbmOptionsForToolBars[0] = new JCheckBoxMenuItem("File");
-	cbmOptionsForToolBars[1] = new JCheckBoxMenuItem("Zoom");
-	cbmOptionsForToolBars[2] = new JCheckBoxMenuItem("ToolBar");
+	cbmOptionsForToolBars[0] = new JCheckBoxMenuItem("File Open");
+	cbmOptionsForToolBars[1] = new JCheckBoxMenuItem("Zoom Action");	
+	cbmOptionsForToolBars[2] = new JCheckBoxMenuItem("Memory Monitor");
+	cbmOptionsForToolBars[3] = new JCheckBoxMenuItem("ToolBar");
 	
 	for (JCheckBoxMenuItem cb : cbmOptionsForToolBars) {
 	    cb.addItemListener(this);
@@ -352,11 +378,10 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	menuView.add(itemfitToPanel);
 	menuView.addSeparator();
 	menuView.add(subMenuForToolBarOptions);
-	
-	
+		
 	jmb.add(menuFile);
 	jmb.add(menuView);
-	setJMenuBar(jmb);	
+	setJMenuBar(jmb);
     }
     public Canvas createCanvas(){
 	
@@ -468,9 +493,11 @@ public class MainWindowIWD extends JFrame implements ItemListener{
         //Set the enabled state of the appropriate Action.
         if (mi == cbmOptionsForToolBars[0]) {
             toolBarFile.setVisible(selected);
-        } else if (mi == cbmOptionsForToolBars[1]) {
+        } else if (mi == cbmOptionsForToolBars[1]) {	    
             toolBarZoom.setVisible(selected);
-        } else if (mi == cbmOptionsForToolBars[2]) {
+        }else if (mi == cbmOptionsForToolBars[2]) {
+	    toolBarMemMonitor.setVisible(selected);
+	}else if (mi == cbmOptionsForToolBars[3]) {
             panelWithToolBars.setVisible(selected);
 	    cbmOptionsForToolBars[0].setEnabled(selected);
 	    cbmOptionsForToolBars[1].setEnabled(selected);
@@ -580,13 +607,14 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	    if(selected){
 		canvas.zoomFromMouseCoordinationEnable(!selected);
 		button.setSelected(!selected);
-		if(MainConfiguration.getMode())
-		    System.out.println("Zoom Disabled");		    
+		if(MainConfiguration.getMode()&&getVerboseStream()!=null)
+		    getVerboseStream().currentStatusChanged("Zoom Disabled");
 	    }else{
 		canvas.zoomFromMouseCoordinationEnable(!selected);
 		button.setSelected(!selected);
-		if(MainConfiguration.getMode())
-		    System.out.println("Zoom Enabled");
+		if(MainConfiguration.getMode()&&getVerboseStream()!=null)
+		    getVerboseStream().currentStatusChanged("Zoom Enabled");
+		    
 	    }
 	    
         }	
@@ -623,7 +651,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	    verbosePane.addEndTextnl("RenderingTransform \t"+canvas.getRenderingTransform());
 	    verbosePane.addEndTextnl("PaintingTransform  \t"+canvas.getPaintingTransform());
 	    verbosePane.addEndTextnl("Visible Rect       \t"+canvas.getVisibleRect());
-	        
+	    getVerboseStream().currentStatusChanged(panelWithToolBars.getSize()+"");    
 	}
     }
     
@@ -634,6 +662,8 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	    
 	    setComponetsZoomEnable(true);
 	}
+	
+	@Override
 	public void documentClosed(){
 	    
 	    setComponetsZoomEnable(false);
