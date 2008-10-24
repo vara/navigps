@@ -5,7 +5,7 @@
 
 package app.gui;
 
-import app.utils.Utils;
+import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -26,9 +26,13 @@ public class ToolBarButton extends JButton implements MouseListener{
     private boolean mouseOnButton = false;
     private boolean selectedButton = false;
     private boolean clickableButton = false;
-    public ToolBarButton(Action a,ImageIcon i){
+    
+    private UpdateComponentsWhenChangedDoc letOfChange = null;
+    
+    public ToolBarButton(Action a,ImageIcon i,UpdateComponentsWhenChangedDoc l){
 	
-	super(a);	
+	super(a);
+	setLetOfChanged(l);
 	setIcon(i);
 	setText("");
 	setFocusPainted(false);
@@ -36,10 +40,15 @@ public class ToolBarButton extends JButton implements MouseListener{
 	if(a.isEnabled())
 	    addMouseListener(this);	
     }
-    public ToolBarButton(Action a,ImageIcon i,boolean clickable){
-	this(a,i);
+    public ToolBarButton(Action a,ImageIcon i,UpdateComponentsWhenChangedDoc l,boolean clickable){
+	this(a,i,l);
 	setClickableButton(clickable);
     }
+    
+    public void setLetOfChanged(UpdateComponentsWhenChangedDoc l){
+	letOfChange = l;
+    }
+    
     @Override
     public void paintComponent(Graphics g){
 	
@@ -47,6 +56,7 @@ public class ToolBarButton extends JButton implements MouseListener{
 	    final Graphics2D g2 = (Graphics2D) g;	
 	    int w = getWidth();
 	    int h = getHeight();
+	    //System.out.println(""+w+","+h);
 	    if(isMouseOnButton() || isSelectedButton()){
 
 		GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight()/4,Color.white, 
@@ -136,7 +146,8 @@ public class ToolBarButton extends JButton implements MouseListener{
 	    addMouseListener(this);
 	else
 	    removeMouseListener(this);
-	
-	System.out.println(getAction().getValue(Action.NAME)+" isEnabled "+b);
+	if(letOfChange!=null)
+	    letOfChange.currentStatusChanged(getAction().getValue(Action.NAME)+" isEnabled "+b);
     }
+    
 }
