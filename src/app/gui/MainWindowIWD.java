@@ -20,7 +20,6 @@ import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -100,6 +99,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     private JTree tree = new JTree();
     
+    //private MySplitPane paneForProperties = new MySplitPane();
     
     public MainWindowIWD(Main c){
 	

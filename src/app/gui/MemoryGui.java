@@ -4,7 +4,6 @@
  */
 package app.gui;
 
-import app.gui.*;
 import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
 import app.utils.MyLogger;
 import app.utils.Utils;
@@ -36,7 +35,6 @@ import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
-import javax.swing.JLabel;
 import javax.swing.JMenuItem;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;

@@ -5,7 +5,6 @@
 
 package app.gui;
 
-import tests.sercher.*;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
