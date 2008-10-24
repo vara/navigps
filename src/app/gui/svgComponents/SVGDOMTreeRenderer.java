@@ -43,9 +43,13 @@ public class SVGDOMTreeRenderer extends DefaultTreeCellRenderer{
 						  int row,
 						  boolean hasFocus) {
 	Node node = (Node)value;	
-	if(node instanceof Element) return elementPanel((Element)node);
+	//if(node instanceof Element) return elementPanel((Element)node);
+	if(node instanceof Element){
+	    setText("Element "+((Element)node).getTagName());
+	    return this;
+	}
 	super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
-	if(node instanceof CharacterData){
+	/*if(node instanceof CharacterData){
 	   setText(characterString((CharacterData)node));
 	}else if(node instanceof Attr){
 	    setText( "Attr : "+((Attr)node).getValue() );
@@ -59,6 +63,7 @@ public class SVGDOMTreeRenderer extends DefaultTreeCellRenderer{
 	    setText(((ProcessingInstruction)node).getData());
 	}else
 	    setText("Unknown "+node.getClass()+":"+node.toString());
+	 */
 	return this;
     }
     

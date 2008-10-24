@@ -23,11 +23,10 @@ public class SVGBridgeComponents implements LetComponentsOfChangedDoc{
     private LinkedList<UpdateComponentsWhenChangedDoc> updateComponets = 
 			new LinkedList<UpdateComponentsWhenChangedDoc>();
     
-    private String absoluteFilePath="";
-    
+    private String absoluteFilePath="";    
     
 
-    public boolean isRedering() {
+    public boolean isRendering() {
 	return rederingStatus;
     }
     
