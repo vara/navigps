@@ -5,12 +5,7 @@
 
 package app.gui;
 
-import java.awt.Color;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
-import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import javax.swing.Icon;
 import javax.swing.JMenuItem;

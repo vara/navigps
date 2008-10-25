@@ -89,6 +89,10 @@ public class Canvas extends JSVGCanvas{
 	addJGVTComponentListener(search.getDocumentStateChanged());
     }
     
+    public SearchServices getSearchServices(){
+	return search;	
+    }
+    
     @Override
     public void setURI(String uri){
 	listeners.setAbsoluteFilePath(uri);

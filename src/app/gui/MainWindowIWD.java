@@ -7,7 +7,6 @@ package app.gui;
 
 import app.Main;
 import app.gui.svgComponents.Canvas;
-import app.gui.svgComponents.LetComponentsOfChangedDoc;
 import app.gui.svgComponents.SVGBridgeListeners;
 import app.gui.svgComponents.SVGDOMTreeModel;
 import app.gui.svgComponents.SVGDOMTreeRenderer;
@@ -68,6 +67,7 @@ import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
+import odb.gui.ODBManager;
 import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 
@@ -354,6 +354,18 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		exitApp();
 	    }
 	});
+	
+	JMenuItem odbManager = new JMenuItem("ODBManager");
+        odbManager.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                
+                ODBManager odb = new ODBManager();
+                odb.setVisible(true);
+                //throw new UnsupportedOperationException("Unsupported exception!");
+            }
+        });
+	
 	JMenuItem itemZoomIn = new JMenuItem(zoomInAction);
 	JMenuItem itemZoomOut = new JMenuItem(zoomOutAction);
 	JMenuItem itemfitToPanel = new JMenuItem(fitToPanelAction);
@@ -362,6 +374,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	JMenu menuFile = new JMenu("File");
 	JMenu menuView = new JMenu("View");
 	JMenu subMenuForToolBarOptions = new JMenu("ToolBars");
+	JMenu menuODB = new JMenu("Database");
 	
 	cbmOptionsForToolBars = new JCheckBoxMenuItem[5];
 	
@@ -387,9 +400,11 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	menuView.add(itemSearchServices);
 	menuView.addSeparator();
 	menuView.add(subMenuForToolBarOptions);
+	menuODB.add(odbManager);
 		
 	jmb.add(menuFile);
 	jmb.add(menuView);
+	jmb.add(menuODB);
 	setJMenuBar(jmb);
     }
     public Canvas createCanvas(){

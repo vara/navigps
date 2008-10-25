@@ -5,6 +5,7 @@
 
 package app.gui;
 
+import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -21,9 +22,12 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
+import odb.core.SubElementService;
+import odb.inter.ODBridge;
 import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
 import org.apache.batik.swing.JSVGCanvas;
@@ -39,6 +43,7 @@ import org.apache.batik.swing.svg.GVTTreeBuilderListener;
  */
 public class SearchServices extends JComponent implements MouseListener,
 							  MouseMotionListener
+							  
 {
 	
 	private Point.Double centerPoint = new Point.Double(0,0);
@@ -48,46 +53,83 @@ public class SearchServices extends JComponent implements MouseListener,
 	
 	private DocumentStateChangedListener listeners;
 	
+	private UpdateComponentsWhenChangedDoc letOfChanged = null;
+	
+	private boolean enabled = false;
+	
+	private ODBridge odbConnector=null;
+	
+	public SearchServices(UpdateComponentsWhenChangedDoc l){
+	    letOfChanged = l;
+	    init();	    
+	}
 	public SearchServices(){
+	     init();	    
+	}
+	private void init(){
 	    
 	    listeners = new DocumentStateChangedListener();
-	    setBackground(Color.GREEN);
+	}
+	
+	public void setEnabledSerchServices(boolean val){
+	    enabled = val;
+	    setVisible(enabled);
+	    setRadius(0.0);
+	    setCenterPoint(0.0,0.0);
+	    setCurrentPosition(0.0,0.0);
+	    repaint();
+	}
+	public boolean isEnabledSearchServices(){
+	    return enabled;	    
+	}	
+	
+	public void initODBConnector(ODBridge odbb){
+	    odbConnector = odbb;
 	}
 	
 	@Override
 	public void paintComponent(Graphics g){
-	    super.paintComponent(g);
+	    
 	    Graphics2D g2 = (Graphics2D)g;
+	    if(isEnabledSearchServices()){
 	    
-	    g2.setTransform(listeners.getRenderingTransform());
-	    float dash[] = { 10.0f };	    	    
-	    BasicStroke bs = new BasicStroke(1.0f, BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);
-	    Ellipse2D circle = new Ellipse2D.Double(-radius,-radius,radius*2,radius*2);
-	    Ellipse2D centerPiont = new Ellipse2D.Double(centerPoint.x-2,centerPoint.y-2,4,4);
-	    g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);		
-	    g2.setColor(Color.GREEN);		
-	    g2.fill(centerPiont);
-	    g2.setColor(Color.BLACK);		
-	    g2.drawLine((int)centerPoint.x,(int)centerPoint.y,(int)currentPos.x,(int)currentPos.y);		
-	    g2.setStroke(bs);
-	    g2.translate(centerPoint.x,centerPoint.y);		
-	    g2.draw(circle);				
-	    Color c = new Color(0,150,255,100);
-	    g2.setColor(c);
-	    g2.fill(circle);
-	    g2.translate(-centerPoint.x,-centerPoint.y);
-	    
-	    //for test
-	    g2.setColor(Color.BLACK);
-	    g2.setTransform(AffineTransform.getScaleInstance(1,1));
-	    String showCenterPoint = "center point "+getCenterPoint();
-	    String showRadius = "Radius "+getRadius();
-	    String showCurrenPoint = "current point "+getCurrentPosition();
-	    FontRenderContext frc = g2.getFontRenderContext();
-	    Rectangle2D rec = g2.getFont().getMaxCharBounds(frc);
-	    g2.drawString(showCenterPoint,30,15);
-	    g2.drawString(showCurrenPoint,30,(int)(15+5+rec.getHeight()));
-	    g2.drawString(showRadius,30,(int)(15+10+(rec.getHeight()*2)));
+		AffineTransform svgTransform = listeners.getRenderingTransform();
+		g2.setTransform(svgTransform);
+		float dash[] = { 10.0f };	    	    
+		float widthStroke  = (float)(1.0 / svgTransform.getScaleX());
+		BasicStroke bsLine = new BasicStroke(widthStroke);
+		g2.setStroke(bsLine);
+		BasicStroke bsCircle = new BasicStroke(widthStroke, BasicStroke.CAP_BUTT,BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);	    
+		Ellipse2D circle = new Ellipse2D.Double(-radius,-radius,radius*2,radius*2);
+		Ellipse2D centerPiont = new Ellipse2D.Double(centerPoint.x-2,centerPoint.y-2,4,4);
+		g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);		
+		g2.setColor(Color.GREEN);		
+		g2.fill(centerPiont);
+		g2.setColor(Color.BLACK);		
+		g2.drawLine((int)centerPoint.x,(int)centerPoint.y,(int)currentPos.x,(int)currentPos.y);		
+		g2.setStroke(bsCircle);
+		g2.translate(centerPoint.x,centerPoint.y);		
+		g2.draw(circle);				
+		Color c = new Color(0,150,255,100);
+		g2.setColor(c);
+		g2.fill(circle);
+		g2.translate(-centerPoint.x,-centerPoint.y);
+
+		//for test
+		g2.setColor(Color.BLACK);
+		g2.setTransform(AffineTransform.getScaleInstance(1,1));
+		String showCenterPoint = "center point "+getCenterPoint();
+		String showRadius = "Radius "+getRadius();
+		String showCurrenPoint = "current point "+getCurrentPosition();
+		FontRenderContext frc = g2.getFontRenderContext();
+		Rectangle2D rec = g2.getFont().getMaxCharBounds(frc);
+		g2.drawString(showCenterPoint,30,15);
+		g2.drawString(showCurrenPoint,30,(int)(15+5+rec.getHeight()));
+		g2.drawString(showRadius,30,(int)(15+10+(rec.getHeight()*2)));
+		
+	    }else{
+				
+	    }
 	}
 	
 	public DocumentStateChangedListener getDocumentStateChanged(){
@@ -123,7 +165,7 @@ public class SearchServices extends JComponent implements MouseListener,
 	public Point.Double convertPointToSvgTransform(Point.Double oldPoint){
 	    AffineTransform at = new AffineTransform(listeners.getRenderingTransform());
 	
-	    System.out.println("affine "+at);
+	    //System.out.println("affine "+at);
 	try {
 	    at.invert();
 	} catch (NoninvertibleTransformException ex) {
@@ -139,24 +181,30 @@ public class SearchServices extends JComponent implements MouseListener,
 	}
 	public void mousePressed(MouseEvent e) {
 	    if(e.getButton()==MouseEvent.BUTTON1){
-				
-		setCenterPoint(e.getX(),e.getY());
-		System.out.println(""+e.getX()+","+ e.getY() +" -> "+getCenterPoint().getX()+","+getCenterPoint().getY());
-		
+		if(isEnabledSearchServices()){
+		    setCenterPoint(e.getX(),e.getY());
+		    //System.out.println(""+e.getX()+","+ e.getY() +" -> "+getCenterPoint().getX()+","+getCenterPoint().getY());
+		}
 	    }
 	}
 	public void mouseReleased(MouseEvent e) {
+	    //odbConnector.
 	}
-	public void mouseEntered(MouseEvent e) {	    
+	public void mouseEntered(MouseEvent e) {
+	    if(letOfChanged!=null)
+		letOfChanged.currentStatusChanged("Search services component size "+getSize());
+	    //System.out.println("Search services component size "+getSize()+"\nVisible rect "+getVisibleRect());
+	    
 	}
 	public void mouseExited(MouseEvent e) {	   
 	}
 	public void mouseDragged(MouseEvent e) {
 		
+	    if(isEnabledSearchServices()){
 		setCurrentPosition(e.getX(),e.getY());		
-		System.out.println("drag "+e.getX()+","+ e.getY() +" -> "+getCurrentPosition().getX()+","+getCurrentPosition().getY());
+		//System.out.println("drag "+e.getX()+","+ e.getY() +" -> "+getCurrentPosition().getX()+","+getCurrentPosition().getY());
 		repaint();
-	    
+	    }
 	}
 	public void mouseMoved(MouseEvent e) {
 	    //System.out.println(""+e.getX()+","+e.getY());
