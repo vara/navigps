@@ -7,6 +7,7 @@ package app.gui;
 
 import app.Main;
 import app.gui.svgComponents.Canvas;
+import app.gui.svgComponents.LetComponentsOfChangedDoc;
 import app.gui.svgComponents.SVGBridgeListeners;
 import app.gui.svgComponents.SVGDOMTreeModel;
 import app.gui.svgComponents.SVGDOMTreeRenderer;
@@ -81,7 +82,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     private JPanel panelWithToolBars;
     private StatusPanel statusPanel;
-    private Action openSVGFileAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction;
+    private Action openSVGFileAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction,searchServicesAction;
     private Canvas canvas;
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
     private JToolBar toolBarFile,toolBarZoom,toolBarSerch,toolBarMemMonitor;
@@ -138,7 +139,10 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 				    createNavigationIcon("fitToPanel16"),
 				    "Center your svg map",
 				    KeyEvent.VK_F);
-	
+	searchServicesAction = new SearchServicesAction("Search Services",
+				    createNavigationIcon("fitToPanel16"),
+				    "Search services with a certain area",
+				    KeyEvent.VK_S);
 	tree.setModel(null);
 	
 	//svgListeners.addUpdateComponents(getVerboseStream());
@@ -296,7 +300,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	
 	toolBarFile = new JToolBar("ToolBar File");
 	toolBarZoom = new JToolBar("ToolBar Zoom");
-	//toolBarSerch = new JToolBar("ToolBar Serch");
+	toolBarSerch = new JToolBar("ToolBar Serch");
 	toolBarMemMonitor = new JToolBar("Memory Monitor"){
 	    @Override
 	    public void setVisible(boolean b){
@@ -316,23 +320,24 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 					  getVerboseStream()));
 	toolBarZoom.add(new ToolBarButton(zoomOutAction, 
 					  createNavigationIcon("zoomOut32"),
-					  getVerboseStream()));
-		
+					  getVerboseStream()));		
 	toolBarZoom.add(new ToolBarButton(zoomAction, 
 					  createNavigationIcon("zoom32"),
 					  getVerboseStream(),true));
 	toolBarZoom.add(new ToolBarButton(fitToPanelAction, 
 					  createNavigationIcon("fitToPanel32"),
-					  getVerboseStream()));
-	System.out.println(""+toolBarZoom.getInsets());
-	//toolBarMemMonitor.setLayout(null);
+					  getVerboseStream()));	
 	toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
 	toolBarMemMonitor.setMargin(new Insets(4,0,4,1));
+	toolBarSerch.add(new ToolBarButton(searchServicesAction,
+					  createNavigationIcon("fitToPanel32"),
+					  getVerboseStream(),true));
 	
-	panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
-	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);
-	//panelWithToolBars.add(toolBarSerch,FlowLayout.LEFT);
+	
 	panelWithToolBars.add(toolBarMemMonitor,FlowLayout.LEFT);
+	panelWithToolBars.add(toolBarSerch,FlowLayout.LEFT);
+	panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
+	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);	
 	
 	getContentPane().add(panelWithToolBars,BorderLayout.PAGE_START);
 	
@@ -352,17 +357,19 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	JMenuItem itemZoomIn = new JMenuItem(zoomInAction);
 	JMenuItem itemZoomOut = new JMenuItem(zoomOutAction);
 	JMenuItem itemfitToPanel = new JMenuItem(fitToPanelAction);
+	JMenuItem itemSearchServices  = new JMenuItem(searchServicesAction);
 	
 	JMenu menuFile = new JMenu("File");
 	JMenu menuView = new JMenu("View");
 	JMenu subMenuForToolBarOptions = new JMenu("ToolBars");
 	
-	cbmOptionsForToolBars = new JCheckBoxMenuItem[4];
+	cbmOptionsForToolBars = new JCheckBoxMenuItem[5];
 	
 	cbmOptionsForToolBars[0] = new JCheckBoxMenuItem("File Open");
 	cbmOptionsForToolBars[1] = new JCheckBoxMenuItem("Zoom Action");	
 	cbmOptionsForToolBars[2] = new JCheckBoxMenuItem("Memory Monitor");
-	cbmOptionsForToolBars[3] = new JCheckBoxMenuItem("ToolBar");
+	cbmOptionsForToolBars[3] = new JCheckBoxMenuItem("Search Services");
+	cbmOptionsForToolBars[4] = new JCheckBoxMenuItem("ToolBar");
 	
 	for (JCheckBoxMenuItem cb : cbmOptionsForToolBars) {
 	    cb.addItemListener(this);
@@ -376,6 +383,8 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	menuView.add(itemZoomIn);
 	menuView.add(itemZoomOut);
 	menuView.add(itemfitToPanel);
+	menuView.addSeparator();
+	menuView.add(itemSearchServices);
 	menuView.addSeparator();
 	menuView.add(subMenuForToolBarOptions);
 		
@@ -479,10 +488,11 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     }
     
     public void setComponetsZoomEnable(boolean b){
-	zoomAction.setEnabled(true);
-	zoomInAction.setEnabled(true);
-	zoomOutAction.setEnabled(true);
-	fitToPanelAction.setEnabled(true);
+	zoomAction.setEnabled(b);
+	zoomInAction.setEnabled(b);
+	zoomOutAction.setEnabled(b);
+	fitToPanelAction.setEnabled(b);
+	searchServicesAction.setEnabled(b);
     }
     
     public void itemStateChanged(ItemEvent e) {
@@ -497,11 +507,12 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             toolBarZoom.setVisible(selected);
         }else if (mi == cbmOptionsForToolBars[2]) {
 	    toolBarMemMonitor.setVisible(selected);
-	}else if (mi == cbmOptionsForToolBars[3]) {
+	}else if (mi == cbmOptionsForToolBars[3]){
+	    toolBarSerch.setVisible(selected);
+	}else if (mi == cbmOptionsForToolBars[4]) {
             panelWithToolBars.setVisible(selected);
-	    cbmOptionsForToolBars[0].setEnabled(selected);
-	    cbmOptionsForToolBars[1].setEnabled(selected);
-	
+	    //stop working memory monitor when 'selected' == false
+	    ((MemoryGui)toolBarMemMonitor.getComponentAtIndex(0)).setVisible(selected);	    
 	}
     }
     
@@ -669,5 +680,20 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	    setComponetsZoomEnable(false);
 	}
     }
-    
+    private class SearchServicesAction extends AbstractAction {
+        public SearchServicesAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+	    putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
+	    setEnabled(false);
+        }
+        public void actionPerformed(ActionEvent e) {
+	    boolean en = ((ToolBarButton)e.getSource()).isSelectedButton();	    
+	    canvas.getSearchServices().setEnabledSerchServices(!en);
+	    getVerboseStream().currentStatusChanged("Search services enabled "+en);
+        }	
+    }
 }

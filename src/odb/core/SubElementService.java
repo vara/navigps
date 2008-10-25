@@ -1,5 +1,7 @@
 package odb.core;
 
+import org.apache.batik.dom.svg.SVGOMPoint;
+
 public class SubElementService extends RootElementStreet {
     
     private String serviceNumber;
@@ -7,12 +9,21 @@ public class SubElementService extends RootElementStreet {
     private String serviceCategory;
     private String additionalAttribute1;
     private RootElementStreet serviceStreet;
+    private SVGOMPoint svgx;
+    private SVGOMPoint svgy;
+    private double localx;
+    private double localy;
     
-    public SubElementService(RootElementStreet street, String num, String name, String category) {
-        serviceStreet = street;
-        serviceNumber = num;
-        serviceName = name;
-        serviceCategory = category;
+    
+    public SubElementService(RootElementStreet street, String num, String name, String category,SVGOMPoint x,SVGOMPoint y,double localx,double localy) {
+        this.serviceStreet = street;
+        this.serviceNumber = num;
+        this.serviceName = name;
+        this.serviceCategory = category;
+        this.svgx = x;
+        this.svgy = y;
+        this.localx = localx;
+        this.localy = localy;
         
         serviceStreet.addService(this);
         
