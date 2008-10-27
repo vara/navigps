@@ -3,10 +3,9 @@
  * and open the template in the editor.
  */
 
-package app.utils;
+package app.gui;
 
-import app.gui.svgComponents.UpdateComponentsAdapter;
-import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
+import app.utils.*;
 import java.util.logging.Level;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
@@ -24,6 +23,7 @@ import javax.swing.text.TabStop;
  *
  * @author vara
  */
+
 public class JTextPaneForVerboseInfo extends JScrollPane{
 
     private JTextPane text = new JTextPane();
@@ -75,9 +75,9 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
     {
 	return pipe;
     }
-    protected class DocumentStatus extends UpdateComponentsAdapter{
+    protected class DocumentStatus extends OutputVerboseStreamAdapter{
 	@Override
-	public void currentStatusChanged(String str){
+	public void outputVerboseStream(String str){
 	    addEndTextnl(str);
 	}
     }

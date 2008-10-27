@@ -64,12 +64,12 @@ public class Canvas extends JSVGCanvas{
     private ZoomAndMove zoomListener;
         
     
-    private SearchServices search = new SearchServices();
+    private SearchServices search;
     
     public Canvas(SVGBridgeListeners listeners){
 		
-	//setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
-	setDocumentState(Canvas.ALWAYS_STATIC);
+	setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+	//setDocumentState(Canvas.ALWAYS_STATIC);
 	setRecenterOnResize(false);
 	setDoubleBuffered(true);
 	
@@ -83,10 +83,12 @@ public class Canvas extends JSVGCanvas{
 	this.listeners = listeners;
 	
 	setLayout(new GridLayout());
+	search = new SearchServices(listeners.getVerboseStream());
 	add(search);
 	addMouseMotionListener(search);
 	addMouseListener(search);
 	addJGVTComponentListener(search.getDocumentStateChanged());
+	
     }
     
     public SearchServices getSearchServices(){
@@ -94,8 +96,7 @@ public class Canvas extends JSVGCanvas{
     }
     
     @Override
-    public void setURI(String uri){
-	listeners.setAbsoluteFilePath(uri);
+    public void setURI(String uri){	
 	super.setURI(uri);	
     }
     public boolean isDocumentSet(){ return (getSVGDocument() != null);}
@@ -120,13 +121,11 @@ public class Canvas extends JSVGCanvas{
 	    if(evt.getButton()==1){
 	    
 		zoomIn(p2d);
-		if(MainConfiguration.getMode())
-		    System.out.println("zoomIn");
+		search.getVerboseStream().outputVerboseStream("Zoom In");
 	    }
 	    else {
 		zoomOut(p2d);
-		if(MainConfiguration.getMode())
-		    System.out.println("zoomOut");
+		search.getVerboseStream().outputVerboseStream("Zoom Out");
 	    }
 	}
 	@Override
@@ -148,7 +147,7 @@ public class Canvas extends JSVGCanvas{
 		String str = e.getX()+","+e.getY()+";"+
 			     e.getXOnScreen()+","+e.getYOnScreen()+";"+
 			     (int)svgp.getX()+","+(int)svgp.getY();
-		//System.out.println(""+str);
+		
 		listeners.setLabelInformationPosytion(str);		
 	    }	    
 	}
@@ -201,16 +200,12 @@ public class Canvas extends JSVGCanvas{
 	}
 	
 	if(setZoom){
-	    addMouseListener(zoomListener);
-	    //System.out.println("Dodano listenera");	    
+	    addMouseListener(zoomListener);	    
 	    setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
 	}
 	else{
 	    setCursor(Cursor.getDefaultCursor());
-	    removeMouseListener(zoomListener);
-	    //System.out.println("Usunieto listenera");		
+	    removeMouseListener(zoomListener);	    
 	}	
     }
-    
-    
 }

@@ -42,13 +42,14 @@ public class SVGDOMTreeRenderer extends DefaultTreeCellRenderer{
 						  boolean leaf, 
 						  int row,
 						  boolean hasFocus) {
+	super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
 	Node node = (Node)value;	
 	//if(node instanceof Element) return elementPanel((Element)node);
 	if(node instanceof Element){
 	    setText("Element "+((Element)node).getTagName());
 	    return this;
 	}
-	super.getTreeCellRendererComponent(tree, value, sel, expanded, leaf, row, hasFocus);
+	
 	/*if(node instanceof CharacterData){
 	   setText(characterString((CharacterData)node));
 	}else if(node instanceof Attr){

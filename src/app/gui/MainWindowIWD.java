@@ -5,6 +5,7 @@
 
 package app.gui;
 
+import app.ArgumentsStartUp;
 import app.Main;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGBridgeListeners;
@@ -13,9 +14,12 @@ import app.gui.svgComponents.SVGDOMTreeRenderer;
 import app.gui.svgComponents.SVGScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
 import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
-import app.utils.JTextPaneForVerboseInfo;
+import app.gui.JTextPaneForVerboseInfo;
+import app.utils.BridgeForVerboseMode;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
+import app.utils.OutputVerboseStream;
+import app.utils.OutputVerboseStreamAdapter;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -87,8 +91,9 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
     private JToolBar toolBarFile,toolBarZoom,toolBarSerch,toolBarMemMonitor;
     private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
-    private JTextPaneForVerboseInfo verbosePane = new JTextPaneForVerboseInfo();
-    private UpdateComponentsWhenChangedDoc verboseStream = null;
+    
+    private JTextPaneForVerboseInfo verbosePane = null;
+    private OutputVerboseStream verboseStream = null;    
     
     private RootWindow rootWindow;
     private ViewMap viewMap = new ViewMap();//key -int i object -View
@@ -98,7 +103,8 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     private Vector <View> views = new Vector<View>();
     private static int ICON_SIZE = 8;
     
-    private JTree tree = new JTree();
+    //create only with -s start up parameter(window with properties svg doc)
+    private JTree tree = null; 
     
     //private MySplitPane paneForProperties = new MySplitPane();
     
@@ -111,14 +117,28 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	
 	initComponents();
 	
-	setTitle("NaviGPS ver. 0.3");
+	if(MainConfiguration.getPathToChartFile()!=null)
+	    openSVGDocument(MainConfiguration.getPathToChartFile());
+	
+	setTitle("NaviGPS ver. 0.4");
 	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 	setVisible(true);
+    }
+    public MainWindowIWD(Main c,ArgumentsStartUp arg){
+	this(c);
+	//openSVGDocument(filePath);
     }
     
     private void initComponents()
     {
-	verboseStream = verbosePane.getInforamtionPipe();
+	BridgeForVerboseMode bfvm = new BridgeForVerboseMode();	    
+	if(MainConfiguration.isModeVerboseGui()){
+		verbosePane = new JTextPaneForVerboseInfo();
+		bfvm.addComponentsWithOutputStream(verbosePane.getInforamtionPipe());	    
+	}
+	
+	verboseStream = bfvm;
+	
 	
 	openSVGFileAction = new OpenSVGFileAction("Open SVG document ...", 
 				    createNavigationIcon("open16"), "Open SVG Document",
@@ -143,9 +163,13 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 				    createNavigationIcon("fitToPanel16"),
 				    "Search services with a certain area",
 				    KeyEvent.VK_S);
-	tree.setModel(null);
 	
-	//svgListeners.addUpdateComponents(getVerboseStream());
+	if(MainConfiguration.isShowDocumentProperties()){	    
+	    tree = new JTree();
+	    tree.setModel(null);	    
+	}
+	
+	svgListeners.setVerboseStream(getVerboseStream());
 	svgListeners.addUpdateComponents(new UpdateMenuAndToolBars());
 	
 	//init docking RootWindow
@@ -162,36 +186,38 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	//createCanvas();
     }
     
-    public UpdateComponentsWhenChangedDoc getVerboseStream(){
+    public OutputVerboseStream getVerboseStream(){
 	return verboseStream;
     }
     
     private void setDefaultLayout() {
-	
-	View[] viewsTabDockingWindow = new View[views.size()];
-	for (int i = 0; i < viewsTabDockingWindow.length; i++) {
-	    viewsTabDockingWindow[i] = views.get(i);	    
-	}
-	
-	TabWindow tabWindow = new TabWindow(viewsTabDockingWindow);
-	int minus=0;
-	if(MainConfiguration.getMode())
-	    minus =2;//first and last window (CanvasWindow and DebugWindow)
-	else
-	    minus=1; //only first window
-	
-	View [] splitTab = new View[views.size()-minus];
-	
-	//only windows on left side
-	for (int i = 0; i < viewsTabDockingWindow.length-minus; i++) {
-	    splitTab[i]= viewsTabDockingWindow[i+1];	    
-	}
-	
-	SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(splitTab),views.lastElement());
-	rootWindow.setWindow(new SplitWindow(true,0.2f,splitWindow,tabWindow));	
-	if(MainConfiguration.getMode()){
-	    WindowBar windowBar = rootWindow.getWindowBar(Direction.DOWN);
-	    windowBar.addTab(views.lastElement());
+	if(views.size()>1){
+	    View[] viewsTabDockingWindow = new View[views.size()];
+	    for (int i = 0; i < viewsTabDockingWindow.length; i++) {
+		viewsTabDockingWindow[i] = views.get(i);	    
+	    }
+
+	    TabWindow tabWindow = new TabWindow(viewsTabDockingWindow);
+	    int minus=0;
+
+	    if(MainConfiguration.isModeVerboseGui())
+		minus =2;//first and last window (CanvasWindow and DebugWindow)
+	    else
+		minus=1; //only first window
+
+	    View [] splitTab = new View[views.size()-minus];
+
+	    //only windows on left side
+	    for (int i = 0; i < viewsTabDockingWindow.length-minus; i++) {
+		splitTab[i]= viewsTabDockingWindow[i+1];	    
+	    }
+
+	    SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(splitTab),views.lastElement());
+	    rootWindow.setWindow(new SplitWindow(true,0.2f,splitWindow,tabWindow));	
+	    if(MainConfiguration.isModeVerboseGui()){
+		WindowBar windowBar = rootWindow.getWindowBar(Direction.DOWN);
+		windowBar.addTab(views.lastElement());
+	    }
 	}
 	
     }
@@ -202,10 +228,10 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	freezeLayout(true,vRoot.getWindowProperties());
 	views.add(vRoot);
 	
-	views.add(new View("Properties " + 1, VIEW_ICON, new JScrollPane(tree)));
-	//views.add(new View("Properties " + 2, VIEW_ICON, new JTextArea()));
+	if(MainConfiguration.isShowDocumentProperties())
+	    views.add(new View("Properties", VIEW_ICON, new JScrollPane(tree)));	
 
-	if(MainConfiguration.getMode()){
+	if(MainConfiguration.isModeVerboseGui()){
 	    
 	    View vv = new View("Result return by functions",VIEW_ICON,verbosePane);
 	    vv.getWindowProperties().setRestoreEnabled(false);
@@ -243,9 +269,10 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	properties.getDockingWindowProperties().setMaximizeEnabled(false);
 	
 	//Enable the bottom window bar
-	rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
-	rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
-	
+	if(MainConfiguration.isModeVerboseGui()){
+	    rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
+	    rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
+	}	
     }
     
     private void freezeLayout(boolean freeze,DockingWindowProperties prop) {
@@ -278,8 +305,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     public void createStatusPanel(){
 		
 	statusPanel = new StatusPanel(svgListeners);		
-	//statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));
-	
+	//statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));	
 	getContentPane().add(getStatusPanel(),BorderLayout.PAGE_END);
     }
     
@@ -350,6 +376,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	JMenuItem itemFile = new JMenuItem(openSVGFileAction);
 	JMenuItem itemExit = new JMenuItem("Exit");
 	itemExit.addActionListener(new ActionListener() {
+	    @Override
 	    public void actionPerformed(ActionEvent e) {
 		exitApp();
 	    }
@@ -358,6 +385,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	JMenuItem odbManager = new JMenuItem("ODBManager");
         odbManager.addActionListener(new ActionListener() {
 
+	    @Override
             public void actionPerformed(ActionEvent e) {
                 
                 ODBManager odb = new ODBManager();
@@ -413,24 +441,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	canvas.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
 	    @Override
 	    public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-		Thread w = new Thread(new Runnable() {
-
-		    public void run() {
-			
-			if (MainConfiguration.getMode())
-			    verbosePane.addEndTextnl("Build Tree Nodes ...");
-			if (MainConfiguration.getMode())
-			    verbosePane.addEndTextnl("Build Tree Model for Tree Nodes ...");
-			SVGDOMTreeModel model = new SVGDOMTreeModel(canvas.getSVGDocument());
-			tree.setModel(model);
-			if (MainConfiguration.getMode())
-			    verbosePane.addEndTextnl("Build Tree Model Completed");						    
-			tree.setCellRenderer(new SVGDOMTreeRenderer());
-			if (MainConfiguration.getMode())
-			    verbosePane.addEndTextnl("Build Tree Nodes Completed");
-		    }
-		});
-		w.start();
+		
 	    }
 	});
 	
@@ -466,23 +477,32 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	int retour = chooser.showOpenDialog(this);	
 	if(retour == JFileChooser.APPROVE_OPTION) {
 	    try {
-		    File f =chooser.getSelectedFile();
-		    //we have 2 ways to loading svg documnets
-		    //1.
-		    //SVGDocument doc = SVGLoader.getSVGDocumentFromFile(f);
-		    //if(doc !=null)
-		    //canvas.setDocument(doc);
-		    //2.
-		    canvas.setDocument(null);		    
-		    canvas.setURI(f.toURI().toString());
-		    views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
+		    openSVGDocument(chooser.getSelectedFile());
 		    	    
 	    } catch (Exception e1) {
-		    e1.printStackTrace();
+		    getVerboseStream().outputVerboseStream(e1.getMessage());
 	    }
 	}
     }
-
+    
+    public void openSVGDocument(String path){
+	
+	File file = new File(path);
+	if(file.exists()){
+	    
+	    canvas.setURI(file.toURI().toString());
+	}else{
+	    getVerboseStream().outputVerboseStream("File "+path+" doesn't exist !!!");
+	    System.err.println("File "+path+" doesn't exist !!!");
+	    MyLogger.log.log(Level.WARNING,"File "+path+" doesn't exist !!!");
+	}
+	
+    }
+    public void openSVGDocument(File file){
+	
+	canvas.setURI(file.toURI().toString());
+    }
+    
     protected StatusPanel getStatusPanel() {
 	return statusPanel;
     }
@@ -509,7 +529,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	fitToPanelAction.setEnabled(b);
 	searchServicesAction.setEnabled(b);
     }
-    
+    @Override
     public void itemStateChanged(ItemEvent e) {
 	JCheckBoxMenuItem mi = (JCheckBoxMenuItem)(e.getSource());
 	
@@ -532,14 +552,15 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     }
     
     private static final Icon BUTTON_ICON = new Icon() {
+	@Override
 	public int getIconHeight() {
 	  return ICON_SIZE;
 	}
-
+	@Override
 	public int getIconWidth() {
 	  return ICON_SIZE;
 	}
-
+	@Override
 	public void paintIcon(Component c, Graphics g, int x, int y) {
 	  Color oldColor = g.getColor();
 
@@ -551,14 +572,16 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     };
     
     private static final Icon VIEW_ICON = new Icon() {
+	@Override
 	public int getIconHeight() {
 	  return ICON_SIZE;
 	}
-
+	@Override
 	public int getIconWidth() {
 	  return ICON_SIZE;
 	}
-
+	
+	@Override
 	public void paintIcon(Component c, Graphics g, int x, int y) {
 	  Color oldColor = g.getColor();
 
@@ -581,6 +604,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	    putValue(AbstractAction.ACCELERATOR_KEY,
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
+	@Override
         public void actionPerformed(ActionEvent e) {
 	    openFileChoserWindow();
 	}
@@ -596,6 +620,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
 	    setEnabled(false);
         }
+	@Override
         public void actionPerformed(ActionEvent e) {
 	    canvas.zoomFromCenterDocumnet(true);      
         }
@@ -611,6 +636,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
 	    setEnabled(false);
         }
+	@Override
         public void actionPerformed(ActionEvent e) {
 	    canvas.zoomFromCenterDocumnet(false);
         }
@@ -626,21 +652,19 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
 	    setEnabled(false);
         }
+	@Override
         public void actionPerformed(ActionEvent e) {
 	    ToolBarButton button = (ToolBarButton)e.getSource();
 	    boolean selected = button.isSelectedButton();	    
 	    System.out.println(""+selected);
 	    if(selected){
 		canvas.zoomFromMouseCoordinationEnable(!selected);
-		button.setSelected(!selected);
-		if(MainConfiguration.getMode()&&getVerboseStream()!=null)
-		    getVerboseStream().currentStatusChanged("Zoom Disabled");
+		button.setSelected(!selected);		
+		getVerboseStream().outputVerboseStream("Zoom Disabled");
 	    }else{
 		canvas.zoomFromMouseCoordinationEnable(!selected);
 		button.setSelected(!selected);
-		if(MainConfiguration.getMode()&&getVerboseStream()!=null)
-		    getVerboseStream().currentStatusChanged("Zoom Enabled");
-		    
+		getVerboseStream().outputVerboseStream("Zoom Enabled");		    
 	    }
 	    
         }	
@@ -656,6 +680,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
 	    setEnabled(false);
         }
+	@Override
         public void actionPerformed(ActionEvent e) {
 	    canvas.resetRenderingTransform();
         }	
@@ -670,14 +695,17 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	    setToolTipText("get document transforms");
 	}
 
+	@Override
 	public void actionPerformed(ActionEvent e) {
-	    verbosePane.addEndTextnl(getClass().getName()+"");
-	    verbosePane.addEndTextnl("ViewingTransform   \t"+canvas.getViewingTransform());
-	    verbosePane.addEndTextnl("ViewBoxTransform   \t"+canvas.getViewBoxTransform());
-	    verbosePane.addEndTextnl("RenderingTransform \t"+canvas.getRenderingTransform());
-	    verbosePane.addEndTextnl("PaintingTransform  \t"+canvas.getPaintingTransform());
-	    verbosePane.addEndTextnl("Visible Rect       \t"+canvas.getVisibleRect());
-	    getVerboseStream().currentStatusChanged(panelWithToolBars.getSize()+"");    
+	    	    
+	    getVerboseStream().outputVerboseStream(getClass().getName()+"");
+	    getVerboseStream().outputVerboseStream("ViewingTransform   \t"+canvas.getViewingTransform());
+	    getVerboseStream().outputVerboseStream("ViewBoxTransform   \t"+canvas.getViewBoxTransform());
+	    getVerboseStream().outputVerboseStream("RenderingTransform \t"+canvas.getRenderingTransform());
+	    getVerboseStream().outputVerboseStream("PaintingTransform  \t"+canvas.getPaintingTransform());
+	    getVerboseStream().outputVerboseStream("Visible Rect       \t"+canvas.getVisibleRect());
+	    getVerboseStream().outputVerboseStream("Svg document status");
+	    
 	}
     }
     
@@ -685,8 +713,25 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	
 	@Override
 	public void documentPrepareToModification(){
-	    
-	    setComponetsZoomEnable(true);
+	    	    
+	    Thread w = new Thread(new Runnable() {
+		    @Override
+		    public void run() {
+			setComponetsZoomEnable(true);
+			views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
+			if(MainConfiguration.isShowDocumentProperties()){
+			    
+			    getVerboseStream().outputVerboseStream("Build Tree Nodes ...");			
+			    getVerboseStream().outputVerboseStream("Build Tree Model for Tree Nodes ...");
+			    SVGDOMTreeModel model = new SVGDOMTreeModel(canvas.getSVGDocument());
+			    tree.setModel(model);
+			    getVerboseStream().outputVerboseStream("Build Tree Model Completed");						    
+			    tree.setCellRenderer(new SVGDOMTreeRenderer());
+			    getVerboseStream().outputVerboseStream("Build Tree Nodes Completed");
+			}
+		    }
+		});
+		w.start();
 	}
 	
 	@Override
@@ -705,10 +750,11 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
 	    setEnabled(false);
         }
+	@Override
         public void actionPerformed(ActionEvent e) {
 	    boolean en = ((ToolBarButton)e.getSource()).isSelectedButton();	    
 	    canvas.getSearchServices().setEnabledSerchServices(!en);
-	    getVerboseStream().currentStatusChanged("Search services enabled "+en);
+	    getVerboseStream().outputVerboseStream("Search services enabled "+!en);	    
         }	
     }
 }

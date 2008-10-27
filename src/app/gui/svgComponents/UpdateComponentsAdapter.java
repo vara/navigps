@@ -11,7 +11,10 @@ package app.gui.svgComponents;
  */
 public abstract class UpdateComponentsAdapter implements UpdateComponentsWhenChangedDoc{
     
+    @Override
     public void currentStatusChanged(String str){}
+    @Override
     public void documentPrepareToModification(){}
+    @Override
     public void documentClosed(){}
 }

@@ -5,7 +5,8 @@
 
 package app.gui;
 
-import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
+import app.utils.MyLogger;
+import app.utils.OutputVerboseStream;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Graphics;
@@ -22,11 +23,9 @@ import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
-import java.util.Vector;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javax.swing.JComponent;
-import odb.core.SubElementService;
 import odb.inter.ODBridge;
 import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
@@ -53,18 +52,15 @@ public class SearchServices extends JComponent implements MouseListener,
 	
 	private DocumentStateChangedListener listeners;
 	
-	private UpdateComponentsWhenChangedDoc letOfChanged = null;
+	private OutputVerboseStream verboseStream = null;
 	
 	private boolean enabled = false;
 	
 	private ODBridge odbConnector=null;
 	
-	public SearchServices(UpdateComponentsWhenChangedDoc l){
-	    letOfChanged = l;
+	public SearchServices(OutputVerboseStream l){
+	    verboseStream = l;
 	    init();	    
-	}
-	public SearchServices(){
-	     init();	    
 	}
 	private void init(){
 	    
@@ -89,8 +85,9 @@ public class SearchServices extends JComponent implements MouseListener,
 	
 	@Override
 	public void paintComponent(Graphics g){
-	    
+	    super.paintComponent(g);
 	    Graphics2D g2 = (Graphics2D)g;
+	    
 	    if(isEnabledSearchServices()){
 	    
 		AffineTransform svgTransform = listeners.getRenderingTransform();
@@ -121,12 +118,14 @@ public class SearchServices extends JComponent implements MouseListener,
 		String showCenterPoint = "center point "+getCenterPoint();
 		String showRadius = "Radius "+getRadius();
 		String showCurrenPoint = "current point "+getCurrentPosition();
+		String sizeComp = getPreferredSize()+" getBounds "+getBounds();
+		
 		FontRenderContext frc = g2.getFontRenderContext();
 		Rectangle2D rec = g2.getFont().getMaxCharBounds(frc);
 		g2.drawString(showCenterPoint,30,15);
 		g2.drawString(showCurrenPoint,30,(int)(15+5+rec.getHeight()));
 		g2.drawString(showRadius,30,(int)(15+10+(rec.getHeight()*2)));
-		
+		g2.drawString(sizeComp,30,(int)(15+10+(rec.getHeight()*3)));
 	    }else{
 				
 	    }
@@ -169,7 +168,9 @@ public class SearchServices extends JComponent implements MouseListener,
 	try {
 	    at.invert();
 	} catch (NoninvertibleTransformException ex) {
-	    Logger.getLogger(SearchServices.class.getName()).log(Level.SEVERE, null, ex);
+	    
+	    MyLogger.log.log(Level.SEVERE,SearchServices.class.getName(), ex);
+	    getVerboseStream().outputVerboseStream(SearchServices.class.getName()+"\n\t"+ex);
 	}
 	    double xx = (oldPoint.getX()*at.getScaleX())+at.getTranslateX();
 	    double yy = (oldPoint.getY()*at.getScaleY())+at.getTranslateY();
@@ -177,8 +178,15 @@ public class SearchServices extends JComponent implements MouseListener,
 	    return oldPoint;
 	}
 	
+	public OutputVerboseStream getVerboseStream(){
+	    return verboseStream;
+	}
+	
+	@Override
 	public void mouseClicked(MouseEvent e) {
 	}
+	
+	@Override
 	public void mousePressed(MouseEvent e) {
 	    if(e.getButton()==MouseEvent.BUTTON1){
 		if(isEnabledSearchServices()){
@@ -187,17 +195,25 @@ public class SearchServices extends JComponent implements MouseListener,
 		}
 	    }
 	}
+	
+	@Override
 	public void mouseReleased(MouseEvent e) {
 	    //odbConnector.
 	}
+	
+	@Override
 	public void mouseEntered(MouseEvent e) {
-	    if(letOfChanged!=null)
-		letOfChanged.currentStatusChanged("Search services component size "+getSize());
+	    
+	    getVerboseStream().outputVerboseStream("Search services component size "+getSize());
 	    //System.out.println("Search services component size "+getSize()+"\nVisible rect "+getVisibleRect());
 	    
 	}
+	
+	@Override
 	public void mouseExited(MouseEvent e) {	   
 	}
+	
+	@Override	
 	public void mouseDragged(MouseEvent e) {
 		
 	    if(isEnabledSearchServices()){
@@ -206,6 +222,8 @@ public class SearchServices extends JComponent implements MouseListener,
 		repaint();
 	    }
 	}
+	
+	@Override
 	public void mouseMoved(MouseEvent e) {
 	    //System.out.println(""+e.getX()+","+e.getY());
 	}
@@ -221,44 +239,76 @@ public class SearchServices extends JComponent implements MouseListener,
 	    public DocumentStateChangedListener(){
 		
 	    }
-	    public void gvtBuildStarted(GVTTreeBuilderEvent e) {	    
+	    @Override
+	    public void gvtBuildStarted(GVTTreeBuilderEvent e) {	
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
-	    public void gvtBuildCompleted(GVTTreeBuilderEvent e) {	    
+	    @Override
+	    public void gvtBuildCompleted(GVTTreeBuilderEvent e) {	
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
-	    public void gvtBuildCancelled(GVTTreeBuilderEvent e) {	    
+	    @Override
+	    public void gvtBuildCancelled(GVTTreeBuilderEvent e) {	
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void gvtBuildFailed(GVTTreeBuilderEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void managerStarted(UpdateManagerEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
-	    public void managerSuspended(UpdateManagerEvent e) {	    
+	    @Override
+	    public void managerSuspended(UpdateManagerEvent e) {	
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void managerResumed(UpdateManagerEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void managerStopped(UpdateManagerEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void updateStarted(UpdateManagerEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void updateCompleted(UpdateManagerEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
-	    public void updateFailed(UpdateManagerEvent e) {	    
+	    @Override
+	    public void updateFailed(UpdateManagerEvent e) {
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
-	    public void gvtRenderingPrepare(GVTTreeRendererEvent e) {	    
+	    @Override
+	    public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
-	    public void gvtRenderingStarted(GVTTreeRendererEvent e) {	    
+	    @Override
+	    public void gvtRenderingStarted(GVTTreeRendererEvent e) {
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void gvtRenderingCompleted(GVTTreeRendererEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
+	    @Override
 	    public void gvtRenderingCancelled(GVTTreeRendererEvent e) {	    
+		getVerboseStream().outputVerboseStream("11111111111");
 	    }
-	    public void gvtRenderingFailed(GVTTreeRendererEvent e) {	    
+	    @Override
+	    public void gvtRenderingFailed(GVTTreeRendererEvent e) {
+		    getVerboseStream().outputVerboseStream("11111111111");
 	    }
 	    
 	    //JGVTComponentListener
+	    @Override
 	    public void componentTransformChanged(ComponentEvent event) {
-		System.out.println("componentTransformChanged");
-		AffineTransform at = ((JSVGCanvas)event.getComponent()).getRenderingTransform();
-		System.out.println("new tranform "+at);
+		
+		AffineTransform at = ((JSVGCanvas)event.getComponent()).getRenderingTransform();		
 		renderingTranform = at;
 	    }
 	    

@@ -4,8 +4,8 @@
  */
 package app.gui;
 
-import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
 import app.utils.MyLogger;
+import app.utils.OutputVerboseStream;
 import app.utils.Utils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -73,7 +73,7 @@ public class MemoryGui extends JComponent implements Runnable,
     private Border mainBorder = BorderFactory.createRaisedBevelBorder();    
     private Border mouseOnBorder = BorderFactory.createBevelBorder(BevelBorder.RAISED,new Color(210,210,210,255), Color.WHITE);   
     
-    private UpdateComponentsWhenChangedDoc letOfChanged = null;
+    private OutputVerboseStream letOfChanged = null;
     
     private boolean showText = true;
     private boolean showShadow = true;
@@ -85,7 +85,7 @@ public class MemoryGui extends JComponent implements Runnable,
     public MemoryGui() {
 	init();
     }
-    public MemoryGui(UpdateComponentsWhenChangedDoc l){
+    public MemoryGui(OutputVerboseStream l){
 	letOfChanged = l;
 	init();	
     }
@@ -203,7 +203,7 @@ public class MemoryGui extends JComponent implements Runnable,
 	    setLoopThread(false);
 	    chart.resetBitmap();
 	    if(letOfChanged!=null)
-		letOfChanged.currentStatusChanged("Memory Monitor stoped");
+		letOfChanged.outputVerboseStream("Memory Monitor stoped");
 	    setStatusMonitor(MemoryGui.STOPED);
 	    repaint();
 	}
@@ -214,7 +214,7 @@ public class MemoryGui extends JComponent implements Runnable,
 	if(!isLoopThread()){
 	    
 	    if(letOfChanged!=null)
-	    letOfChanged.currentStatusChanged("Memory Monitor started");
+	    letOfChanged.outputVerboseStream("Memory Monitor started");
 	    
 	    setLoopThread(true);
 	    Thread thread = new Thread(this);
@@ -229,7 +229,7 @@ public class MemoryGui extends JComponent implements Runnable,
 	setLoopThread(false);
 	
 	if(letOfChanged!=null)
-	    letOfChanged.currentStatusChanged("Memory Monitor paused");
+	    letOfChanged.outputVerboseStream("Memory Monitor paused");
 	setStatusMonitor(MemoryGui.PAUSED);
     }
     
@@ -413,7 +413,7 @@ public class MemoryGui extends JComponent implements Runnable,
 	public void setShowGrid(boolean showGrid) {
 	    this.showGrid = showGrid;
 	    if(letOfChanged!=null)
-		letOfChanged.currentStatusChanged("Monitor.grid show ="+showGrid);
+		letOfChanged.outputVerboseStream("Monitor.grid show ="+showGrid);
 	}
     }
     
@@ -503,7 +503,7 @@ public class MemoryGui extends JComponent implements Runnable,
 	else
 	    start();
 	//if(letOfChanged!=null)
-	//    letOfChanged.currentStatusChanged("MemoryMonitor.setvisible "+val);
+	//    letOfChanged.outputVerboseStream("MemoryMonitor.setvisible "+val);
     }
     public void mousePressed(MouseEvent e) {
 	

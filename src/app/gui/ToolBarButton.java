@@ -5,7 +5,7 @@
 
 package app.gui;
 
-import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
+import app.utils.OutputVerboseStream;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -27,9 +27,9 @@ public class ToolBarButton extends JButton implements MouseListener{
     private boolean selectedButton = false;
     private boolean clickableButton = false;
     
-    private UpdateComponentsWhenChangedDoc letOfChange = null;
+    private OutputVerboseStream letOfChange = null;
     
-    public ToolBarButton(Action a,ImageIcon i,UpdateComponentsWhenChangedDoc l){
+    public ToolBarButton(Action a,ImageIcon i,OutputVerboseStream l){
 	
 	super(a);
 	setLetOfChanged(l);
@@ -40,12 +40,12 @@ public class ToolBarButton extends JButton implements MouseListener{
 	if(a.isEnabled())
 	    addMouseListener(this);	
     }
-    public ToolBarButton(Action a,ImageIcon i,UpdateComponentsWhenChangedDoc l,boolean clickable){
+    public ToolBarButton(Action a,ImageIcon i,OutputVerboseStream l,boolean clickable){
 	this(a,i,l);
 	setClickableButton(clickable);
     }
     
-    public void setLetOfChanged(UpdateComponentsWhenChangedDoc l){
+    public void setLetOfChanged(OutputVerboseStream l){
 	letOfChange = l;
     }
     
@@ -83,6 +83,7 @@ public class ToolBarButton extends JButton implements MouseListener{
 	    super.paintComponent(g);
     }
 
+    @Override
     public void mouseClicked(MouseEvent e) {
 	if(isClickableButton())
 	    if(isSelectedButton()){
@@ -95,23 +96,24 @@ public class ToolBarButton extends JButton implements MouseListener{
 		//setBorder(Utils.createSimpleBorder(1, 1,1,1,new Color(174,201,255)));
 	    }
     }
-
+    @Override
     public void mousePressed(MouseEvent e) {
 	
 	    setBorderPainted(true);
 	
     }
-
+    @Override
     public void mouseReleased(MouseEvent e) {
 	if(!isClickableButton()){
 	    setBorderPainted(false);
 	}
     }
-
+    @Override
     public void mouseEntered(MouseEvent e) {
 	setMouseOnButton(true);	
     }
 
+    @Override
     public void mouseExited(MouseEvent e) {
 	setMouseOnButton(false);
     }
@@ -147,7 +149,7 @@ public class ToolBarButton extends JButton implements MouseListener{
 	else
 	    removeMouseListener(this);
 	if(letOfChange!=null)
-	    letOfChange.currentStatusChanged(getAction().getValue(Action.NAME)+" isEnabled "+b);
+	    letOfChange.outputVerboseStream(getAction().getValue(Action.NAME)+" isEnabled "+b);
     }
     
 }

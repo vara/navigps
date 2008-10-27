@@ -22,67 +22,68 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
 				GVTTreeRendererListener	{
             
     
+    @Override
     public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
 	setRederingStatus(true);
 	setTextToCurrentStatus("Document Loading Started ...");
     }
-
+    @Override
     public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
 	
 	setTextToCurrentStatus("Document Loading Completed");
+	setAbsoluteFilePath(e.getSVGDocument().getDocumentURI());
     }
-
+    @Override
     public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
 	setTextToCurrentStatus("Document Loading Cancelled !");
     }
-
+    @Override
     public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
+	
 	setTextToCurrentStatus("Document Loading Failed !");
     }
     
     
-    
+    @Override
     public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
 	documentBuildCompleted();
 	setTextToCurrentStatus("Document Build Completed");
     }
-
+    @Override
     public void gvtBuildCancelled(GVTTreeBuilderEvent e) {
 	setTextToCurrentStatus("Document Build Cancelled !");
     }
-
+    @Override
     public void gvtBuildFailed(GVTTreeBuilderEvent e) {
 	setTextToCurrentStatus("Document Build Failed !");
     }
-
+    @Override
     public void gvtBuildStarted(GVTTreeBuilderEvent e) {
 	setTextToCurrentStatus("Documnet Build Started");
     }
     
     
-    
+    @Override
     public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
 	setTextToCurrentStatus("Document Rendering Prepare ...");	
     }
-
+    @Override
     public void gvtRenderingStarted(GVTTreeRendererEvent e) {
 	setTextToCurrentStatus("Document Rendering Started ...");
 	setRederingStatus(true);
     }
-
+    @Override
     public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
 	
 	setTextToCurrentStatus("Document Rendering Completed");
 	setRederingStatus(false);
     }
-
+    @Override
     public void gvtRenderingCancelled(GVTTreeRendererEvent e) {
 	setTextToCurrentStatus("Documnet Rendering Cancelled !");
     }
-
+    @Override
     public void gvtRenderingFailed(GVTTreeRendererEvent e) {
 	setTextToCurrentStatus("Documnet Rendering Failed !");
-    }
-
-           
+    }           
 }
