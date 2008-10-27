@@ -7,10 +7,7 @@ package app;
 
 import app.gui.MainWindowIWD;
 import app.utils.MyLogger;
-import app.utils.Utils;
-import config.MainConfiguration;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.SwingUtilities;
 
 /**
@@ -20,24 +17,28 @@ import javax.swing.SwingUtilities;
 public class Main {
     
     public final MyLogger logger = new MyLogger();
-    public Main(){
+   
+    
+    public Main(String [] args){
 	
-	MyLogger.log.log(Level.FINE,"start application");	
+	MyLogger.log.log(Level.FINE,"Start main application");
+	new ArgumentsStartUp(args);		
+	//MainConfiguration.setModeVerboseGui(true);
     }
     
     public static void main(String[] args) {
-        
-	MainConfiguration.setMode(true);
-	//MainConfiguration.setMode(false);
-	Main.initGui(new Main());
+        	
+	Main app = new Main(args);	
+	Main.initGui(app);
     }
 
     public static void initGui(final Main m)
     {
 	SwingUtilities.invokeLater(new Runnable() {
-	    public void run() {			
+	    @Override
+	    public void run() {
+		
 		new MainWindowIWD(m);
-	
 	    }
 	});
     }
