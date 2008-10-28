@@ -13,13 +13,11 @@ import app.gui.svgComponents.SVGDOMTreeModel;
 import app.gui.svgComponents.SVGDOMTreeRenderer;
 import app.gui.svgComponents.SVGScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
-import app.gui.svgComponents.UpdateComponentsWhenChangedDoc;
 import app.gui.JTextPaneForVerboseInfo;
 import app.utils.BridgeForVerboseMode;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
-import app.utils.OutputVerboseStreamAdapter;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -36,6 +34,7 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.geom.Rectangle2D;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -72,8 +71,14 @@ import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
 import odb.gui.ODBManager;
+import org.apache.batik.bridge.ViewBox;
+import org.apache.batik.gvt.CanvasGraphicsNode;
+import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
+import org.apache.batik.util.SVGConstants;
+import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGSVGElement;
 
 /**
  *
@@ -697,14 +702,33 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 
 	@Override
 	public void actionPerformed(ActionEvent e) {
-	    	    
-	    getVerboseStream().outputVerboseStream(getClass().getName()+"");
+	    
+	    SVGDocument doc = canvas.getSVGDocument();    
+	    SVGSVGElement el = doc.getRootElement();
+	    String viewBoxStr = el.getAttributeNS(null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
+        
+            float[] rect = ViewBox.parseViewBoxAttribute(el, viewBoxStr, null);
+            Rectangle2D rect2d =  new Rectangle2D.Float(rect[0], rect[1],rect[2], rect[3]);
+	    GraphicsNode gn = canvas.getGraphicsNode();
+	    Rectangle2D bounds = gn.getBounds();
+	    
+	    CanvasGraphicsNode cgn = canvas.getCanvasGraphicsNode();	    
+	    getVerboseStream().outputVerboseStream("-------- Transform SVG Document --------");
+	    getVerboseStream().outputVerboseStream("\t"+getClass().getName()+"");
 	    getVerboseStream().outputVerboseStream("ViewingTransform   \t"+canvas.getViewingTransform());
 	    getVerboseStream().outputVerboseStream("ViewBoxTransform   \t"+canvas.getViewBoxTransform());
 	    getVerboseStream().outputVerboseStream("RenderingTransform \t"+canvas.getRenderingTransform());
 	    getVerboseStream().outputVerboseStream("PaintingTransform  \t"+canvas.getPaintingTransform());
+	    getVerboseStream().outputVerboseStream("InitialTransform   \t"+canvas.getInitialTransform());
 	    getVerboseStream().outputVerboseStream("Visible Rect       \t"+canvas.getVisibleRect());
-	    getVerboseStream().outputVerboseStream("Svg document status");
+	    getVerboseStream().outputVerboseStream("ViewBox Rect       \t"+rect2d+"\t"+bounds);
+	    getVerboseStream().outputVerboseStream("-------- Transform Graphics Nood -------");
+	    getVerboseStream().outputVerboseStream("PositionTransform  \t"+cgn.getPositionTransform());
+	    getVerboseStream().outputVerboseStream("ViewingTransform   \t"+cgn.getViewingTransform());
+	    getVerboseStream().outputVerboseStream("GlobalTransform    \t"+cgn.getGlobalTransform());
+	    getVerboseStream().outputVerboseStream("InverseTransform   \t"+cgn.getInverseTransform());
+	    getVerboseStream().outputVerboseStream("Transform          \t"+cgn.getTransform());	    
+	    getVerboseStream().outputVerboseStream("----------------------------------------");
 	    
 	}
     }

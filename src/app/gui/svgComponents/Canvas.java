@@ -9,6 +9,7 @@ import app.gui.SearchServices;
 import app.utils.Utils;
 import config.MainConfiguration;
 import config.SVGConfiguration;
+import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.GridLayout;
@@ -68,8 +69,8 @@ public class Canvas extends JSVGCanvas{
     
     public Canvas(SVGBridgeListeners listeners){
 		
-	setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
-	//setDocumentState(Canvas.ALWAYS_STATIC);
+	//setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+	setDocumentState(Canvas.ALWAYS_STATIC);
 	setRecenterOnResize(false);
 	setDoubleBuffered(true);
 	
@@ -82,13 +83,12 @@ public class Canvas extends JSVGCanvas{
         addMouseMotionListener(zoomListener);
 	this.listeners = listeners;
 	
-	setLayout(new GridLayout());
+	setLayout(new BorderLayout());
 	search = new SearchServices(listeners.getVerboseStream());
-	add(search);
+	add(search,BorderLayout.CENTER);
 	addMouseMotionListener(search);
 	addMouseListener(search);
-	addJGVTComponentListener(search.getDocumentStateChanged());
-	
+	addJGVTComponentListener(search.getDocumentStateChanged());	
     }
     
     public SearchServices getSearchServices(){

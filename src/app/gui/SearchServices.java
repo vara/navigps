@@ -91,7 +91,9 @@ public class SearchServices extends JComponent implements MouseListener,
 	    if(isEnabledSearchServices()){
 	    
 		AffineTransform svgTransform = listeners.getRenderingTransform();
-		g2.setTransform(svgTransform);
+		AffineTransform oldTr = g2.getTransform();
+		oldTr.concatenate(svgTransform);
+		g2.setTransform(oldTr);
 		float dash[] = { 10.0f };	    	    
 		float widthStroke  = (float)(1.0 / svgTransform.getScaleX());
 		BasicStroke bsLine = new BasicStroke(widthStroke);
@@ -114,7 +116,10 @@ public class SearchServices extends JComponent implements MouseListener,
 
 		//for test
 		g2.setColor(Color.BLACK);
-		g2.setTransform(AffineTransform.getScaleInstance(1,1));
+		AffineTransform atText = AffineTransform.getScaleInstance(1,1);
+		AffineTransform mainTra = g2.getTransform();
+		mainTra.concatenate(atText);
+		g2.setTransform(mainTra);
 		String showCenterPoint = "center point "+getCenterPoint();
 		String showRadius = "Radius "+getRadius();
 		String showCurrenPoint = "current point "+getCurrentPosition();

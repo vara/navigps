@@ -39,6 +39,8 @@ import java.awt.Dimension;
 import java.awt.Rectangle;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.MouseWheelEvent;
+import java.awt.event.MouseWheelListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.swing.BoundedRangeModel;
@@ -119,7 +121,7 @@ public class SVGScrollPane extends JPanel{
         // by default, scrollbars are not needed
         updateScrollbarState(false, false);
 
-        // addMouseWheelListener(new WheelListener());
+        addMouseWheelListener(new WheelListener());
 
         // layout
         setLayout(new BorderLayout());
@@ -241,6 +243,7 @@ public class SVGScrollPane extends JPanel{
         canvas.setRenderingTransform(crt);
     }// setScrollPosition()
 
+    
 
 
     /**
@@ -255,9 +258,10 @@ public class SVGScrollPane extends JPanel{
      *
      * TODO Move this to a JDK 1.4 specific class in sources-1.4.
      */
-    /*
+    
     protected class WheelListener implements MouseWheelListener
     {
+	@Override
         public void mouseWheelMoved(MouseWheelEvent e)
         {
             final JScrollBar sb = (vertical.isVisible()) ?
@@ -272,8 +276,8 @@ public class SVGScrollPane extends JPanel{
             }
 
         }// mouseWheelMoved()
+
     }// inner class WheelListener
-    */
 
 
     /**
@@ -367,17 +371,20 @@ public class SVGScrollPane extends JPanel{
         }// componentResized()
 
 
+	@Override
         public void gvtBuildStarted  (GVTTreeBuilderEvent e) {
             isReady = false;
             // Start by assuming we won't need them.
             updateScrollbarState(false, false);
         }
+	@Override
         public void gvtBuildCompleted(GVTTreeBuilderEvent e)
         {
             isReady = true;
             viewBox = null;   // new document forget old viewBox if any.
         }// gvtRenderingCompleted()
 
+	@Override
         public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
             if (viewBox == null) {
                 resizeScrollBars();
@@ -394,6 +401,7 @@ public class SVGScrollPane extends JPanel{
             }
         }
 
+	@Override
         public void updateCompleted(UpdateManagerEvent e) {
             if (viewBox == null) {
                 resizeScrollBars();
