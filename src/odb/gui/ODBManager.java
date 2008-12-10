@@ -32,6 +32,7 @@ public class ODBManager extends javax.swing.JFrame {
     
     FileFilter filter = new FileFilter() {
 
+        @Override
         public boolean accept(File f) {
             return f.getName().toLowerCase().endsWith(".odb")
               || f.isDirectory();
@@ -982,13 +983,17 @@ private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             
             jList1.setModel(new javax.swing.AbstractListModel() {
             String strings [] = (String []) al.toArray (new String [al.size ()]);
+            @Override
             public int getSize() { return strings.length; }
+            @Override
             public Object getElementAt(int i) { return strings[i]; }
         });
         
             jList2.setModel(new javax.swing.AbstractListModel() {
             String strings [] = (String []) al.toArray (new String [al.size ()]);
+            @Override
             public int getSize() { return strings.length; }
+            @Override
             public Object getElementAt(int i) { return strings[i]; }
         
     });
@@ -1013,7 +1018,9 @@ private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
             
             jList3.setModel(new javax.swing.AbstractListModel() {
             String strings [] = (String []) al.toArray (new String [al.size ()]);
+            @Override
             public int getSize() { return strings.length; }
+            @Override
             public Object getElementAt(int i) { return strings[i]; }
         });
     }
@@ -1051,9 +1058,11 @@ private void jButton7ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRS
 //                
             jList4.setModel(new javax.swing.AbstractListModel() {
             String strings [] = (String []) al.toArray (new String [al.size ()]);
-            public int getSize() { return strings.length; }
-            public Object getElementAt(int i) { return strings[i]; }
-        });
+                @Override
+                public int getSize() { return strings.length; }
+                @Override
+                public Object getElementAt(int i) { return strings[i]; }
+            });
         }
     }
 }

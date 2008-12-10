@@ -2,6 +2,7 @@
 *.log
 *~
 *.temp
+*.odb
 dist
 build
 src/tests

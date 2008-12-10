@@ -35,9 +35,9 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     private String title = "UNKNOWN";
 
     private static int sensitiveMouseReaction = 8;
-    private static int alpha = 190;
+    private static int alpha = 210;
     private Color colorBorder = new Color(0,0,0,alpha);
-    private DoubleOvalBorder mainBorder = new DoubleOvalBorder(20,20,colorBorder,55,55,colorBorder);
+    private DoubleOvalBorder mainBorder = new DoubleOvalBorder(20,20,colorBorder,45,45,colorBorder);
 
     private OutputVerboseStream verboseStream = null;
 
@@ -45,9 +45,12 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     private boolean resizeHeghtPanel = false;
     private boolean cursorChanged = false;
 
+    private boolean needRevalidate = false;
+    private boolean dynamicRevalidate = false;
+
     private RotatedButton toggleButton;
 
-    private Dimension defaultSize = new Dimension(310,400);
+    private Dimension defaultSize = new Dimension(330,400);
 
     private Shape childClip = null;
 
@@ -63,11 +66,11 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
         addMouseListener(this);
         addMouseMotionListener(this);
         mainBorder.setInsetsOuter(new Insets(2,2,2,2));
-        mainBorder.setInsetsInner(new Insets(55,25,15,25));
+        mainBorder.setInsetsInner(new Insets(55,11,11,11));
         setBorder(mainBorder);
 
-        toggleButton = new RotatedButton("^", false,getSize(),l);
-        add(toggleButton);
+        //toggleButton = new RotatedButton("^", false,getSize(),l);
+        //add(toggleButton);
         setLayout(new GridBagLayout());
         
     }
@@ -78,14 +81,15 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
         int width = getParent().getWidth();
         int height = getParent().getHeight();
         this.setLocation(width-getWidth(), (height-getHeight())/2 );        
-        revalidate();
+        if(dynamicRevalidate)
+            revalidate();
         //getVerboseStream().outputVerboseStream(getClass().getSimpleName()+" UpdateMyUI\n Parent size ["+width+","+height+"]" +
-          //      "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");
+          //      "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");        
     }
 
     @Override
     public void paintComponent(Graphics g){
-        
+        super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g.create();
 
         GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,new Color(1,51,90,alpha),
@@ -117,13 +121,13 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
         g2.setPaint(gp);
         g2.fill(innerBorder);
 
-        g2.setClip(0,0,getWidth(),getHeight());
+        //g2.setClip(0,0,getWidth(),getHeight());
         g2.setPaint(oldPaint);
 
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                             RenderingHints.VALUE_ANTIALIAS_ON);
 
-        paintBorderGlow(g2,6,outerBorder);
+        paintBorderGlow(g2,5,outerBorder);
         paintBorderShadow(g2,2,innerBorder);
         
 
@@ -133,7 +137,7 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
                 innerBorder.getArcWidth(), innerBorder.getArcHeight());
 
         //System.out.println("childClip "+childClip.getBounds2D()+" innerBorder "+innerBorder.getBounds2D());
-        super.paintComponent(g2);        
+        
         g2.dispose();        
     }
 
@@ -174,10 +178,8 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
         float[] clr1 = c1.getComponents(null);
         float[] clr2 = c2.getComponents(null);
         for (int i = 0; i < clr1.length-1; i++) {
-            clr1[i] = (clr1[i] * pct1) + (clr2[i] * pct2);
-            System.out.println(""+i);
-        }
-        
+            clr1[i] = (clr1[i] * pct1) + (clr2[i] * pct2);            
+        }        
         return new Color(clr1[0], clr1[1], clr1[2], (float)alpha/255);
     }
 
@@ -209,7 +211,12 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     }
     @Override
     public void mouseReleased(MouseEvent e) {
-        getVerboseStream().outputVerboseStream("Release!");
+
+        if(needRevalidate){
+            getVerboseStream().outputVerboseStream("Revalidate!");            
+            revalidate();
+            needRevalidate=false;
+        }
         resizeWidthPanel = false;
         resizeHeghtPanel = false;
     }
@@ -226,14 +233,14 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
             if(resizeWidthPanel)
                 setSize(getWidth()-e.getX()+2, getHeight());
             else
-                setSize(getWidth(), getHeight()-e.getY());
-            
+                setSize(getWidth(), getHeight()-e.getY());            
             updateMyUI();
+            needRevalidate=true;
         }
     }
     @Override
     public void mouseMoved(MouseEvent e) {
-        getVerboseStream().outputVerboseStream("mouseMoved "+e.getX()+","+getY());
+        
         if(e.getX()<sensitiveMouseReaction||e.getY()<sensitiveMouseReaction){
             setCursor(Cursor.getPredefinedCursor( e.getX()<sensitiveMouseReaction ?
                                       Cursor.W_RESIZE_CURSOR:Cursor.N_RESIZE_CURSOR));

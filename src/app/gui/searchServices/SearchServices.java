@@ -29,7 +29,7 @@ import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
 import java.util.logging.Level;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
+import javax.swing.SwingUtilities;
 import odb.inter.ODBridge;
 import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
@@ -40,7 +40,7 @@ import org.apache.batik.swing.gvt.JGVTComponentListener;
  *
  * @author vara
  */
-public class SearchServices extends JPanel implements MouseListener,
+public class SearchServices extends JComponent implements MouseListener,
 							  MouseMotionListener,ComponentListener
 							  
 {	
@@ -225,7 +225,14 @@ public class SearchServices extends JPanel implements MouseListener,
     @Override
     public void componentResized(ComponentEvent e) {
         getVerboseStream().outputVerboseStream(""+getClass()+" component Resized "+getBounds());
-        detailsPane.updateMyUI();
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                detailsPane.updateMyUI();
+            }
+        });
+        
     }
 
     @Override
@@ -269,7 +276,7 @@ public class SearchServices extends JPanel implements MouseListener,
 	    public void componentTransformChanged(ComponentEvent event) {
 		
 		AffineTransform at = ((JSVGCanvas)event.getComponent()).getRenderingTransform();		
-		renderingTranform = at;
+            renderingTranform = at;
 	    }
 	    
 	    public AffineTransform getRenderingTransform(){

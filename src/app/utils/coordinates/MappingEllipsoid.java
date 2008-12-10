@@ -34,8 +34,19 @@ public class MappingEllipsoid {
 	double k = Math.pow(u/v,e/2);
 	double c = k * Math.tan( ((phi/2)+Math.PI/4) );
 	phi = 2*Math.atan(c) - Math.PI/2;
-	double delta = PointXY.Conversion.convertDMSToDecimalDegree(15,0,0) + l;
+	double delta = PointXY.Conversion.convertDMSToDecimalDegree(15,0,0) + (l-PointXY.Conversion.convertDMSToDecimalDegree(15,0,0));
 	return new PointXY(phi,delta);	
+	/*
+	Params : Latitude 54.19 Longitude 16.1825
+Lagrange : Latitude : 0.8322110555269999 Longitude : 31.1825
+Marcator : Latitude : 108102.00309768399 Longitude : 3649870.714536103
+Gauss Kruger : Latitude : 1889.9027949587519 Longitude : 63809.1792214115
+	 * 
+Lagrange : Latitude : 0.9426057930109599 Longitude : 31.1825
+Marcator : Latitude : 122441.09387753019 Longitude : 3649736.3121762136
+Gauss Kruger : Latitude : 2140.587212999138 Longitude : 63806.82952110365
+	 */
+		
     }
     protected static PointXY mappingMercator(double phi,double lambda){
 	
@@ -72,7 +83,7 @@ public class MappingEllipsoid {
 	return new PointXY(xgc,ygc);
     }
     
-    public PointXY getCoordinateFromGK(double latitude,double longitude){
+    public static PointXY getCoordinateFromGK(double latitude,double longitude){
 	PointXY lag = MappingEllipsoid.mappingLagrange(latitude,longitude);
 	PointXY marc = MappingEllipsoid.mappingMercator(lag.getLatitude(), lag.getLongitude());
 	PointXY krug = MappingEllipsoid.mappingGaussKruger(marc.getLatitude(), marc.getLongitude());
