@@ -7,12 +7,16 @@ package app.gui;
 
 import app.utils.OutputVerboseStream;
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.awt.Paint;
+import java.awt.RenderingHints;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
+import java.awt.geom.Rectangle2D;
+import java.awt.geom.RoundRectangle2D;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -24,132 +28,152 @@ import javax.swing.JButton;
 public class ToolBarButton extends JButton implements MouseListener{
         
     private boolean mouseOnButton = false;
-    private boolean selectedButton = false;
+    private boolean mousePressedButton = false;
     private boolean clickableButton = false;
     
-    private OutputVerboseStream letOfChange = null;
-    
+    private OutputVerboseStream letOfChange;
+
+    private GradientPaint[] gradientOnButton = new GradientPaint[2];
+    private GradientPaint[] gradientPressedButtion = new GradientPaint[2];
+    private Rectangle2D [] recForGradient = new Rectangle2D[2];
+    private Dimension oldSize = null;
+    private RoundRectangle2D borderOnButton;
+
+    private float roundCorner = 12.0f;
+
     public ToolBarButton(Action a,ImageIcon i,OutputVerboseStream l){
 	
-	super(a);
-	setLetOfChanged(l);
-	setIcon(i);
-	setText("");
-	setFocusPainted(false);
-	setBorderPainted(false);
-	if(a.isEnabled())
-	    addMouseListener(this);	
+        super(a);
+        setVerboseStream(l);
+        setIcon(i);
+        setText("");
+        setFocusPainted(false);
+        setBorderPainted(false);
+        if(a.isEnabled())
+            addMouseListener(this);
     }
     public ToolBarButton(Action a,ImageIcon i,OutputVerboseStream l,boolean clickable){
-	this(a,i,l);
-	setClickableButton(clickable);
+        this(a,i,l);
+        setClickableButton(clickable);
     }
     
-    public void setLetOfChanged(OutputVerboseStream l){
+    public void setVerboseStream(OutputVerboseStream l){
 	letOfChange = l;
     }
-    
+
+    private void updateMyUI(){
+        oldSize = getSize();
+        gradientOnButton[0] = new GradientPaint(0.0f, (float) getHeight()/4,new Color(250,250,255),
+                                                0.0f, 0.0f, new Color(224,234,255));
+        gradientOnButton[1] = new GradientPaint(0.0f, (float) getHeight()/3, new Color(250,250,255),
+                                                0.0f, (float) getHeight(), new Color(174,201,255));
+
+        gradientPressedButtion[0] = new GradientPaint(0.0f, (float) getHeight()/4,new Color(255,255,255),
+                                                      0.0f, 0.0f, new Color(124,134,155));
+        gradientPressedButtion[1] = new GradientPaint(0.0f, (float) getHeight()/3, new Color(255,255,255),
+                                                      0.0f, (float) getHeight(), new Color(74,101,155));
+
+        recForGradient[0] = new Rectangle2D.Double(0, 0, getWidth(), getHeight()/3);
+        recForGradient[1] = new Rectangle2D.Double(0, getHeight()/3, getWidth(), getHeight());
+        borderOnButton    = new RoundRectangle2D.Double(1,2, getWidth()-2, getHeight()-4, roundCorner,roundCorner);
+    }
+
     @Override
     public void paintComponent(Graphics g){
-	
-	if(isEnabled()){
-	    final Graphics2D g2 = (Graphics2D) g;	
-	    int w = getWidth();
-	    int h = getHeight();
-	    //System.out.println(""+w+","+h);
-	    if(isMouseOnButton() || isSelectedButton()){
+        //super.paintComponent(g);
 
-		GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight()/4,Color.white, 
-							    0.0f, 0.0f, new Color(224,234,255));			    
-		Rectangle rec1 = new Rectangle(0, 0, getWidth(), getHeight()/3);
-		g2.setPaint(gradient1);
-		g2.fill(rec1);
-		// paint lower gradient
-		GradientPaint gradient2 = new GradientPaint(0.0f, (float) getHeight()/3, Color.WHITE,
-							    0.0f, (float) getHeight(), new Color(174,201,255));
-		Rectangle rec2 = new Rectangle(0, getHeight()/3, getWidth(), getHeight());
-		g2.setPaint(gradient2);
-		g2.fill(rec2);
+        if(isEnabled()){
+            final Graphics2D g2 = (Graphics2D) g.create();
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.setColor(getBackground());
+            g2.fillRect(0, 0, getWidth(), getHeight());
 
-	    }else{
-		g2.setColor(getBackground());
-		g2.fillRect(0, 0, w, h);
-	    }
-	    //g2.fillRect(0, 0, w, h);
+            if(oldSize==null || oldSize.getHeight()!=getHeight() || oldSize.getWidth()!=getWidth())
+                updateMyUI();
+            
+            if(isMouseOnButton() || isSelected()){
+                Paint oldPaint = g2.getPaint();
+                g2.setClip(borderOnButton);
+                GradientPaint [] gradient = null;
+                Color borderColor = null;
+                
+                if(mousePressedButton){
+                    borderColor = new Color(25, 25, 25);
+                    gradient = gradientPressedButtion;                    
+                }else{                    
+                    borderColor = new Color(155, 155, 155);
+                    gradient = gradientOnButton;
+                }
 
-	    getIcon().paintIcon(this, g2,(w-getIcon().getIconWidth())/2, (h-getIcon().getIconHeight())/2);
-	    
-	}else			
-	    super.paintComponent(g);
+                for(int i=0;i<gradient.length && i<recForGradient.length;i++){
+                    g2.setPaint(gradient[i]);
+                    g2.fill(recForGradient[i]);
+                }
+                g2.setPaint(oldPaint);
+                g2.setClip(0, 0,getWidth(),getHeight());
+                g2.setColor(borderColor);
+                g2.draw(borderOnButton);
+
+            }
+            getIcon().paintIcon(this, g2,(getWidth()-getIcon().getIconWidth())/2,
+                                         (getHeight()-getIcon().getIconHeight())/2);
+            g2.dispose();
+        }else
+            super.paintComponent(g);	    
     }
 
     @Override
-    public void mouseClicked(MouseEvent e) {
-	if(isClickableButton())
-	    if(isSelectedButton()){
-		setSelectedButton(!selectedButton);
-		setBorderPainted(false);
-	    }
-	    else{
-		setSelectedButton(!selectedButton);
-		setBorderPainted(true);
-		//setBorder(Utils.createSimpleBorder(1, 1,1,1,new Color(174,201,255)));
-	    }
-    }
+    public void mouseClicked(MouseEvent e) {}
     @Override
     public void mousePressed(MouseEvent e) {
-	
-	    setBorderPainted(true);
-	
+        mousePressedButton = true;
     }
     @Override
     public void mouseReleased(MouseEvent e) {
-	if(!isClickableButton()){
-	    setBorderPainted(false);
-	}
+        if(isClickableButton()){
+            setSelected(!isSelected());
+        }
+        mousePressedButton = false;
     }
     @Override
     public void mouseEntered(MouseEvent e) {
-	setMouseOnButton(true);	
+        setMouseOnButton(true);
     }
 
     @Override
     public void mouseExited(MouseEvent e) {
-	setMouseOnButton(false);
+        setMouseOnButton(false);
     }
 
     protected boolean isMouseOnButton() {
-	return mouseOnButton;
+        return mouseOnButton;
     }
 
     protected void setMouseOnButton(boolean mouseOnButton) {
-	this.mouseOnButton = mouseOnButton;
-    }
-
-    public boolean isSelectedButton() {
-	return selectedButton;
-    }
-
-    protected void setSelectedButton(boolean selectedButton) {
-	this.selectedButton = selectedButton;
+        this.mouseOnButton = mouseOnButton;
     }
 
     protected boolean isClickableButton() {
-	return clickableButton;
+        return clickableButton;
     }
 
-    protected void setClickableButton(boolean clickableButton) {
-	this.clickableButton = clickableButton;
-    }
-    @Override
-    public void setEnabled(boolean b){
-	super.setEnabled(b);
-	if(b)
-	    addMouseListener(this);
-	else
-	    removeMouseListener(this);
-	if(letOfChange!=null)
-	    letOfChange.outputVerboseStream(getAction().getValue(Action.NAME)+" isEnabled "+b);
+    protected OutputVerboseStream getVerboseStream() {
+        return letOfChange;
     }
     
+    protected void setClickableButton(boolean clickableButton) {
+        this.clickableButton = clickableButton;
+    }
+
+    @Override
+    public void setEnabled(boolean b){
+        super.setEnabled(b);
+        if(b)
+            addMouseListener(this);
+        else
+            removeMouseListener(this);
+        
+        if(getVerboseStream()!=null)
+            getVerboseStream().outputVerboseStream(getAction().getValue(Action.NAME)+" isEnabled "+b);
+    }   
 }

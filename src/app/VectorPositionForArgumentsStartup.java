@@ -18,59 +18,58 @@ public class VectorPositionForArgumentsStartup {
     
     public VectorPositionForArgumentsStartup(String [] arg){
 	
-	for (String string : arg) {
-	    vec.add(string);
-	}	
+        for (String string : arg) {
+            vec.add(string);
+        }
     }
     
     @Override
     public String toString(){
-	String ret="";
-	for (String string : vec) {
-	    ret+=string+" ";
-	}
-	return ret;
+        String ret="";
+        for (String string : vec) {
+            ret+=string+" ";
+        }
+        return ret;
     }
     
     public String getParameter()throws IndexOutOfBoundsException{
-	if(counter<vec.size())
-	    return vec.elementAt(counter);
-	throw new IndexOutOfBoundsException("End list of parameters");
+        if(counter<vec.size())
+            return vec.elementAt(counter);
+        throw new IndexOutOfBoundsException("End list of parameters");
     }
     public String getNextParameter()throws IndexOutOfBoundsException{
-	try {
-	    String ret = getParameter();
-	    incrementCounter();
-	    return ret;
-	} catch (IndexOutOfBoundsException ex) {
-	    decrementCounter(); //return to last element in vec
-	    throw ex;
-	}
+        try {
+            String ret = getParameter();
+            incrementCounter();
+            return ret;
+        } catch (IndexOutOfBoundsException ex) {
+            decrementCounter(); //return to last element in vec
+            throw ex;
+        }
     }
     
     public boolean isNextParameter(){
-	return getCounter()<vec.size();
+        return getCounter()<vec.size();
     }
     
     public String getPreviewParameter()throws LackOfNextItemException{
-	try{
-	
-	String str = getNextParameter();
-	decrementCounter();
-	return str;
-	
-	}catch(IndexOutOfBoundsException e)
-	{
-	    throw new LackOfNextItemException("Lack of next item ...");
-	}	
+        try{
+
+            String str = getNextParameter();
+            decrementCounter();
+            return str;
+
+        }catch(IndexOutOfBoundsException e){
+            throw new LackOfNextItemException("Lack of next item ...");
+        }
     }
     private void incrementCounter(){
-	counter++;
+        counter++;
     }
     private void decrementCounter(){
-	counter--;
+        counter--;
     }
     public final int getCounter(){
-	return counter;
+        return counter;
     }
 }

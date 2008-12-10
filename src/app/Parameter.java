@@ -15,30 +15,30 @@ public class Parameter {
     private String value;
         
     public Parameter(String p,String val){
-	param = p;
-	value = val;
+        param = p;
+        value = val;
     }
 
     public String getParam() {
-	return param;
+        return param;
     }
     public char getCharParam(){
-	char [] charArr = param.toCharArray();
-	char sumChar=0;
-	for (char c : charArr) {
-	    sumChar+=c;
-	}
-	return sumChar;
+        char [] charArr = param.toCharArray();
+        char sumChar=0;
+        for (char c : charArr) {
+            sumChar+=c;
+        }
+        return sumChar;
     }
     public void setParam(String param) {
-	this.param = param;
+        this.param = param;
     }
 
     public String getValue() {
-	return value;
+        return value;
     }
 
     public void setValue(String value) {
-	this.value = value;
+        this.value = value;
     }
 }

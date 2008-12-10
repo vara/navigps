@@ -23,13 +23,13 @@ public class SVGLoader {
 	public SVGLoader()
 	{}
 
-	public static SVGDocument getSVGDocumentFromPath(String path)
+	public static SVGDocument getSVGDocumentFromPath(String path) throws IOException
 	{
 		File file = new File(path);
 		return getSVGDocumentFromFile(file);
 	}
 
-	public static SVGDocument getSVGDocumentFromInputStream(InputStream in)
+	public static SVGDocument getSVGDocumentFromInputStream(InputStream in) throws IOException
 	{	if(in!=null)
 			{
 			try {
@@ -39,14 +39,15 @@ public class SVGLoader {
 				return doc;
 
 			} catch(IOException ex) {
-				System.err.println(SVGLoader.class.getName()+" "+ ex);
+			    System.out.println(""+ex);
+				throw ex;
 			}
 		}else
 			System.err.println(SVGLoader.class.getName()+"  InputStream == null");
 		return null;
 	}
 	
-	public static SVGDocument getSVGDocumentFromFile(File file)
+	public static SVGDocument getSVGDocumentFromFile(File file) throws IOException
 	{
 		if(file.isFile()){		    
 		    try {
@@ -55,8 +56,8 @@ public class SVGLoader {
 			return fac.createSVGDocument(file.toURI().toString());
 
 		    } catch (IOException ex) {
-			Logger.getLogger(SVGLoader.class.getName()).log(Level.SEVERE, null, ex);
-			return null;
+			System.out.println(""+ex);
+			throw ex;
 		    }
 		}
 		

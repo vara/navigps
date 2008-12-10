@@ -28,6 +28,8 @@ import java.awt.font.GlyphVector;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
+import java.lang.management.ManagementFactory;
+import java.lang.management.MemoryMXBean;
 import java.text.NumberFormat;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
@@ -91,8 +93,7 @@ public class MemoryGui extends JComponent implements Runnable,
     }
     
     private void init(){
-	
-	
+		
 	MyLogger.log.log(Level.FINE, "Init Memory Gui");
 	chart = new Chart();		
 	setBounds(0,1,getWPaint()+(int)tPaint,getHPaint()+(int)tPaint+1);

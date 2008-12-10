@@ -21,7 +21,7 @@ public class ArgumentsStartUp {
     private boolean exitProgram = true;    
     private String infoParameters = "\n\t-v  \t(verbose mode) result return by function only on console" +
 				    "\n\t-vg \t(verbose mode) like -v + create window in gui with the same result on console" +
-				    "\n\t-s  \t(Show properties) create window in app with properties chart file" +
+				    "\n\t-sp  \t(Show properties) create window in app with properties chart file" +
 				    "\n\t-c  \t(path to configuration file) not suported yet !!!"+
 				    "\n\t-f  \t(path to chart file) file format documents must by only svg !!!"+
 				    "\n\t-h  \t(Show this text)";
@@ -113,7 +113,7 @@ public class ArgumentsStartUp {
 		    //You can add check whether this is a file?
 		    
 		    break;
-	    case 's':
+	    case 's'+'p':
 		
 		    MainConfiguration.setShowDocumentProperties(true);
 		    break;
@@ -160,7 +160,7 @@ public class ArgumentsStartUp {
 
 	    map.put("vg",new Boolean(false));
 	    map.put("v",new Boolean(false));
-	    map.put("s",new Boolean(false));
+	    map.put("sp",new Boolean(false));
 	    map.put("f",new Boolean(true));
 	    map.put("c",new Boolean(true));
 	    map.put("h",new Boolean(false));

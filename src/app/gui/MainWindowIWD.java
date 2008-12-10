@@ -13,7 +13,6 @@ import app.gui.svgComponents.SVGDOMTreeModel;
 import app.gui.svgComponents.SVGDOMTreeRenderer;
 import app.gui.svgComponents.SVGScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
-import app.gui.JTextPaneForVerboseInfo;
 import app.utils.BridgeForVerboseMode;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
@@ -85,10 +84,8 @@ import org.w3c.dom.svg.SVGSVGElement;
  * @author vara
  */
 public class MainWindowIWD extends JFrame implements ItemListener{
-
     
     private Main core;
-    
     private JPanel panelWithToolBars;
     private StatusPanel statusPanel;
     private Action openSVGFileAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction,searchServicesAction;
@@ -115,180 +112,179 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     public MainWindowIWD(Main c){
 	
-	MyLogger.log.log(Level.FINE,"Constructor "+getClass().toString());
-	core = c;
-	setSize(MainConfiguration.getScreenSize());	
-	setLayout(new BorderLayout());
-	
-	initComponents();
-	
-	if(MainConfiguration.getPathToChartFile()!=null)
-	    openSVGDocument(MainConfiguration.getPathToChartFile());
-	
-	setTitle("NaviGPS ver. 0.4");
-	setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-	setVisible(true);
+        MyLogger.log.log(Level.FINE,"Constructor "+getClass().toString());
+        core = c;
+        setSize(MainConfiguration.getScreenSize());
+        setLayout(new BorderLayout());
+
+        initComponents();
+
+        if(MainConfiguration.getPathToChartFile()!=null)
+            openSVGDocument(MainConfiguration.getPathToChartFile());
+
+        setTitle("NaviGPS ver. 0.4");
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        setVisible(true);
     }
+
     public MainWindowIWD(Main c,ArgumentsStartUp arg){
-	this(c);
-	//openSVGDocument(filePath);
+        this(c);
+        //openSVGDocument(filePath);
     }
     
-    private void initComponents()
-    {
-	BridgeForVerboseMode bfvm = new BridgeForVerboseMode();	    
-	if(MainConfiguration.isModeVerboseGui()){
-		verbosePane = new JTextPaneForVerboseInfo();
-		bfvm.addComponentsWithOutputStream(verbosePane.getInforamtionPipe());	    
-	}
-	
-	verboseStream = bfvm;
-	
-	
-	openSVGFileAction = new OpenSVGFileAction("Open SVG document ...", 
-				    createNavigationIcon("open16"), "Open SVG Document",
-				    KeyEvent.VK_O);
-	zoomInAction = new ZoomInAction("Zoom In", 
-				    createNavigationIcon("zoomIn16"), 
-				    "Zoom in from center document", 
-				    KeyEvent.VK_PLUS);
-	zoomOutAction = new ZoomOutAction("Zoom Out", 
-				    createNavigationIcon("zoomOut16"), 
-				    "Zoom out from center document", 
-				    KeyEvent.VK_MINUS);
-	zoomAction = new ZoomAction("Zoom", 
-				    createNavigationIcon("zoom16"), 
-				    "Zoom from svg coordinate (in/out Left/Right Mouse Key)", 
-				    KeyEvent.VK_Z);
-	fitToPanelAction = new FitToPanelAction("Fit to Panel",
-				    createNavigationIcon("fitToPanel16"),
-				    "Center your svg map",
-				    KeyEvent.VK_F);
-	searchServicesAction = new SearchServicesAction("Search Services",
-				    createNavigationIcon("fitToPanel16"),
-				    "Search services with a certain area",
-				    KeyEvent.VK_S);
-	
-	if(MainConfiguration.isShowDocumentProperties()){	    
-	    tree = new JTree();
-	    tree.setModel(null);	    
-	}
-	
-	svgListeners.setVerboseStream(getVerboseStream());
-	svgListeners.addUpdateComponents(new UpdateMenuAndToolBars());
-	
-	//init docking RootWindow
-	createRootWindow();
-	setDefaultLayout();
-	
-	 
-	getContentPane().add(rootWindow, BorderLayout.CENTER);    
-    
-	
-	creatToolBars();	//must be before creatMenuBar()
-	creatMenuBar();
-	createStatusPanel();	//must be before createCanvasPanel() 
-	//createCanvas();
+    private void initComponents(){
+        BridgeForVerboseMode bfvm = new BridgeForVerboseMode();
+        if(MainConfiguration.isModeVerboseGui()){
+            verbosePane = new JTextPaneForVerboseInfo();
+            bfvm.addComponentsWithOutputStream(verbosePane.getInforamtionPipe());
+        }
+
+        verboseStream = bfvm;
+
+
+        openSVGFileAction = new OpenSVGFileAction("Open SVG document ...",
+                        createNavigationIcon("open16"), "Open SVG Document",
+                        KeyEvent.VK_O);
+        zoomInAction = new ZoomInAction("Zoom In",
+                        createNavigationIcon("zoomIn16"),
+                        "Zoom in from center document",
+                        KeyEvent.VK_PLUS);
+        zoomOutAction = new ZoomOutAction("Zoom Out",
+                        createNavigationIcon("zoomOut16"),
+                        "Zoom out from center document",
+                        KeyEvent.VK_MINUS);
+        zoomAction = new ZoomAction("Zoom",
+                        createNavigationIcon("zoom16"),
+                        "Zoom from svg coordinate (in/out Left/Right Mouse Key)",
+                        KeyEvent.VK_Z);
+        fitToPanelAction = new FitToPanelAction("Fit to Panel",
+                        createNavigationIcon("fitToPanel16"),
+                        "Center your svg map",
+                        KeyEvent.VK_F);
+        searchServicesAction = new SearchServicesAction("Search Services",
+                        createNavigationIcon("fitToPanel16"),
+                        "Search services with a certain area",
+                        KeyEvent.VK_S);
+
+        if(MainConfiguration.isShowDocumentProperties()){
+            tree = new JTree();
+            tree.setModel(null);
+        }
+
+        svgListeners.setVerboseStream(getVerboseStream());
+        svgListeners.addUpdateComponents(new UpdateMenuAndToolBars());
+
+        //init docking RootWindow
+        createRootWindow();
+        setDefaultLayout();
+
+
+        getContentPane().add(rootWindow, BorderLayout.CENTER);
+
+
+        creatToolBars();	//must be before creatMenuBar()
+        creatMenuBar();
+        createStatusPanel();	//must be before createCanvasPanel()
+        //createCanvas();
     }
     
     public OutputVerboseStream getVerboseStream(){
-	return verboseStream;
+        return verboseStream;
     }
     
     private void setDefaultLayout() {
-	if(views.size()>1){
-	    View[] viewsTabDockingWindow = new View[views.size()];
-	    for (int i = 0; i < viewsTabDockingWindow.length; i++) {
-		viewsTabDockingWindow[i] = views.get(i);	    
-	    }
+        if(views.size()>1){
+            View[] viewsTabDockingWindow = new View[views.size()];
+            for (int i = 0; i < viewsTabDockingWindow.length; i++) {
+                viewsTabDockingWindow[i] = views.get(i);
+            }
 
-	    TabWindow tabWindow = new TabWindow(viewsTabDockingWindow);
-	    int minus=0;
+            TabWindow tabWindow = new TabWindow(viewsTabDockingWindow);
+            int minus=0;
 
-	    if(MainConfiguration.isModeVerboseGui())
-		minus =2;//first and last window (CanvasWindow and DebugWindow)
-	    else
-		minus=1; //only first window
+            if(MainConfiguration.isModeVerboseGui())
+            minus =2;//first and last window (CanvasWindow and DebugWindow)
+            else
+            minus=1; //only first window
 
-	    View [] splitTab = new View[views.size()-minus];
+            View [] splitTab = new View[views.size()-minus];
 
-	    //only windows on left side
-	    for (int i = 0; i < viewsTabDockingWindow.length-minus; i++) {
-		splitTab[i]= viewsTabDockingWindow[i+1];	    
-	    }
+            //only windows on left side
+            for (int i = 0; i < viewsTabDockingWindow.length-minus; i++) {
+                splitTab[i]= viewsTabDockingWindow[i+1];
+            }
 
-	    SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(splitTab),views.lastElement());
-	    rootWindow.setWindow(new SplitWindow(true,0.2f,splitWindow,tabWindow));	
-	    if(MainConfiguration.isModeVerboseGui()){
-		WindowBar windowBar = rootWindow.getWindowBar(Direction.DOWN);
-		windowBar.addTab(views.lastElement());
-	    }
-	}
+            SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(splitTab),views.lastElement());
+            rootWindow.setWindow(new SplitWindow(true,0.2f,splitWindow,tabWindow));
+            if(MainConfiguration.isModeVerboseGui()){
+                WindowBar windowBar = rootWindow.getWindowBar(Direction.DOWN);
+                windowBar.addTab(views.lastElement());
+            }
+        }
 	
     }
     private void createRootWindow() {
     
-	//main window should always be first
-	View vRoot = new View("SVG Document", VIEW_ICON, createCanvasWithScrollPane());
-	freezeLayout(true,vRoot.getWindowProperties());
-	views.add(vRoot);
-	
-	if(MainConfiguration.isShowDocumentProperties())
-	    views.add(new View("Properties", VIEW_ICON, new JScrollPane(tree)));	
+        //main window should always be first
+        View vRoot = new View("SVG Document", VIEW_ICON, createCanvasWithScrollPane());        
+        freezeLayout(true,vRoot.getWindowProperties());
+        views.add(vRoot);
+        if(MainConfiguration.isShowDocumentProperties())
+            views.add(new View("Properties", VIEW_ICON, new JScrollPane(tree)));
 
-	if(MainConfiguration.isModeVerboseGui()){
-	    
-	    View vv = new View("Result return by functions",VIEW_ICON,verbosePane);
-	    vv.getWindowProperties().setRestoreEnabled(false);
-	    JButtonActionForDebugWindow button = new JButtonActionForDebugWindow(BUTTON_ICON);
-	    vv.getCustomTabComponents().add(button);	    
-	    views.add(vv);
-	}
-	for(int i=0;i<views.size();i++){
-	    viewMap.addView(i, views.get(i));
-	}	
-	
-	// The mixed view map makes it easy to mix static and dynamic views inside the same root window
-	//MixedViewHandler handler = new MixedViewHandler(viewMap, new ViewSerializer() {
-	//  public void writeView(View view, ObjectOutputStream out) throws IOException {
-	//    out.writeInt(((DynamicView) view).getId());
-	//  }
+        if(MainConfiguration.isModeVerboseGui()){
 
-	//  public View readView(ObjectInputStream in) throws IOException {
-	//    return getDynamicView(in.readInt());
-	//  }
-	//});
-	//rootWindow = DockingUtil.createRootWindow(viewMap,handler,true);
-	
-	//rootWindow.setPopupMenuFactory(null);
-	rootWindow = DockingUtil.createRootWindow(viewMap,true);
-	//rootWindow.add(createCanvas(),BorderLayout.CENTER);
-	// Set gradient theme. The theme properties object is the super object of our properties object, which
-	// means our property value settings will override the theme values
-	properties.addSuperObject(currentTheme.getRootWindowProperties());	
-	
-	// Our properties object is the super object of the root window properties object, so all property values of the
-	// theme and in our property object will be used by the root window
-	rootWindow.getRootWindowProperties().addSuperObject(properties);
-	properties.setRecursiveTabsEnabled(false);
-	properties.getDockingWindowProperties().setMaximizeEnabled(false);
-	
-	//Enable the bottom window bar
-	if(MainConfiguration.isModeVerboseGui()){
-	    rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
-	    rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
-	}	
+            View vv = new View("Result return by functions",VIEW_ICON,verbosePane);
+            vv.getWindowProperties().setRestoreEnabled(false);
+            JButtonActionForDebugWindow button = new JButtonActionForDebugWindow(BUTTON_ICON);
+            vv.getCustomTabComponents().add(button);
+            views.add(vv);
+        }
+        for(int i=0;i<views.size();i++){
+            viewMap.addView(i, views.get(i));
+        }
+
+        // The mixed view map makes it easy to mix static and dynamic views inside the same root window
+        //MixedViewHandler handler = new MixedViewHandler(viewMap, new ViewSerializer() {
+        //  public void writeView(View view, ObjectOutputStream out) throws IOException {
+        //    out.writeInt(((DynamicView) view).getId());
+        //  }
+
+        //  public View readView(ObjectInputStream in) throws IOException {
+        //    return getDynamicView(in.readInt());
+        //  }
+        //});
+        //rootWindow = DockingUtil.createRootWindow(viewMap,handler,true);
+
+        //rootWindow.setPopupMenuFactory(null);
+        rootWindow = DockingUtil.createRootWindow(viewMap,true);
+        //rootWindow.add(createCanvas(),BorderLayout.CENTER);
+        // Set gradient theme. The theme properties object is the super object of our properties object, which
+        // means our property value settings will override the theme values
+        properties.addSuperObject(currentTheme.getRootWindowProperties());
+
+        // Our properties object is the super object of the root window properties object, so all property values of the
+        // theme and in our property object will be used by the root window
+        rootWindow.getRootWindowProperties().addSuperObject(properties);
+        properties.setRecursiveTabsEnabled(false);
+        properties.getDockingWindowProperties().setMaximizeEnabled(false);
+
+        //Enable the bottom window bar
+        if(MainConfiguration.isModeVerboseGui()){
+            rootWindow.getWindowBar(Direction.DOWN).setEnabled(true);
+            rootWindow.addTabMouseButtonListener(DockingWindowActionMouseButtonListener.MIDDLE_BUTTON_CLOSE_LISTENER);
+        }       
     }
     
     private void freezeLayout(boolean freeze,DockingWindowProperties prop) {
-	// Freeze window operations
-	prop.setDragEnabled(!freeze);
-	prop.setCloseEnabled(!freeze);
-	prop.setMinimizeEnabled(!freeze);
-	prop.setRestoreEnabled(!freeze);
-	prop.setMaximizeEnabled(!freeze);
-	prop.setUndockEnabled(!freeze);
-	prop.setDockEnabled(!freeze);	
+        // Freeze window operations
+        prop.setDragEnabled(!freeze);
+        prop.setCloseEnabled(!freeze);
+        prop.setMinimizeEnabled(!freeze);
+        prop.setRestoreEnabled(!freeze);
+        prop.setMaximizeEnabled(!freeze);
+        prop.setUndockEnabled(!freeze);
+        prop.setDockEnabled(!freeze);
     }
     
     protected static ImageIcon createNavigationIcon(String imageName) {
@@ -310,152 +306,152 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     public void createStatusPanel(){
 		
 	statusPanel = new StatusPanel(svgListeners);		
-	//statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));	
-	getContentPane().add(getStatusPanel(),BorderLayout.PAGE_END);
+        //statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));
+        getContentPane().add(getStatusPanel(),BorderLayout.PAGE_END);
     }
     
     public void creatToolBars(){
     
-	panelWithToolBars = new JPanel(new FlowLayout(0,0,0)){
-	    @Override
-	    public void paintComponent(Graphics g){
-		super.paintComponent(g);
-		final Graphics2D g2 = (Graphics2D) g;	    
-		GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight(),Color.white, 
-							    0.0f, 8.5f, new Color(235,245,255));			    
-		Rectangle rec1 = new Rectangle(0, 0, getWidth(), getHeight());
-		g2.setPaint(gradient1);
-		g2.fill(rec1);
-	    }
-	};
-	
-	toolBarFile = new JToolBar("ToolBar File");
-	toolBarZoom = new JToolBar("ToolBar Zoom");
-	toolBarSerch = new JToolBar("ToolBar Serch");
-	toolBarMemMonitor = new JToolBar("Memory Monitor"){
-	    @Override
-	    public void setVisible(boolean b){
-		super.setVisible(b);
-		Component[] comp = getComponents();		
-		for (Component component : comp) {
-		    component.setVisible(b);		    
-		}
-	    }
-	};
-	
-	toolBarFile.add(new ToolBarButton(openSVGFileAction, 
-					  createNavigationIcon("open32"),
-					  getVerboseStream()));
-	toolBarZoom.add(new ToolBarButton(zoomInAction, 
-					  createNavigationIcon("zoomIn32"),
-					  getVerboseStream()));
-	toolBarZoom.add(new ToolBarButton(zoomOutAction, 
-					  createNavigationIcon("zoomOut32"),
-					  getVerboseStream()));		
-	toolBarZoom.add(new ToolBarButton(zoomAction, 
-					  createNavigationIcon("zoom32"),
-					  getVerboseStream(),true));
-	toolBarZoom.add(new ToolBarButton(fitToPanelAction, 
-					  createNavigationIcon("fitToPanel32"),
-					  getVerboseStream()));	
-	toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
-	toolBarMemMonitor.setMargin(new Insets(4,0,4,1));
-	toolBarSerch.add(new ToolBarButton(searchServicesAction,
-					  createNavigationIcon("fitToPanel32"),
-					  getVerboseStream(),true));
-	
-	
-	panelWithToolBars.add(toolBarMemMonitor,FlowLayout.LEFT);
-	panelWithToolBars.add(toolBarSerch,FlowLayout.LEFT);
-	panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
-	panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);	
-	
-	getContentPane().add(panelWithToolBars,BorderLayout.PAGE_START);
+        panelWithToolBars = new JPanel(new FlowLayout(0,0,0)){
+            @Override
+            public void paintComponent(Graphics g){
+                super.paintComponent(g);
+                final Graphics2D g2 = (Graphics2D) g;
+                GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight(),Color.white,
+                                        0.0f, 8.5f, new Color(235,245,255));
+                Rectangle rec1 = new Rectangle(0, 0, getWidth(), getHeight());
+                g2.setPaint(gradient1);
+                g2.fill(rec1);
+            }
+        };
+
+        toolBarFile = new JToolBar("ToolBar File");
+        toolBarZoom = new JToolBar("ToolBar Zoom");
+        toolBarSerch = new JToolBar("ToolBar Serch");
+        toolBarMemMonitor = new JToolBar("Memory Monitor"){
+            @Override
+            public void setVisible(boolean b){
+                super.setVisible(b);
+                Component[] comp = getComponents();
+                    for (Component component : comp) {
+                        component.setVisible(b);
+                    }
+                }
+        };
+
+        toolBarFile.add(new ToolBarButton(openSVGFileAction,
+                          createNavigationIcon("open32"),
+                          getVerboseStream()));
+        toolBarZoom.add(new ToolBarButton(zoomInAction,
+                          createNavigationIcon("zoomIn32"),
+                          getVerboseStream()));
+        toolBarZoom.add(new ToolBarButton(zoomOutAction,
+                          createNavigationIcon("zoomOut32"),
+                          getVerboseStream()));
+        toolBarZoom.add(new ToolBarButton(zoomAction,
+                          createNavigationIcon("zoom32"),
+                          getVerboseStream(),true));
+        toolBarZoom.add(new ToolBarButton(fitToPanelAction,
+                          createNavigationIcon("fitToPanel32"),
+                          getVerboseStream()));
+        toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
+        toolBarMemMonitor.setMargin(new Insets(4,0,4,1));
+        toolBarSerch.add(new ToolBarButton(searchServicesAction,
+                          createNavigationIcon("fitToPanel32"),
+                          getVerboseStream(),true));
+
+
+        panelWithToolBars.add(toolBarMemMonitor,FlowLayout.LEFT);
+        panelWithToolBars.add(toolBarSerch,FlowLayout.LEFT);
+        panelWithToolBars.add(toolBarZoom,FlowLayout.LEFT);
+        panelWithToolBars.add(toolBarFile,FlowLayout.LEFT);
+
+        getContentPane().add(panelWithToolBars,BorderLayout.PAGE_START);
 	
     }
     
     public void creatMenuBar(){
 	
-	JMenuBar jmb = new JMenuBar();
-	
-	JMenuItem itemFile = new JMenuItem(openSVGFileAction);
-	JMenuItem itemExit = new JMenuItem("Exit");
-	itemExit.addActionListener(new ActionListener() {
-	    @Override
-	    public void actionPerformed(ActionEvent e) {
-		exitApp();
-	    }
-	});
-	
-	JMenuItem odbManager = new JMenuItem("ODBManager");
-        odbManager.addActionListener(new ActionListener() {
+        JMenuBar jmb = new JMenuBar();
 
-	    @Override
+        JMenuItem itemFile = new JMenuItem(openSVGFileAction);
+        JMenuItem itemExit = new JMenuItem("Exit");
+        itemExit.addActionListener(new ActionListener() {
+            @Override
             public void actionPerformed(ActionEvent e) {
-                
-                ODBManager odb = new ODBManager();
-                odb.setVisible(true);
-                //throw new UnsupportedOperationException("Unsupported exception!");
+            exitApp();
             }
         });
-	
-	JMenuItem itemZoomIn = new JMenuItem(zoomInAction);
-	JMenuItem itemZoomOut = new JMenuItem(zoomOutAction);
-	JMenuItem itemfitToPanel = new JMenuItem(fitToPanelAction);
-	JMenuItem itemSearchServices  = new JMenuItem(searchServicesAction);
-	
-	JMenu menuFile = new JMenu("File");
-	JMenu menuView = new JMenu("View");
-	JMenu subMenuForToolBarOptions = new JMenu("ToolBars");
-	JMenu menuODB = new JMenu("Database");
-	
-	cbmOptionsForToolBars = new JCheckBoxMenuItem[5];
-	
-	cbmOptionsForToolBars[0] = new JCheckBoxMenuItem("File Open");
-	cbmOptionsForToolBars[1] = new JCheckBoxMenuItem("Zoom Action");	
-	cbmOptionsForToolBars[2] = new JCheckBoxMenuItem("Memory Monitor");
-	cbmOptionsForToolBars[3] = new JCheckBoxMenuItem("Search Services");
-	cbmOptionsForToolBars[4] = new JCheckBoxMenuItem("ToolBar");
-	
-	for (JCheckBoxMenuItem cb : cbmOptionsForToolBars) {
-	    cb.addItemListener(this);
-	    cb.setSelected(true);
-	    subMenuForToolBarOptions.add(cb);
-	}
-		
-	menuFile.add(itemFile);
-	menuFile.addSeparator();
-	menuFile.add(itemExit);
-	menuView.add(itemZoomIn);
-	menuView.add(itemZoomOut);
-	menuView.add(itemfitToPanel);
-	menuView.addSeparator();
-	menuView.add(itemSearchServices);
-	menuView.addSeparator();
-	menuView.add(subMenuForToolBarOptions);
-	menuODB.add(odbManager);
-		
-	jmb.add(menuFile);
-	jmb.add(menuView);
-	jmb.add(menuODB);
-	setJMenuBar(jmb);
+
+        JMenuItem odbManager = new JMenuItem("ODBManager");
+            odbManager.addActionListener(new ActionListener() {
+
+            @Override
+                public void actionPerformed(ActionEvent e) {
+
+                    ODBManager odb = new ODBManager();
+                    odb.setVisible(true);
+                    //throw new UnsupportedOperationException("Unsupported exception!");
+                }
+            });
+
+        JMenuItem itemZoomIn = new JMenuItem(zoomInAction);
+        JMenuItem itemZoomOut = new JMenuItem(zoomOutAction);
+        JMenuItem itemfitToPanel = new JMenuItem(fitToPanelAction);
+        JMenuItem itemSearchServices  = new JMenuItem(searchServicesAction);
+
+        JMenu menuFile = new JMenu("File");
+        JMenu menuView = new JMenu("View");
+        JMenu subMenuForToolBarOptions = new JMenu("ToolBars");
+        JMenu menuODB = new JMenu("Database");
+
+        cbmOptionsForToolBars = new JCheckBoxMenuItem[5];
+
+        cbmOptionsForToolBars[0] = new JCheckBoxMenuItem("File Open");
+        cbmOptionsForToolBars[1] = new JCheckBoxMenuItem("Zoom Action");
+        cbmOptionsForToolBars[2] = new JCheckBoxMenuItem("Memory Monitor");
+        cbmOptionsForToolBars[3] = new JCheckBoxMenuItem("Search Services");
+        cbmOptionsForToolBars[4] = new JCheckBoxMenuItem("ToolBar");
+
+        for (JCheckBoxMenuItem cb : cbmOptionsForToolBars) {
+            cb.addItemListener(this);
+            cb.setSelected(true);
+            subMenuForToolBarOptions.add(cb);
+        }
+
+        menuFile.add(itemFile);
+        menuFile.addSeparator();
+        menuFile.add(itemExit);
+        menuView.add(itemZoomIn);
+        menuView.add(itemZoomOut);
+        menuView.add(itemfitToPanel);
+        menuView.addSeparator();
+        menuView.add(itemSearchServices);
+        menuView.addSeparator();
+        menuView.add(subMenuForToolBarOptions);
+        menuODB.add(odbManager);
+
+        jmb.add(menuFile);
+        jmb.add(menuView);
+        jmb.add(menuODB);
+        setJMenuBar(jmb);
     }
     public Canvas createCanvas(){
 	
-	canvas = new Canvas(svgListeners);
-	canvas.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
-	    @Override
-	    public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-		
-	    }
-	});
-	
-	canvas.setBackground(Color.white);
-	
-	//getContentPane().add(canvas,BorderLayout.CENTER);
-	//line only for accelerate tests
-	//canvas.setURI("file:./MapWorld.svg");
-	return canvas;
+        canvas = new Canvas(svgListeners);
+        canvas.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
+            @Override
+            public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
+                //getVerboseStream().outputVerboseStream("Bounds GVT ROOT"+e.getGVTRoot().getBounds());
+            }
+        });
+
+        canvas.setBackground(Color.white);
+
+        //getContentPane().add(canvas,BorderLayout.CENTER);
+        //line only for accelerate tests
+        //canvas.setURI("file:./MapWorld.svg");
+        return canvas;
     }
     
     public SVGScrollPane createCanvasWithScrollPane(){
@@ -472,11 +468,11 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	if(canvas.isDocumentSet()){
 	    
 	    try {
-		String lastPath = canvas.getSVGDocument().getDocumentURI();
-		URI uri = new URI(lastPath);
-		chooser.setCurrentDirectory(new File(uri));
+            String lastPath = canvas.getSVGDocument().getDocumentURI();
+            URI uri = new URI(lastPath);
+            chooser.setCurrentDirectory(new File(uri));
 	    } catch (URISyntaxException ex) {
-		System.err.println(""+ex);
+            System.err.println(""+ex);
 	    }	    
 	}	
 	int retour = chooser.showOpenDialog(this);	
@@ -503,40 +499,37 @@ public class MainWindowIWD extends JFrame implements ItemListener{
 	}
 	
     }
-    public void openSVGDocument(File file){
-	
-	canvas.setURI(file.toURI().toString());
+    public void openSVGDocument(File file){	
+        canvas.setURI(file.toURI().toString());
     }
     
     protected StatusPanel getStatusPanel() {
-	return statusPanel;
+        return statusPanel;
     }
-    
-    
-    
     public void exitApp(){
-	System.exit(0);
+        //do something before exit app !!!
+
+        System.exit(0);
     }
     
     //unused function !!!
-    private void reloadMainWindow()
-    {
-	setVisible(false);
-	core.reload();
-	core=null;
-	dispose();
+    private void reloadMainWindow(){
+        setVisible(false);
+        core.reload();
+        core=null;
+        dispose();
     }
     
     public void setComponetsZoomEnable(boolean b){
-	zoomAction.setEnabled(b);
-	zoomInAction.setEnabled(b);
-	zoomOutAction.setEnabled(b);
-	fitToPanelAction.setEnabled(b);
-	searchServicesAction.setEnabled(b);
+        zoomAction.setEnabled(b);
+        zoomInAction.setEnabled(b);
+        zoomOutAction.setEnabled(b);
+        fitToPanelAction.setEnabled(b);
+        searchServicesAction.setEnabled(b);
     }
     @Override
     public void itemStateChanged(ItemEvent e) {
-	JCheckBoxMenuItem mi = (JCheckBoxMenuItem)(e.getSource());
+        JCheckBoxMenuItem mi = (JCheckBoxMenuItem)(e.getSource());
 	
         boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
 
@@ -557,62 +550,57 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     }
     
     private static final Icon BUTTON_ICON = new Icon() {
-	@Override
-	public int getIconHeight() {
-	  return ICON_SIZE;
-	}
-	@Override
-	public int getIconWidth() {
-	  return ICON_SIZE;
-	}
-	@Override
-	public void paintIcon(Component c, Graphics g, int x, int y) {
-	  Color oldColor = g.getColor();
-
-	  g.setColor(Color.BLACK);
-	  g.fillOval(x, y, ICON_SIZE, ICON_SIZE);
-
-	  g.setColor(oldColor);
-	}
+        @Override
+        public int getIconHeight() {
+            return ICON_SIZE;
+        }
+        @Override
+        public int getIconWidth() {
+            return ICON_SIZE;
+        }
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Color oldColor = g.getColor();
+            g.setColor(Color.BLACK);
+            g.fillOval(x, y, ICON_SIZE, ICON_SIZE);
+            g.setColor(oldColor);
+        }
     };
     
     private static final Icon VIEW_ICON = new Icon() {
-	@Override
-	public int getIconHeight() {
-	  return ICON_SIZE;
-	}
-	@Override
-	public int getIconWidth() {
-	  return ICON_SIZE;
-	}
-	
-	@Override
-	public void paintIcon(Component c, Graphics g, int x, int y) {
-	  Color oldColor = g.getColor();
-
-	  g.setColor(new Color(70, 70, 70));
-	  g.fillRect(x, y, ICON_SIZE, ICON_SIZE);
-
-	  g.setColor(new Color(100, 230, 100));
-	  g.fillRect(x + 1, y + 1, ICON_SIZE - 2, ICON_SIZE - 2);
-
-	  g.setColor(oldColor);
-	}
+        @Override
+        public int getIconHeight() {
+            return ICON_SIZE;
+        }
+        @Override
+        public int getIconWidth() {
+            return ICON_SIZE;
+        }
+        @Override
+        public void paintIcon(Component c, Graphics g, int x, int y) {
+            Color oldColor = g.getColor();
+            g.setColor(new Color(70, 70, 70));
+            g.fillRect(x, y, ICON_SIZE, ICON_SIZE);
+            g.setColor(new Color(100, 230, 100));
+            g.fillRect(x + 1, y + 1, ICON_SIZE - 2, ICON_SIZE - 2);
+            g.setColor(oldColor);
+        }
     };
-    
+
     private class OpenSVGFileAction extends AbstractAction {
         public OpenSVGFileAction(String text, ImageIcon icon,
                            String desc, Integer mnemonic) {
             super(text, icon);
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
+            putValue(AbstractAction.ACCELERATOR_KEY,
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
         }
-	@Override
+        @Override
         public void actionPerformed(ActionEvent e) {
-	    openFileChoserWindow();
-	}
+            getVerboseStream().outputVerboseStream("Open SVG file ...");
+            openFileChoserWindow();
+        }
     }
     
     private class ZoomInAction extends AbstractAction {
@@ -621,13 +609,14 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             super(text, icon);
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
+            putValue(AbstractAction.ACCELERATOR_KEY,
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-	    setEnabled(false);
+            setEnabled(false);
         }
-	@Override
+        @Override
         public void actionPerformed(ActionEvent e) {
-	    canvas.zoomFromCenterDocumnet(true);      
+	    canvas.zoomFromCenterDocumnet(true);
+            getVerboseStream().outputVerboseStream("Zoom in");
         }
     }
     
@@ -637,13 +626,14 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             super(text, icon);
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
+            putValue(AbstractAction.ACCELERATOR_KEY,
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-	    setEnabled(false);
+            setEnabled(false);
         }
-	@Override
+        @Override
         public void actionPerformed(ActionEvent e) {
 	    canvas.zoomFromCenterDocumnet(false);
+            getVerboseStream().outputVerboseStream("Zoom out");
         }
     }
     
@@ -653,25 +643,16 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             super(text, icon);
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
+            putValue(AbstractAction.ACCELERATOR_KEY,
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-	    setEnabled(false);
+            setEnabled(false);
         }
-	@Override
+        @Override
         public void actionPerformed(ActionEvent e) {
-	    ToolBarButton button = (ToolBarButton)e.getSource();
-	    boolean selected = button.isSelectedButton();	    
-	    System.out.println(""+selected);
-	    if(selected){
-		canvas.zoomFromMouseCoordinationEnable(!selected);
-		button.setSelected(!selected);		
-		getVerboseStream().outputVerboseStream("Zoom Disabled");
-	    }else{
-		canvas.zoomFromMouseCoordinationEnable(!selected);
-		button.setSelected(!selected);
-		getVerboseStream().outputVerboseStream("Zoom Enabled");		    
-	    }
-	    
+            ToolBarButton button = (ToolBarButton)e.getSource();
+            boolean selected = button.isSelected();
+            canvas.zoomFromMouseCoordinationEnable(!selected);
+            getVerboseStream().outputVerboseStream("Zoom from mouse position "+(selected ? "Disabled":"Enabled"));
         }	
     }
     
@@ -681,88 +662,88 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             super(text, icon);
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
+            putValue(AbstractAction.ACCELERATOR_KEY,
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-	    setEnabled(false);
+            setEnabled(false);
         }
-	@Override
+        @Override
         public void actionPerformed(ActionEvent e) {
-	    canvas.resetRenderingTransform();
+            canvas.resetRenderingTransform();
+            getVerboseStream().outputVerboseStream("Fit to panel");
         }	
     }
     private class JButtonActionForDebugWindow extends JButton implements ActionListener{
-	public JButtonActionForDebugWindow(Icon ico){
-	    super(ico);
-	    addActionListener(this);
-	    setOpaque(false);
-	    setBorder(null);
-	    setFocusable(false);
-	    setToolTipText("get document transforms");
-	}
+        public JButtonActionForDebugWindow(Icon ico){
+            super(ico);
+            addActionListener(this);
+            setOpaque(false);
+            setBorder(null);
+            setFocusable(false);
+            setToolTipText("get document transforms");
+        }
 
-	@Override
-	public void actionPerformed(ActionEvent e) {
-	    
-	    SVGDocument doc = canvas.getSVGDocument();    
-	    SVGSVGElement el = doc.getRootElement();
-	    String viewBoxStr = el.getAttributeNS(null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
-        
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+            SVGDocument doc = canvas.getSVGDocument();
+            SVGSVGElement el = doc.getRootElement();
+            String viewBoxStr = el.getAttributeNS(null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
             float[] rect = ViewBox.parseViewBoxAttribute(el, viewBoxStr, null);
             Rectangle2D rect2d =  new Rectangle2D.Float(rect[0], rect[1],rect[2], rect[3]);
-	    GraphicsNode gn = canvas.getGraphicsNode();
-	    Rectangle2D bounds = gn.getBounds();
-	    
-	    CanvasGraphicsNode cgn = canvas.getCanvasGraphicsNode();	    
-	    getVerboseStream().outputVerboseStream("-------- Transform SVG Document --------");
-	    getVerboseStream().outputVerboseStream("\t"+getClass().getName()+"");
-	    getVerboseStream().outputVerboseStream("ViewingTransform   \t"+canvas.getViewingTransform());
-	    getVerboseStream().outputVerboseStream("ViewBoxTransform   \t"+canvas.getViewBoxTransform());
-	    getVerboseStream().outputVerboseStream("RenderingTransform \t"+canvas.getRenderingTransform());
-	    getVerboseStream().outputVerboseStream("PaintingTransform  \t"+canvas.getPaintingTransform());
-	    getVerboseStream().outputVerboseStream("InitialTransform   \t"+canvas.getInitialTransform());
-	    getVerboseStream().outputVerboseStream("Visible Rect       \t"+canvas.getVisibleRect());
-	    getVerboseStream().outputVerboseStream("ViewBox Rect       \t"+rect2d+"\t"+bounds);
-	    getVerboseStream().outputVerboseStream("-------- Transform Graphics Nood -------");
-	    getVerboseStream().outputVerboseStream("PositionTransform  \t"+cgn.getPositionTransform());
-	    getVerboseStream().outputVerboseStream("ViewingTransform   \t"+cgn.getViewingTransform());
-	    getVerboseStream().outputVerboseStream("GlobalTransform    \t"+cgn.getGlobalTransform());
-	    getVerboseStream().outputVerboseStream("InverseTransform   \t"+cgn.getInverseTransform());
-	    getVerboseStream().outputVerboseStream("Transform          \t"+cgn.getTransform());	    
-	    getVerboseStream().outputVerboseStream("----------------------------------------");
-	    
-	}
+            GraphicsNode gn = canvas.getGraphicsNode();
+            Rectangle2D bounds = gn.getBounds();
+
+            CanvasGraphicsNode cgn = canvas.getCanvasGraphicsNode();
+            getVerboseStream().outputVerboseStream("-------- Transform SVG Document --------");
+            getVerboseStream().outputVerboseStream("\t"+getClass().getName()+"");
+            getVerboseStream().outputVerboseStream("ViewingTransform\t"+canvas.getViewingTransform());
+            getVerboseStream().outputVerboseStream("ViewBoxTransform\t"+canvas.getViewBoxTransform());
+            getVerboseStream().outputVerboseStream("RenderingTransform\t"+canvas.getRenderingTransform());
+            getVerboseStream().outputVerboseStream("PaintingTransform\t"+canvas.getPaintingTransform());
+            getVerboseStream().outputVerboseStream("InitialTransform\t"+canvas.getInitialTransform());
+            getVerboseStream().outputVerboseStream("Visible Rect\t"+canvas.getVisibleRect());
+            getVerboseStream().outputVerboseStream("ViewBox Rect\t"+rect2d+"\t"+bounds);
+            getVerboseStream().outputVerboseStream("-------- Transform Graphics Nood -------");
+            getVerboseStream().outputVerboseStream("PositionTransform\t"+cgn.getPositionTransform());
+            getVerboseStream().outputVerboseStream("ViewingTransform\t"+cgn.getViewingTransform());
+            getVerboseStream().outputVerboseStream("GlobalTransform\t"+cgn.getGlobalTransform());
+            getVerboseStream().outputVerboseStream("InverseTransform\t"+cgn.getInverseTransform());
+            getVerboseStream().outputVerboseStream("Transform\t"+cgn.getTransform());
+            getVerboseStream().outputVerboseStream("----------------------------------------");
+
+        }
     }
     
     private class UpdateMenuAndToolBars extends UpdateComponentsAdapter{
 	
-	@Override
-	public void documentPrepareToModification(){
-	    	    
-	    Thread w = new Thread(new Runnable() {
-		    @Override
-		    public void run() {
-			setComponetsZoomEnable(true);
-			views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
-			if(MainConfiguration.isShowDocumentProperties()){
-			    
-			    getVerboseStream().outputVerboseStream("Build Tree Nodes ...");			
-			    getVerboseStream().outputVerboseStream("Build Tree Model for Tree Nodes ...");
-			    SVGDOMTreeModel model = new SVGDOMTreeModel(canvas.getSVGDocument());
-			    tree.setModel(model);
-			    getVerboseStream().outputVerboseStream("Build Tree Model Completed");						    
-			    tree.setCellRenderer(new SVGDOMTreeRenderer());
-			    getVerboseStream().outputVerboseStream("Build Tree Nodes Completed");
-			}
-		    }
-		});
-		w.start();
-	}
-	
-	@Override
-	public void documentClosed(){
-	    
-	    setComponetsZoomEnable(false);
-	}
+        @Override
+        public void documentPrepareToModification(){
+
+            Thread w = new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    setComponetsZoomEnable(true);
+                    views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
+                    if(MainConfiguration.isShowDocumentProperties()){
+                        getVerboseStream().outputVerboseStream("----Create content window properties----");
+                        getVerboseStream().outputVerboseStream("Build Tree Nodes ...");
+                        getVerboseStream().outputVerboseStream("Build Tree Model for Tree Nodes ...");
+                        SVGDOMTreeModel model = new SVGDOMTreeModel(canvas.getSVGDocument());
+                        tree.setModel(model);
+                        getVerboseStream().outputVerboseStream("Build Tree Model Completed");
+                        tree.setCellRenderer(new SVGDOMTreeRenderer());
+                        getVerboseStream().outputVerboseStream("Build Tree Nodes Completed");
+                    }
+                }
+            });
+            w.start();
+        }
+
+        @Override
+        public void documentClosed(){
+
+            setComponetsZoomEnable(false);
+        }
     }
     private class SearchServicesAction extends AbstractAction {
         public SearchServicesAction(String text, ImageIcon icon,
@@ -770,15 +751,15 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             super(text, icon);
             putValue(AbstractAction.SHORT_DESCRIPTION, desc);
             putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-	    putValue(AbstractAction.ACCELERATOR_KEY,
+            putValue(AbstractAction.ACCELERATOR_KEY,
 		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-	    setEnabled(false);
+            setEnabled(false);
         }
-	@Override
+        @Override
         public void actionPerformed(ActionEvent e) {
-	    boolean en = ((ToolBarButton)e.getSource()).isSelectedButton();	    
-	    canvas.getSearchServices().setEnabledSerchServices(!en);
-	    getVerboseStream().outputVerboseStream("Search services enabled "+!en);	    
+            boolean en = ((ToolBarButton)e.getSource()).isSelected();
+            canvas.getSearchServices().setEnabledSerchServices(!en);
+            getVerboseStream().outputVerboseStream("Search services enabled "+!en);
         }	
     }
 }

@@ -27,7 +27,7 @@ public class Main {
     }
     
     public static void main(String[] args) {
-        	
+        args = new String[]{"-vg","-v","-f","/home/vara/MapWorld.svg"};
 	Main app = new Main(args);	
 	Main.initGui(app);
     }

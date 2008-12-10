@@ -18,8 +18,8 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
 			new LinkedList<OutputVerboseStream>();
         
     public BridgeForVerboseMode(){
-	//if(MainConfiguration.getMode())
-	  //  addComponentsWithOutputStream(new OutputVerboseStreamToConsole());
+	if(MainConfiguration.getMode())
+	    addComponentsWithOutputStream(new OutputVerboseStreamToConsole());
     }
     
     @Override
