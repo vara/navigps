@@ -21,7 +21,8 @@ public class SVGBridgeComponents implements LetComponentsOfChangedDoc{
     private String strCurrentStatus ="";
     private boolean rederingStatus = true;
     private OutputVerboseStream verboseStream = null;
-    
+    private boolean verboseEnabled = false;
+
     private LinkedList<UpdateComponentsWhenChangedDoc> updateComponets = 
 			new LinkedList<UpdateComponentsWhenChangedDoc>();
     
@@ -40,9 +41,9 @@ public class SVGBridgeComponents implements LetComponentsOfChangedDoc{
 
 	    @Override
 	    public void run() {
-		for (UpdateComponentsWhenChangedDoc ucomp : updateComponets) {
-		    ucomp.documentPrepareToModification();
-		}
+            for (UpdateComponentsWhenChangedDoc ucomp : updateComponets) {
+                ucomp.documentPrepareToModification();
+            }
 	    }
 	});
 	t.start();
@@ -53,60 +54,74 @@ public class SVGBridgeComponents implements LetComponentsOfChangedDoc{
     }
     
     protected void setTextToCurrentStatus(String text){
-	labCurrentStatus.setText(text);
-	strCurrentStatus = text;
-	for (UpdateComponentsWhenChangedDoc ucomp : updateComponets) {
-	    ucomp.currentStatusChanged(text);
-	}
-	if(getVerboseStream()!=null)
-	   getVerboseStream().outputVerboseStream(text);
+        labCurrentStatus.setText(text);
+        strCurrentStatus = text;
+        for (UpdateComponentsWhenChangedDoc ucomp : updateComponets) {
+            ucomp.currentStatusChanged(text);
+        }
+        if(getVerboseStream()!=null && isVerboseEnabled())
+           getVerboseStream().outputVerboseStream(text);
     }
     
     @Override
     public JLabel getLabelWithPosOnSvgComponent() {
-	return mousePosOnSvgComponent;
+        return mousePosOnSvgComponent;
     }
     
     @Override
     public JLabel getLabelWithPointInSvgDoc() {
-	return pointInSvgDoc;
+        return pointInSvgDoc;
     }
     
     public void setLabelInformationPosytion(String pos){
 	
-	String [] str = pos.split(";");
-	mousePosOnSvgComponent.setText(str[0]);
-	pointInSvgDoc.setText(str[2]);
+        String [] str = pos.split(";");
+        mousePosOnSvgComponent.setText(str[0]);
+        pointInSvgDoc.setText(str[2]);
     }
 
     @Override
     public String getStringWithCurrentStatus() {
-	return strCurrentStatus;
+        return strCurrentStatus;
     }
     
     @Override
     public JLabel getLabelWithCurrentStatus() {
-	return labCurrentStatus;
+        return labCurrentStatus;
     }
     
     public void setAbsoluteFilePath(String path){
-	absoluteFilePath = path;
+        absoluteFilePath = path;
     }
     
     public final String getAbsoluteFilePath(){
-	return absoluteFilePath;
+        return absoluteFilePath;
     }
     
     public void addUpdateComponents(UpdateComponentsWhenChangedDoc l){
 	
-	if(l!=null)
-	    updateComponets.add(l);
-	//System.out.println("Update components size "+updateComponets.size());
+        if(l!=null)
+            updateComponets.add(l);
+        //System.out.println("Update components size "+updateComponets.size());
     }
     public void setVerboseStream(OutputVerboseStream v){
-	verboseStream = v;
+        verboseStream = v;
     }
     public OutputVerboseStream getVerboseStream(){
-	return verboseStream;
+        return verboseStream;
+    }
+
+    /**
+     * @return the verboseEnabled
+     */
+    protected boolean isVerboseEnabled() {
+        return verboseEnabled;
+    }
+
+    /**
+     * @param verboseEnabled the verboseEnabled to set
+     */
+    protected void verboseEnabled(boolean verboseEnabled) {
+        this.verboseEnabled = verboseEnabled;
     }
 }

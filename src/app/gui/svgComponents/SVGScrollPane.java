@@ -187,7 +187,9 @@ public class SVGScrollPane extends JPanel{
                 (XMLConstants.XML_EVENTS_NAMESPACE_URI,
                  SVGConstants.SVG_SVGZOOM_EVENT_TYPE,
                  new EventListener() {
-                     public void handleEvent(Event evt) {
+
+                    @Override
+                    public void handleEvent(Event evt) {
                          if (!(evt.getTarget() instanceof SVGSVGElement))
                              return;
                          // assert(evt.getType() ==
