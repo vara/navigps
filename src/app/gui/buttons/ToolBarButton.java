@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package app.gui;
+package app.gui.buttons;
 
 import app.utils.OutputVerboseStream;
 import java.awt.Color;
