@@ -18,27 +18,41 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
 			new LinkedList<OutputVerboseStream>();
         
     public BridgeForVerboseMode(){
-	if(MainConfiguration.getMode())
-	    addComponentsWithOutputStream(new OutputVerboseStreamToConsole());
+        if(MainConfiguration.getMode())
+            addComponentsWithOutputStream(new OutputVerboseStreamToConsole());
     }
     
     @Override
-    public void outputVerboseStream(String text){
-	
-	for (OutputVerboseStream ucomp : updateComponets) {
-	    ucomp.outputVerboseStream(text);
-	}
+    public void outputVerboseStream(String text){	
+        for (OutputVerboseStream ucomp : updateComponets) {
+            ucomp.outputVerboseStream(text);
+        }
     }
     public void addComponentsWithOutputStream(OutputVerboseStream l){	
-	if(l!=null)
-	    updateComponets.add(l);	
+        if(l!=null)
+            updateComponets.add(l);
+    }
+    public boolean removeComponentFromOutputStream(OutputVerboseStream l){
+        if(l!=null){
+            return updateComponets.remove(l);
+        }return false;
+    }
+    @Override
+    public void outputErrorVerboseStream(String text) {
+        for (OutputVerboseStream ucomp : updateComponets) {
+            ucomp.outputErrorVerboseStream(text);
+        }
     }
     
     public class OutputVerboseStreamToConsole extends OutputVerboseStreamAdapter{
 	
-	@Override
-	public void outputVerboseStream(String text){
-	    System.out.println(text);
-	}
+        @Override
+        public void outputVerboseStream(String text){
+            System.out.println(text);
+        }
+        @Override
+        public void outputErrorVerboseStream(String text) {
+            System.err.println(text);
+        }
     }
 }

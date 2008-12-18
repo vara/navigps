@@ -16,4 +16,7 @@ public class OutputVerboseStreamAdapter implements OutputVerboseStream{
 
     @Override
     public void outputVerboseStream(String text) {}
+
+    @Override
+    public void outputErrorVerboseStream(String text) {}
 }

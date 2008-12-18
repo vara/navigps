@@ -11,5 +11,6 @@ package app.utils;
  */
 public interface OutputVerboseStream {
 
-    void outputVerboseStream(String text);    
+    void outputVerboseStream(String text);
+    void outputErrorVerboseStream(String text);
 }
