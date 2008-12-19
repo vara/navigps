@@ -3,22 +3,20 @@
  * and open the template in the editor.
  */
 
-package app.gui;
+package app.gui.verboseTextPane;
 
+import app.gui.*;
+import app.gui.verboseTextPane.MyTextPane.ClearAllAction;
 import app.utils.*;
 import java.awt.Color;
-import java.awt.event.ActionEvent;
-import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.util.logging.Level;
-import javax.swing.AbstractAction;
-import javax.swing.ImageIcon;
+import javax.swing.Action;
 import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
-import javax.swing.KeyStroke;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.text.BadLocationException;
@@ -39,7 +37,7 @@ import javax.swing.text.TabStop;
 
 public class JTextPaneForVerboseInfo extends JScrollPane{
 
-    private JTextPane textPane = new JTextPane();
+    private JTextPane textPane = new MyTextPane();
     private StyledDocument document;
     
     private SimpleAttributeSet defaultAttributes;
@@ -54,7 +52,7 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
         StyleConstants.setAlignment(style, StyleConstants.ALIGN_LEFT);
         StyleConstants.setFontSize(style, 4);
         StyleConstants.setSpaceAbove(style, 1);
-        StyleConstants.setSpaceBelow(style, 1);        
+        StyleConstants.setSpaceBelow(style, 1);
 
         //StyleConstants.setBold(attributes, true);
         int positions[] = { TabStop.ALIGN_BAR, TabStop.ALIGN_CENTER, TabStop.ALIGN_DECIMAL,
@@ -70,10 +68,7 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
         document = new DefaultStyledDocument(context);
         document.setParagraphAttributes(0,1,defaultAttributes,true);
         document.addDocumentListener(new MyDocumentListener());
-
         textPane.setDocument(document);
-        textPane.setEditable(false);
-        textPane.addMouseListener(new MouseForVerboseTextPane());
         
         add(textPane);
         setViewportView(textPane);
@@ -84,6 +79,10 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
     
     public synchronized void addEndTextnl(String str,SimpleAttributeSet attr){
 
+        if(str.startsWith("\tat")){
+            attr = new SimpleAttributeSet(attr);
+            StyleConstants.setForeground(attr,Color.BLUE);
+        }
         try {
             getDocument().insertString(getDocument().getLength(), str+"\n", attr);
             getTextPane().setCaretPosition(getDocument().getLength());
@@ -167,59 +166,23 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
         public void outputErrorVerboseStream(String text) {
             addEndTextnl(text,getErrorAtributes());
         }
-    }
-
-    private class ClearAllAction extends AbstractAction{
-
-        public ClearAllAction(String text, ImageIcon icon,
-                           String desc, Integer mnemonic){
-            super(text);
-            putValue(AbstractAction.SMALL_ICON, icon);
-            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
-            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
-            putValue(AbstractAction.ACCELERATOR_KEY,
-		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
-            setEnabled(true);
-
-        }
-        @Override
-        public void actionPerformed(ActionEvent e) {
-            getTextPane().setText("");
-            //setEnabled(false);
-        }
-    }
-
-    protected class MouseForVerboseTextPane extends MouseAdapter{
-        @Override
-        public void mouseClicked(MouseEvent e){
-            if(e.getButton()==MouseEvent.BUTTON3){
-                MyPopupMenu popup = new MyPopupMenu();
-                AbstractAction clear = new ClearAllAction("Clear All",
-                        null,
-                        "Clear All text from document",KeyEvent.VK_C);
-
-                JMenuItem item = new JMenuItem(clear);
-                popup.add(item);
-                popup.show(getTextPane(),e.getX(),e.getY());
-            }
-        }
-    }
+    }        
 
     protected class MyDocumentListener implements DocumentListener {
 
         @Override
         public void insertUpdate(DocumentEvent e) {
-            displayEditInfo(e);
+            //displayEditInfo(e);
         }
 
         @Override
         public void removeUpdate(DocumentEvent e) {
-            displayEditInfo(e);
+            //displayEditInfo(e);
         }
 
         @Override
         public void changedUpdate(DocumentEvent e) {
-            displayEditInfo(e);
+            //displayEditInfo(e);
         }
 
         private void displayEditInfo(DocumentEvent e) {

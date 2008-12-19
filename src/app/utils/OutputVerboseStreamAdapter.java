@@ -5,11 +5,13 @@
 
 package app.utils;
 
+import java.io.PrintWriter;
+
 /**
  *
  * @author vara
  */
-public class OutputVerboseStreamAdapter implements OutputVerboseStream{
+public abstract class OutputVerboseStreamAdapter implements OutputVerboseStream{
 
     public OutputVerboseStreamAdapter(){
     }
@@ -19,4 +21,14 @@ public class OutputVerboseStreamAdapter implements OutputVerboseStream{
 
     @Override
     public void outputErrorVerboseStream(String text) {}
+
+    @Override
+    public PrintWriter getOutputStream(){
+        return null;
+    }
+
+    @Override
+    public PrintWriter getErrOutputStream(){
+        return null;
+    }
 }

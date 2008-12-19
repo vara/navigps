@@ -66,4 +66,12 @@ public class Utils {
         int newSize = (int)(f.getSize()*scale);
         return new Font(f.getName(),f.getStyle(), newSize);
     }
+
+    public static char[] resizeArray(char[] tab,int expand){
+        char [] newArray = new char [tab.length+expand];
+        for (int i = 0; i < tab.length; i++) {
+            newArray[i] = tab[i];
+        }
+        return newArray;
+    }
 }
