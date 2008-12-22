@@ -7,6 +7,6 @@ dist
 build
 src/tests
 nbproject
-build.xml
+*.xml
 manifest.mf
 navigps.log*
