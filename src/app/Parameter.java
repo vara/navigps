@@ -5,6 +5,8 @@
 
 package app;
 
+import java.util.Vector;
+
 /**
  *
  * @author vara
@@ -12,13 +14,15 @@ package app;
 public class Parameter {
         
     private String param;
-    private String value;
+    private Vector <String> value = new Vector<String>(3,1);
         
     public Parameter(String p,String val){
         param = p;
-        value = val;
+        value.add(val);
     }
-
+    public Parameter(String p){
+        param = p;
+    }
     public String getParam() {
         return param;
     }
@@ -34,11 +38,19 @@ public class Parameter {
         this.param = param;
     }
 
-    public String getValue() {
-        return value;
+    public String getValue(int index){
+
+        try{
+            return value.get(index); 
+        }catch(Exception e){
+            return null;
+        }
     }
 
-    public void setValue(String value) {
-        this.value = value;
+    public void addValue(String value) {
+        this.value.add(value);
+    }
+    public Vector<String> getVecValue(){
+        return value;
     }
 }

@@ -6,7 +6,9 @@
 package app;
 
 import app.utils.MyLogger;
+import config.GUIConfiguration;
 import config.MainConfiguration;
+import java.awt.Dimension;
 import java.io.File;
 import java.util.HashMap;
 import java.util.logging.Level;
@@ -16,163 +18,215 @@ import java.util.logging.Level;
  * @author vara
  */
 public class ArgumentsStartUp {
-
+    
     private boolean isArguments = false;
-    private boolean exitProgram = true;    
-    private String infoParameters = "\n\t-v  \t(verbose mode) result return by function only on console" +
-				    "\n\t-vg \t(verbose mode) like -v + create window in gui with the same result on console" +
-				    "\n\t-sp  \t(Show properties) create window in app with properties chart file" +
+    private boolean exitProgram = false;
+    private String infoParameters = "\n\t-v  \t(version) print version application" +
+                    "\n\t-V  \t(verbose mode) result return by function only on console" +
+				    "\n\t-Vg \t(verbose mode) like -v + create window in gui with the same result on console" +
+				    "\n\t-sp \t(Show properties) create window in app with properties chart file" +
 				    "\n\t-c  \t(path to configuration file) not suported yet !!!"+
 				    "\n\t-f  \t(path to chart file) file format documents must by only svg !!!"+
+                    "\n\t-ws \t(window size  eq. -ws 800 600 ) " +
+                           "\n\t\t\tIt takes two arguments defining the size of the total number of main window." +
+                           "\n\t\t\tIf there is to adopt the size of a window the size of screen resolution"+
 				    "\n\t-h  \t(Show this text)";
     
-    public ArgumentsStartUp(String [] arg){
-	
-	if(arg.length>0){
-	    try {
-		
-		cheackParameters(arg);
-		
-	    } catch (Exception ex) {
-		helpInformation(ex.getMessage());
-	    }
-	}else{
-	    MyLogger.log.log(Level.FINE,"no arguments to start application");
-	}
+    public ArgumentsStartUp(String [] arg){	
+        if(arg.length>0){
+            try {
+                checkParameters(arg);                
+                MyLogger.log.log(Level.FINE,"Validate arguments status OK !");
+            } catch (Exception ex) {
+                
+                helpInformation(ex.getMessage());
+            }
+        }else{
+            MyLogger.log.log(Level.FINE,"no arguments to start application");
+        }
+        if(exitProgram()){            
+            MyLogger.log.log(Level.FINE,"Set exit program! EXIT");
+            System.exit(0);
+        }
     }
     
-    private void cheackParameters(String [] arg) throws Exception{
-	
-	VectorPositionForArgumentsStartup vp =new VectorPositionForArgumentsStartup(arg);
-	ValidateParameter valid = new ValidateParameter();
-	
-	String strTmp = "";
-	Boolean boolTmp;
-	
-	while(true){
-	    try {
-		String param = vp.getNextParameter();
-		//System.out.println("" +param);
-		if(param.charAt(0)=='-'){
-		    if( !(strTmp=param.substring(1)).equals("") ){
-			
-			if((boolTmp = valid.getInformationOnParameter(strTmp))!=null){
-			    
-			    if(boolTmp.booleanValue()){
-				//parameter with value				
-				String val;
-				if(vp.isNextParameter()){
-				    val = vp.getNextParameter();
-				    if(val.charAt(0)=='-'){
-					throw new Exception("Missing file to parameter "+strTmp);
-				    }
-				    if((new File(val)).exists())
-				    {
-					orderCommands(new Parameter(strTmp,val));
-				    }else {
-					throw new Exception("This path to file doesn't exist "+val);
-				    }
-				}else{
-				    throw new Exception("Missing file to parameter "+strTmp);
-				}			
-				
-			    }else{//only one parameter (switch)
-				
-				orderCommands(new Parameter(strTmp,null));
-			    }
-			    
-			}else{
-			    throw new Exception("Unrecognized parameter '"+param+"'\tTry with '-h'");
-			}
-			
-		    }else{
-			throw new Exception("Bad parameter only '-' not suported\tTry with '-h'");
-		    }
-		}else{
-		    throw new Exception("Bad parameter , missing '-' in '"+param+"'\tTry with '-h'");
-		}
+    private void checkParameters(String [] arg) throws Exception{
+        //Vektor for positioning arguments
+        VectorPositionForArgumentsStartup vecArgumentsOffset =new VectorPositionForArgumentsStartup(arg);
+        ValidateParameter valid = new ValidateParameter();
 
-	    } catch (IndexOutOfBoundsException ex) {
-		//System.out.println("Koniec "+ex.getMessage());
-		break;//end while
-	    }
-	}
-	MyLogger.log.log(Level.FINE,"Arguments to start application ["+vp+"]");
+        String paramWhithoutMarker = "";
+        //number of arguments accepted by the function
+        Integer numOfParam;
+
+        while(true){
+            try {
+                String param = vecArgumentsOffset.getNextParameter();
+                //System.out.println("Counter arg. offset "+vecArgumentsOffset.getCounter());
+                //System.out.print("\n"+param);
+                //'-' parameter marker
+                if(param.charAt(0)=='-'){
+                    //check chars without parameter marker
+                    if( !(paramWhithoutMarker=param.substring(1)).equals("") ){
+
+                        if((numOfParam = valid.getInformationOnParameter(paramWhithoutMarker))!=null){
+                            //System.out.println(" [num of org] "+numOfParam.intValue());
+                            //If more than one argument
+                            if(numOfParam.intValue()!=0){
+                                Parameter arrayForParam = new Parameter(paramWhithoutMarker);
+                                for(int i=1;i<=numOfParam.intValue();i++){
+                                    //parameter with value (argument for parameter)
+                                    String argument;
+                                    if(vecArgumentsOffset.isNextParameter()){
+
+                                        argument = vecArgumentsOffset.getNextParameter();                                        ;
+                                        //check is next argument isn't next parameter
+                                        if(argument.charAt(0)=='-'){
+                                            throw new Exception("Missing argument for '-"+paramWhithoutMarker+"'"+
+                                                    "Required number of arguments ["+numOfParam.intValue()+"]\tTry with '-h'");
+                                        }
+                                        //add argument to array
+                                        //System.out.println(""+argument);
+                                        arrayForParam.addValue(argument);
+                                    }else{
+                                        throw new Exception("Required number of arguments for '-"+paramWhithoutMarker+
+                                                "' ["+numOfParam.intValue()+"]\tTry with '-h'");
+                                    }
+                                }//end for
+
+                                orderCommands(arrayForParam);
+
+                            }else{//only one parameter (switch)
+                                orderCommands(new Parameter(paramWhithoutMarker,null));
+                            }
+
+                        }else{
+                            throw new Exception("Unrecognized parameter '"+param+"'\tTry with '-h'");
+                        }
+
+                    }else{
+                        throw new Exception("Bad parameter only '-' not suported\tTry with '-h'");
+                    }
+                }else{
+                    throw new Exception("Bad parameter , missing '-' in '"+param+"'\tTry with '-h'");
+                }
+
+            } catch (IndexOutOfBoundsException ex) {                
+                //System.out.println("Koniec "+ex.getMessage());
+                //ex.printStackTrace();
+                break;//end while
+            }
+
+        }//while
+        MyLogger.log.log(Level.FINE,"Arguments to start application ["+vecArgumentsOffset+"]");
     }
     
     public void orderCommands(Parameter p) throws Exception{
 	
-	switch(p.getCharParam()){
-	    case 'v':
-		
-		    MainConfiguration.setMode(true);
-		    break;
-	    case 'f':
-		
-		    MainConfiguration.setPathChartToFile(p.getValue());
-		    //You can add check whether this is a file?
-		    
-		    break;
-	    case 's'+'p':
-		
-		    MainConfiguration.setShowDocumentProperties(true);
-		    break;
-	    case 'v'+'g':
-		
-		    MainConfiguration.setModeVerboseGui(true);
-		    break;
-	    case 'h':
-		
-		    setExitProgram(true);
-		    throw new Exception(getHelpInformation());		    
-		    
-	    default:
-		    setExitProgram(true);
-		    throw new Exception("Unrecognized parameter '"+p.getParam()+"'\tTry with '-h'");
-	}
+        switch(p.getCharParam()){
+            case 'V':
+
+                MainConfiguration.setMode(true);
+                break;
+            case 'f':
+                String path = p.getValue(0);
+                if(!(new File(path)).exists())
+                    throw new Exception("This path to file doesn't exist "+path);
+                MainConfiguration.setPathChartToFile(path);
+                break;
+            case 's'+'p':
+
+                MainConfiguration.setShowDocumentProperties(true);
+                break;
+            case 'V'+'g':
+
+                MainConfiguration.setModeVerboseGui(true);
+                break;
+            case 'h':
+
+                MainConfiguration.printVersion("NaviGPS version ",null);
+                setExitProgram(true);
+                throw new Exception(getHelpInformation());
+            case 'w'+'s':
+                                
+                {//sWidth or sHeight == null This situation will probably never take place. I hope ! ;D
+                    String sWidth = p.getValue(0);
+                    String sHeight = p.getValue(1);
+                    int width;
+                    int height;
+                    if(sWidth!=null){
+                        try{
+                            width = Integer.parseInt(sWidth);
+                        }catch(NumberFormatException e){
+                            throw new Exception(e.getClass().getSimpleName()+": Width "+e.getMessage());
+                        }
+                    }else
+                        throw new Exception("Error "+Parameter.class.getName()+" " +
+                                            "method getValue(0) return null");
+                    if(sHeight!=null){
+                        try{
+                            height = Integer.parseInt(sHeight);
+                        }catch(NumberFormatException e){
+                            throw new Exception(e.getClass().getSimpleName()+": Height "+e.getMessage());
+                        }
+                    }else
+                        throw new Exception("Error "+Parameter.class.getName()+
+                                            " method getValue(1) return null");
+
+                    GUIConfiguration.setWindowSize(new Dimension(width, height));
+                }                          
+                break;
+            case 'v':
+                MainConfiguration.printVersion("NaviGPS version ",null);
+                setExitProgram(true);
+                break;
+            default:
+                setExitProgram(true);
+                throw new Exception("Unrecognized parameter '"+p.getParam()+"'\tTry with '-h'");
+        }
     }
     
     public String getHelpInformation(){
-	return infoParameters;
+        return infoParameters;
     }
     
     public boolean isArguments(){
-	return isArguments;
+        return isArguments;
     }
     
     public void setExitProgram(boolean val){
-	exitProgram = val;
+        exitProgram = val;
     }
     
     public boolean exitProgram(){
-	return exitProgram;
+        return exitProgram;
     }
     
     private void setArgumentsOn(){
-	isArguments = true;
+        isArguments = true;
     }
-    
-    public class ValidateParameter {
-    
-    private HashMap map = new HashMap();
-    
-	public ValidateParameter(){
 
-	    map.put("vg",new Boolean(false));
-	    map.put("v",new Boolean(false));
-	    map.put("sp",new Boolean(false));
-	    map.put("f",new Boolean(true));
-	    map.put("c",new Boolean(true));
-	    map.put("h",new Boolean(false));
-	}
-	public Boolean getInformationOnParameter(String val){
-	    return (Boolean)map.get(val);
-	}
-    }
-    
     protected void helpInformation(String text){
-	System.out.println(""+text);
-	if(exitProgram())
-	    System.exit(2);
+        System.out.println(""+text);        
+    }
+
+    public class ValidateParameter {
+
+        private HashMap <String,Integer> map = new HashMap<String,Integer>();
+
+        public ValidateParameter(){
+
+            map.put("Vg",0);
+            map.put("V",0);
+            map.put("sp",0);
+            map.put("f",1);
+            map.put("c",1);
+            map.put("h",0);
+            map.put("ws",2);
+            map.put("v",0);
+        }
+        public Integer getInformationOnParameter(String val){
+            return map.get(val);
+        }
     }
 }

@@ -72,4 +72,7 @@ public class VectorPositionForArgumentsStartup {
     public final int getCounter(){
         return counter;
     }
+    public int getContentSize(){
+        return vec.size();
+    }
 }
