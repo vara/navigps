@@ -63,8 +63,7 @@ public class Utils {
     }
 
     public static Font createFitFont(Font f,double scale){
-        int newSize = (int)(f.getSize()*scale);
-        return new Font(f.getName(),f.getStyle(), newSize);
+        return f.deriveFont((float)(f.getSize()*scale));
     }
 
     public static char[] resizeArray(char[] tab,int expand){
