@@ -22,10 +22,8 @@ public class DoubleOvalBorder extends OvalBorder{
   
     private double roundInnerX = 20;
     private double roundInnerY = 20;
-
-    //private Color colorForOuterBorder = new Color(90,100,190,255);
+    
     private Color colorForInnerBorder = new Color(90, 100, 190, 255);
-    //private Insets insetsOuter = new Insets(6, 6, 6, 6);
     private Insets insetsInner = new Insets(6, 10, 6, 10);
     private int thickness=0;
 
