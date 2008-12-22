@@ -5,6 +5,8 @@
 
 package app.gui;
 
+import app.gui.verboseTextPane.PanelForVerboseWindow;
+import app.gui.buttons.ToolBarButton;
 import app.ArgumentsStartUp;
 import app.Main;
 import app.gui.svgComponents.Canvas;
@@ -17,6 +19,7 @@ import app.utils.BridgeForVerboseMode;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
+import config.GUIConfiguration;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -33,7 +36,11 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.WindowEvent;
+import java.awt.event.WindowFocusListener;
 import java.awt.geom.Rectangle2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
@@ -46,6 +53,7 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
+import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JMenu;
@@ -83,7 +91,7 @@ import org.w3c.dom.svg.SVGSVGElement;
  *
  * @author vara
  */
-public class MainWindowIWD extends JFrame implements ItemListener{
+public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemListener{
     
     private Main core;
     private JPanel panelWithToolBars;
@@ -94,8 +102,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     private JToolBar toolBarFile,toolBarZoom,toolBarSerch,toolBarMemMonitor;
     private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
     
-    private JTextPaneForVerboseInfo verbosePane = null;
-    private OutputVerboseStream verboseStream = null;    
+    private OutputVerboseStream verboseStream = new BridgeForVerboseMode();
     
     private RootWindow rootWindow;
     private ViewMap viewMap = new ViewMap();//key -int i object -View
@@ -108,21 +115,36 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     //create only with -s start up parameter(window with properties svg doc)
     private JTree tree = null; 
     
-    //private MySplitPane paneForProperties = new MySplitPane();
-    
+    //private MySplitPane paneForProperties = new MySplitPane();    
+
     public MainWindowIWD(Main c){
-	
+        System.setOut(getVerboseStream().getOutputStream());
+        System.setErr(getVerboseStream().getErrOutputStream());
+        addWindowFocusListener(this);
+        addPropertyChangeListener(new PropertyChangeListener() {
+
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                System.out.println("prop name "+evt.getPropertyName());
+                System.out.println("New Value "+evt.getNewValue());
+                System.out.println("Old Value "+evt.getOldValue());
+            }
+        });
+
         MyLogger.log.log(Level.FINE,"Constructor "+getClass().toString());
         core = c;
-        setSize(MainConfiguration.getScreenSize());
+
+        setSize(GUIConfiguration.getWindowSize());
+        //always center location
+        setLocationRelativeTo(null);
         setLayout(new BorderLayout());
-
+        
         initComponents();
-
+        
         if(MainConfiguration.getPathToChartFile()!=null)
             openSVGDocument(MainConfiguration.getPathToChartFile());
 
-        setTitle("NaviGPS ver. 0.4");
+        setTitle("NaviGPS ver. "+MainConfiguration.NAVIGPS_VERSION);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
         setVisible(true);
     }
@@ -133,14 +155,6 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     }
     
     private void initComponents(){
-        BridgeForVerboseMode bfvm = new BridgeForVerboseMode();
-        if(MainConfiguration.isModeVerboseGui()){
-            verbosePane = new JTextPaneForVerboseInfo();
-            bfvm.addComponentsWithOutputStream(verbosePane.getInforamtionPipe());
-        }
-
-        verboseStream = bfvm;
-
 
         openSVGFileAction = new OpenSVGFileAction("Open SVG document ...",
                         createNavigationIcon("open16"), "Open SVG Document",
@@ -177,11 +191,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
         //init docking RootWindow
         createRootWindow();
         setDefaultLayout();
-
-
         getContentPane().add(rootWindow, BorderLayout.CENTER);
-
-
         creatToolBars();	//must be before creatMenuBar()
         creatMenuBar();
         createStatusPanel();	//must be before createCanvasPanel()
@@ -198,22 +208,17 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             for (int i = 0; i < viewsTabDockingWindow.length; i++) {
                 viewsTabDockingWindow[i] = views.get(i);
             }
-
             TabWindow tabWindow = new TabWindow(viewsTabDockingWindow);
             int minus=0;
-
             if(MainConfiguration.isModeVerboseGui())
-            minus =2;//first and last window (CanvasWindow and DebugWindow)
+                minus =2;//first and last window (CanvasWindow and DebugWindow)
             else
-            minus=1; //only first window
-
+                minus=1; //only first window
             View [] splitTab = new View[views.size()-minus];
-
             //only windows on left side
             for (int i = 0; i < viewsTabDockingWindow.length-minus; i++) {
                 splitTab[i]= viewsTabDockingWindow[i+1];
             }
-
             SplitWindow splitWindow = new SplitWindow(true,0.2f,new TabWindow(splitTab),views.lastElement());
             rootWindow.setWindow(new SplitWindow(true,0.2f,splitWindow,tabWindow));
             if(MainConfiguration.isModeVerboseGui()){
@@ -233,11 +238,13 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             views.add(new View("Properties", VIEW_ICON, new JScrollPane(tree)));
 
         if(MainConfiguration.isModeVerboseGui()){
+            PanelForVerboseWindow panel = 
+                    new PanelForVerboseWindow((BridgeForVerboseMode)getVerboseStream());
 
-            View vv = new View("Result return by functions",VIEW_ICON,verbosePane);
+            View vv = new View("Result return by functions",VIEW_ICON,panel);
             vv.getWindowProperties().setRestoreEnabled(false);
             JButtonActionForDebugWindow button = new JButtonActionForDebugWindow(BUTTON_ICON);
-            vv.getCustomTabComponents().add(button);
+            vv.getCustomTabComponents().add(button);            
             views.add(vv);
         }
         for(int i=0;i<views.size();i++){
@@ -305,7 +312,7 @@ public class MainWindowIWD extends JFrame implements ItemListener{
     
     public void createStatusPanel(){
 		
-	statusPanel = new StatusPanel(svgListeners);		
+        statusPanel = new StatusPanel(svgListeners);
         //statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));
         getContentPane().add(getStatusPanel(),BorderLayout.PAGE_END);
     }
@@ -353,9 +360,9 @@ public class MainWindowIWD extends JFrame implements ItemListener{
                           getVerboseStream(),true));
         toolBarZoom.add(new ToolBarButton(fitToPanelAction,
                           createNavigationIcon("fitToPanel32"),
-                          getVerboseStream()));
+                          getVerboseStream()));        
         toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
-        toolBarMemMonitor.setMargin(new Insets(4,0,4,1));
+        toolBarMemMonitor.setMargin(new Insets(4,1,4,1));
         toolBarSerch.add(new ToolBarButton(searchServicesAction,
                           createNavigationIcon("fitToPanel32"),
                           getVerboseStream(),true));
@@ -442,61 +449,55 @@ public class MainWindowIWD extends JFrame implements ItemListener{
         canvas.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
             @Override
             public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-                //getVerboseStream().outputVerboseStream("Bounds GVT ROOT"+e.getGVTRoot().getBounds());
+                getVerboseStream().outputErrorVerboseStream("Bounds GVT ROOT"+e.getGVTRoot().getBounds());
             }
         });
-
         canvas.setBackground(Color.white);
-
-        //getContentPane().add(canvas,BorderLayout.CENTER);
-        //line only for accelerate tests
-        //canvas.setURI("file:./MapWorld.svg");
         return canvas;
     }
     
-    public SVGScrollPane createCanvasWithScrollPane(){
-	if(canvas == null)
-	    return new SVGScrollPane(createCanvas());
-	return new SVGScrollPane(canvas);
+    public JComponent createCanvasWithScrollPane(){
+        if(canvas == null)
+            return new SVGScrollPane(createCanvas());
+        return new SVGScrollPane(canvas);
     }
     
     private void openFileChoserWindow(){
-	JFileChooser chooser = new JFileChooser();
-	String fileFilter = "svg";
-	chooser.addChoosableFileFilter(new MyFileFilter(new String[]{"svg"},fileFilter));
-	chooser.setAcceptAllFileFilterUsed(false);	
-	if(canvas.isDocumentSet()){
-	    
-	    try {
-            String lastPath = canvas.getSVGDocument().getDocumentURI();
-            URI uri = new URI(lastPath);
-            chooser.setCurrentDirectory(new File(uri));
-	    } catch (URISyntaxException ex) {
-            System.err.println(""+ex);
-	    }	    
-	}	
-	int retour = chooser.showOpenDialog(this);	
-	if(retour == JFileChooser.APPROVE_OPTION) {
-	    try {
-		    openSVGDocument(chooser.getSelectedFile());
-		    	    
-	    } catch (Exception e1) {
-		    getVerboseStream().outputVerboseStream(e1.getMessage());
-	    }
-	}
+        JFileChooser chooser = new JFileChooser();
+        String fileFilter = "svg";
+        chooser.addChoosableFileFilter(new MyFileFilter(new String[]{"svg"},fileFilter));
+        chooser.setAcceptAllFileFilterUsed(false);
+        if(canvas.isDocumentSet()){
+
+            try {
+                String lastPath = canvas.getSVGDocument().getDocumentURI();
+                URI uri = new URI(lastPath);
+                chooser.setCurrentDirectory(new File(uri));
+            } catch (URISyntaxException ex) {
+                System.err.println(""+ex);
+            }
+        }
+        int retour = chooser.showOpenDialog(this);
+        if(retour == JFileChooser.APPROVE_OPTION) {
+            try {
+                openSVGDocument(chooser.getSelectedFile());
+
+            } catch (Exception e1) {
+                getVerboseStream().outputVerboseStream(e1.getMessage());
+            }
+        }
     }
     
     public void openSVGDocument(String path){
 	
-	File file = new File(path);
-	if(file.exists()){
-	    
-	    canvas.setURI(file.toURI().toString());
-	}else{
-	    getVerboseStream().outputVerboseStream("File "+path+" doesn't exist !!!");
-	    System.err.println("File "+path+" doesn't exist !!!");
-	    MyLogger.log.log(Level.WARNING,"File "+path+" doesn't exist !!!");
-	}
+        File file = new File(path);
+        if(file.exists()){
+
+            canvas.setURI(file.toURI().toString());
+        }else{
+            System.err.println("File "+path+" doesn't exist !!!");
+            MyLogger.log.log(Level.WARNING,"File "+path+" doesn't exist !!!");
+        }
 	
     }
     public void openSVGDocument(File file){	
@@ -539,14 +540,14 @@ public class MainWindowIWD extends JFrame implements ItemListener{
         } else if (mi == cbmOptionsForToolBars[1]) {	    
             toolBarZoom.setVisible(selected);
         }else if (mi == cbmOptionsForToolBars[2]) {
-	    toolBarMemMonitor.setVisible(selected);
-	}else if (mi == cbmOptionsForToolBars[3]){
-	    toolBarSerch.setVisible(selected);
-	}else if (mi == cbmOptionsForToolBars[4]) {
+            toolBarMemMonitor.setVisible(selected);
+        }else if (mi == cbmOptionsForToolBars[3]){
+            toolBarSerch.setVisible(selected);
+        }else if (mi == cbmOptionsForToolBars[4]) {
             panelWithToolBars.setVisible(selected);
-	    //stop working memory monitor when 'selected' == false
-	    ((MemoryGui)toolBarMemMonitor.getComponentAtIndex(0)).setVisible(selected);	    
-	}
+            //stop working memory monitor when 'selected' == false
+            ((MemoryGui)toolBarMemMonitor.getComponentAtIndex(0)).setVisible(selected);
+        }
     }
     
     private static final Icon BUTTON_ICON = new Icon() {
@@ -586,6 +587,16 @@ public class MainWindowIWD extends JFrame implements ItemListener{
             g.setColor(oldColor);
         }
     };
+
+    @Override
+    public void windowGainedFocus(WindowEvent e) {
+        getVerboseStream().outputVerboseStream("windowGainedFocus");
+    }
+
+    @Override
+    public void windowLostFocus(WindowEvent e) {
+        getVerboseStream().outputVerboseStream("windowLostFocus");
+    }
 
     private class OpenSVGFileAction extends AbstractAction {
         public OpenSVGFileAction(String text, ImageIcon icon,
@@ -757,6 +768,9 @@ public class MainWindowIWD extends JFrame implements ItemListener{
         }
         @Override
         public void actionPerformed(ActionEvent e) {
+
+            //repair this bug!! (ToolBarButton) added to JMenuItem
+            //ClassCastException: javax.swing.JMenuItem cannot be cast to app.gui.buttons.ToolBarButton
             boolean en = ((ToolBarButton)e.getSource()).isSelected();
             canvas.getSearchServices().setEnabledSerchServices(!en);
             getVerboseStream().outputVerboseStream("Search services enabled "+!en);

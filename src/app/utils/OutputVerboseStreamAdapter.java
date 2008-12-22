@@ -5,6 +5,7 @@
 
 package app.utils;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
@@ -23,12 +24,21 @@ public abstract class OutputVerboseStreamAdapter implements OutputVerboseStream{
     public void outputErrorVerboseStream(String text) {}
 
     @Override
-    public PrintWriter getOutputStream(){
+    public PrintStream getOutputStream(){
         return null;
     }
 
     @Override
-    public PrintWriter getErrOutputStream(){
+    public PrintStream getErrOutputStream(){
+        return null;
+    }
+
+    @Override
+    public PrintWriter getErrOutputWriter(){
+        return null;
+    }
+    @Override
+    public PrintWriter getOutputWriter(){
         return null;
     }
 }

@@ -8,6 +8,7 @@ package app.utils;
 import config.MainConfiguration;
 import java.io.IOException;
 import java.io.OutputStream;
+import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.util.LinkedList;
 
@@ -20,8 +21,10 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
     private LinkedList<OutputVerboseStream> updateComponets = 
 			new LinkedList<OutputVerboseStream>();
     
-    private PrintWriter out = new PrintWriter(new MyOutputStram(false),true);
-    private PrintWriter err = new PrintWriter(new MyOutputStram(true),true);
+    private PrintWriter out = new PrintWriter(new MyOutputStream(false),true);
+    private PrintWriter err = new PrintWriter(new MyOutputStream(true),true);
+    private PrintStream sout = new PrintStream(new MyOutputStream(false),true);
+    private PrintStream serr = new PrintStream(new MyOutputStream(true),true);
 
     public BridgeForVerboseMode(){
         if(MainConfiguration.getMode())
@@ -51,49 +54,63 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
     }
 
     @Override
-    public PrintWriter getOutputStream() {
+    public PrintWriter getOutputWriter() {
         return out;
     }
 
     @Override
-    public PrintWriter getErrOutputStream() {
+    public PrintWriter getErrOutputWriter() {
         return err;
     }
 
+    @Override
+    public PrintStream getOutputStream() {
+        return sout;
+    }
+
+    @Override
+    public PrintStream getErrOutputStream() {
+        return serr;
+    }
+
     public class OutputVerboseStreamToConsole extends OutputVerboseStreamAdapter{
-	
+        private PrintStream systemOut = System.out;
+        private PrintStream systemErr = System.err;
         @Override
         public void outputVerboseStream(String text){
-            System.out.println(text);
+            systemOut.println(text);
         }
         @Override
         public void outputErrorVerboseStream(String text) {
-            System.err.println(text);
+            systemErr.println(text);
         }
     }
 
-    class MyOutputStram extends OutputStream {
+    private class MyOutputStream extends OutputStream {
         
         protected char buf[] = new char[512];
         protected int count=0;
         private int lsep;
         private boolean err;
-        MyOutputStram(boolean err){
+        MyOutputStream(boolean err){
             lsep = System.getProperty("line.separator").getBytes()[0];
             this.err = err;
         }
         @Override
-        public void write(int b) throws IOException {
+        public void write(int b) throws IOException {           
             if(b!=lsep)
                 addToBuffer(b);
         }
         @Override
         public void flush(){
-            if(err)
-                outputErrorVerboseStream(new String(buf,0, count));
-            else
-                outputVerboseStream(new String(buf,0, count));
-            reset();            
+            if(count!=0){
+                if (err) {
+                    outputErrorVerboseStream(new String(buf, 0, count));
+                } else {
+                    outputVerboseStream(new String(buf, 0, count));
+                }
+                reset();          
+            }
         }
         protected void addToBuffer(int val){            
             buf[count++]=(char) val;

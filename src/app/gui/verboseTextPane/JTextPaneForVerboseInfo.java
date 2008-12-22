@@ -63,7 +63,7 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
         defaultAttributes = new SimpleAttributeSet();
         errorAtributes = new SimpleAttributeSet();
         StyleConstants.setTabSet(defaultAttributes,tabset);        
-        StyleConstants.setForeground(errorAtributes, new Color(255,0,0));
+        StyleConstants.setForeground(errorAtributes, new Color(165,2,2));
         
         document = new DefaultStyledDocument(context);
         document.setParagraphAttributes(0,1,defaultAttributes,true);
@@ -159,8 +159,8 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
 
     protected class DocumentStatus extends OutputVerboseStreamAdapter{
         @Override
-        public void outputVerboseStream(String str){
-            addEndTextnl(str);
+        public void outputVerboseStream(String text){
+            addEndTextnl(text);
         }
         @Override
         public void outputErrorVerboseStream(String text) {

@@ -5,6 +5,7 @@
 
 package app.utils;
 
+import java.io.PrintStream;
 import java.io.PrintWriter;
 
 /**
@@ -15,6 +16,8 @@ public interface OutputVerboseStream {
 
     void outputVerboseStream(String text);
     void outputErrorVerboseStream(String text);
-    PrintWriter getOutputStream();
-    PrintWriter getErrOutputStream();
+    PrintStream getOutputStream();
+    PrintStream getErrOutputStream();
+    PrintWriter getOutputWriter();
+    PrintWriter getErrOutputWriter();
 }
