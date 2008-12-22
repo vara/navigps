@@ -223,7 +223,7 @@ public class SearchServices extends JComponent implements MouseListener,
 		
 	    if(isEnabledSearchServices()){
             setCurrentPosition(e.getX(),e.getY());
-            System.out.println("drag "+e.getX()+","+ e.getY() +" -> "+getCurrentPosition().getX()+","+getCurrentPosition().getY());
+            //System.out.println("drag "+e.getX()+","+ e.getY() +" -> "+getCurrentPosition().getX()+","+getCurrentPosition().getY());
             Rectangle visbleRec = new Rectangle((int)(getCenterPoint().getX()-getRadius()-10),
                                                 (int)(getCenterPoint().getY()-getRadius()-10),
                                                 (int)(getCenterPoint().getX()+getRadius()+10),

@@ -73,4 +73,8 @@ public class Utils {
         }
         return newArray;
     }
+    
+    public static Color colorAlpha(int r,int g,int b,float alpha){
+        return new Color(r,g,b,(int)(alpha*255));
+    }
 }

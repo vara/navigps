@@ -7,6 +7,7 @@ package app.gui.detailspanel;
 
 import app.gui.borders.DoubleOvalBorder;
 import app.utils.OutputVerboseStream;
+import app.utils.Utils;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -32,7 +33,6 @@ import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
-import javax.swing.SwingUtilities;
 
 /**
  * Created on 2008-12-08, 21:25:25
@@ -41,9 +41,10 @@ import javax.swing.SwingUtilities;
 public class DetailsPanelForSearchServices extends JPanel implements MouseListener,MouseMotionListener{
 
 
-    private static int sensitiveMouseReaction = 8;
-    private static int alpha = 190;
-    private Color colorBorder = new Color(0,0,0,alpha);
+    private int sensitiveMouseReaction = 8;
+    private float alpha = 0.5f;
+    
+    private Color colorBorder = Utils.colorAlpha(0,0,0,getAlpha());
     private DoubleOvalBorder mainBorder = new DoubleOvalBorder(20,20,new Color(0,0,0,0),45,45,colorBorder);
 
     private OutputVerboseStream verboseStream = null;
@@ -53,10 +54,9 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     private boolean cursorChanged = false;
 
     private boolean needRevalidate = false;
-    private boolean dynamicRevalidate = true;
+    private boolean dynamicRevalidate = false;
 
     private Dimension defaultSize = new Dimension(330,400);
-    private Dimension oldSize;
 
     private Shape childClip = null;
 
@@ -91,7 +91,7 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
         int height = getParent().getHeight();
         this.setLocation(width-getWidth(), (height-getHeight())/2 );
 
-        if(dynamicRevalidate)
+        if(isDynamicRevalidate())
             revalidate();
         //getVerboseStream().outputVerboseStream(getClass().getSimpleName()+" UpdateMyUI\n Parent size ["+width+","+height+"]" +
         //        "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");
@@ -109,12 +109,9 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     @Override
     public void paintChildren(Graphics g){
         Graphics2D g2 = (Graphics2D)g;
-
-        float tmpAlpha = (float)alpha/255;
         AlphaComposite newComposite =
-              AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,tmpAlpha);
+              AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
         g2.setComposite(newComposite);
-
         if(childClip!=null)
             g2.setClip(childClip);
         super.paintChildren(g);
@@ -122,62 +119,42 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
 
     @Override
     public void paintComponent(Graphics g){
-        System.err.println("paint component clip = "+g.getClip().getBounds());
-        //super.paintComponent(g);
-        //if(oldSize==null || oldSize.getWidth()!=getWidth() ||
-          //      oldSize.getHeight()!=getHeight()){
-            
-            oldSize = new Dimension(getSize());
 
-            Graphics2D g2 = (Graphics2D)g.create();
+        Graphics2D g2 = (Graphics2D)g.create();
 
-            GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,new Color(1,51,90,alpha),
-                                                (float)getWidth()/2, 80.0f, new Color(43,105,152,alpha));
+        GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,Utils.colorAlpha(1,51,90,getAlpha()),
+                                            (float)getWidth()/2, 80.0f,Utils.colorAlpha(43,105,152,getAlpha()));
 
-            GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(), new Color(0,0,0,alpha),
-                                                0.0f, 0.0f,new Color(90,122,166,alpha));
+        GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
+                                            0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
 
-            Insets outerIns = mainBorder.getInsetsOuter();
-            Insets innerIns = mainBorder.getInsetsInner();
+        Insets outerIns = mainBorder.getInsetsOuter();
+        Insets innerIns = mainBorder.getInsetsInner();
 
-            RoundRectangle2D outerBorder = DoubleOvalBorder.createOuterShape(outerIns.left,outerIns.top,
-                    getWidth()-outerIns.left-outerIns.right,getHeight()-outerIns.top-outerIns.bottom,
-                    mainBorder.getRoundOuterX(), mainBorder.getRoundOuterY(),outerIns);
-            RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(outerBorder.getX()-2,outerBorder.getY()-2,
-                    outerBorder.getWidth()+3,outerBorder.getHeight()+3,mainBorder.getRoundInnerX(), mainBorder.getRoundInnerY(),
-                    innerIns);
+        RoundRectangle2D outerBorder = DoubleOvalBorder.createOuterShape(outerIns.left,outerIns.top,
+                getWidth()-outerIns.left-outerIns.right,getHeight()-outerIns.top-outerIns.bottom,
+                mainBorder.getRoundOuterX(), mainBorder.getRoundOuterY(),outerIns);
+        RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(outerBorder.getX()-2,outerBorder.getY()-2,
+                outerBorder.getWidth()+3,outerBorder.getHeight()+3,mainBorder.getRoundInnerX(), mainBorder.getRoundInnerY(),
+                innerIns);
 
-            float tmpAlpha = (float)alpha/255;
-            AlphaComposite newComposite =
-                  AlphaComposite.getInstance(AlphaComposite.SRC_OVER,tmpAlpha);
+        g2.setPaint(gp2);
+        g2.fill(outerBorder);
+        g2.setPaint(gp);
+        g2.fill(innerBorder);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                            RenderingHints.VALUE_ANTIALIAS_ON);
 
-            //Paint oldPaint = g2.getPaint();
-            //g2.setComposite(newComposite);
+        paintBorderGlow(g2,5,outerBorder);
+        paintBorderShadow(g2,2,innerBorder);
 
-            g2.setPaint(gp2);
-            //g2.setClip(outerBorder);
-            g2.fill(outerBorder);
-
-            g2.setPaint(gp);
-            g2.fill(innerBorder);
-
-            //g2.setClip(0,0,getWidth(),getHeight());
-            //g2.setPaint(oldPaint);
-
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_ON);
-
-            paintBorderGlow(g2,5,outerBorder);
-            paintBorderShadow(g2,2,innerBorder);
-
-
-            float widthStroke = ((BasicStroke)g2.getStroke()).getLineWidth();
-            childClip = new RoundRectangle2D.Double(innerBorder.getX()+widthStroke+1,innerBorder.getY()+widthStroke+1,
-                    innerBorder.getWidth()-widthStroke*2,innerBorder.getHeight()-widthStroke*2,
-                    innerBorder.getArcWidth(), innerBorder.getArcHeight());
-            //getVerboseStream().outputVerboseStream("childClip "+childClip.getBounds2D()+" innerBorder "+innerBorder.getBounds2D());
-            g2.dispose();
-        //}
+        float widthStroke = ((BasicStroke)g2.getStroke()).getLineWidth();
+        childClip = new RoundRectangle2D.Double(innerBorder.getX()+widthStroke+1,innerBorder.getY()+widthStroke+1,
+                innerBorder.getWidth()-widthStroke*2,innerBorder.getHeight()-widthStroke*2,
+                innerBorder.getArcWidth(), innerBorder.getArcHeight());
+        //getVerboseStream().outputVerboseStream("childClip "+childClip.getBounds2D()+" innerBorder "+innerBorder.getBounds2D());
+        g2.dispose();
+        
     }
 
     private void paintBorderShadow(Graphics2D g2, int shadowWidth,Shape clipShape) {        
@@ -206,20 +183,20 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
             g2.setPaint(new GradientPaint(0.0f, clipShape.getBounds().height*0.25f,  mixHi,
                                           0.0f, clipShape.getBounds().height, mixLo));
  */
-            g2.setColor(new Color(240,240,255,alpha));
+            g2.setColor(Utils.colorAlpha(240,240,255,getAlpha()));
             g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, pct));
             g2.setStroke(new BasicStroke(i));
             g2.draw(clipShape);
         }
     }
 
-    private static Color getMixedColor(Color c1, float pct1, Color c2, float pct2) {
+    private Color getMixedColor(Color c1, float pct1, Color c2, float pct2) {
         float[] clr1 = c1.getComponents(null);
         float[] clr2 = c2.getComponents(null);
         for (int i = 0; i < clr1.length-1; i++) {
             clr1[i] = (clr1[i] * pct1) + (clr2[i] * pct2);            
         }        
-        return new Color(clr1[0], clr1[1], clr1[2], (float)alpha/255);
+        return new Color(clr1[0], clr1[1], clr1[2], getAlpha());
     }  
 
     @Override
@@ -245,7 +222,7 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     @Override
     public void mouseReleased(MouseEvent e) {
 
-        if(needRevalidate && !dynamicRevalidate){
+        if(needRevalidate || !isDynamicRevalidate()){
             getVerboseStream().outputVerboseStream("Revalidate!");            
             revalidate();
             needRevalidate=false;
@@ -291,11 +268,39 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     }
 
     /**
+     * @return the alpha
+     */
+    public float getAlpha() {
+        return alpha;
+    }
+
+    /**
+     * @param aAlpha the alpha to set
+     */
+    public void setAlpha(float aAlpha) {
+        alpha = aAlpha;
+    }
+
+    /**
      * @param decoratePanel the decoratePanel to set
      */
     public void setDecoratePanel(boolean decoratePanel) {
         this.decoratePanel = decoratePanel;
-    }    
+    }
+
+    /**
+     * @return the dynamicRevalidate
+     */
+    public boolean isDynamicRevalidate() {
+        return dynamicRevalidate;
+    }
+
+    /**
+     * @param dynamicRevalidate the dynamicRevalidate to set
+     */
+    public void setDynamicRevalidate(boolean dynamicRevalidate) {
+        this.dynamicRevalidate = dynamicRevalidate;
+    }
 
     class DecoratePanel extends JPanel{
         
@@ -372,46 +377,31 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     }
 
     public class MyRepaintManager extends RepaintManager {
-        // it is recommended to pass the complete check
-        private boolean completeCheck = true;
-/*
-        public boolean isCompleteCheck() {
-            return completeCheck;
-        }
-
-        public void setCompleteCheck(boolean completeCheck) {
-            this.completeCheck = completeCheck;
-        }
-
-        @Override
-        public synchronized void addInvalidComponent(JComponent component) {
-            checkThreadViolations(component);
-            super.addInvalidComponent(component);
-        }
-*/
+        
         @Override
         public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
+
             Rectangle dirtyRegion = getDirtyRegion(c);
-            //System.err.println("Dirty region "+dirtyRegion.getBounds2D());
-            
-            Container parent = c.getParent();
-            while (parent instanceof JComponent) {
-                if (!parent.isVisible())
-                    return;      
-                if (parent instanceof DetailsPanelForSearchServices) {
-                    //getVerboseStream().outputVerboseStream("Repaint parent "+parent.getClass());
-                    //getVerboseStream().outputVerboseStream("Repaint child "+c.getClass());
-                    //getVerboseStream().outputVerboseStream("x "+x+" y "+y+" w "+w+" h "+h );
-                   // System.out.println("Location on parent "+c.getLocation());
-                    super.addDirtyRegion(c, x, y, w, h);
-                    Rectangle parentRepaint = SwingUtilities.convertRectangle(c, dirtyRegion, parent);                    
-                    //System.out.println("SwingUtilities.convertRectangle  "+parentRepaint);
-                    //System.out.println("SwingUtilities.calculateInnerArea "+SwingUtilities.calculateInnerArea((JComponent)parent, dirtyRegion));
-                    super.addDirtyRegion((JComponent)parent, (int)parentRepaint.getX(),
-                            (int)parentRepaint.getY(), (int)parentRepaint.getWidth(), (int)parentRepaint.getHeight());
-                    return;
+            if (dirtyRegion.width == 0 && dirtyRegion.height == 0) {
+                int lastDeltaX = c.getX();
+                int lastDeltaY = c.getY();
+                Container parent = c.getParent();
+                while (parent instanceof JComponent) {
+                    if (!parent.isVisible() || (parent.getPeer() == null)) {
+                        return;
+                    }
+                    if (parent instanceof DetailsPanelForSearchServices &&
+                            (((DetailsPanelForSearchServices)parent).getAlpha() < 1f ||
+                            !parent.isOpaque())) {
+                        x += lastDeltaX;
+                        y += lastDeltaY;
+                        lastDeltaX = lastDeltaY = 0;
+                        c = (JComponent)parent;
+                    }
+                    lastDeltaX += parent.getX();
+                    lastDeltaY += parent.getY();
+                    parent = parent.getParent();
                 }
-                parent = parent.getParent();
             }
             super.addDirtyRegion(c, x, y, w, h);
         }
