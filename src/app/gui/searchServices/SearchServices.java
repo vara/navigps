@@ -5,7 +5,7 @@
 
 package app.gui.searchServices;
 
-import app.gui.DetailsPanelForSearchServices;
+import app.gui.detailspanel.DetailsPanelForSearchServices;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
 import java.awt.BasicStroke;
@@ -13,6 +13,7 @@ import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ComponentEvent;
@@ -67,7 +68,7 @@ public class SearchServices extends JComponent implements MouseListener,
         add( (detailsPane = new DetailsPanelForSearchServices(getVerboseStream())) );
         detailsPane.add(guiForSearchServ);
 
-        add(new GraphicsVisualVerboseMode());
+        //add(new GraphicsVisualVerboseMode());
         addComponentListener(this);
         setOpaque(false);
 	}
@@ -87,7 +88,6 @@ public class SearchServices extends JComponent implements MouseListener,
 	public void initODBConnector(ODBridge odbb){
 	    odbConnector = odbb;
 	}
-	
 	@Override
 	public void paintComponent(Graphics g){
 	    super.paintComponent(g);
@@ -100,13 +100,18 @@ public class SearchServices extends JComponent implements MouseListener,
             double offsety = svgTransform.getTranslateY();
             double scalex = svgTransform.getScaleX();
             double scaley = svgTransform.getScaleY();
-
+            try {
+                svgTransform.invert();
+            } catch (NoninvertibleTransformException ex) {
+                getVerboseStream().outputErrorVerboseStream(""+ex);
+                ex.printStackTrace(getVerboseStream().getErrOutputStream());
+            }
             AffineTransform oldTr = g2.getTransform();
             AffineTransform newTr = AffineTransform.getTranslateInstance(offsetx, offsety);
             oldTr.concatenate(newTr);
             g2.setTransform(oldTr);
 
-            float dash[] = { 10.0f };
+            float dash[] = { 10.0f ,5f,20.2f};
             float widthStroke  = (float)1.0;
             BasicStroke bsLine = new BasicStroke(widthStroke);
             g2.setStroke(bsLine);
@@ -139,6 +144,7 @@ public class SearchServices extends JComponent implements MouseListener,
 	public void setCenterPoint(double x,double y){
 	    centerPoint.setLocation(convertPointToSvgTransform(x, y));
 	    //centerPoint.setLocation(x, y);
+        guiForSearchServ.setCenterPoint(getCenterPoint());
 	}
 	public void setRadius(double r){
 	    radius =r;
@@ -150,6 +156,8 @@ public class SearchServices extends JComponent implements MouseListener,
 	    currentPos.setLocation(convertPointToSvgTransform(x, y));
 	    //currentPos.setLocation(x, y);	    
 	    setRadius(centerPoint.distance(getCurrentPosition()));
+        guiForSearchServ.setRadius(getRadius());
+        guiForSearchServ.setCurrentPos(getCurrentPosition());
 	}
 	public Point.Double getCenterPoint(){
 	    return centerPoint;
@@ -166,13 +174,13 @@ public class SearchServices extends JComponent implements MouseListener,
 	    AffineTransform at = new AffineTransform(listeners.getRenderingTransform());
 	
 	    //System.out.println("affine "+at);
-	try {
-	    at.invert();
-	} catch (NoninvertibleTransformException ex) {
-	    
-	    MyLogger.log.log(Level.SEVERE,SearchServices.class.getName(), ex);
-	    getVerboseStream().outputVerboseStream(SearchServices.class.getName()+"\n\t"+ex);
-	}
+        try {
+            at.invert();
+        } catch (NoninvertibleTransformException ex) {
+
+            MyLogger.log.log(Level.SEVERE,SearchServices.class.getName(), ex);
+            getVerboseStream().outputVerboseStream(SearchServices.class.getName()+"\n\t"+ex);
+        }
 	    double xx = (oldPoint.getX()*at.getScaleX())+at.getTranslateX();
 	    double yy = (oldPoint.getY()*at.getScaleY())+at.getTranslateY();
 	    oldPoint.setLocation(xx, yy);
@@ -214,9 +222,14 @@ public class SearchServices extends JComponent implements MouseListener,
 	public void mouseDragged(MouseEvent e) {
 		
 	    if(isEnabledSearchServices()){
-		setCurrentPosition(e.getX(),e.getY());		
-		//System.out.println("drag "+e.getX()+","+ e.getY() +" -> "+getCurrentPosition().getX()+","+getCurrentPosition().getY());
-		repaint();
+            setCurrentPosition(e.getX(),e.getY());
+            System.out.println("drag "+e.getX()+","+ e.getY() +" -> "+getCurrentPosition().getX()+","+getCurrentPosition().getY());
+            Rectangle visbleRec = new Rectangle((int)(getCenterPoint().getX()-getRadius()-10),
+                                                (int)(getCenterPoint().getY()-getRadius()-10),
+                                                (int)(getCenterPoint().getX()+getRadius()+10),
+                                                (int)(getCenterPoint().getY()+getRadius()+10));
+            repaint(visbleRec);
+            //repaint();
 	    }
 	}	
 	@Override
@@ -225,13 +238,18 @@ public class SearchServices extends JComponent implements MouseListener,
     @Override
     public void componentResized(ComponentEvent e) {
         getVerboseStream().outputVerboseStream(""+getClass()+" component Resized "+getBounds());
-        SwingUtilities.invokeLater(new Runnable() {
-
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                detailsPane.updateMyUI();
+                SwingUtilities.invokeLater(new Runnable() {
+                    @Override
+                    public void run() {
+                        System.out.println("Component Rezised");
+                        detailsPane.updateMyUI();
+                    }
+                });
             }
-        });
+        }).start();
         
     }
 
@@ -253,7 +271,7 @@ public class SearchServices extends JComponent implements MouseListener,
 	public class DocumentStateChangedListener implements JGVTComponentListener,
 							  UpdateManagerListener
 	{
-            private AffineTransform renderingTranform = new AffineTransform();
+        private AffineTransform renderingTranform = new AffineTransform();
 
 	    public DocumentStateChangedListener(){}
 	    @Override
@@ -275,13 +293,13 @@ public class SearchServices extends JComponent implements MouseListener,
 	    @Override
 	    public void componentTransformChanged(ComponentEvent event) {
 		
-		AffineTransform at = ((JSVGCanvas)event.getComponent()).getRenderingTransform();		
-            renderingTranform = at;
-	    }
-	    
-	    public AffineTransform getRenderingTransform(){
-		return renderingTranform;
-	    }
+            AffineTransform at = ((JSVGCanvas)event.getComponent()).getRenderingTransform();
+                renderingTranform = at;
+            }
+
+            public AffineTransform getRenderingTransform(){
+                return renderingTranform;
+            }
 	}       
         private class GraphicsVisualVerboseMode extends JComponent{
 

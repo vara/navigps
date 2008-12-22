@@ -111,10 +111,30 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         jLabel1.setText("Radius");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 10, -1, -1));
+
+        gRadius.setCaretColor(new java.awt.Color(151, 151, 151));
+        gRadius.setOpaque(false);
+        gRadius.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gRadius, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 170, -1));
+
+        gCurrentX.setCaretColor(new java.awt.Color(151, 151, 151));
+        gCurrentX.setOpaque(false);
+        gCurrentX.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCurrentX, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 80, -1));
+
+        gCurrentY.setCaretColor(new java.awt.Color(151, 151, 151));
+        gCurrentY.setOpaque(false);
+        gCurrentY.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCurrentY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 80, 80, -1));
+
+        gCenterX.setCaretColor(new java.awt.Color(151, 151, 151));
+        gCenterX.setOpaque(false);
+        gCenterX.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCenterX, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 80, -1));
+
+        gCenterY.setCaretColor(new java.awt.Color(151, 151, 151));
+        gCenterY.setOpaque(false);
+        gCenterY.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCenterY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 140, 80, -1));
 
         jPanel3.setOpaque(false);
