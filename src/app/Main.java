@@ -17,34 +17,30 @@ import javax.swing.SwingUtilities;
 public class Main {
     
     public final MyLogger logger = new MyLogger();
-   
-    
+
     public Main(String [] args){
-	
-	MyLogger.log.log(Level.FINE,"Start main application");
-	new ArgumentsStartUp(args);		
-	//MainConfiguration.setModeVerboseGui(true);
+
+        MyLogger.log.log(Level.FINE,"Start main application");
+        new ArgumentsStartUp(args);
     }
     
     public static void main(String[] args) {
-        args = new String[]{"-vg","-v","-f","./resources/maps/MapWorld.svg"};
-	Main app = new Main(args);	
-	Main.initGui(app);
+        args = new String[]{"-Vg","-V","-f","./resources/maps/MapWorld.svg","-ws","800","600"};
+        Main app = new Main(args);
+        Main.initGui(app);
     }
 
-    public static void initGui(final Main m)
-    {
-	SwingUtilities.invokeLater(new Runnable() {
-	    @Override
-	    public void run() {
-		
-		new MainWindowIWD(m);
-	    }
-	});
+    public static void initGui(final Main m){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+
+            new MainWindowIWD(m);
+            }
+        });
     }
     
-    public void reload()
-    {		 
-	initGui(this);
+    public void reload(){		 
+        initGui(this);
     }
 }
