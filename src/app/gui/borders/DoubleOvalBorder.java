@@ -61,14 +61,14 @@ public class DoubleOvalBorder extends OvalBorder{
 
         Graphics2D g2 = (Graphics2D)g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        float alpha = (float) ((float) getColorForOuterBorder().getAlpha() * 0.003921568627450980392);
+        float alpha = (float) (getColorForOuterBorder().getAlpha() /255);
         AlphaComposite newComposite =
                AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,alpha);
         g2.setComposite(newComposite);
         g2.setColor(getColorForOuterBorder());
 
         g2.draw(outerBorder);
-        alpha = (float) ((float) getColorForInnerBorder().getAlpha() * 0.003921568627450980392);
+        alpha = (float) (getColorForInnerBorder().getAlpha()/255);
         newComposite =
                AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,alpha);
         g2.setComposite(newComposite);

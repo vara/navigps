@@ -1,4 +1,4 @@
-/*
+    /*
  * To change this template, choose Tools | Templates
  * and open the template in the editor.
  */
@@ -76,5 +76,10 @@ public class Utils {
     
     public static Color colorAlpha(int r,int g,int b,float alpha){
         return new Color(r,g,b,(int)(alpha*255));
+    }
+
+    public static Color colorAlpha(Color oldCol,float alpha){
+        return new Color(oldCol.getRed(),
+                oldCol.getGreen(),oldCol.getBlue(),(int)(alpha*255));
     }
 }

@@ -27,25 +27,31 @@ import java.awt.Shape;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.event.PaintEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.RepaintManager;
+import org.jdesktop.animation.timing.Animator;
+import org.jdesktop.animation.timing.Animator.Direction;
+import org.jdesktop.animation.timing.Animator.RepeatBehavior;
+import org.jdesktop.animation.timing.TimingTarget;
 
 /**
  * Created on 2008-12-08, 21:25:25
  * @author vara
  */
-public class DetailsPanelForSearchServices extends JPanel implements MouseListener,MouseMotionListener{
+public class DetailsPanelForSearchServices extends JPanel 
+        implements MouseListener,MouseMotionListener,TimingTarget{
 
 
     private int sensitiveMouseReaction = 8;
-    private float alpha = 0.5f;
+    private float alpha = 0.8f;
     
     private Color colorBorder = Utils.colorAlpha(0,0,0,getAlpha());
-    private DoubleOvalBorder mainBorder = new DoubleOvalBorder(20,20,new Color(0,0,0,0),45,45,colorBorder);
+    private DoubleOvalBorder mainBorder = new DoubleOvalBorder(20,20,new Color(0,0,0,100),45,45,colorBorder);
 
     private OutputVerboseStream verboseStream = null;
 
@@ -67,6 +73,9 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
 
     private boolean decoratePanel = true;
     private DecoratePanel decorate = new DecoratePanel();
+
+    private Animator animator;
+    private int animationDuration = 2000;
     
     public DetailsPanelForSearchServices(OutputVerboseStream l){
 
@@ -82,8 +91,19 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
         //toggleButton = new RotatedButton("^", false,getSize(),l);
         //add(toggleButton);        
         installRepaintManager();
-
         //add(decorate);
+
+        animator = new Animator(animationDuration, 2,
+                RepeatBehavior.LOOP, this);
+        animator.setStartFraction(0.0f);
+        animator.setStartDirection(Direction.FORWARD);
+        animator.start();
+    }
+
+    @Override
+    public void setEnabled(boolean aFlag) {
+        super.setEnabled(aFlag);
+        System.err.println("SetEnabled "+aFlag);
     }
 
     public void updateMyUI(){
@@ -120,40 +140,56 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     @Override
     public void paintComponent(Graphics g){
 
-        Graphics2D g2 = (Graphics2D)g.create();
+        //if(getParent().isVisible() && getParent().isEnabled()){
+            Graphics2D g2 = (Graphics2D)g.create();
 
-        GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,Utils.colorAlpha(1,51,90,getAlpha()),
-                                            (float)getWidth()/2, 80.0f,Utils.colorAlpha(43,105,152,getAlpha()));
+            GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,Utils.colorAlpha(1,51,90,getAlpha()),
+                                                (float)getWidth()/2, 80.0f,Utils.colorAlpha(43,105,152,getAlpha()));
+            GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
+                                                0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
+            Insets outerIns = mainBorder.getInsetsOuter();
+            Insets innerIns = mainBorder.getInsetsInner();
+            RoundRectangle2D outerBorder = DoubleOvalBorder.createOuterShape(outerIns.left,outerIns.top,
+                    getWidth()-outerIns.left-outerIns.right,getHeight()-outerIns.top-outerIns.bottom,
+                    mainBorder.getRoundOuterX(), mainBorder.getRoundOuterY(),outerIns);
+            RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(outerBorder.getX()-2,outerBorder.getY()-2,
+                    outerBorder.getWidth()+3,outerBorder.getHeight()+3,mainBorder.getRoundInnerX(), mainBorder.getRoundInnerY(),
+                    innerIns);
 
-        GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
-                                            0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
+            g2.setPaint(gp2);
+            g2.fill(outerBorder);
+            g2.setPaint(gp);
+            g2.fill(innerBorder);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                RenderingHints.VALUE_ANTIALIAS_ON);
 
-        Insets outerIns = mainBorder.getInsetsOuter();
-        Insets innerIns = mainBorder.getInsetsInner();
+            paintBorderGlow(g2,5,outerBorder);
+            paintBorderShadow(g2,2,innerBorder);
 
-        RoundRectangle2D outerBorder = DoubleOvalBorder.createOuterShape(outerIns.left,outerIns.top,
-                getWidth()-outerIns.left-outerIns.right,getHeight()-outerIns.top-outerIns.bottom,
-                mainBorder.getRoundOuterX(), mainBorder.getRoundOuterY(),outerIns);
-        RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(outerBorder.getX()-2,outerBorder.getY()-2,
-                outerBorder.getWidth()+3,outerBorder.getHeight()+3,mainBorder.getRoundInnerX(), mainBorder.getRoundInnerY(),
-                innerIns);
+            //calculte child clip <check the mainClip must be outsider relative childClip>
+            float widthStroke = ((BasicStroke)g2.getStroke()).getLineWidth();
+            double clipX  = innerBorder.getX()+widthStroke+1;
+            double clipY = innerBorder.getY()+widthStroke+1;
+            double clipW = innerBorder.getWidth()-(widthStroke*2);
+            double clipH = innerBorder.getHeight()-(widthStroke*2);
+    /*
+            clipX+=mainClip.getX();
+            clipY+=mainClip.getY();
+            if(clipW>mainClip.getWidth())
+                clipW =mainClip.getWidth();
+            if(clipH>mainClip.getHeight())
+                clipH =mainClip.getHeight();
+    */
+            childClip = new RoundRectangle2D.Double(clipX,clipY,clipW,clipH,innerBorder.getArcWidth(), innerBorder.getArcHeight());
 
-        g2.setPaint(gp2);
-        g2.fill(outerBorder);
-        g2.setPaint(gp);
-        g2.fill(innerBorder);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                            RenderingHints.VALUE_ANTIALIAS_ON);
+            //getVerboseStream().outputVerboseStream("childClip "+childClip.getBounds2D()+" innerBorder "+innerBorder.getBounds2D());
+            Color cInn = mainBorder.getColorForInnerBorder();
+            Color cOut = mainBorder.getColorForOuterBorder();
+            mainBorder.setColorForInnerBorder(Utils.colorAlpha(cInn, getAlpha()%.5f));
+            mainBorder.setColorForOuterBorder(Utils.colorAlpha(cOut, getAlpha()%.25f));
 
-        paintBorderGlow(g2,5,outerBorder);
-        paintBorderShadow(g2,2,innerBorder);
-
-        float widthStroke = ((BasicStroke)g2.getStroke()).getLineWidth();
-        childClip = new RoundRectangle2D.Double(innerBorder.getX()+widthStroke+1,innerBorder.getY()+widthStroke+1,
-                innerBorder.getWidth()-widthStroke*2,innerBorder.getHeight()-widthStroke*2,
-                innerBorder.getArcWidth(), innerBorder.getArcHeight());
-        //getVerboseStream().outputVerboseStream("childClip "+childClip.getBounds2D()+" innerBorder "+innerBorder.getBounds2D());
-        g2.dispose();
+            g2.dispose();
+        //}
         
     }
 
@@ -301,6 +337,14 @@ public class DetailsPanelForSearchServices extends JPanel implements MouseListen
     public void setDynamicRevalidate(boolean dynamicRevalidate) {
         this.dynamicRevalidate = dynamicRevalidate;
     }
+
+    public void timingEvent(float arg0) {
+        setAlpha(arg0);
+        repaint();
+    }
+    public void begin() {}
+    public void end() {}
+    public void repeat() {}
 
     class DecoratePanel extends JPanel{
         

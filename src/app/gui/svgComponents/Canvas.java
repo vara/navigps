@@ -122,15 +122,14 @@ public class Canvas extends JSVGCanvas{
 
             Point2D p2d = new Point2D.Double(evt.getX(),evt.getY());
             if(evt.getButton()==1){
-
-            zoomIn(p2d);
-            search.getVerboseStream().outputVerboseStream("Zoom In\n\tPoint "+p2d+
-                            "\n\tRate ["+svgConfig.getZoomInRateX()+","+svgConfig.getZoomInRateY()+"]");
+                zoomIn(p2d);
+                search.getVerboseStream().outputVerboseStream("Zoom In\n\tPoint "+p2d+
+                                "\n\tRate ["+svgConfig.getZoomInRateX()+","+svgConfig.getZoomInRateY()+"]");
             }
             else {
-            zoomOut(p2d);
-            search.getVerboseStream().outputVerboseStream("Zoom Out\n\tPoint "+p2d+
-                            "\n\tRate ["+svgConfig.getZoomOutRateX()+","+svgConfig.getZoomOutRateY()+"]");
+                zoomOut(p2d);
+                search.getVerboseStream().outputVerboseStream("Zoom Out\n\tPoint "+p2d+
+                                "\n\tRate ["+svgConfig.getZoomOutRateX()+","+svgConfig.getZoomOutRateY()+"]");
             }
         }
         @Override
@@ -142,13 +141,13 @@ public class Canvas extends JSVGCanvas{
         public void mouseMoved(MouseEvent e) {
             SVGDocument doc = getSVGDocument();
             if(doc != null && !listeners.isRendering()){
-            SVGOMPoint svgp =Utils.getLocalPointFromDomElement(doc.getRootElement(),e.getX() ,e.getY());
-            //0.position on source component 1.positon on screen 2. posytion on svg doc (root element)
-            String str = e.getX()+","+e.getY()+";"+
-                     e.getXOnScreen()+","+e.getYOnScreen()+";"+
-                     (int)svgp.getX()+","+(int)svgp.getY();
+                SVGOMPoint svgp =Utils.getLocalPointFromDomElement(doc.getRootElement(),e.getX() ,e.getY());
+                //0.position on source component 1.positon on screen 2. posytion on svg doc (root element)
+                String str = e.getX()+","+e.getY()+";"+
+                         e.getXOnScreen()+","+e.getYOnScreen()+";"+
+                         (int)svgp.getX()+","+(int)svgp.getY();
 
-            listeners.setLabelInformationPosytion(str);
+                listeners.setLabelInformationPosytion(str);
             }
         }
 
