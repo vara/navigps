@@ -7,6 +7,9 @@ package app.gui.verboseTextPane;
 
 import app.gui.MyPopupMenu;
 import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
@@ -45,6 +48,13 @@ public class MyTextPane extends JTextPane{
 
         return parent != null ?
             (compUi.getPreferredSize(this).width <= parent.getSize().width) : true;
+    }
+
+    @Override
+    public void paint(Graphics g){
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        super.paint(g2);
     }
 
     /**
