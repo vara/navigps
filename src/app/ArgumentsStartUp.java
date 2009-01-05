@@ -38,7 +38,7 @@ public class ArgumentsStartUp {
                 checkParameters(arg);                
                 MyLogger.log.log(Level.FINE,"Validate arguments status OK !");
             } catch (Exception ex) {
-                
+                MyLogger.log.log(Level.WARNING,ex.getMessage());
                 helpInformation(ex.getMessage());
             }
         }else{
@@ -58,7 +58,7 @@ public class ArgumentsStartUp {
         String paramWhithoutMarker = "";
         //number of arguments accepted by the function
         Integer numOfParam;
-
+        
         while(true){
             try {
                 String param = vecArgumentsOffset.getNextParameter();
@@ -117,8 +117,7 @@ public class ArgumentsStartUp {
                 break;//end while
             }
 
-        }//while
-        MyLogger.log.log(Level.FINE,"Arguments to start application ["+vecArgumentsOffset+"]");
+        }//while        
     }
     
     public void orderCommands(Parameter p) throws Exception{
