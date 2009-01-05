@@ -24,8 +24,8 @@ public class OvalBorder extends AbstractBorder {
 
      private double recw=0;
      private double rech=0;
-     private Color borderColor=new Color(90,100,190,10);
-     private Insets insets = new Insets(0,0,0,0);
+     private Color borderColor=new Color(90,100,190,255);
+     private Insets insets = new Insets(6, 10, 6, 10);
 
      public OvalBorder() {
              recw=6;
@@ -58,7 +58,11 @@ public class OvalBorder extends AbstractBorder {
      public OvalBorder(int top, int left, int bottom, int right) {
         insets = new Insets(top, left, bottom, right);
      }
-
+     public OvalBorder(int top, int left, int bottom, int right,double recw, double rech) {
+        this(top, left, bottom, right);
+        setRecH(rech);
+        setRecW(recw);
+     }
     @Override
      public Insets getBorderInsets(Component c) {
         return getInsets();
@@ -70,7 +74,7 @@ public class OvalBorder extends AbstractBorder {
     @Override
      public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
         RoundRectangle2D border = createOuterShape(x,y,w-1,h-1,getRecW(),getRecH(),getInsets());
-        Graphics2D g2 = (Graphics2D)g;
+        Graphics2D g2 = (Graphics2D)g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         float alpha = (float)getBorderColor().getAlpha()/255;
         AlphaComposite newComposite =
@@ -78,6 +82,7 @@ public class OvalBorder extends AbstractBorder {
         g2.setComposite(newComposite);
         g2.setColor(getBorderColor());
         g2.draw(border);
+        g2.dispose();
      }
 
     public static RoundRectangle2D.Double createOuterShape(double x, double y, double w, double h,

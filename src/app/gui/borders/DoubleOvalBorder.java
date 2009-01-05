@@ -27,8 +27,10 @@ public class DoubleOvalBorder extends OvalBorder{
     private Insets insetsInner = new Insets(6, 10, 6, 10);
     private int thickness=0;
 
-    public DoubleOvalBorder(int w, int h) {
-        super(w, h);
+    public DoubleOvalBorder(int arcW, int arcH) {
+        super(arcW, arcH);
+        setRoundInnerX(arcW);
+        setRoundInnerY(arcH);
     }
 
     public DoubleOvalBorder(int arcw1, int arch1, Color topColor1,int arcw2, int arch2, Color topColor2) {
@@ -54,24 +56,14 @@ public class DoubleOvalBorder extends OvalBorder{
 
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-
-        RoundRectangle2D outerBorder = DoubleOvalBorder.createOuterShape(x, y, w-1,h-1,getRoundOuterX(),getRoundOuterY(), getInsetsOuter());
-        RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(outerBorder.getX(),outerBorder.getY(),
-                outerBorder.getWidth(),outerBorder.getHeight(),getRoundInnerX(),getRoundInnerY(), getInsetsInner());
+        super.paintBorder(c, g, x, y, w, h);
+        RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(x,y,w-1,h-1,
+                getRoundInnerX(),getRoundInnerY(), getInsetsInner());
 
         Graphics2D g2 = (Graphics2D)g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        float alpha = (float) (getColorForOuterBorder().getAlpha() /255);
-        AlphaComposite newComposite =
-               AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,alpha);
-        g2.setComposite(newComposite);
-        g2.setColor(getColorForOuterBorder());
-
-        g2.draw(outerBorder);
-        alpha = (float) (getColorForInnerBorder().getAlpha()/255);
-        newComposite =
-               AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,alpha);
-        g2.setComposite(newComposite);
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);        
+        float alpha = (float) getColorForInnerBorder().getAlpha()/255;
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,alpha));
         g2.setColor(getColorForInnerBorder());
         g2.draw(innerBorder);
 
@@ -156,34 +148,6 @@ public class DoubleOvalBorder extends OvalBorder{
      */
     public void setThickness(int thickness) {
         this.thickness = thickness;
-    }
-
-    /**
-     * @return the roundOuterX
-     */
-    public double getRoundOuterX() {
-        return super.getRecW();
-    }
-
-    /**
-     * @param roundOuterX the roundOuterX to set
-     */
-    public void setRoundOuterX(double roundOuterX) {
-        super.setRecW(roundOuterX);
-    }
-
-    /**
-     * @return the roundOuterY
-     */
-    public double getRoundOuterY() {
-        return super.getRecH();
-    }
-
-    /**
-     * @param roundOuterY the roundOuterY to set
-     */
-    public void setRoundOuterY(double roundOuterY) {
-        super.setRecH(roundOuterY);
     }
 
     /**
