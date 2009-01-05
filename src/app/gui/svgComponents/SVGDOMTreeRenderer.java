@@ -5,6 +5,7 @@
 
 package app.gui.svgComponents;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.FlowLayout;
 import javax.swing.JLabel;
@@ -12,17 +13,11 @@ import javax.swing.JPanel;
 import javax.swing.JTable;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
-import javax.xml.parsers.SAXParser;
 import javax.xml.stream.events.Comment;
-import javax.xml.stream.events.ProcessingInstruction;
-import org.w3c.dom.Attr;
 import org.w3c.dom.CDATASection;
 import org.w3c.dom.CharacterData;
-import org.w3c.dom.DocumentType;
 import org.w3c.dom.Element;
-import org.w3c.dom.EntityReference;
 import org.w3c.dom.Node;
-import org.w3c.dom.Notation;
 import org.w3c.dom.Text;
 
 /**
@@ -33,6 +28,7 @@ import org.w3c.dom.Text;
 public class SVGDOMTreeRenderer extends DefaultTreeCellRenderer{
 
     public SVGDOMTreeRenderer(){
+       setBackgroundNonSelectionColor(new Color(0,0,0,0));
     }
     
     @Override
@@ -46,7 +42,7 @@ public class SVGDOMTreeRenderer extends DefaultTreeCellRenderer{
 	Node node = (Node)value;	
 	//if(node instanceof Element) return elementPanel((Element)node);
 	if(node instanceof Element){
-	    setText("Element "+((Element)node).getTagName());
+        setText("Element "+((Element)node).getTagName());
 	    return this;
 	}
 	

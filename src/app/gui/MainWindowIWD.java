@@ -9,10 +9,11 @@ import app.gui.verboseTextPane.PanelForVerboseWindow;
 import app.gui.buttons.ToolBarButton;
 import app.ArgumentsStartUp;
 import app.Main;
+import app.gui.displayItemsMap.DetailsPanel;
+import app.gui.displayItemsMap.MainDetailsPanel;
+import app.gui.displayItemsMap.PanelWithBatikJTree;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGBridgeListeners;
-import app.gui.svgComponents.SVGDOMTreeModel;
-import app.gui.svgComponents.SVGDOMTreeRenderer;
 import app.gui.svgComponents.SVGScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
 import app.utils.BridgeForVerboseMode;
@@ -60,9 +61,7 @@ import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
-import javax.swing.JScrollPane;
 import javax.swing.JToolBar;
-import javax.swing.JTree;
 import javax.swing.KeyStroke;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
@@ -111,10 +110,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     
     private Vector <View> views = new Vector<View>();
     private static int ICON_SIZE = 8;
-    
-    //create only with -s start up parameter(window with properties svg doc)
-    private JTree tree = null; 
-    
+         
     //private MySplitPane paneForProperties = new MySplitPane();    
 
     public MainWindowIWD(Main c){
@@ -180,11 +176,6 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
                         "Search services with a certain area",
                         KeyEvent.VK_S);
 
-        if(MainConfiguration.isShowDocumentProperties()){
-            tree = new JTree();
-            tree.setModel(null);
-        }
-
         svgListeners.setVerboseStream(getVerboseStream());
         svgListeners.addUpdateComponents(new UpdateMenuAndToolBars());
 
@@ -231,12 +222,16 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     private void createRootWindow() {
     
         //main window should always be first
-        View vRoot = new View("SVG Document", VIEW_ICON, createCanvasWithScrollPane());        
+        View vRoot = new View("SVG Document", VIEW_ICON, createCanvasWithScrollPane());
         freezeLayout(true,vRoot.getWindowProperties());
         views.add(vRoot);
-        if(MainConfiguration.isShowDocumentProperties())
-            views.add(new View("Properties", VIEW_ICON, new JScrollPane(tree)));
+        if(MainConfiguration.isShowDocumentProperties()){
 
+            MainDetailsPanel detailsPanel = new MainDetailsPanel(getVerboseStream());
+            detailsPanel.addToUpperContent(new PanelWithBatikJTree(canvas, getVerboseStream()));
+            detailsPanel.addToLowerContent(new DetailsPanel());
+            views.add(new View("Properties", VIEW_ICON,detailsPanel));
+        }
         if(MainConfiguration.isModeVerboseGui()){
             PanelForVerboseWindow panel = 
                     new PanelForVerboseWindow((BridgeForVerboseMode)getVerboseStream());
@@ -294,10 +289,13 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         prop.setDockEnabled(!freeze);
     }
     
-    protected static ImageIcon createNavigationIcon(String imageName) {
+    public static ImageIcon createNavigationIcon(String imageName) {
+        return createNavigationIcon(imageName,"png");
+    }
+    public static ImageIcon createNavigationIcon(String imageName,String ext) {
         String imgLocation = "resources/graphics/icons/"
                              + imageName
-                             + ".png";
+                             + "."+ext;
         URL imageURL = MainWindowIWD.class.getResource(imgLocation);
 
         if (imageURL == null) {
@@ -306,10 +304,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             return null;
         } else {
             return new ImageIcon(imageURL);
-	   
+
         }
     }
-    
+
     public void createStatusPanel(){
 		
         statusPanel = new StatusPanel(svgListeners);
@@ -492,8 +490,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
 	
         File file = new File(path);
         if(file.exists()){
-
-            canvas.setURI(file.toURI().toString());
+            openSVGDocument(file);
         }else{
             System.err.println("File "+path+" doesn't exist !!!");
             MyLogger.log.log(Level.WARNING,"File "+path+" doesn't exist !!!");
@@ -734,17 +731,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
                 @Override
                 public void run() {
                     setComponetsZoomEnable(true);
-                    views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
-                    if(MainConfiguration.isShowDocumentProperties()){
-                        getVerboseStream().outputVerboseStream("----Create content window properties----");
-                        getVerboseStream().outputVerboseStream("Build Tree Nodes ...");
-                        getVerboseStream().outputVerboseStream("Build Tree Model for Tree Nodes ...");
-                        SVGDOMTreeModel model = new SVGDOMTreeModel(canvas.getSVGDocument());
-                        tree.setModel(model);
-                        getVerboseStream().outputVerboseStream("Build Tree Model Completed");
-                        tree.setCellRenderer(new SVGDOMTreeRenderer());
-                        getVerboseStream().outputVerboseStream("Build Tree Nodes Completed");
-                    }
+                    views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());                    
                 }
             });
             w.start();
@@ -772,7 +759,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             //repair this bug!! (ToolBarButton) added to JMenuItem
             //ClassCastException: javax.swing.JMenuItem cannot be cast to app.gui.buttons.ToolBarButton
             boolean en = ((ToolBarButton)e.getSource()).isSelected();
-            canvas.getSearchServices().setEnabledSerchServices(!en);
+            canvas.getSearchServices().setEnabled(!en);
             getVerboseStream().outputVerboseStream("Search services enabled "+!en);
         }	
     }
