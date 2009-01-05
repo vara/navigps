@@ -26,14 +26,16 @@ public class OpenCloseButton extends RotatedButton implements ActionListener,Tim
     private int animationDuration = 2000;
 
     public OpenCloseButton(String text,boolean clockwise,Dimension size,OutputVerboseStream verbose){
-        super(text,true,size,verbose);
+        this(text, clockwise, size, 0, verbose);
+    }
+    public OpenCloseButton(String text,boolean clockwise,Dimension size,double round,OutputVerboseStream verbose){
+        super(text,true,size,round,verbose);
         animator = new Animator(animationDuration, Animator.INFINITE,
                 RepeatBehavior.REVERSE, this);
         animator.setStartFraction(0.2f);
         animator.setStartDirection(Direction.BACKWARD);
-        addActionListener(this);        
+        addActionListener(this);
     }
-
     @Override
     public void timingEvent(float arg0) {
         setAlpha(arg0);

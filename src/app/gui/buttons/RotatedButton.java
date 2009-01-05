@@ -35,7 +35,10 @@ public class RotatedButton extends RoundButton{
             setPreferredSize(size);
             //setLocation(size.width-width,0);
         }       
-
+        public RotatedButton(String text, boolean clockwise,Dimension size,double round,OutputVerboseStream l) {
+            this(text, clockwise, size, l);
+            setRound(round, round);
+        }
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);
