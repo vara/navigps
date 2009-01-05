@@ -63,15 +63,17 @@ public class Canvas extends JSVGCanvas{
     
     private SVGBridgeListeners listeners;
     private ZoomAndMove zoomListener;
-        
     
+    //not used yet
+    //private SVGUserAgentGUIAdapter agent;
+
     private SearchServices search;
     
     public Canvas(SVGBridgeListeners listeners){
 		
         //setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
         setDocumentState(Canvas.ALWAYS_STATIC);
-        setRecenterOnResize(false);
+        //setRecenterOnResize(false);
         setDoubleBuffered(false);
 
         addSVGDocumentLoaderListener(listeners);
@@ -79,8 +81,8 @@ public class Canvas extends JSVGCanvas{
         addGVTTreeRendererListener(listeners);
 
         zoomListener=new  ZoomAndMove();
-            //addMouseListener(zoomListener);
-            addMouseMotionListener(zoomListener);
+         //addMouseListener(zoomListener);
+        addMouseMotionListener(zoomListener);
         this.listeners = listeners;
 
         setLayout(new BorderLayout());
@@ -103,15 +105,17 @@ public class Canvas extends JSVGCanvas{
         super.setURI(uri);
         
     }
-    public boolean isDocumentSet(){ return (getSVGDocument() != null);}
+    public boolean isDocumentSet(){ 
+        return (getSVGDocument() != null);
+    }
     
-    public JLabel getLabelViewMousePosyton() {
-	return labelViewMousePosyton;
+    public JLabel getLabelViewMousePosition() {
+        return labelViewMousePosyton;
     }
     
     @Override
     public void paintComponent(Graphics g){
-	super.paintComponent(g);
+        super.paintComponent(g);
     }
     
     private class ZoomAndMove extends MouseAdapter{	
@@ -135,7 +139,9 @@ public class Canvas extends JSVGCanvas{
         @Override
         public void mousePressed(MouseEvent e) {}
         @Override
-        public void mouseDragged(MouseEvent e) {}
+        public void mouseDragged(MouseEvent e) {
+            mouseMoved(e);
+        }
 
         @Override
         public void mouseMoved(MouseEvent e) {
@@ -145,7 +151,7 @@ public class Canvas extends JSVGCanvas{
                 //0.position on source component 1.positon on screen 2. posytion on svg doc (root element)
                 String str = e.getX()+","+e.getY()+";"+
                          e.getXOnScreen()+","+e.getYOnScreen()+";"+
-                         (int)svgp.getX()+","+(int)svgp.getY();
+                         svgp.getX()+","+svgp.getY();
 
                 listeners.setLabelInformationPosytion(str);
             }
