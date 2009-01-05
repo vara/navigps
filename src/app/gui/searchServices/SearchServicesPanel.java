@@ -11,13 +11,13 @@
 
 package app.gui.searchServices;
 
-import java.awt.Color;
+import app.gui.detailspanel.DetailsPanelForSearchServices;
+import app.gui.displayItemsMap.PanelWithJTree.MyScrollBarUI;
 import java.awt.Component;
 import java.awt.Point;
 import java.util.Vector;
+import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTree;
-import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.TreeSelectionModel;
 
 /**
@@ -37,7 +37,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         val.add("Streets");
         val.add("Schools");
         val.add("Bars");
-
+        
         jTree1 = new JCheckBoxTree(val);
         jTree1.setCellRenderer(new JCheckBoxTreeRenderer());
         jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -47,6 +47,17 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jScrollPane1.setOpaque(false);
         jScrollPane1.getViewport().setOpaque(false);
         jScrollPane1.getViewport().setBorder(null);
+
+        JScrollBar scbH = jScrollPane1.getHorizontalScrollBar();
+        JScrollBar scbV = jScrollPane1.getVerticalScrollBar();
+        scbH.setOpaque(false);
+        scbV.setOpaque(false);
+        scbV.setUI(new MyScrollBarUI());
+        scbH.setUI(new MyScrollBarUI());
+
+        scbH.removeAll();
+        scbV.removeAll();
+
         jTree1.setOpaque(false);
         jTree1.setFocusable(false);
 
@@ -91,6 +102,11 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         jButton1.setText("Search");
         jButton1.setFocusPainted(false);
+        jButton1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton1ActionPerformed(evt);
+            }
+        });
 
         jPanel1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(204, 219, 255)));
         jPanel1.setOpaque(false);
@@ -203,6 +219,18 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, 300));
     }// </editor-fold>//GEN-END:initComponents
+
+    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+       Component comp;
+        for (comp = getParent(); comp!=null; comp=comp.getParent()) {
+            if(comp instanceof DetailsPanelForSearchServices){
+                DetailsPanelForSearchServices det  =(DetailsPanelForSearchServices)comp;
+                System.out.println("current alpha "+det.getAlpha());
+                break;
+            }
+        }
+
+    }//GEN-LAST:event_jButton1ActionPerformed
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
