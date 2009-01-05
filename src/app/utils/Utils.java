@@ -52,18 +52,18 @@ public class Utils {
 	    return (SVGOMPoint) pt.matrixTransform(imat);
     }
 
-    public static String roundsValue(double val,int n,int mul){
+    public static String roundsValue(double val,int fraction,int mul){
         NumberFormat nf = NumberFormat.getInstance();
-        nf.setMaximumFractionDigits(n);
+        nf.setMaximumFractionDigits(fraction);
         return nf.format(val/mul);
     }
 
-    public static String roundsValue(double val,int n){
-        return roundsValue(val,n,1);
+    public static String roundsValue(double val,int fraction){
+        return roundsValue(val,fraction,1);
     }
 
     public static Font createFitFont(Font f,double scale){
-        return f.deriveFont((float)(f.getSize()*scale));
+        return f.deriveFont( (float)(f.getSize()*scale) );
     }
 
     public static char[] resizeArray(char[] tab,int expand){
@@ -81,5 +81,23 @@ public class Utils {
     public static Color colorAlpha(Color oldCol,float alpha){
         return new Color(oldCol.getRed(),
                 oldCol.getGreen(),oldCol.getBlue(),(int)(alpha*255));
+    }
+    public static Color checkColor(int r,int g,int b,int a){
+        if ( a < 0 || a > 255) {
+            a = a < 0 ? 0 : 255;
+        }
+        if ( r < 0 || r > 255) {
+            r = r < 0 ? 0 : 255;
+        }
+        if ( g < 0 || g > 255) {
+            g = g < 0 ? 0 : 255;
+        }
+        if ( b < 0 || b > 255) {
+            b = b < 0 ? 0 : 255;
+        }
+        return new Color(r,g,b,a);
+    }
+    public static Color checkColor(int r,int g,int b){
+        return checkColor(r, g, b, 255);
     }
 }
