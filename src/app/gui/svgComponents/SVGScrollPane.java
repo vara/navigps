@@ -45,6 +45,7 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.swing.BoundedRangeModel;
 import javax.swing.Box;
+import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.event.ChangeEvent;
@@ -138,7 +139,7 @@ public class SVGScrollPane extends JPanel{
         canvas.addGVTTreeRendererListener(xlistener);
         canvas.addJGVTComponentListener  (xlistener);
         canvas.addGVTTreeBuilderListener (xlistener);
-        canvas.addUpdateManagerListener  (xlistener);
+        canvas.addUpdateManagerListener  (xlistener);        
     }// JSVGScrollPane()
 
     public boolean getScrollbarsAlwaysVisible() {
@@ -619,7 +620,7 @@ public class SVGScrollPane extends JPanel{
      * (zoom) factor in a status bar, for example.
      */
     public void scaleChange(float scale) {
-       System.out.println("Skala "+scale);
+       System.err.println("Scale changed "+scale);
     }
 }// class JSVGScrollPane
 

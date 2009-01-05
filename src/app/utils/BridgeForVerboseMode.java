@@ -18,7 +18,7 @@ import java.util.LinkedList;
  */
 public class BridgeForVerboseMode implements OutputVerboseStream{
 
-    private LinkedList<OutputVerboseStream> updateComponets = 
+    private LinkedList<OutputVerboseStream> updateComponents =
 			new LinkedList<OutputVerboseStream>();
     
     private PrintWriter out = new PrintWriter(new MyOutputStream(false),true);
@@ -33,22 +33,22 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
     
     @Override
     public void outputVerboseStream(String text){	
-        for (OutputVerboseStream ucomp : updateComponets) {
+        for (OutputVerboseStream ucomp : updateComponents) {
             ucomp.outputVerboseStream(text);
         }
     }
     public void addComponentsWithOutputStream(OutputVerboseStream l){	
         if(l!=null)
-            updateComponets.add(l);
+            updateComponents.add(l);
     }
     public boolean removeComponentFromOutputStream(OutputVerboseStream l){
         if(l!=null){
-            return updateComponets.remove(l);
+            return updateComponents.remove(l);
         }return false;
     }
     @Override
     public void outputErrorVerboseStream(String text) {
-        for (OutputVerboseStream ucomp : updateComponets) {
+        for (OutputVerboseStream ucomp : updateComponents) {
             ucomp.outputErrorVerboseStream(text);
         }
     }

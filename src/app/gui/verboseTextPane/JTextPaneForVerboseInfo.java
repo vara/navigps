@@ -5,16 +5,9 @@
 
 package app.gui.verboseTextPane;
 
-import app.gui.*;
-import app.gui.verboseTextPane.MyTextPane.ClearAllAction;
 import app.utils.*;
 import java.awt.Color;
-import java.awt.event.KeyEvent;
-import java.awt.event.MouseAdapter;
-import java.awt.event.MouseEvent;
 import java.util.logging.Level;
-import javax.swing.Action;
-import javax.swing.JMenuItem;
 import javax.swing.JScrollPane;
 import javax.swing.JTextPane;
 import javax.swing.event.DocumentEvent;
