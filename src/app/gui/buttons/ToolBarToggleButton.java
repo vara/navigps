@@ -17,18 +17,19 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.Rectangle2D;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
-import javax.swing.JButton;
+import javax.swing.JToggleButton;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 
 /**
- *
+ * Created on 2009-01-06, 04:01:24
  * @author vara
  */
-public class ToolBarButton extends JButton implements MouseListener,ChangeListener{
-    
+public class ToolBarToggleButton extends JToggleButton implements MouseListener,ChangeListener{
+
     private boolean mouseOnButton = false;
     private boolean mousePressedButton = false;
 
@@ -42,8 +43,7 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
 
     private float roundCorner = 12.0f;
 
-    public ToolBarButton(Action a,ImageIcon i,OutputVerboseStream l){
-	
+    public ToolBarToggleButton(Action a,ImageIcon i,OutputVerboseStream l){
         super(a);
         setVerboseStream(l);
         setIcon(i);
@@ -55,7 +55,7 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
 
         addChangeListener(this);
     }
-
+    
     public void setVerboseStream(OutputVerboseStream l){
         letOfChange = l;
     }
@@ -89,17 +89,17 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
 
             if(oldSize==null || oldSize.getHeight()!=getHeight() || oldSize.getWidth()!=getWidth())
                 updateMyUI();
-            
-            if(isMouseOnButton()){
+
+            if(isMouseOnButton() || isSelected()){
                 Paint oldPaint = g2.getPaint();
                 g2.setClip(borderOnButton);
                 GradientPaint [] gradient = null;
                 Color borderColor = null;
-                
+
                 if(mousePressedButton){
                     borderColor = new Color(25, 25, 25);
-                    gradient = gradientPressedButtion;                    
-                }else{                    
+                    gradient = gradientPressedButtion;
+                }else{
                     borderColor = new Color(155, 155, 155);
                     gradient = gradientOnButton;
                 }
@@ -118,7 +118,7 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
                                          (getHeight()-getIcon().getIconHeight())/2);
             g2.dispose();
         }else
-            super.paintComponent(g);	    
+            super.paintComponent(g);
     }
 
     @Override
@@ -129,7 +129,7 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
     }
     @Override
     public void mouseReleased(MouseEvent e) {
-        
+
         mousePressedButton = false;
     }
     @Override
@@ -161,13 +161,13 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
             addMouseListener(this);
         else
             removeMouseListener(this);
-        
+
         if(getVerboseStream()!=null)
             getVerboseStream().outputVerboseStream(getAction().getValue(Action.NAME)+" isEnabled "+b);
     }
 
     public void stateChanged(ChangeEvent e) {
         System.out.print("ChangeEvent ");
-        System.out.println(((JButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((JButton)e.getSource()).isSelected());
+        System.out.println(((AbstractButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((AbstractButton)e.getSource()).isSelected());
     }
 }

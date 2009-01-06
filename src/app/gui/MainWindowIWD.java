@@ -9,6 +9,7 @@ import app.gui.verboseTextPane.PanelForVerboseWindow;
 import app.gui.buttons.ToolBarButton;
 import app.ArgumentsStartUp;
 import app.Main;
+import app.gui.buttons.ToolBarToggleButton;
 import app.gui.displayItemsMap.DetailsPanel;
 import app.gui.displayItemsMap.MainDetailsPanel;
 import app.gui.displayItemsMap.PanelWithBatikJTree;
@@ -49,6 +50,7 @@ import java.net.URL;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
+import javax.swing.AbstractButton;
 import javax.swing.Action;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
@@ -63,6 +65,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.event.ChangeEvent;
+import javax.swing.event.ChangeListener;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
@@ -353,18 +357,20 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         toolBarZoom.add(new ToolBarButton(zoomOutAction,
                           createNavigationIcon("zoomOut32"),
                           getVerboseStream()));
-        toolBarZoom.add(new ToolBarButton(zoomAction,
+        toolBarZoom.add(new ToolBarToggleButton(zoomAction,
                           createNavigationIcon("zoom32"),
-                          getVerboseStream(),true));
+                          getVerboseStream()));
         toolBarZoom.add(new ToolBarButton(fitToPanelAction,
                           createNavigationIcon("fitToPanel32"),
                           getVerboseStream()));        
         toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
         toolBarMemMonitor.setMargin(new Insets(4,1,4,1));
-        toolBarSerch.add(new ToolBarButton(searchServicesAction,
+        ToolBarToggleButton tb = new ToolBarToggleButton(searchServicesAction,
                           createNavigationIcon("fitToPanel32"),
-                          getVerboseStream(),true));
+                          getVerboseStream());
+        toolBarSerch.add(tb);
 
+        ((SearchServicesAction)searchServicesAction).addToSelectableGroup(tb);
 
         panelWithToolBars.add(toolBarMemMonitor,FlowLayout.LEFT);
         panelWithToolBars.add(toolBarSerch,FlowLayout.LEFT);
@@ -403,7 +409,14 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         JMenuItem itemZoomIn = new JMenuItem(zoomInAction);
         JMenuItem itemZoomOut = new JMenuItem(zoomOutAction);
         JMenuItem itemfitToPanel = new JMenuItem(fitToPanelAction);
-        JMenuItem itemSearchServices  = new JMenuItem(searchServicesAction);
+        JCheckBoxMenuItem itemSearchServices  = new JCheckBoxMenuItem(searchServicesAction);
+        itemSearchServices.addChangeListener(new ChangeListener() {
+
+            public void stateChanged(ChangeEvent e) {
+                System.out.println(((AbstractButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((AbstractButton)e.getSource()).isSelected());
+            }
+        });
+        ((SearchServicesAction)searchServicesAction).addToSelectableGroup(itemSearchServices);
 
         JMenu menuFile = new JMenu("File");
         JMenu menuView = new JMenu("View");
@@ -657,9 +670,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         }
         @Override
         public void actionPerformed(ActionEvent e) {
-            ToolBarButton button = (ToolBarButton)e.getSource();
+            AbstractButton button = (AbstractButton)e.getSource();
             boolean selected = button.isSelected();
-            canvas.zoomFromMouseCoordinationEnable(!selected);
+            canvas.zoomFromMouseCoordinationEnable(selected);
             getVerboseStream().outputVerboseStream("Zoom from mouse position "+(selected ? "Disabled":"Enabled"));
         }	
     }
@@ -743,7 +756,37 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             setComponetsZoomEnable(false);
         }
     }
-    private class SearchServicesAction extends AbstractAction {
+
+    public abstract class ActionNotifyALLCompGroup extends AbstractAction {
+        private Vector<AbstractButton> vecToggle = new Vector<AbstractButton>();
+
+        public ActionNotifyALLCompGroup(String text, ImageIcon icon){
+            super(text, icon);
+            addPropertyChangeListener(new Listener());
+        }
+
+        public void addToSelectableGroup(AbstractButton ab){
+            vecToggle.add(ab);
+        }
+
+        private class Listener implements PropertyChangeListener{
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {                
+                if(evt.getPropertyName().equals(AbstractAction.SELECTED_KEY)){
+                    AbstractAction tmp = (AbstractAction)evt.getSource();
+                    for (AbstractButton abstractButton : vecToggle) {
+                        if(!abstractButton.getAction().equals(tmp)){
+                            //System.out.println(""+abstractButton);
+                            abstractButton.setSelected((Boolean)evt.getNewValue());
+                        }
+                    }
+                }
+            }
+        }
+    }
+
+    private class SearchServicesAction extends ActionNotifyALLCompGroup {
+
         public SearchServicesAction(String text, ImageIcon icon,
                            String desc, Integer mnemonic) {
             super(text, icon);
@@ -756,11 +799,11 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            //repair this bug!! (ToolBarButton) added to JMenuItem
-            //ClassCastException: javax.swing.JMenuItem cannot be cast to app.gui.buttons.ToolBarButton
-            boolean en = ((ToolBarButton)e.getSource()).isSelected();
-            canvas.getSearchServices().setEnabled(!en);
-            getVerboseStream().outputVerboseStream("Search services enabled "+!en);
-        }	
+            AbstractButton button = (AbstractButton)e.getSource();            
+            boolean en = button.getModel().isSelected();
+            putValue(AbstractAction.SELECTED_KEY,new Boolean(en));          
+            canvas.getSearchServices().setEnabled(en);
+            getVerboseStream().outputVerboseStream("Search services enabled "+en);
+        }
     }
 }
