@@ -118,10 +118,16 @@ public class DetailsPanelForSearchServices extends JPanel
         System.err.println("Search Services Visible "+aFlag);
     }
     public void displayPanel(boolean val){
-        if(animator.isRunning())
-            animator.stop();
+        if(!animator.isRunning() && !val)
+            return;
+        
+        float frac = .0f;
+        if(animator.isRunning()){
+            animator.cancel();
+            frac = getAlpha();
+        }
         if(val){
-           animator.setStartFraction(0.0f);
+           animator.setStartFraction(frac);
            animator.setStartDirection(Direction.FORWARD);
         }else{
            animator.setStartFraction(getAlpha());
@@ -385,11 +391,11 @@ public class DetailsPanelForSearchServices extends JPanel
     }
     public void begin() {
         if(isEnabled())
-        setVisible(isEnabled());
+            setVisible(isEnabled());
     }
     public void end() {
         if(!isEnabled())
-        setVisible(isEnabled());
+            setVisible(isEnabled());
     }
     public void repeat() {
     }
