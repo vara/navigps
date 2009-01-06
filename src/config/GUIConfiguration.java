@@ -6,6 +6,8 @@
 package config;
 
 import java.awt.Dimension;
+import java.awt.GraphicsDevice;
+import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
 
 /**
@@ -13,16 +15,35 @@ import java.awt.Toolkit;
  * @author vara
  */
 public class GUIConfiguration {   
-    private static Dimension windowSize = Toolkit.getDefaultToolkit().getScreenSize();
+    
+    private static Dimension defaultWindowSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+    public static final byte FULL_SCREEN = 0;
+    public static final byte FRAME_SCREEN = 1;
+
+    private static byte modeScreen = FRAME_SCREEN;
 
     public GUIConfiguration(){
     }
 
     /**
+     * @return the modeScreen
+     */
+    public static byte getModeScreen() {
+        return modeScreen;
+    }
+
+    /**
+     * @param aModeScreen the modeScreen to set
+     */
+    public static void setModeScreen(byte aModeScreen) {
+        modeScreen = aModeScreen;
+    }
+    /**
      * @return the windowSize
      */
     public static Dimension getWindowSize() {
-        return windowSize;
+        return defaultWindowSize;
     }
 
     /**
@@ -33,7 +54,7 @@ public class GUIConfiguration {
             if(winSize.getWidth()<=getWindowSize().getWidth() &&
                winSize.getHeight()<=getWindowSize().getHeight() ){
 
-                GUIConfiguration.windowSize = winSize;
+                GUIConfiguration.defaultWindowSize = winSize;
                 return;
             }
             else System.out.println("The root window can not be greater than screen resolution !");
@@ -42,5 +63,9 @@ public class GUIConfiguration {
 
         System.out.println("Default window size "+
                 (int)getWindowSize().getWidth()+","+(int)getWindowSize().getHeight());
+    }
+
+    public static GraphicsDevice getGraphicDevice(){
+        return GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     }
 }

@@ -78,10 +78,8 @@ public class SearchServices extends JComponent implements MouseListener,
 	public void setEnabled(boolean val){
         //super.setEnabled(val);
 	    enabled = val;
-	    //setVisible(enabled);
-        System.out.println("Prepare to detailsPane.setEnabled "+ val);
         detailsPane.setEnabled(val);
-        System.out.println("Prepare to detailsPane.setEnabled DONE!!!");
+
 	    setCenterPoint(0.0,0.0);
 	    setCurrentPosition(0.0,0.0);
 	    repaint(visibleRec);

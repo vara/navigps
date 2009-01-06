@@ -30,6 +30,7 @@ import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.GraphicsDevice;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -114,7 +115,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     
     private Vector <View> views = new Vector<View>();
     private static int ICON_SIZE = 8;
-         
+
+    private GraphicsDevice device = GUIConfiguration.getGraphicDevice();
+
     //private MySplitPane paneForProperties = new MySplitPane();    
 
     public MainWindowIWD(Main c){
@@ -146,7 +149,11 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
 
         setTitle("NaviGPS ver. "+MainConfiguration.NAVIGPS_VERSION);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setVisible(true);
+
+        setDisplayMode();
+        //if winidow init not FULL_SCREEN mode then must be invoke setVisible
+        if(!isVisible())
+            setVisible(true);
     }
 
     public MainWindowIWD(Main c,ArgumentsStartUp arg){
@@ -437,6 +444,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             subMenuForToolBarOptions.add(cb);
         }
 
+        JMenuItem dispFull = new JMenuItem(new DisplayModeAction("Full Screen", null,
+                    "Display Full Screen", KeyEvent.VK_ENTER));
+
         menuFile.add(itemFile);
         menuFile.addSeparator();
         menuFile.add(itemExit);
@@ -447,6 +457,8 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         menuView.add(itemSearchServices);
         menuView.addSeparator();
         menuView.add(subMenuForToolBarOptions);
+        menuView.addSeparator();
+        menuView.add(dispFull);
         menuODB.add(odbManager);
 
         jmb.add(menuFile);
@@ -804,6 +816,33 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             putValue(AbstractAction.SELECTED_KEY,new Boolean(en));          
             canvas.getSearchServices().setEnabled(en);
             getVerboseStream().outputVerboseStream("Search services enabled "+en);
+        }
+    }
+
+    private void setDisplayMode(){
+        if(GUIConfiguration.getModeScreen()==GUIConfiguration.FULL_SCREEN){
+            device.setFullScreenWindow(this);
+        }else{
+            device.setFullScreenWindow(null);
+        }
+    }
+    public void switchDisplayMode(){
+        GUIConfiguration.setModeScreen((byte) (0x01 & ~GUIConfiguration.getModeScreen()));
+        setDisplayMode();
+    }
+
+    private class DisplayModeAction extends AbstractAction{
+        public DisplayModeAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic) {
+            super(text, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+            putValue(AbstractAction.ACCELERATOR_KEY,
+                    KeyStroke.getKeyStroke(mnemonic,InputEvent.SHIFT_DOWN_MASK|InputEvent.CTRL_DOWN_MASK));
+        }
+
+        public void actionPerformed(ActionEvent e) {
+            switchDisplayMode();
         }
     }
 }

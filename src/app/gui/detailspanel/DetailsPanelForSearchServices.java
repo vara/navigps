@@ -118,8 +118,6 @@ public class DetailsPanelForSearchServices extends JPanel
         System.err.println("Search Services Visible "+aFlag);
     }
     public void displayPanel(boolean val){
-        if(!animator.isRunning() && !val)
-            return;
         
         float frac = .0f;
         if(animator.isRunning()){
