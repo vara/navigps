@@ -25,6 +25,7 @@ public class PanelForVerboseWindow extends JPanel{
     public PanelForVerboseWindow(BridgeForVerboseMode verboseStream){
         setLayout(new BorderLayout());
         verbosePane = new JTextPaneForVerboseInfo();
+        verbosePane.setRowHeaderView(new LineNumber(verbosePane.getTextEditor()));
         verboseStream.addComponentsWithOutputStream(verbosePane.getInforamtionPipe());
 
         add(new PanelMenu(),BorderLayout.NORTH);
