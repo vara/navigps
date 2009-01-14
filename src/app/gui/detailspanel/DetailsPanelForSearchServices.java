@@ -11,6 +11,7 @@ import app.utils.Utils;
 import java.awt.AlphaComposite;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -25,8 +26,6 @@ import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
-import java.awt.event.ActionEvent;
-import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -103,6 +102,17 @@ public class DetailsPanelForSearchServices extends JPanel
     }
 
     @Override
+    public Component add(Component comp) {
+        Dimension dim = comp.getPreferredSize();
+        Insets ins = getInsets();
+        int w = dim.width + (ins.left+ins.right);
+        int h = dim.height+ (ins.bottom+ins.top);
+        setSize(w,h);
+        setPreferredSize(getSize());
+        return super.add(comp);
+    }
+
+    @Override
     public void setEnabled(final boolean aFlag) {
         super.setEnabled(aFlag);
         SwingUtilities.invokeLater(new Runnable() {
@@ -134,7 +144,10 @@ public class DetailsPanelForSearchServices extends JPanel
         animator.start();
     }
     public void updateMyUI(){
-        
+        Container parent = getParent();
+        if(parent == null)
+            return;
+
         int width = getParent().getWidth();
         int height = getParent().getHeight();
         this.setLocation(width-getWidth(), (height-getHeight())/2 );
@@ -161,26 +174,33 @@ public class DetailsPanelForSearchServices extends JPanel
               AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
         g2.setComposite(newComposite);
 
-        Rectangle bounds = getBounds();
-        Insets ins = getInsets();
         Rectangle oldClip = g2.getClipBounds();
         Rectangle newClip = (Rectangle)oldClip.clone();
+        RoundRectangle2D vis = computeVisibleChildrenArea();
 
-        int canX = ins.left;
-        int canY = ins.top;
-        int canWidth = bounds.width-ins.left-ins.right;
-        int canHeight = bounds.height-ins.top-ins.bottom;
-        SwingUtilities.computeIntersection(canX, canY, canWidth, canHeight, newClip);
-
+        SwingUtilities.computeIntersection((int)vis.getX(),(int)vis.getY(),
+                (int)vis.getWidth(),(int)vis.getHeight(), newClip);
         g.setClip(newClip);
         super.paintChildren(g);
         g.setClip(oldClip);
     }
 
+    protected RoundRectangle2D.Double computeVisibleChildrenArea(){
+        Rectangle bounds = getBounds();
+        Insets ins = getInsets();
+        int canX = ins.left;
+        int canY = ins.top;
+        int canWidth = bounds.width-ins.left-ins.right;
+        int canHeight = bounds.height-ins.top-ins.bottom;
+        double arcx = mainBorder.getRoundInnerX();
+        double arcy = mainBorder.getRoundInnerY();
+        return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
+    }
+
     @Override
     public void paintComponent(Graphics g){
-        
-        if(isVisible() && getParent().isEnabled()){
+        Container parent = getParent();
+        if(isVisible() && parent!=null && parent.isEnabled()){
             Graphics2D g2 = (Graphics2D)g.create();
 
             GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,Utils.colorAlpha(1,51,90,getAlpha()),
@@ -205,30 +225,6 @@ public class DetailsPanelForSearchServices extends JPanel
 
             paintBorderGlow(g2,5,outerBorder);
             paintBorderShadow(g2,2,innerBorder);
-/*
-            //calculte child clip <check the mainClip must be outsider relative childClip>
-            float widthStroke = ((BasicStroke)g2.getStroke()).getLineWidth();
-            double clipX  = innerBorder.getX()+widthStroke+1;
-            double clipY = innerBorder.getY()+widthStroke+1;
-            double clipW = innerBorder.getWidth()-(widthStroke*2);
-            double clipH = innerBorder.getHeight()-(widthStroke*2);
-    
-            clipX+=mainClip.getX();
-            clipY+=mainClip.getY();
-            if(clipW>mainClip.getWidth())
-                clipW =mainClip.getWidth();
-            if(clipH>mainClip.getHeight())
-                clipH =mainClip.getHeight();
-    */
-//            childClip = new RoundRectangle2D.Double(clipX,clipY,clipW,clipH,innerBorder.getArcWidth(), innerBorder.getArcHeight());
-
-            //getVerboseStream().outputVerboseStream("childClip "+childClip.getBounds2D()+" innerBorder "+innerBorder.getBounds2D());
-            //Color cInn = mainBorder.getColorForInnerBorder();
-            //Color cOut = mainBorder.getColorForOuterBorder();
-            //System.out.println("Color alpha "+(getAlpha()%.25f));
-            //mainBorder.setColorForInnerBorder(Utils.colorAlpha(cInn, getAlpha()%.25f));
-            //mainBorder.setColorForOuterBorder(Utils.colorAlpha(cOut, getAlpha()%.25f));
-
             g2.dispose();
         }
         
@@ -299,10 +295,12 @@ public class DetailsPanelForSearchServices extends JPanel
     @Override
     public void mouseReleased(MouseEvent e) {
 
-        if(needRevalidate || !isDynamicRevalidate()){
-            getVerboseStream().outputVerboseStream("Revalidate!");            
+        if(needRevalidate || !isDynamicRevalidate()){                        
             revalidate();
             needRevalidate=false;
+            getVerboseStream().outputVerboseStream("Revalidate!");
+            System.out.println("GetBounds "+getBounds());
+            System.out.println("computeVisibleChildrenArea "+computeVisibleChildrenArea());
         }
         resizeWidthPanel = false;
         resizeHeghtPanel = false;
