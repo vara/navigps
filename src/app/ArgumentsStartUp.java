@@ -30,6 +30,7 @@ public class ArgumentsStartUp {
                     "\n\t-ws \t(window size  eq. -ws 800 600 ) " +
                            "\n\t\t\tIt takes two arguments defining the size of the total number of main window." +
                            "\n\t\t\tIf there is to adopt the size of a window the size of screen resolution"+
+                    "\n\t-fs  \t(Display root window in full screen mode)"+
 				    "\n\t-h  \t(Show this text)";
     
     public ArgumentsStartUp(String [] arg){	
@@ -179,6 +180,9 @@ public class ArgumentsStartUp {
                 MainConfiguration.printVersion("NaviGPS version ",null);
                 setExitProgram(true);
                 break;
+            case 'f'+'s':
+                GUIConfiguration.setModeScreen(GUIConfiguration.FULL_SCREEN);
+                break;
             default:
                 setExitProgram(true);
                 throw new Exception("Unrecognized parameter '"+p.getParam()+"'\tTry with '-h'");
@@ -223,6 +227,7 @@ public class ArgumentsStartUp {
             map.put("h",0);
             map.put("ws",2);
             map.put("v",0);
+            map.put("fs",0);
         }
         public Integer getInformationOnParameter(String val){
             return map.get(val);
