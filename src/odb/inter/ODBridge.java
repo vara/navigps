@@ -10,5 +10,6 @@ public interface ODBridge {
     public SubElementService[] searchCategoryRadius(Category category,float x,float y);       //dla danej kategorii
     public Vector getCategories();                                                          //zwraca liste kategorii
     public Vector getSubcategories(Category category);                                                       //lista podkategorii dla danej kategorii
+    public SubElementService getSingleTest();
 
 }

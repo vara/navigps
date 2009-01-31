@@ -6,26 +6,25 @@ public class SubElementService extends RootElementStreet {
     
     private String serviceNumber;
     private String serviceName;
-    private String serviceCategory;
+    private Subcategory serviceSubCategory;
     private String additionalAttribute1;
     private RootElementStreet serviceStreet;
-    private SVGOMPoint svgx;
-    private SVGOMPoint svgy;
+    private SVGOMPoint svg;
     private double localx;
     private double localy;
     
     
-    public SubElementService(RootElementStreet street, String num, String name, String category,SVGOMPoint x,SVGOMPoint y,double localx,double localy) {
+    public SubElementService(RootElementStreet street, String num, String name, Subcategory subcategory,SVGOMPoint x,double localx,double localy, String add) {
         this.serviceStreet = street;
         this.serviceNumber = num;
         this.serviceName = name;
-        this.serviceCategory = category;
-        this.svgx = x;
-        this.svgy = y;
+        this.serviceSubCategory = subcategory;
+        this.additionalAttribute1 = add;
+        this.svg = x;
         this.localx = localx;
         this.localy = localy;
         
-        serviceStreet.addService(this);
+        //serviceStreet.addService(this);
         
     }
     
@@ -45,14 +44,6 @@ public class SubElementService extends RootElementStreet {
         this.serviceName = serviceName;
     }
 
-    public String getServiceCategory() {
-        return serviceCategory;
-    }
-
-    public void setServiceCategory(String serviceCategory) {
-        this.serviceCategory = serviceCategory;
-    }
-
     public String getAdditionalAttribute1() {
         return additionalAttribute1;
     }
@@ -68,4 +59,21 @@ public class SubElementService extends RootElementStreet {
     public void setServiceStreet(RootElementStreet serviceStreet) {
         this.serviceStreet = serviceStreet;
     }
+
+    public Subcategory getServiceSubCategory() {
+        return serviceSubCategory;
+    }
+
+    public void setServiceSubCategory(Subcategory serviceSubCategory) {
+        this.serviceSubCategory = serviceSubCategory;
+    }
+
+    public SVGOMPoint getSvg() {
+        return svg;
+    }
+
+    public void setSvg(SVGOMPoint svg) {
+        this.svg = svg;
+    }
+    
 }

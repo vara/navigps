@@ -1,7 +1,13 @@
 package odb.core;
 
+import config.DataBaseConfig;
 import java.util.Vector;
 import odb.inter.ODBridge;
+import org.neodatis.odb.ODB;
+import org.neodatis.odb.ODBFactory;
+import org.neodatis.odb.Objects;
+import org.neodatis.odb.core.query.IQuery;
+import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
  *
@@ -32,5 +38,19 @@ public class Search implements ODBridge {
 
     public Vector getSubcategories(Category category) {
         throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public SubElementService getSingleTest() {
+        SubElementService sub;
+        ODB odb = null;
+        odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath()+"neodatis.odb");
+        
+
+        IQuery query = new CriteriaQuery(SubElementService.class);
+
+        Objects subcat = odb.getObjects(query);
+        sub = (SubElementService)subcat.getFirst();
+
+        return sub;
     }
 }

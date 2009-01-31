@@ -5,6 +5,7 @@
  */
 package odb.gui;
 
+import config.DataBaseConfig;
 import java.util.Vector;
 import odb.core.SubElementService;
 import odb.core.Category;
@@ -389,7 +390,7 @@ private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN
             Category c;
             ODB odb = null;
             
-            odb = ODBFactory.open("neodatis.odb");
+            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath()+"neodatis.odb");
             IQuery query = new CriteriaQuery(Category.class);
             Objects categories = odb.getObjects(query);         
             odb.close();
@@ -416,7 +417,7 @@ private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN
             ODB odb = null;
             Vector v;
             
-            odb = ODBFactory.open("neodatis.odb");
+            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath()+"neodatis.odb");
             IQuery query = new CriteriaQuery(Category.class, Where.equal("name",s));
             Objects categories = odb.getObjects(query);         
             odb.close();
@@ -453,7 +454,7 @@ private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN
             ODB odb = null;
             Subcategory subcat;
             
-            odb = ODBFactory.open("neodatis.odb");
+            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath()+"neodatis.odb");
             IQuery query2 = new CriteriaQuery(Subcategory.class, Where.equal("name",(String)jList2.getSelectedValue()));
             
             Objects subcategories = odb.getObjects(query2);
@@ -489,7 +490,7 @@ private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN
             SubElementService service;
             
             ODB odb = null;
-            odb = ODBFactory.open("neodatis.odb");
+            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath()+"neodatis.odb");
             
             IQuery query = new CriteriaQuery(SubElementService.class, Where.equal("serviceName",(String)jList3.getSelectedValue()));
             Objects services = odb.getObjects(query);
