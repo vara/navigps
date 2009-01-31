@@ -102,27 +102,29 @@ public class PanelWithBatikJTree extends JScrollPane{
     public OutputVerboseStream getVerboseStream(){
         return verbose;
     }
+    public void createModelTree(){
+        long startTime = System.nanoTime();
+        getVerboseStream().outputVerboseStream("----Create content window properties----");
+        getVerboseStream().outputVerboseStream("Build Tree Nodes ...");
+        getVerboseStream().outputVerboseStream("Build Tree Model for Tree Nodes ...");
+        TreeNode root = createTree(canvas.getSVGDocument(),false);
+        DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
+        if(model==null){
+            model = new DefaultTreeModel(root);
+            tree.setModel(model);
+        }else
+            model.setRoot(root);
 
+        getVerboseStream().outputVerboseStream("Build Tree Model Completed");
+        getVerboseStream().outputVerboseStream("Build Tree Nodes Completed");
+        long stopTime = System.nanoTime();
+        String time = Utils.roundsValue(((stopTime-startTime)/1000000),5);
+        getVerboseStream().outputErrorVerboseStream("Time : "+time+" milisec.");
+    }
     private class GVTTreeListener extends GVTTreeBuilderAdapter{
         @Override
         public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-            long startTime = System.nanoTime();
-            getVerboseStream().outputVerboseStream("----Create content window properties----");
-            getVerboseStream().outputVerboseStream("Build Tree Nodes ...");
-            getVerboseStream().outputVerboseStream("Build Tree Model for Tree Nodes ...");
-            TreeNode root = createTree(canvas.getSVGDocument(),false);
-            DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
-            if(model==null){
-                model = new DefaultTreeModel(root);
-                tree.setModel(model);
-            }else
-                model.setRoot(root);
-            
-            getVerboseStream().outputVerboseStream("Build Tree Model Completed");
-            getVerboseStream().outputVerboseStream("Build Tree Nodes Completed");
-            long stopTime = System.nanoTime();
-            String time = Utils.roundsValue(((stopTime-startTime)/1000000),5);
-            getVerboseStream().outputErrorVerboseStream("Time : "+time+" milisec.");
+            createModelTree();
         }
         @Override
         public void gvtBuildStarted(GVTTreeBuilderEvent e) {
