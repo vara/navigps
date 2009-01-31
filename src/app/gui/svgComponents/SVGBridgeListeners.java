@@ -83,6 +83,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     @Override
     public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
         setTextToCurrentStatus("Document Rendering Completed");
+        setLabelInformationPosytion(new String("0,0;0,0;0,0"));
         setRederingStatus(false);
     }
     @Override

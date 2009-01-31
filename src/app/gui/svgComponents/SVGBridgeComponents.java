@@ -76,8 +76,10 @@ public class SVGBridgeComponents implements LetComponentsOfChangedDoc{
     public void setLabelInformationPosytion(String pos){
 	
         String [] str = pos.split(";");
-        mousePosOnSvgComponent.setText(str[0]);
-        pointInSvgDoc.setText(str[2]);
+        if(str.length>2){
+            mousePosOnSvgComponent.setText(str[0]);
+            pointInSvgDoc.setText(str[2]);
+        }
     }
 
     @Override

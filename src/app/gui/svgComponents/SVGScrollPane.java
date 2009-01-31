@@ -229,7 +229,7 @@ public class SVGScrollPane extends JPanel{
         if (vbt == null) vbt = new AffineTransform();
 
         Rectangle r2d = vbt.createTransformedShape(viewBox).getBounds();
-        // System.err.println("Pre : " + r2d);
+         System.err.println("Pre : " + r2d);
         int tx = 0, ty = 0;
         if (r2d.x < 0) tx -= r2d.x;
         if (r2d.y < 0) ty -= r2d.y;

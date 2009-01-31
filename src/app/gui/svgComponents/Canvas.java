@@ -6,22 +6,26 @@
 package app.gui.svgComponents;
 
 import app.gui.searchServices.SearchServices;
+import app.gui.svgComponents.displayobjects.DisplayManager;
 import app.utils.Utils;
 import config.SVGConfiguration;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Cursor;
+import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import javax.swing.JLabel;
-import org.apache.batik.bridge.UpdateManagerEvent;
-import org.apache.batik.bridge.UpdateManagerListener;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
+import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
+import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -68,7 +72,8 @@ public class Canvas extends JSVGCanvas{
     //private SVGUserAgentGUIAdapter agent;
 
     private SearchServices search;
-    
+    DisplayManager dm;
+
     public Canvas(SVGBridgeListeners listeners){
 		
         //setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
@@ -91,9 +96,12 @@ public class Canvas extends JSVGCanvas{
         addMouseMotionListener(search);
         addMouseListener(search);
         addJGVTComponentListener(search.getDocumentStateChanged());
+        addGVTTreeRendererListener(listener);
 
+        dm = new DisplayManager(this,listeners.getVerboseStream());
+
+        addGVTTreeRendererListener(dm.getRenderingTreeListener());
         //for test
-        addUpdateManagerListener(new UpdateManagerInfoListener());
     }
     
     public SearchServices getSearchServices(){
@@ -208,43 +216,5 @@ public class Canvas extends JSVGCanvas{
             setCursor(Cursor.getDefaultCursor());
             removeMouseListener(zoomListener);
         }
-    }
-
-    protected class UpdateManagerInfoListener implements UpdateManagerListener{
-
-        @Override
-        public void managerStarted(UpdateManagerEvent e) {
-            search.getVerboseStream().outputVerboseStream("managerStarted ");
-        }
-
-        @Override
-        public void managerSuspended(UpdateManagerEvent e) {
-            search.getVerboseStream().outputVerboseStream("managerSuspend ");
-        }
-
-        @Override
-        public void managerResumed(UpdateManagerEvent e) {
-            search.getVerboseStream().outputVerboseStream("managerResumed ");
-        }
-
-        @Override
-        public void managerStopped(UpdateManagerEvent e) {
-            search.getVerboseStream().outputVerboseStream("managerStoped ");
-        }
-
-        @Override
-        public void updateStarted(UpdateManagerEvent e) {
-            search.getVerboseStream().outputVerboseStream("updateStarted ");
-        }
-
-        @Override
-        public void updateCompleted(UpdateManagerEvent e) {
-            search.getVerboseStream().outputVerboseStream("updateCompleted ");
-        }
-
-        @Override
-        public void updateFailed(UpdateManagerEvent e) {
-            search.getVerboseStream().outputVerboseStream("updateFailed ");
-        }
-    }
+    }    
 }
