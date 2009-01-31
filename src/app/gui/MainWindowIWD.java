@@ -26,6 +26,7 @@ import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.DisplayMode;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -318,7 +319,18 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
 
         }
     }
-
+    public static String createNavigationIconPath(String imageName,String ext){
+        String imgLocation = "resources/graphics/icons/"
+                             + imageName
+                             + "."+ext;
+        URL imageURL = MainWindowIWD.class.getResource(imgLocation);
+        if (imageURL == null) {
+            System.err.println("Resource not found: "
+                               + imgLocation);
+            return null;
+        }
+        return imageURL.getPath();
+    }
     public void createStatusPanel(){
 		
         statusPanel = new StatusPanel(svgListeners);
@@ -821,9 +833,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
 
     private void setDisplayMode(){
         if(GUIConfiguration.getModeScreen()==GUIConfiguration.FULL_SCREEN){
+            getVerboseStream().outputVerboseStream("full screen mode "+device.isFullScreenSupported());
+            this.setUndecorated(true);
             device.setFullScreenWindow(this);
         }else{
             device.setFullScreenWindow(null);
+            this.setUndecorated(false);
         }
     }
     public void switchDisplayMode(){
