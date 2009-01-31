@@ -16,7 +16,7 @@ import java.util.LinkedList;
  *
  * @author vara
  */
-public class BridgeForVerboseMode implements OutputVerboseStream{
+public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
 
     private LinkedList<OutputVerboseStream> updateComponents =
 			new LinkedList<OutputVerboseStream>();
@@ -26,14 +26,17 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
     private PrintStream sout = new PrintStream(new MyOutputStream(false),true);
     private PrintStream serr = new PrintStream(new MyOutputStream(true),true);
 
+    public static final Console console =
+                        new Console();
+
     public BridgeForVerboseMode(){
         if(MainConfiguration.getMode())
-            addComponentsWithOutputStream(new OutputVerboseStreamToConsole());
+            addComponentsWithOutputStream(console);
     }
     
     @Override
     public void outputVerboseStream(String text){	
-        for (OutputVerboseStream ucomp : updateComponents) {
+        for (OutputVerboseStream ucomp : updateComponents) {            
             ucomp.outputVerboseStream(text);
         }
     }
@@ -48,7 +51,7 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
     }
     @Override
     public void outputErrorVerboseStream(String text) {
-        for (OutputVerboseStream ucomp : updateComponents) {
+        for (OutputVerboseStream ucomp : updateComponents) {            
             ucomp.outputErrorVerboseStream(text);
         }
     }
@@ -71,19 +74,6 @@ public class BridgeForVerboseMode implements OutputVerboseStream{
     @Override
     public PrintStream getErrOutputStream() {
         return serr;
-    }
-
-    public class OutputVerboseStreamToConsole extends OutputVerboseStreamAdapter{
-        private PrintStream systemOut = System.out;
-        private PrintStream systemErr = System.err;
-        @Override
-        public void outputVerboseStream(String text){
-            systemOut.println(text);
-        }
-        @Override
-        public void outputErrorVerboseStream(String text) {
-            systemErr.println(text);
-        }
     }
 
     private class MyOutputStream extends OutputStream {

@@ -20,4 +20,6 @@ public interface OutputVerboseStream {
     PrintStream getErrOutputStream();
     PrintWriter getOutputWriter();
     PrintWriter getErrOutputWriter();
+    void setTimeEnabled(boolean val);
+    boolean isTimeEnabled();
 }

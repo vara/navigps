@@ -55,7 +55,7 @@ public class LineNumber extends JComponent{
 		setForeground(DEFAULT_FOREGROUND);
 		setPreferredWidth(DEFAULT_WIDTH);
 
-        addMouseListener(new MyMouseListener());
+        //addMouseListener(new MyMouseListener());
 	}
 
 	/**
@@ -125,7 +125,7 @@ public class LineNumber extends JComponent{
 		g2.fillRect(drawHere.x, drawHere.y, drawHere.width, drawHere.height);
 
 		//  Determine the number of lines to draw in the foreground.
-        System.out.println("paintComponent isShow number "+isShowNumber());
+        //System.out.println("paintComponent isShow number "+isShowNumber());
         if(isShowNumber()){
 
             g2.setColor(getForeground());
@@ -138,7 +138,7 @@ public class LineNumber extends JComponent{
             int endLineNumber = startLineNumber + (drawHere.height / localLineHeight);
 
             int start = (drawHere.y / localLineHeight) * localLineHeight + startOffset;
-
+            
             for (int i = startLineNumber; i <= endLineNumber; i++){
                 String lineNumber = String.valueOf(i);
                 int stringWidth = fontMetrics.stringWidth(lineNumber);
@@ -148,14 +148,13 @@ public class LineNumber extends JComponent{
             }
             int rows = component.getSize().height / componentFontHeight;
             setPreferredWidth(rows);
-            System.out.println(""+rows);
+            //System.out.println(""+rows);
         }
-		setPreferredWidth(1);
 	}
 
     public void setColorFontAlpha(float alpha){
         colorFontAlpha = alpha<0.0f ? 0.0f : (alpha>1.0f ? 1.0f:getLimitColorFontAlpha());
-        System.out.println("ColorAlpha "+colorFontAlpha);
+        //System.out.println("ColorAlpha "+colorFontAlpha);
     }
 
     /**
