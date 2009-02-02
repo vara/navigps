@@ -82,7 +82,7 @@ import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
-import odb.gui.ODBManager;
+import odb.gui.Manager;
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.gvt.CanvasGraphicsNode;
 import org.apache.batik.gvt.GraphicsNode;
@@ -419,7 +419,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             @Override
                 public void actionPerformed(ActionEvent e) {
 
-                    ODBManager odb = new ODBManager();
+                    Manager odb = new Manager(MainWindowIWD.this,true);
                     odb.setVisible(true);
                     //throw new UnsupportedOperationException("Unsupported exception!");
                 }

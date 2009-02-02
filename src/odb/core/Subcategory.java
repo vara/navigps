@@ -12,8 +12,6 @@ public class Subcategory {
     public Subcategory(Category category,String name) {
         this.name = name;
         this.category = category;
-        
-        //category.addSubcategory(this);
     }
 
     public String getName() {

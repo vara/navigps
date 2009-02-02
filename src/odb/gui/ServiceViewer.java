@@ -7,7 +7,7 @@ package odb.gui;
 
 import config.DataBaseConfig;
 import java.util.Vector;
-import odb.core.SubElementService;
+import odb.core.ServiceDescription;
 import odb.core.Category;
 import odb.core.Subcategory;
 import org.neodatis.odb.ODB;
@@ -450,7 +450,7 @@ private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN
      private void updateServiceModel() {
         final ArrayList al = new ArrayList();
         
-            SubElementService c;
+            ServiceDescription c;
             ODB odb = null;
             Subcategory subcat;
             
@@ -468,13 +468,13 @@ private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN
             } else {
             subcat = (Subcategory)subcategories.getFirst();
             
-            IQuery query = new CriteriaQuery(SubElementService.class, Where.equal("serviceSubCategory",subcat));
+            IQuery query = new CriteriaQuery(ServiceDescription.class, Where.equal("serviceSubCategory",subcat));
             Objects categories = odb.getObjects(query);         
             odb.close();
             
             Object[] obj = categories.toArray();     
             for(int i=0;i<obj.length;i++) {
-                c = (SubElementService) obj[i];
+                c = (ServiceDescription) obj[i];
                 al.add(c.getServiceName());
             }
             
@@ -487,30 +487,30 @@ private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN
   }
      
   private void updateServiceInfo() {
-            SubElementService service;
+            ServiceDescription service;
             
             ODB odb = null;
             odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath()+"neodatis.odb");
             
-            IQuery query = new CriteriaQuery(SubElementService.class, Where.equal("serviceName",(String)jList3.getSelectedValue()));
+            IQuery query = new CriteriaQuery(ServiceDescription.class, Where.equal("serviceName",(String)jList3.getSelectedValue()));
             Objects services = odb.getObjects(query);
             odb.close();
             
             if (services.isEmpty()) {
                 
             } else {
-            service = (SubElementService)services.getFirst();
+            service = (ServiceDescription)services.getFirst();
             
             
-            jTextField1.setText(service.getServiceNumber());
-            jTextField2.setText(service.getServiceName());
-            jTextField3.setText(service.getServiceSubCategory().getCategory().getName());
-            jTextField4.setText(service.getAdditionalAttribute1());        
-            jTextField5.setText(service.getServiceStreet());
-            jTextField6.setText(Float.toString(service.getSvg().getX()));
-            jTextField7.setText(Float.toString(service.getSvg().getY()));
-            jTextField8.setText(Double.toString(service.getLocalx()));
-            jTextField9.setText(Double.toString(service.getLocaly()));    
+//            jTextField1.setText(service.getServiceNumber());
+//            jTextField2.setText(service.getServiceName());
+//            jTextField3.setText(service.getServiceSubCategory().getCategory().getName());
+//            jTextField4.setText(service.getAdditionalAttribute1());
+//            jTextField5.setText(service.getServiceStreet());
+//            jTextField6.setText(Float.toString(service.getSvg().getX()));
+//            jTextField7.setText(Float.toString(service.getSvg().getY()));
+//            jTextField8.setText(Double.toString(service.getLocalx()));
+//            jTextField9.setText(Double.toString(service.getLocaly()));
             }
   }
       
