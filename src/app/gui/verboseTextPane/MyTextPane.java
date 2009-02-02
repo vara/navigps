@@ -6,14 +6,12 @@
 package app.gui.verboseTextPane;
 
 import app.gui.MyPopupMenu;
-import app.utils.Console;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStreamAdapter;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.InputEvent;
@@ -157,10 +155,8 @@ public class MyTextPane extends JTextPane{
     }
 
     public synchronized void addEndText(String str,SimpleAttributeSet attr){
-
         try {
-            ((StyledDocument)getDocument()).insertString(getDocument().getLength(), str, attr);
-            
+            ((StyledDocument)getDocument()).insertString(getDocument().getLength(), str, attr);            
             if(isAutoScroll()){
                 Component c = getParent();
                 if(c instanceof JViewport){                    
@@ -168,13 +164,11 @@ public class MyTextPane extends JTextPane{
                     vp.scrollRectToVisible(vp.getViewRect());
                 }
             }
-
         } catch (BadLocationException ex) {
             MyLogger.log.logp(Level.WARNING,getClass().getName(),
                     "addEndTextnl(String str)","str \""+str+"\"",ex);
         }
     }
-
     public synchronized void addEndTextnl(String str,SimpleAttributeSet attr){
         addEndText(str+"\n", attr);
     }

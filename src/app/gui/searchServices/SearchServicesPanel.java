@@ -15,6 +15,8 @@ import app.gui.detailspanel.DetailsPanelForSearchServices;
 import app.gui.displayItemsMap.PanelWithJTree.MyScrollBarUI;
 import java.awt.Component;
 import java.awt.Point;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -219,6 +221,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, 300));
     }// </editor-fold>//GEN-END:initComponents
+
+    public void addActionForSearchButton(ActionListener al){
+        jButton1.addActionListener(al);
+    }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        Component comp;

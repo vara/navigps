@@ -9,6 +9,7 @@ import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.image.BufferedImage;
+import javax.swing.Action;
 import javax.swing.JButton;
 
 /**
@@ -24,7 +25,10 @@ public class OpacityButton extends JButton{
         super(label);
         setOpaque(false);        
     }
-
+    public OpacityButton(Action a) {
+        super(a);
+        setOpaque(false);
+    }
     @Override
     public void paint(Graphics g) {        
         // Create an image for the button graphics if necessary
