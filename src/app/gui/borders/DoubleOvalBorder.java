@@ -26,6 +26,7 @@ public class DoubleOvalBorder extends OvalBorder{
     private Color colorForInnerBorder = new Color(90, 100, 190, 255);
     private Insets insetsInner = new Insets(6, 10, 6, 10);
     private int thickness=0;
+    private float upperThresholdAlphaInner = 1f;
 
     public DoubleOvalBorder(int arcW, int arcH) {
         super(arcW, arcH);
@@ -38,6 +39,7 @@ public class DoubleOvalBorder extends OvalBorder{
        roundInnerX=arcw2;
        roundInnerY=arch2;
        colorForInnerBorder = topColor2;
+       setUpperThresholdAlphaInner((float)colorForInnerBorder.getAlpha()/255);
     }
 
     public DoubleOvalBorder(int arcw1, int arch1, Color topColor1,int arcw2, int arch2, Color topColor2,int tick) {
@@ -176,5 +178,19 @@ public class DoubleOvalBorder extends OvalBorder{
      */
     public void setRoundInnerY(double roundInnerY) {
         this.roundInnerY = roundInnerY;
+    }
+
+    /**
+     * @return the upperThresholdAlphaInner
+     */
+    public float getUpperThresholdAlphaInner() {
+        return upperThresholdAlphaInner;
+    }
+
+    /**
+     * @param upperThresholdAlphaInner the upperThresholdAlphaInner to set
+     */
+    public void setUpperThresholdAlphaInner(float upperThresholdAlphaInner) {
+        this.upperThresholdAlphaInner = upperThresholdAlphaInner;
     }
 }
