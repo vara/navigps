@@ -1,97 +1,112 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
 package odb.core;
 
-import java.util.Vector;
-import org.apache.batik.dom.svg.SVGOMPoint;
+import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
 import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.TypeInfo;
 import org.w3c.dom.UserDataHandler;
 
-public class RootElementStreet implements Node {
-    
-    private String name;
-    private String additionalAttributeA;
-    private String additionalAttributeB;
-    private Vector services;
-    private SVGOMPoint svgPoint;
-    private double localx;
-    private double localy;
-    
+/**
+ *
+ * @author ACME
+ */
+public class ServiceAttributes implements Element {
 
-    public RootElementStreet(String s,String attribA,String attribB,SVGOMPoint svgPoint,double localx,double localy) {
-        this.name = s;
-        this.additionalAttributeA = attribA;
-        this.additionalAttributeB = attribB;
-        this.services = null;
-        this.svgPoint = svgPoint;
-        this.localx = localx;
-        this.localy = localy;
-    }
-    
-    public RootElementStreet() {
-        
+    String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+    public ServiceAttributes(Float x, Float y) {
+
+        this.setAttributeNS(svgNS, "x", x.toString());
+        this.setAttributeNS(svgNS, "y", y.toString());
     }
 
-    public String getName() {
-        return name;
+    public String getTagName() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String getAdditionalAttributeA() { 
-        return additionalAttributeA;
+    public String getAttribute(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public String getAdditionalAttributeB() {
-        return additionalAttributeB;
+    public void setAttribute(String name, String value) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setName(String name) {
-        this.name = name;
+    public void removeAttribute(String name) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setAdditionalAttributeA(String additionalAttributeA) {
-        this.additionalAttributeA = additionalAttributeA;
+    public Attr getAttributeNode(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setAdditionalAttributeB(String additionalAttributeB) {
-        this.additionalAttributeB = additionalAttributeB;
+    public Attr setAttributeNode(Attr newAttr) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public Vector getServices() {
-        return services;
+    public Attr removeAttributeNode(Attr oldAttr) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setServices(Vector services) {
-        this.services = services;
-    }
-    
-    public void addService(SubElementService service) {
-        services.add(service);
+    public NodeList getElementsByTagName(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public double getLocalx() {
-        return localx;
+    public String getAttributeNS(String namespaceURI, String localName) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setLocalx(double localx) {
-        this.localx = localx;
+    public void setAttributeNS(String namespaceURI, String qualifiedName, String value) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public double getLocaly() {
-        return localy;
+    public void removeAttributeNS(String namespaceURI, String localName) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setLocaly(double localy) {
-        this.localy = localy;
+    public Attr getAttributeNodeNS(String namespaceURI, String localName) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public SVGOMPoint getSvgPoint() {
-        return svgPoint;
+    public Attr setAttributeNodeNS(Attr newAttr) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public void setSvgPoint(SVGOMPoint svgPoint) {
-        this.svgPoint = svgPoint;
+    public NodeList getElementsByTagNameNS(String namespaceURI, String localName) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean hasAttribute(String name) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public boolean hasAttributeNS(String namespaceURI, String localName) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public TypeInfo getSchemaTypeInfo() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setIdAttribute(String name, boolean isId) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setIdAttributeNS(String namespaceURI, String localName, boolean isId) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    public void setIdAttributeNode(Attr idAttr, boolean isId) throws DOMException {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     public String getNodeName() {

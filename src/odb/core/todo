@@ -1,9 +1,4 @@
 search return Element
 indexing
-
-Service: remove, update
-Category: update
-Subcategory: update
-street: update
-
-antyidiot -> list models selected items : null
+update Gui
+ServiceAttrib

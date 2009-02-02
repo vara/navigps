@@ -28,11 +28,11 @@ public class Search implements ODBridge {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public SubElementService[] searchRadius(double x, double y) {
+    public ServiceDescription[] searchRadius(double x, double y) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public SubElementService[] searchCategoryRadius(Category category, float x, float y) {
+    public ServiceDescription[] searchCategoryRadius(Category category, float x, float y) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
@@ -40,16 +40,16 @@ public class Search implements ODBridge {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
-    public SubElementService getSingleTest() {
-        SubElementService sub;
+    public ServiceDescription getSingleTest() {
+        ServiceDescription sub;
         ODB odb = null;
         odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath()+"neodatis.odb");
         
 
-        IQuery query = new CriteriaQuery(SubElementService.class);
+        IQuery query = new CriteriaQuery(ServiceDescription.class);
 
         Objects subcat = odb.getObjects(query);
-        sub = (SubElementService)subcat.getFirst();
+        sub = (ServiceDescription)subcat.getFirst();
 
         return sub;
     }

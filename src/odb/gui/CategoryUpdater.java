@@ -60,28 +60,28 @@ public class CategoryUpdater extends javax.swing.JFrame {
 
         setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
 
-        jLabel2.setFont(new java.awt.Font("Verdana", 1, 13)); // NOI18N
+        jLabel2.setFont(new java.awt.Font("Verdana", 1, 13));
         jLabel2.setText("Modify street:");
 
-        jLabel3.setFont(new java.awt.Font("Verdana", 1, 13)); // NOI18N
+        jLabel3.setFont(new java.awt.Font("Verdana", 1, 13));
         jLabel3.setText("Name:");
 
-        jLabel4.setFont(new java.awt.Font("Verdana", 1, 13)); // NOI18N
+        jLabel4.setFont(new java.awt.Font("Verdana", 1, 13));
         jLabel4.setText("Additional info #1:");
 
-        jLabel5.setFont(new java.awt.Font("Verdana", 1, 13)); // NOI18N
+        jLabel5.setFont(new java.awt.Font("Verdana", 1, 13));
         jLabel5.setText("Additional info #2:");
 
-        jLabel12.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
+        jLabel12.setFont(new java.awt.Font("Verdana", 1, 11));
         jLabel12.setText("SVG X:");
 
-        jLabel8.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
+        jLabel8.setFont(new java.awt.Font("Verdana", 1, 11));
         jLabel8.setText("SVG Y:");
 
         jLabel13.setFont(new java.awt.Font("Verdana", 1, 11));
         jLabel13.setText("Local X:");
 
-        jLabel14.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
+        jLabel14.setFont(new java.awt.Font("Verdana", 1, 11));
         jLabel14.setText("Local Y:");
 
         jButton1.setFont(new java.awt.Font("Verdana", 1, 13)); // NOI18N
@@ -99,9 +99,9 @@ public class CategoryUpdater extends javax.swing.JFrame {
             .addGroup(jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel2)
-                .addContainerGap(287, Short.MAX_VALUE))
+                .addContainerGap(289, Short.MAX_VALUE))
             .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                     .addGap(17, 17, 17)
                     .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                         .addComponent(jLabel3)
@@ -164,8 +164,9 @@ public class CategoryUpdater extends javax.swing.JFrame {
                                 .addComponent(jTextField10, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                                 .addComponent(jLabel14))
                             .addGap(18, 18, 18)
-                            .addComponent(jButton1)))
-                    .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)))
+                            .addComponent(jButton1)
+                            .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
+                    .addContainerGap(33, Short.MAX_VALUE)))
         );
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
