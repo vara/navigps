@@ -50,9 +50,10 @@ public class DetailsPanelForSearchServices extends JPanel
 
 
     private int sensitiveMouseReaction = 8;
-    private float alpha = .9f;
+    private float upperThresholdAlpha = .8f;
+    private float alpha = getUpperThresholdAlpha();
     
-    private Color colorBorder = Utils.colorAlpha(0,0,0,getAlpha());
+    private Color colorBorder = Utils.colorAlpha(0,0,0,getUpperThresholdAlpha());
     private DoubleOvalBorder mainBorder = new DoubleOvalBorder(20,20,Utils.colorAlpha(100,100,100,.45f),45,45,colorBorder);
 
     private OutputVerboseStream verboseStream = null;
@@ -219,10 +220,9 @@ public class DetailsPanelForSearchServices extends JPanel
             g2.setPaint(gp2);
             g2.fill(outerBorder);
             g2.setPaint(gp);
-            g2.fill(innerBorder);
+            g2.fill(innerBorder);            
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
-
             paintBorderGlow(g2,5,outerBorder);
             paintBorderShadow(g2,2,innerBorder);
             g2.dispose();
@@ -379,7 +379,15 @@ public class DetailsPanelForSearchServices extends JPanel
 
     public void timingEvent(float arg0) {
         //System.out.println("Alpha on Details panel for SServ. "+arg0);
-        if(arg0<0.7f && arg0>0){
+        if(arg0>0 && arg0<getUpperThresholdAlpha()){
+            Color innerColor = mainBorder.getColorForInnerBorder();
+            Color outerColor = mainBorder.getColorForOuterBorder();
+            if(arg0<mainBorder.getUpperThresholdAlphaInner()){                
+                mainBorder.setColorForInnerBorder(Utils.colorAlpha(innerColor, arg0));
+            }
+            if(arg0<mainBorder.getUpperThresholdAlpha()){             
+                mainBorder.setColorForOuterBorder(Utils.colorAlpha(outerColor, arg0));
+            }
             setAlpha(arg0);
             repaint();
         }else
@@ -394,6 +402,20 @@ public class DetailsPanelForSearchServices extends JPanel
             setVisible(isEnabled());
     }
     public void repeat() {
+    }
+
+    /**
+     * @return the upperThresholdAlpha
+     */
+    public float getUpperThresholdAlpha() {
+        return upperThresholdAlpha;
+    }
+
+    /**
+     * @param upperThresholdAlpha the upperThresholdAlpha to set
+     */
+    public void setUpperThresholdAlpha(float upperThresholdAlpha) {
+        this.upperThresholdAlpha = upperThresholdAlpha;
     }
 
     class DecoratePanel extends JPanel{

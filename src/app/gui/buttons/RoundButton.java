@@ -9,6 +9,7 @@ import app.gui.borders.OvalBorder;
 import java.awt.Color;
 import java.awt.Graphics;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.Action;
 
 /**
  *
@@ -24,14 +25,21 @@ public class RoundButton extends OpacityButton{
 	
         super(label);
         setFocusPainted(false);
-        //setBorder(null);
+        setBorder(null);
         
     }
+
+    public RoundButton(Action a){
+        super(a);
+        setFocusPainted(false);
+        setBorder(null);
+    }
+
     public RoundButton(String label,double arcw,double arch){
         this(label);
         roundX = arcw;
         roundY = arch;
-        setBorder(new OvalBorder(5,8,5,8,arcw,arch,new Color(80,80,100)));
+        setDefaultBorder();
     }
 
     @Override
@@ -81,10 +89,9 @@ public class RoundButton extends OpacityButton{
     public void setRound(double arcw,double arch){
         setRoundX(arcw);
         setRoundY(arch);
-        setDefaultBorder();
     }
 
     public void setDefaultBorder(){
-        setBorder(new OvalBorder(5,8,5,8,getRoundX(),getRoundY(),new Color(80,80,100)));
+        setBorder(new OvalBorder(6,8,6,8,getRoundX(),getRoundY(),new Color(80,80,100)));
     }
 }

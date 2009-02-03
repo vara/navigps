@@ -5,7 +5,6 @@
 
 package app.gui.buttons;
 
-import app.utils.OutputVerboseStream;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
@@ -22,21 +21,18 @@ public class RotatedButton extends RoundButton{
 
         private XButton template;
         private boolean clockwise;
-
-        private OutputVerboseStream verboseStream = null;
         
-        public RotatedButton(String text, boolean clockwise,Dimension size,OutputVerboseStream l) {
+        public RotatedButton(String text, boolean clockwise,Dimension size) {
             
             super(text);
-            verboseStream = l;
             template = new XButton(text);
             this.clockwise = clockwise;
             template.setSize(size);
             setPreferredSize(size);
             //setLocation(size.width-width,0);
         }       
-        public RotatedButton(String text, boolean clockwise,Dimension size,double round,OutputVerboseStream l) {
-            this(text, clockwise, size, l);
+        public RotatedButton(String text, boolean clockwise,Dimension size,double round) {
+            this(text, clockwise, size);
             setRound(round, round);
         }
         @Override
@@ -57,10 +53,6 @@ public class RotatedButton extends RoundButton{
             template.setSelected(this.getModel().isPressed());
             template.paintComponent(g2);
             g2.dispose();
-        }
-
-        public OutputVerboseStream getVerboseStream(){
-            return verboseStream;
         }
         /*
         public void showToggleButton(){

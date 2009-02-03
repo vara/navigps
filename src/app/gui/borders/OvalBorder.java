@@ -26,6 +26,7 @@ public class OvalBorder extends AbstractBorder {
      private double rech=0;
      private Color borderColor=new Color(90,100,190,255);
      private Insets insets = new Insets(6, 10, 6, 10);
+     private float upperThresholdAlpha = 1f;
 
      public OvalBorder() {
              recw=6;
@@ -41,6 +42,7 @@ public class OvalBorder extends AbstractBorder {
         this.recw=recw;
         this.rech=rech;
         borderColor = topColor;
+        setUpperThresholdAlpha((float)borderColor.getAlpha()/255);
      }
 
      public OvalBorder(int top, int left, int bottom, int right,double recw, double rech, Color topColor) {
@@ -153,6 +155,20 @@ public class OvalBorder extends AbstractBorder {
      */
     public void setInsets(Insets insets) {
         this.insets = insets;
+    }
+
+    /**
+     * @return the upperThresholdAlpha
+     */
+    public float getUpperThresholdAlpha() {
+        return upperThresholdAlpha;
+    }
+
+    /**
+     * @param upperThresholdAlpha the upperThresholdAlpha to set
+     */
+    public void setUpperThresholdAlpha(float upperThresholdAlpha) {
+        this.upperThresholdAlpha = upperThresholdAlpha;
     }
 
 }

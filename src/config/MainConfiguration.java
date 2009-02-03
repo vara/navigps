@@ -15,7 +15,7 @@ import java.io.PrintStream;
  */
 public class MainConfiguration {
     
-    public static final String NAVIGPS_VERSION = "0.5";
+    public static final String NAVIGPS_VERSION = "0.5.1";
 
     private static boolean modeVerbose = false;
     private static boolean modeVerboseGui = false;
