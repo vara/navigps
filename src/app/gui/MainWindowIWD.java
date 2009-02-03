@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.gui;
 
 import app.gui.verboseTextPane.PanelForVerboseWindow;
@@ -26,7 +21,6 @@ import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.DisplayMode;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -46,9 +40,11 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
@@ -67,6 +63,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ChangeEvent;
 import javax.swing.event.ChangeListener;
 import net.infonode.docking.RootWindow;
@@ -115,13 +112,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     private RootWindowProperties properties = new RootWindowProperties();
     
     private Vector <View> views = new Vector<View>();
-    private static int ICON_SIZE = 8;
-
-    private GraphicsDevice device = GUIConfiguration.getGraphicDevice();
+    private static int ICON_SIZE = 8;    
 
     //private MySplitPane paneForProperties = new MySplitPane();    
 
     public MainWindowIWD(Main c){
+        super(GUIConfiguration.getGraphicDevice().getDefaultConfiguration());
         System.setOut(getVerboseStream().getOutputStream());
         System.setErr(getVerboseStream().getErrOutputStream());
         addWindowFocusListener(this);
@@ -138,9 +134,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         MyLogger.log.log(Level.FINE,"Constructor "+getClass().toString());
         core = c;
 
-        setSize(GUIConfiguration.getWindowSize());
-        //always center location
-        setLocationRelativeTo(null);
+        setSize(GUIConfiguration.getWindowSize());        
         setLayout(new BorderLayout());
         
         initComponents();
@@ -152,9 +146,6 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setDisplayMode();
-        //if winidow init not FULL_SCREEN mode then must be invoke setVisible
-        if(!isVisible())
-            setVisible(true);
     }
 
     public MainWindowIWD(Main c,ArgumentsStartUp arg){
@@ -832,13 +823,46 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     }
 
     private void setDisplayMode(){
-        if(GUIConfiguration.getModeScreen()==GUIConfiguration.FULL_SCREEN){
-            getVerboseStream().outputVerboseStream("full screen mode "+device.isFullScreenSupported());
-            this.setUndecorated(true);
-            device.setFullScreenWindow(this);
-        }else{
-            device.setFullScreenWindow(null);
-            this.setUndecorated(false);
+        final GraphicsDevice device = GUIConfiguration.getGraphicDevice();
+        synchronized(MainWindowIWD.this){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {                   
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.err.println(new Date() +"\n\t Change Display mode !!! ");
+                            if (GUIConfiguration.getModeScreen() == GUIConfiguration.FULL_SCREEN) {
+                                getVerboseStream().outputVerboseStream("full screen mode Supported " + device.isFullScreenSupported());
+                                setVisible(false);
+                                dispose();
+                                try {Thread.sleep(500);} catch (InterruptedException ex){}
+                                setUndecorated(true);                                
+                                device.setFullScreenWindow(MainWindowIWD.this);
+
+                            } else {
+
+                                if(isVisible()){
+                                    System.out.println("Window invisible");
+                                    setVisible(false);
+                                }
+                                device.setFullScreenWindow(null);
+                                try {Thread.sleep(500);} catch (InterruptedException ex){}
+                                if (isUndecorated()) {
+                                    System.out.println("Window must dispose for decorate Frame");
+                                    dispose();                                    
+                                    System.out.println("Window decorate");
+                                    setUndecorated(false);
+                                }
+                                if(!isVisible()){
+                                    System.out.println("Show Window");
+                                    setVisible(true);
+                                }
+                            }
+                        }
+                    });
+                }
+            }).start();
         }
     }
     public void switchDisplayMode(){
