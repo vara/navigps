@@ -5,7 +5,7 @@
 
 package app.gui.searchServices;
 
-import app.gui.detailspanel.DetailsPanelForSearchServices;
+import app.gui.detailspanel.RoundWindow;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
 import java.awt.BasicStroke;
@@ -51,7 +51,7 @@ public class SearchServices extends JPanel implements MouseListener,
 	
 	private ODBridge odbConnector=null;
 
-    private DetailsPanelForSearchServices detailsPane;
+    private RoundWindow detailsPane;
     private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
     private Rectangle visibleRec = new Rectangle(0,0,0,0);
     private boolean needRepaint = false;
@@ -67,9 +67,9 @@ public class SearchServices extends JPanel implements MouseListener,
 	private void init(){
         setLayout(null);
 	    svgViewListener = new DocumentStateChangedListener();
-        detailsPane = new DetailsPanelForSearchServices(getVerboseStream());
+        detailsPane = new RoundWindow(getVerboseStream());
         add(detailsPane);
-        detailsPane.add(guiForSearchServ);
+        detailsPane.getContentPane().add(guiForSearchServ);
         detailsPane.setVisible(false);
 
         //add(new GraphicsVisualVerboseMode());

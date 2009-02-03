@@ -5,32 +5,27 @@
 
 package app.gui.detailspanel;
 
-import app.gui.borders.DoubleOvalBorder;
+import app.gui.borders.OvalBorder;
 import app.utils.OutputVerboseStream;
 import app.utils.Utils;
 import java.awt.AlphaComposite;
-import java.awt.BasicStroke;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
-import java.awt.Font;
-import java.awt.FontMetrics;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.font.FontRenderContext;
-import java.awt.font.TextLayout;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
@@ -45,16 +40,15 @@ import org.jdesktop.animation.timing.TimingTarget;
  * Created on 2008-12-08, 21:25:25
  * @author vara
  */
-public class DetailsPanelForSearchServices extends JPanel 
+public class RoundWindow extends JPanel
         implements MouseListener,MouseMotionListener,TimingTarget{
 
 
     private int sensitiveMouseReaction = 8;
-    private float upperThresholdAlpha = .8f;
+    private float upperThresholdAlpha = .5f;
     private float alpha = getUpperThresholdAlpha();
-    
-    private Color colorBorder = Utils.colorAlpha(0,0,0,getUpperThresholdAlpha());
-    private DoubleOvalBorder mainBorder = new DoubleOvalBorder(20,20,Utils.colorAlpha(100,100,100,.45f),45,45,colorBorder);
+
+    private OvalBorder mainBorder = new OvalBorder(20,20,Utils.colorAlpha(100,100,100,.38f));
 
     private OutputVerboseStream verboseStream = null;
 
@@ -67,56 +61,62 @@ public class DetailsPanelForSearchServices extends JPanel
 
     private Dimension defaultSize = new Dimension(330,400);
 
-    private static final Color clrGlowInnerHi = new Color(253, 239, 175, 148);
-    private static final Color clrGlowInnerLo = new Color(255, 209, 0);
-    private static final Color clrGlowOuterHi = new Color(253, 239, 175, 124);
-    private static final Color clrGlowOuterLo = new Color(255, 179, 0);
+    private Color[] colorBorderGlow = {new Color(230,230,230,148),new Color(70,102,146,200),
+                                       new Color(190,190,190, 250),new Color(255,255,255, 255)};
 
     private boolean decoratePanel = true;
     private DecoratePanel decorate = new DecoratePanel();
 
     private Animator animator;
     private int animationDuration = 5000;
-    
-    public DetailsPanelForSearchServices(OutputVerboseStream l){
+
+    private ContentPaneForRoundWindow contentPane = new ContentPaneForRoundWindow();
+
+    public RoundWindow(OutputVerboseStream l){
         
         verboseStream = l;
         setOpaque(false);
         setSize(defaultSize);
         addMouseListener(this);
         addMouseMotionListener(this);
-        mainBorder.setInsetsOuter(new Insets(2,2,2,2));
-        mainBorder.setInsetsInner(new Insets(35,11,11,11));
+        mainBorder.setInsets(new Insets(3,3,3,0));
         setBorder(mainBorder);        
-        setLayout(new GridLayout());
+        super.setLayout(new BorderLayout());
         //OpenCloseButton toggleButton = new OpenCloseButton("^", true,getSize(),30,l);
        
         //add(toggleButton);
         installRepaintManager();
-        //add(decorate);
+        contentPane.setOpaque(false);
+        contentPane.setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
+                mainBorder.getRecH(), mainBorder.getBorderColor()));
+
+        add(decorate,BorderLayout.NORTH);
+        add(contentPane,BorderLayout.CENTER);
 
         animator = new Animator(animationDuration, 2,
                 RepeatBehavior.LOOP, this);    
-        
-        setDynamicRevalidate(true);
+        decorate.addActionListenerToCloseButton(new CloseAction());
         super.setEnabled(false);
     }
 
+    public Container getContentPane(){
+        return contentPane;
+    }
+
+    public void setTitle(String str){
+        decorate.setTitle(str);
+    }
+
     @Override
-    public Component add(Component comp) {
-        Dimension dim = comp.getPreferredSize();
-        Insets ins = getInsets();
-        int w = dim.width + (ins.left+ins.right);
-        int h = dim.height+ (ins.bottom+ins.top);
-        setSize(w,h);
-        setPreferredSize(getSize());
-        return super.add(comp);
+    protected void addImpl(Component comp, Object constraints, int index) {        
+        super.addImpl(comp, constraints, index);
     }
 
     @Override
     public void setEnabled(final boolean aFlag) {
         super.setEnabled(aFlag);
         SwingUtilities.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 displayPanel(aFlag);
             }
@@ -126,7 +126,6 @@ public class DetailsPanelForSearchServices extends JPanel
     @Override
     public void setVisible(boolean aFlag) {
         super.setVisible(aFlag);
-        System.err.println("Search Services Visible "+aFlag);
     }
     public void displayPanel(boolean val){
         
@@ -149,12 +148,18 @@ public class DetailsPanelForSearchServices extends JPanel
         if(parent == null)
             return;
 
-        int width = getParent().getWidth();
-        int height = getParent().getHeight();
-        this.setLocation(width-getWidth(), (height-getHeight())/2 );
+        final int width = getParent().getWidth();
+        final int height = getParent().getHeight();
+        SwingUtilities.invokeLater(new Runnable() {
 
-        if(isDynamicRevalidate())
-            revalidate();
+            @Override
+            public void run() {
+                setLocation(width-getWidth(), (height-getHeight())/2 );
+                if(isDynamicRevalidate())
+                    revalidate();
+            }
+        });
+        
         //getVerboseStream().outputVerboseStream(getClass().getSimpleName()+" UpdateMyUI\n Parent size ["+width+","+height+"]" +
         //        "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");
     }
@@ -169,32 +174,19 @@ public class DetailsPanelForSearchServices extends JPanel
 	}
 
     @Override
-    public void paintChildren(Graphics g){
-        Graphics2D g2 = (Graphics2D)g;
-        AlphaComposite newComposite =
-              AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
-        g2.setComposite(newComposite);
-
-        Rectangle oldClip = g2.getClipBounds();
-        Rectangle newClip = (Rectangle)oldClip.clone();
-        RoundRectangle2D vis = computeVisibleChildrenArea();
-
-        SwingUtilities.computeIntersection((int)vis.getX(),(int)vis.getY(),
-                (int)vis.getWidth(),(int)vis.getHeight(), newClip);
-        g.setClip(newClip);
+    public void paintChildren(Graphics g){        
         super.paintChildren(g);
-        g.setClip(oldClip);
     }
 
     protected RoundRectangle2D.Double computeVisibleChildrenArea(){
         Rectangle bounds = getBounds();
-        Insets ins = getInsets();
+        Insets ins = super.getInsets();
         int canX = ins.left;
         int canY = ins.top;
         int canWidth = bounds.width-ins.left-ins.right;
         int canHeight = bounds.height-ins.top-ins.bottom;
-        double arcx = mainBorder.getRoundInnerX();
-        double arcy = mainBorder.getRoundInnerY();
+        double arcx = ((OvalBorder)getBorder()).getRecW();
+        double arcy = ((OvalBorder)getBorder()).getRecH();
         return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
     }
 
@@ -206,71 +198,39 @@ public class DetailsPanelForSearchServices extends JPanel
 
             GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,Utils.colorAlpha(1,51,90,getAlpha()),
                                                 (float)getWidth()/2, 80.0f,Utils.colorAlpha(43,105,152,getAlpha()));
-            GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
-                                                0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
-            Insets outerIns = mainBorder.getInsetsOuter();
-            Insets innerIns = mainBorder.getInsetsInner();
-            RoundRectangle2D outerBorder = DoubleOvalBorder.createOuterShape(outerIns.left,outerIns.top,
+            //GradientPaint gp = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
+            //                                    0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
+            
+            Insets outerIns = super.getInsets();
+            RoundRectangle2D outerBorderShape = OvalBorder.createOuterShape(outerIns.left,outerIns.top,
                     getWidth()-outerIns.left-outerIns.right,getHeight()-outerIns.top-outerIns.bottom,
                     mainBorder.getRecW(), mainBorder.getRecH(),outerIns);
-            RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(outerBorder.getX()-2,outerBorder.getY()-2,
-                    outerBorder.getWidth()+3,outerBorder.getHeight()+3,mainBorder.getRoundInnerX(), mainBorder.getRoundInnerY(),
-                    innerIns);
-
-            g2.setPaint(gp2);
-            g2.fill(outerBorder);
+            
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                RenderingHints.VALUE_ANTIALIAS_OFF);
             g2.setPaint(gp);
-            g2.fill(innerBorder);            
+            g2.fill(outerBorderShape);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
-            paintBorderGlow(g2,5,outerBorder);
-            paintBorderShadow(g2,2,innerBorder);
+            AlphaComposite newComposite =
+              AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
+            g2.setComposite(newComposite);
+
+            BorderEfects.paintBorderGlow(g2,4,outerBorderShape,colorBorderGlow);
             g2.dispose();
-        }
-        
-    }
-
-    private void paintBorderShadow(Graphics2D g2, int shadowWidth,Shape clipShape) {        
-        int sw = shadowWidth*2;
-        for (int i=sw; i >= 2; i-=1) {
-            float pct = (float)(sw - i) / (sw - 1);
-            g2.setColor(getMixedColor(Color.LIGHT_GRAY, pct,
-                                      Color.WHITE, 1.0f-pct));
-            
-            g2.setStroke(new BasicStroke(i));
-            g2.draw(clipShape);
-        }
-    }    
-
-    private void paintBorderGlow(Graphics2D g2, int glowWidth,Shape clipShape) {
-
-        int gw = glowWidth*2;
-        for (int i=gw; i >= 2; i-=2) {
-            float pct = (float)(gw - i) / (gw - 1);
-/*
-            Color mixHi = getMixedColor(clrGlowInnerHi, pct,
-                                       clrGlowOuterHi, 1.0f - pct);
-            Color mixLo = getMixedColor(clrGlowInnerLo, pct,
-                                      clrGlowOuterLo, 1.0f - pct);
-
-            g2.setPaint(new GradientPaint(0.0f, clipShape.getBounds().height*0.25f,  mixHi,
-                                          0.0f, clipShape.getBounds().height, mixLo));
- */
-            g2.setColor(Utils.colorAlpha(240,240,255,getAlpha()));
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, pct));
-            g2.setStroke(new BasicStroke(i));
-            g2.draw(clipShape);
-        }
-    }
-
-    private Color getMixedColor(Color c1, float pct1, Color c2, float pct2) {
-        float[] clr1 = c1.getComponents(null);
-        float[] clr2 = c2.getComponents(null);
-        for (int i = 0; i < clr1.length-1; i++) {
-            clr1[i] = (clr1[i] * pct1) + (clr2[i] * pct2);            
         }        
-        return new Color(clr1[0], clr1[1], clr1[2], getAlpha());
-    }  
+    }
+
+    @Override
+    public Insets getInsets() {
+        Insets in = super.getInsets();
+        return new Insets(in.top+7, in.left+7+1, in.bottom+7, in.right+7);
+    }
+
+    @Override
+    protected void paintBorder(Graphics g) {
+        super.paintBorder(g);
+    }
 
     @Override
     public void mouseClicked(MouseEvent e) {
@@ -298,9 +258,6 @@ public class DetailsPanelForSearchServices extends JPanel
         if(needRevalidate || !isDynamicRevalidate()){                        
             revalidate();
             needRevalidate=false;
-            getVerboseStream().outputVerboseStream("Revalidate!");
-            System.out.println("GetBounds "+getBounds());
-            System.out.println("computeVisibleChildrenArea "+computeVisibleChildrenArea());
         }
         resizeWidthPanel = false;
         resizeHeghtPanel = false;
@@ -377,30 +334,31 @@ public class DetailsPanelForSearchServices extends JPanel
         this.dynamicRevalidate = dynamicRevalidate;
     }
 
+    @Override
     public void timingEvent(float arg0) {
-        //System.out.println("Alpha on Details panel for SServ. "+arg0);
         if(arg0>0 && arg0<getUpperThresholdAlpha()){
-            Color innerColor = mainBorder.getColorForInnerBorder();
-            Color outerColor = mainBorder.getColorForOuterBorder();
-            if(arg0<mainBorder.getUpperThresholdAlphaInner()){                
-                mainBorder.setColorForInnerBorder(Utils.colorAlpha(innerColor, arg0));
-            }
-            if(arg0<mainBorder.getUpperThresholdAlpha()){             
-                mainBorder.setColorForOuterBorder(Utils.colorAlpha(outerColor, arg0));
+            Color outerColor = ((OvalBorder)getBorder()).getBorderColor();
+            
+            if(arg0<mainBorder.getUpperThresholdAlpha()){ 
+                ((OvalBorder)getBorder()).setBorderColor(Utils.colorAlpha(outerColor, arg0));
             }
             setAlpha(arg0);
+            contentPane.setAlpha(arg0);
             repaint();
         }else
             animator.stop();
     }
+    @Override
     public void begin() {
         if(isEnabled())
             setVisible(isEnabled());
     }
+    @Override
     public void end() {
         if(!isEnabled())
             setVisible(isEnabled());
     }
+    @Override
     public void repeat() {
     }
 
@@ -418,80 +376,6 @@ public class DetailsPanelForSearchServices extends JPanel
         this.upperThresholdAlpha = upperThresholdAlpha;
     }
 
-    class DecoratePanel extends JPanel{
-        
-        public static final int CENTER = 0;
-        public static final int LEFT = 1;
-        public static final int RIGHT = 2;
-        
-        private int layout = 0;
-
-        private String title = "Unknown";
-
-        public DecoratePanel(){
-            setOpaque(false);
-        }
-
-        @Override
-        public void paintComponent(Graphics g){
-            super.paintComponent(g);
-            Graphics2D g2 = (Graphics2D)g;
-            FontRenderContext frc = g2.getFontRenderContext();
-            Font font = g2.getFont();
-            Point.Double  centerFont = findPositionForString(font,getDecoreteLayout(),getTitle(),frc);
-            g2.drawString(getTitle(),(float)centerFont.getX(), (float)centerFont.getY());
-
-        }
-
-        private Point.Double findPositionForString(Font f,int mode,String text,FontRenderContext frc){
-            if(mode==DecoratePanel.CENTER) {
-                TextLayout textTl = new TextLayout(text,f, frc);
-                Rectangle rec = textTl.getPixelBounds(frc,0,0);
-
-                FontMetrics fm = getFontMetrics(f);
-                //rozmiary stringu w pixelach
-                double strWidthInPix = (int)rec.getWidth();
-                double strHeightInPix = (int)rec.getHeight();
-                //size panel in pixels
-                int width = getSize().width;
-                int height = getSize().height;
-
-                double centPointX = (width-strWidthInPix-2)/2;
-                double centPointY = (height+strHeightInPix-2)/2;
-                //System.out.println("rozmiar Panelu "+width+","+height+
-                //				   "\nrozmiar stringu "+strWidthInPix+","+strHeightInPix+
-                //				   "\nSrodek "+centPointX+","+centPointY);
-                return new Point.Double(centPointX,centPointY);
-            }
-            return null;
-        }
-
-        /**
-         * @return the layout
-         */
-        public int getDecoreteLayout() {
-            return layout;
-        }
-        /**
-         * @param layout the layout to set
-         */
-        public void setDecorateLayout(int layout) {
-            this.layout = layout;
-        }
-        /**
-         * @return the title
-         */
-        public String getTitle() {
-            return title;
-        }
-        /**
-         * @param title the title to set
-         */
-        public void setTitle(String title) {
-            this.title = title;
-        }
-    }
-
     public class MyRepaintManager extends RepaintManager {
         
         @Override
@@ -506,8 +390,8 @@ public class DetailsPanelForSearchServices extends JPanel
                     if (!parent.isVisible() || (parent.getPeer() == null)) {
                         return;
                     }
-                    if (parent instanceof DetailsPanelForSearchServices &&
-                            (((DetailsPanelForSearchServices)parent).getAlpha() < 1f ||
+                    if (parent instanceof RoundWindow &&
+                            (((RoundWindow)parent).getAlpha() < 1f ||
                             !parent.isOpaque())) {
                         x += lastDeltaX;
                         y += lastDeltaY;
@@ -522,4 +406,44 @@ public class DetailsPanelForSearchServices extends JPanel
             super.addDirtyRegion(c, x, y, w, h);
         }
     }//MyRepaintManager
+
+    class CloseAction implements ActionListener,TimingTarget{
+        private Animator animator;
+
+        public CloseAction(){
+            animator = new Animator(animationDuration, 2,
+            RepeatBehavior.LOOP, this);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+           animator.setStartFraction(contentPane.getAlpha());
+           animator.setStartDirection(Direction.BACKWARD);
+           animator.start();
+        }
+
+        @Override
+        public void timingEvent(float arg0) {
+            contentPane.setAlpha(arg0);
+            setSize(getWidth()-1, getHeight());
+            updateMyUI();
+            //repaint();
+        }
+
+        @Override
+        public void begin() {
+
+        }
+
+        @Override
+        public void end() {
+
+        }
+
+        @Override
+        public void repeat() {
+
+        }
+
+    }
 }

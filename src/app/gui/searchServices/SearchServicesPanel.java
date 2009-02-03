@@ -11,7 +11,7 @@
 
 package app.gui.searchServices;
 
-import app.gui.detailspanel.DetailsPanelForSearchServices;
+import app.gui.detailspanel.RoundWindow;
 import app.gui.displayItemsMap.PanelWithJTree.MyScrollBarUI;
 import java.awt.Component;
 import java.awt.Point;
@@ -229,8 +229,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        Component comp;
         for (comp = getParent(); comp!=null; comp=comp.getParent()) {
-            if(comp instanceof DetailsPanelForSearchServices){
-                DetailsPanelForSearchServices det  =(DetailsPanelForSearchServices)comp;
+            if(comp instanceof RoundWindow){
+                RoundWindow det  =(RoundWindow)comp;
                 System.out.println("current alpha "+det.getAlpha());
                 break;
             }
