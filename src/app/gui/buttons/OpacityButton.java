@@ -1,24 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.gui.buttons;
 
 import java.awt.AlphaComposite;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.RenderingHints;
 import java.awt.image.BufferedImage;
 import javax.swing.Action;
-import javax.swing.JButton;
 
 /**
  * Created on 2008-12-15, 21:39:58
  * @author vara
  */
-public class OpacityButton extends JButton{
+public class OpacityButton extends AbstractOpacityJButton{
 
-    private float alpha = 1.0f;      // current opacity of button
     private BufferedImage buttonImage = null;
 
     public OpacityButton(String label) {
@@ -37,17 +31,18 @@ public class OpacityButton extends JButton{
             setButtonImage(getGraphicsConfiguration().createCompatibleImage(getWidth(), getHeight()));
         }
         Graphics2D gButton = (Graphics2D)getButtonImage().getGraphics();
-        gButton.setClip(g.getClip());
-        //gButton.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        //gButton.setClip(g.getClip());
+        gButton.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         super.paint(gButton);
 
-        Graphics2D g2d  = (Graphics2D)g;
+        Graphics2D g2  = (Graphics2D)g;
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
         AlphaComposite newComposite =
             AlphaComposite.getInstance(AlphaComposite.SRC_OVER,getAlpha());
-        g2d.setComposite(newComposite);
+        g2.setComposite(newComposite);
 
         // Copy the button's image to the destination graphics, translucently
-        g2d.drawImage(getButtonImage(), 0, 0, null);
+        g2.drawImage(getButtonImage(), 0, 0, null);
     }
 
     @Override
@@ -63,20 +58,6 @@ public class OpacityButton extends JButton{
     @Override
     public void setOpaque(boolean isOpaque) {
         super.setOpaque(false);
-    }
-
-    /**
-     * @return the alpha
-     */
-    public float getAlpha() {
-        return alpha;
-    }
-
-    /**
-     * @param alpha the alpha to set
-     */
-    public void setAlpha(float alpha) {
-        this.alpha = alpha;
     }
 
     /**

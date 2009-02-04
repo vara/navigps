@@ -5,6 +5,7 @@
 
 package app.gui.borders;
 
+import app.gui.detailspanel.AlphaInterface;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
@@ -26,7 +27,6 @@ public class DoubleOvalBorder extends OvalBorder{
     private Color colorForInnerBorder = new Color(90, 100, 190, 255);
     private Insets insetsInner = new Insets(6, 10, 6, 10);
     private int thickness=0;
-    private float upperThresholdAlphaInner = 1f;
 
     public DoubleOvalBorder(int arcW, int arcH) {
         super(arcW, arcH);
@@ -38,8 +38,7 @@ public class DoubleOvalBorder extends OvalBorder{
        super(arcw1, arch1, topColor1);
        roundInnerX=arcw2;
        roundInnerY=arch2;
-       colorForInnerBorder = topColor2;
-       setUpperThresholdAlphaInner((float)colorForInnerBorder.getAlpha()/255);
+       colorForInnerBorder = topColor2;       
     }
 
     public DoubleOvalBorder(int arcw1, int arch1, Color topColor1,int arcw2, int arch2, Color topColor2,int tick) {
@@ -64,8 +63,7 @@ public class DoubleOvalBorder extends OvalBorder{
 
         Graphics2D g2 = (Graphics2D)g.create();
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);        
-        float alpha = (float) getColorForInnerBorder().getAlpha()/255;
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,alpha));
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha()));
         g2.setColor(getColorForInnerBorder());
         g2.draw(innerBorder);
 
@@ -178,19 +176,5 @@ public class DoubleOvalBorder extends OvalBorder{
      */
     public void setRoundInnerY(double roundInnerY) {
         this.roundInnerY = roundInnerY;
-    }
-
-    /**
-     * @return the upperThresholdAlphaInner
-     */
-    public float getUpperThresholdAlphaInner() {
-        return upperThresholdAlphaInner;
-    }
-
-    /**
-     * @param upperThresholdAlphaInner the upperThresholdAlphaInner to set
-     */
-    public void setUpperThresholdAlphaInner(float upperThresholdAlphaInner) {
-        this.upperThresholdAlphaInner = upperThresholdAlphaInner;
     }
 }

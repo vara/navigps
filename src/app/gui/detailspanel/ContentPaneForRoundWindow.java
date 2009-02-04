@@ -16,17 +16,14 @@ import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
 
 /**
  *
  * @author wara
  */
-public class ContentPaneForRoundWindow extends JPanel{
+public class ContentPaneForRoundWindow extends AlphaJPanel implements AlphaInterface{
 
-    private float upperThresholdAlpha = .7f;
-    private float alpha = 1f;
 
     private Color [] colorBorderEfect = {new Color(200,200,255,200),
                                          new Color(255,255,255,100)};
@@ -80,42 +77,16 @@ public class ContentPaneForRoundWindow extends JPanel{
         int canY = ins.top;
         int canWidth = bounds.width-ins.left-ins.right;
         int canHeight = bounds.height-ins.top-ins.bottom;
-        //double arcx = mainBorder.getRoundInnerX();
         double arcx = ((OvalBorder)getBorder()).getRecW();
-        //double arcy = mainBorder.getRoundInnerY();
         double arcy = ((OvalBorder)getBorder()).getRecH();
         return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
     }
 
-    /**
-     * @return the alpha
-     */
-    public float getAlpha() {
-        return alpha;
-    }
-
-    /**
-     * @param alpha the alpha to set
-     */
-    public boolean setAlpha(float alpha) {
-        if(alpha<=getUpperThresholdAlpha()){
-            this.alpha = alpha;
-            return true;
+    @Override
+    protected void paintBorder(Graphics g) {
+        if(getBorder()instanceof AlphaInterface){
+            ((AlphaInterface)getBorder()).setAlpha(getAlpha());
         }
-        return false;
-    }
-
-    /**
-     * @return the upperThresholdAlpha
-     */
-    public float getUpperThresholdAlpha() {
-        return upperThresholdAlpha;
-    }
-
-    /**
-     * @param upperThresholdAlpha the upperThresholdAlpha to set
-     */
-    public void setUpperThresholdAlpha(float upperThresholdAlpha) {
-        this.upperThresholdAlpha = upperThresholdAlpha;
+        super.paintBorder(g);
     }
 }

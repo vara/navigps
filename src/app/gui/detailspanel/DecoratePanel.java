@@ -17,13 +17,12 @@ import java.awt.event.ActionListener;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import javax.swing.JButton;
-import javax.swing.JPanel;
 
 /**
  *
  * @author wara
  */
-public class DecoratePanel extends JPanel{
+public class DecoratePanel extends AlphaJPanel{
     public static final int CENTER = 0;
     public static final int LEFT = 1;
     public static final int RIGHT = 2;
@@ -36,8 +35,7 @@ public class DecoratePanel extends JPanel{
 
     public DecoratePanel(){
         setOpaque(false);
-        setAlignmentY(20f);
-        setPreferredSize(new Dimension(100,20));
+        setPreferredSize(new Dimension(10,80));
         init();
     }
 
@@ -48,6 +46,7 @@ public class DecoratePanel extends JPanel{
     private void init(){
         ((FlowLayout)getLayout()).setAlignment(FlowLayout.RIGHT);
         add(closeButton);
+
     }
 
     @Override

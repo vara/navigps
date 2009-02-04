@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.gui.detailspanel;
 
 import app.gui.borders.OvalBorder;
@@ -28,7 +23,6 @@ import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
-import javax.swing.JPanel;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import org.jdesktop.animation.timing.Animator;
@@ -40,13 +34,11 @@ import org.jdesktop.animation.timing.TimingTarget;
  * Created on 2008-12-08, 21:25:25
  * @author vara
  */
-public class RoundWindow extends JPanel
-        implements MouseListener,MouseMotionListener,TimingTarget{
+public class RoundWindow extends AlphaJPanel
+        implements MouseListener,MouseMotionListener,TimingTarget,AlphaInterface{
 
 
-    private int sensitiveMouseReaction = 8;
-    private float upperThresholdAlpha = .5f;
-    private float alpha = getUpperThresholdAlpha();
+    private int sensitiveMouseReaction = 8;    
 
     private OvalBorder mainBorder = new OvalBorder(20,20,Utils.colorAlpha(100,100,100,.38f));
 
@@ -68,7 +60,7 @@ public class RoundWindow extends JPanel
     private DecoratePanel decorate = new DecoratePanel();
 
     private Animator animator;
-    private int animationDuration = 5000;
+    private int animationDuration = 4000;
 
     private ContentPaneForRoundWindow contentPane = new ContentPaneForRoundWindow();
 
@@ -93,7 +85,7 @@ public class RoundWindow extends JPanel
         add(decorate,BorderLayout.NORTH);
         add(contentPane,BorderLayout.CENTER);
 
-        animator = new Animator(animationDuration, 2,
+        animator = new Animator(animationDuration, 1,
                 RepeatBehavior.LOOP, this);    
         decorate.addActionListenerToCloseButton(new CloseAction());
         super.setEnabled(false);
@@ -138,7 +130,7 @@ public class RoundWindow extends JPanel
            animator.setStartFraction(frac);
            animator.setStartDirection(Direction.FORWARD);
         }else{
-           animator.setStartFraction(getAlpha());
+           animator.setStartFraction(Math.max(contentPane.getAlpha(),getAlpha()));
            animator.setStartDirection(Direction.BACKWARD);
         }
         animator.start();
@@ -148,22 +140,23 @@ public class RoundWindow extends JPanel
         if(parent == null)
             return;
 
-        final int width = getParent().getWidth();
-        final int height = getParent().getHeight();
-        SwingUtilities.invokeLater(new Runnable() {
-
-            @Override
-            public void run() {
-                setLocation(width-getWidth(), (height-getHeight())/2 );
-                if(isDynamicRevalidate())
-                    revalidate();
-            }
-        });
+        int x = (getParent().getWidth()-getWidth());
+        int y = (getParent().getHeight()-getHeight())>>1;
+        updateMyUI(x, y, getWidth(), getHeight());
         
         //getVerboseStream().outputVerboseStream(getClass().getSimpleName()+" UpdateMyUI\n Parent size ["+width+","+height+"]" +
         //        "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");
     }
-
+     public void updateMyUI(final int x,final int y,final int width,final int height){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                setBounds(x,y, width, height);
+                if(isDynamicRevalidate())
+                    revalidate();
+            }
+        });
+     }
     private void installRepaintManager() {
         MyRepaintManager manager = new MyRepaintManager();
         RepaintManager.setCurrentManager(manager);
@@ -196,8 +189,8 @@ public class RoundWindow extends JPanel
         if(isVisible() && parent!=null && parent.isEnabled()){
             Graphics2D g2 = (Graphics2D)g.create();
 
-            GradientPaint gp = new GradientPaint(0.0f, (float) getHeight()/2,Utils.colorAlpha(1,51,90,getAlpha()),
-                                                (float)getWidth()/2, 80.0f,Utils.colorAlpha(43,105,152,getAlpha()));
+            GradientPaint gp = new GradientPaint(0.0f, (float) (getHeight()>>1),Utils.colorAlpha(1,51,90,getAlpha()),
+                                                (float)(getWidth()>>1), 80.0f,Utils.colorAlpha(43,105,152,getAlpha()));
             //GradientPaint gp = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
             //                                    0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
             
@@ -225,11 +218,6 @@ public class RoundWindow extends JPanel
     public Insets getInsets() {
         Insets in = super.getInsets();
         return new Insets(in.top+7, in.left+7+1, in.bottom+7, in.right+7);
-    }
-
-    @Override
-    protected void paintBorder(Graphics g) {
-        super.paintBorder(g);
     }
 
     @Override
@@ -272,10 +260,15 @@ public class RoundWindow extends JPanel
     @Override
     public void mouseDragged(MouseEvent e) {
         if(resizeWidthPanel || resizeHeghtPanel){
-            if(resizeWidthPanel)
-                setSize(getWidth()-e.getX()+2, getHeight());
-            else
-                setSize(getWidth(), getHeight()-e.getY());            
+            int width =0,height = 0;
+            if(resizeWidthPanel){
+                width = getWidth()-e.getX()+2;
+                setSize(width, getHeight());
+            }
+            else{
+                height = getHeight()-e.getY();
+                setSize(getWidth(), height);
+            }
             updateMyUI();
             needRevalidate=true;
         }
@@ -297,20 +290,6 @@ public class RoundWindow extends JPanel
      */
     public boolean isDecoratePanel() {
         return decoratePanel;
-    }
-
-    /**
-     * @return the alpha
-     */
-    public float getAlpha() {
-        return alpha;
-    }
-
-    /**
-     * @param aAlpha the alpha to set
-     */
-    public void setAlpha(float aAlpha) {
-        alpha = aAlpha;
     }
 
     /**
@@ -336,7 +315,8 @@ public class RoundWindow extends JPanel
 
     @Override
     public void timingEvent(float arg0) {
-        if(arg0>0 && arg0<getUpperThresholdAlpha()){
+        if(arg0>0 && arg0<Math.max(contentPane.getUpperThresholdAlpha(),
+                                   getUpperThresholdAlpha())){
             Color outerColor = ((OvalBorder)getBorder()).getBorderColor();
             
             if(arg0<mainBorder.getUpperThresholdAlpha()){ 
@@ -360,20 +340,6 @@ public class RoundWindow extends JPanel
     }
     @Override
     public void repeat() {
-    }
-
-    /**
-     * @return the upperThresholdAlpha
-     */
-    public float getUpperThresholdAlpha() {
-        return upperThresholdAlpha;
-    }
-
-    /**
-     * @param upperThresholdAlpha the upperThresholdAlpha to set
-     */
-    public void setUpperThresholdAlpha(float upperThresholdAlpha) {
-        this.upperThresholdAlpha = upperThresholdAlpha;
     }
 
     public class MyRepaintManager extends RepaintManager {
@@ -411,7 +377,7 @@ public class RoundWindow extends JPanel
         private Animator animator;
 
         public CloseAction(){
-            animator = new Animator(animationDuration, 2,
+            animator = new Animator(animationDuration, 1,
             RepeatBehavior.LOOP, this);
         }
 
@@ -424,26 +390,19 @@ public class RoundWindow extends JPanel
 
         @Override
         public void timingEvent(float arg0) {
-            contentPane.setAlpha(arg0);
+            if(contentPane.setAlpha(arg0)){
             setSize(getWidth()-1, getHeight());
             updateMyUI();
             //repaint();
+            }else{
+                end();
+            }
         }
-
         @Override
-        public void begin() {
-
-        }
-
+        public void begin() {}
         @Override
-        public void end() {
-
-        }
-
+        public void end() {}
         @Override
-        public void repeat() {
-
-        }
-
+        public void repeat() {}
     }
 }
