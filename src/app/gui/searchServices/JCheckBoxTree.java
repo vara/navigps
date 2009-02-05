@@ -88,7 +88,7 @@ public class JCheckBoxTree extends JTree{
     }
 
     public boolean isAnyChildChecked(TreePath path) {
-        if ((path != null) || (checkedPaths != null)) {
+        if ((path != null) && (checkedPaths != null)) {
             for(int i=0; i < checkedPaths.size(); i++) {
                 TreePath checkedPath = (TreePath)checkedPaths.elementAt(i);
                 if(checkedPath==null){
