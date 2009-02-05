@@ -50,10 +50,9 @@ public class BorderEfects {
     public static void paintBorderGlow(Graphics2D g2, int glowWidth,Shape clipShape,Color[] col) {
 
         float mainAlpha=1;
-        if(g2.getComposite()instanceof AlphaComposite){
-            AlphaComposite com = (AlphaComposite)g2.getComposite();
-            mainAlpha = com.getAlpha();
-        }
+        if(g2.getComposite()instanceof AlphaComposite)
+            mainAlpha = ((AlphaComposite)g2.getComposite()).getAlpha();
+        
         int gw = glowWidth*2;
         for (int i=gw; i >= 2; i-=2) {
             float pct = (float)(gw - i) / (gw - 1);
@@ -66,7 +65,7 @@ public class BorderEfects {
             g2.setPaint(new GradientPaint(0.0f, clipShape.getBounds().height*0.15f,  mixHi,
                                           0.0f, clipShape.getBounds().height, mixLo));
 
-            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, Math.min(mainAlpha, pct)));
+            g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, (mainAlpha <= pct) ? mainAlpha : pct));
             g2.setStroke(new BasicStroke(i));
             g2.draw(clipShape);
         }

@@ -5,20 +5,41 @@
 
 package app.gui.detailspanel;
 
+import java.awt.AlphaComposite;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import javax.swing.JPanel;
 
 /**
  *
  * @author wara
  */
-public abstract class AlphaJPanel extends JPanel implements AlphaInterface{
+public class AlphaJPanel extends JPanel implements AlphaInterface{
 
     private float upperThresholdAlpha = 1f;
     private float alpha = 1f;
 
+    @Override
+    public void paint(Graphics g) {        
+        super.paint(g);
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {        
+        Graphics2D g2 = (Graphics2D)g;        
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getAlpha()));
+        super.paintComponent(g);
+    }
+
+    @Override
+    protected void paintBorder(Graphics g) {
+        super.paintBorder(g);
+    }
+
     /**
      * @return the upperThresholdAlpha
      */
+
     @Override
     public float getUpperThresholdAlpha() {
         return upperThresholdAlpha;

@@ -28,11 +28,14 @@ public class ContentPaneForRoundWindow extends AlphaJPanel implements AlphaInter
     private Color [] colorBorderEfect = {new Color(200,200,255,200),
                                          new Color(255,255,255,100)};
 
+    public ContentPaneForRoundWindow() {
+        //setOpaque(false);
+    }
+
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g.create();
-        
         RoundRectangle2D borderShape = OvalBorder.createOuterShape(2,2,
                     getWidth()-4,getHeight()-5,20, 20,null);
 
@@ -70,15 +73,20 @@ public class ContentPaneForRoundWindow extends AlphaJPanel implements AlphaInter
         super.paintChildren(g2);
         g.setClip(oldClip);
     }
-    protected RoundRectangle2D.Double computeVisibleChildrenArea(){
+    public RoundRectangle2D.Double computeVisibleChildrenArea(){
         Rectangle bounds = getBounds();
         Insets ins = super.getInsets();
         int canX = ins.left;
         int canY = ins.top;
         int canWidth = bounds.width-ins.left-ins.right;
         int canHeight = bounds.height-ins.top-ins.bottom;
-        double arcx = ((OvalBorder)getBorder()).getRecW();
-        double arcy = ((OvalBorder)getBorder()).getRecH();
+
+        double arcx = 0;
+        double arcy = 0;
+        if(getBorder() instanceof OvalBorder){
+            arcx = ((OvalBorder)getBorder()).getRecW();
+            arcy = ((OvalBorder)getBorder()).getRecH();
+        }
         return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
     }
 

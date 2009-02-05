@@ -56,13 +56,16 @@ public class RoundWindow extends AlphaJPanel
     private Color[] colorBorderGlow = {new Color(230,230,230,148),new Color(70,102,146,200),
                                        new Color(190,190,190, 250),new Color(255,255,255, 255)};
 
-    private boolean decoratePanel = true;
-    private DecoratePanel decorate = new DecoratePanel();
+    private boolean decoratePanel = true;    
 
     private Animator animator;
     private int animationDuration = 4000;
 
-    private ContentPaneForRoundWindow contentPane = new ContentPaneForRoundWindow();
+    private DecoratePanel decorate = new DecoratePanel();
+    private RoundWindowRootPane rootPane;
+
+    //uncomment for test root pane
+    //ContentPaneForRoundWindow content = new ContentPaneForRoundWindow();
 
     public RoundWindow(OutputVerboseStream l){
         
@@ -74,25 +77,46 @@ public class RoundWindow extends AlphaJPanel
         mainBorder.setInsets(new Insets(3,3,3,0));
         setBorder(mainBorder);        
         super.setLayout(new BorderLayout());
-        //OpenCloseButton toggleButton = new OpenCloseButton("^", true,getSize(),30,l);
-       
-        //add(toggleButton);
-        installRepaintManager();
-        contentPane.setOpaque(false);
-        contentPane.setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
-                mainBorder.getRecH(), mainBorder.getBorderColor()));
-
-        add(decorate,BorderLayout.NORTH);
-        add(contentPane,BorderLayout.CENTER);
 
         animator = new Animator(animationDuration, 1,
-                RepeatBehavior.LOOP, this);    
+                RepeatBehavior.LOOP, this);
         decorate.addActionListenerToCloseButton(new CloseAction());
+
+        installRepaintManager();
+
+        //contentPane.setOpaque(false);
+        //contentPane.setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
+          //      mainBorder.getRecH(), mainBorder.getBorderColor()));
+
+        add(decorate,BorderLayout.NORTH);
+        //comment for test root pane
+        setRootPane(createRootPane());
+        //uncomment for test root pane
+        //add(content,BorderLayout.CENTER);
+        getContentPane().setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
+                mainBorder.getRecH(), mainBorder.getBorderColor()));
         super.setEnabled(false);
     }
 
-    public Container getContentPane(){
-        return contentPane;
+    protected RoundWindowRootPane createRootPane(){
+        rootPane = new RoundWindowRootPane();
+        return rootPane;
+    }
+
+    public RoundWindowRootPane getRoundWindowRootPane() {
+        return rootPane;
+    }
+
+
+
+    protected void setRootPane(RoundWindowRootPane rp){
+        add(rp, BorderLayout.CENTER);
+    }
+    public AlphaJPanel getContentPane(){
+        //uncomment for test
+        //return content;
+        //comment for test root pane
+        return rootPane.getContentPane();
     }
 
     public void setTitle(String str){
@@ -130,7 +154,7 @@ public class RoundWindow extends AlphaJPanel
            animator.setStartFraction(frac);
            animator.setStartDirection(Direction.FORWARD);
         }else{
-           animator.setStartFraction(Math.max(contentPane.getAlpha(),getAlpha()));
+           animator.setStartFraction(Math.max(getContentPane().getAlpha(),getAlpha()));
            animator.setStartDirection(Direction.BACKWARD);
         }
         animator.start();
@@ -185,6 +209,7 @@ public class RoundWindow extends AlphaJPanel
 
     @Override
     public void paintComponent(Graphics g){
+        //super.paintComponent(g);
         Container parent = getParent();
         if(isVisible() && parent!=null && parent.isEnabled()){
             Graphics2D g2 = (Graphics2D)g.create();
@@ -315,7 +340,7 @@ public class RoundWindow extends AlphaJPanel
 
     @Override
     public void timingEvent(float arg0) {
-        if(arg0>0 && arg0<Math.max(contentPane.getUpperThresholdAlpha(),
+        if(arg0>0 && arg0<Math.max(getContentPane().getUpperThresholdAlpha(),
                                    getUpperThresholdAlpha())){
             Color outerColor = ((OvalBorder)getBorder()).getBorderColor();
             
@@ -323,7 +348,8 @@ public class RoundWindow extends AlphaJPanel
                 ((OvalBorder)getBorder()).setBorderColor(Utils.colorAlpha(outerColor, arg0));
             }
             setAlpha(arg0);
-            contentPane.setAlpha(arg0);
+            getContentPane().setAlpha(arg0);
+            decorate.setAlpha(arg0);
             repaint();
         }else
             animator.stop();
@@ -356,19 +382,19 @@ public class RoundWindow extends AlphaJPanel
                     if (!parent.isVisible() || (parent.getPeer() == null)) {
                         return;
                     }
-                    if (parent instanceof RoundWindow &&
-                            (((RoundWindow)parent).getAlpha() < 1f ||
-                            !parent.isOpaque())) {
+                    if (parent instanceof ContentPaneForRoundWindow &&
+                            (((AlphaJPanel)parent).getAlpha() < 1f ||
+                            !parent.isOpaque())) {                        
                         x += lastDeltaX;
                         y += lastDeltaY;
                         lastDeltaX = lastDeltaY = 0;
-                        c = (JComponent)parent;
+                        c = (JComponent)parent;             
                     }
                     lastDeltaX += parent.getX();
                     lastDeltaY += parent.getY();
                     parent = parent.getParent();
                 }
-            }
+            }           
             super.addDirtyRegion(c, x, y, w, h);
         }
     }//MyRepaintManager
@@ -383,14 +409,14 @@ public class RoundWindow extends AlphaJPanel
 
         @Override
         public void actionPerformed(ActionEvent e) {
-           animator.setStartFraction(contentPane.getAlpha());
+           animator.setStartFraction(getContentPane().getAlpha());
            animator.setStartDirection(Direction.BACKWARD);
            animator.start();
         }
 
         @Override
         public void timingEvent(float arg0) {
-            if(contentPane.setAlpha(arg0)){
+            if(getContentPane().setAlpha(arg0)){
             setSize(getWidth()-1, getHeight());
             updateMyUI();
             //repaint();

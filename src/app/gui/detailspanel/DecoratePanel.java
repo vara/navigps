@@ -5,18 +5,26 @@
 
 package app.gui.detailspanel;
 
+import java.awt.Color;
 import java.awt.Dimension;
 import java.awt.FlowLayout;
 import java.awt.Font;
 import java.awt.FontMetrics;
+import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
+import java.awt.RadialGradientPaint;
 import java.awt.Rectangle;
+import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import java.awt.font.FontRenderContext;
+import java.awt.font.GlyphVector;
 import java.awt.font.TextLayout;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.Point2D;
 import javax.swing.JButton;
+import javax.swing.JLabel;
 
 /**
  *
@@ -35,8 +43,9 @@ public class DecoratePanel extends AlphaJPanel{
 
     public DecoratePanel(){
         setOpaque(false);
-        setPreferredSize(new Dimension(10,80));
+        setPreferredSize(new Dimension(10,30));
         init();
+        setAlpha(0.6f);
     }
 
     public void addActionListenerToCloseButton(ActionListener al){
@@ -45,7 +54,7 @@ public class DecoratePanel extends AlphaJPanel{
 
     private void init(){
         ((FlowLayout)getLayout()).setAlignment(FlowLayout.RIGHT);
-        add(closeButton);
+        //add(closeButton);
 
     }
 
@@ -53,13 +62,17 @@ public class DecoratePanel extends AlphaJPanel{
     public void paintComponent(Graphics g){
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
-        FontRenderContext frc = g2.getFontRenderContext();
-        Font font = g2.getFont();
-        Point.Double  centerFont = findPositionForString(font,getDecoreteLayout(),getTitle(),frc);
-        g2.drawString(getTitle(),(float)centerFont.getX(), (float)centerFont.getY());
-        //g2.setColor(Color.RED);
-        //g2.drawRect(0, 0, getWidth()-1, getHeight()-1);
 
+        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+        Font font = new Font("Ariel", Font.PLAIN, 16);
+        FontRenderContext frc = g2.getFontRenderContext();
+        Point.Double  centerFont = findPositionForString(font,getDecoreteLayout(),getTitle(),frc);
+        GlyphVector gv = font.createGlyphVector(frc, getTitle());        
+        g2.setColor(new Color(60,60,60));
+        g2.drawGlyphVector(gv,(int)centerFont.getX()+2, (int)centerFont.getY()+2);
+
+        g2.setColor(Color.WHITE);
+        g2.drawGlyphVector(gv, (int)centerFont.getX(), (int)centerFont.getY());
     }
 
     private Point.Double findPositionForString(Font f,int mode,String text,FontRenderContext frc){
@@ -108,5 +121,18 @@ public class DecoratePanel extends AlphaJPanel{
      */
     public void setTitle(String title) {
         this.title = title;
+    }
+
+    class Title extends JLabel{
+
+        public Title(String txt) {
+            super(txt);
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+        }
+
     }
 }
