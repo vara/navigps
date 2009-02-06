@@ -68,7 +68,7 @@ public class SearchServices extends JPanel implements MouseListener,
 	private void init(){
         setLayout(null);
 	    svgViewListener = new DocumentStateChangedListener();
-        detailsPane = new RoundWindow(getVerboseStream());
+        detailsPane = new RoundWindow();
         detailsPane.setDynamicRevalidate(true);
         detailsPane.setUpperThresholdAlpha(0.6f);
         detailsPane.setAlpha(0.0f);

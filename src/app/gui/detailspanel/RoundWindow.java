@@ -1,7 +1,7 @@
 package app.gui.detailspanel;
 
+import app.gui.borders.AlphaBorder;
 import app.gui.borders.OvalBorder;
-import app.utils.OutputVerboseStream;
 import app.utils.Utils;
 import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
@@ -18,13 +18,17 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
+import javax.swing.border.Border;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.Animator.Direction;
 import org.jdesktop.animation.timing.Animator.RepeatBehavior;
@@ -35,14 +39,12 @@ import org.jdesktop.animation.timing.TimingTarget;
  * @author vara
  */
 public class RoundWindow extends AlphaJPanel
-        implements MouseListener,MouseMotionListener,TimingTarget,AlphaInterface{
+        implements MouseListener,MouseMotionListener,TimingTarget,FocusListener{
 
 
     private int sensitiveMouseReaction = 8;    
 
-    private OvalBorder mainBorder = new OvalBorder(20,20,Utils.colorAlpha(100,100,100,.38f));
-
-    private OutputVerboseStream verboseStream = null;
+    private OvalBorder mainBorder = new OvalBorder(20,20,Utils.colorAlpha(100,100,100,.99f));
 
     private boolean resizeWidthPanel = false;
     private boolean resizeHeghtPanel = false;
@@ -56,31 +58,33 @@ public class RoundWindow extends AlphaJPanel
     private Color[] colorBorderGlow = {new Color(230,230,230,148),new Color(70,102,146,200),
                                        new Color(190,190,190, 250),new Color(255,255,255, 255)};
 
-    private boolean decoratePanel = true;    
+    private boolean decoratedWindow = true;
 
     private Animator animator;
     private int animationDuration = 4000;
 
-    private DecoratePanel decorate = new DecoratePanel();
+    private AbstractDecoratePanel decorate = new DecoratePanel();
     private RoundWindowRootPane rootPane;
 
+    private Insets innerGap = new Insets(7,7,7,7);
     //uncomment for test root pane
     //ContentPaneForRoundWindow content = new ContentPaneForRoundWindow();
 
-    public RoundWindow(OutputVerboseStream l){
+    public RoundWindow(){
         
-        verboseStream = l;
         setOpaque(false);
         setSize(defaultSize);
         addMouseListener(this);
         addMouseMotionListener(this);
         mainBorder.setInsets(new Insets(3,3,3,0));
-        setBorder(mainBorder);        
+        setBorder(mainBorder);
+        setFocusable(true);
+        addFocusListener(this);
         super.setLayout(new BorderLayout());
 
         animator = new Animator(animationDuration, 1,
                 RepeatBehavior.LOOP, this);
-        decorate.addActionListenerToCloseButton(new CloseAction());
+        ((DecoratePanel)decorate).addActionListenerToCloseButton(new CloseAction());
 
         installRepaintManager();
 
@@ -98,6 +102,15 @@ public class RoundWindow extends AlphaJPanel
         super.setEnabled(false);
     }
 
+    public RoundRectangle2D getWindowShape(){
+        Border border = getBorder();
+        RoundRectangle2D.Double shape = new RoundRectangle2D.Double(0,0, getWidth(), getHeight(), 0,0);
+        if(border instanceof OvalBorder){
+            shape.arcwidth = ((OvalBorder)border).getRecW();
+            shape.archeight = ((OvalBorder)border).getRecH();
+        }
+        return shape;
+    }
     protected RoundWindowRootPane createRootPane(){
         rootPane = new RoundWindowRootPane();
         return rootPane;
@@ -120,7 +133,8 @@ public class RoundWindow extends AlphaJPanel
     }
 
     public void setTitle(String str){
-        decorate.setTitle(str);
+
+        getDecoratePanel().setTitle(str);
     }
 
     @Override
@@ -186,10 +200,6 @@ public class RoundWindow extends AlphaJPanel
         RepaintManager.setCurrentManager(manager);
     }
 
-    public OutputVerboseStream getVerboseStream(){
-	    return verboseStream;
-	}
-
     @Override
     public void paintChildren(Graphics g){        
         super.paintChildren(g);
@@ -211,7 +221,8 @@ public class RoundWindow extends AlphaJPanel
     public void paintComponent(Graphics g){
         //super.paintComponent(g);
         Container parent = getParent();
-        if(isVisible() && parent!=null && parent.isEnabled()){
+        if(isVisible() && parent!=null && parent.isEnabled() && getAlpha()>0){
+            System.out.println("maluje ");
             Graphics2D g2 = (Graphics2D)g.create();
 
             GradientPaint gp = new GradientPaint(0.0f, (float) (getHeight()>>1),Utils.colorAlpha(1,51,90,getAlpha()),
@@ -242,7 +253,9 @@ public class RoundWindow extends AlphaJPanel
     @Override
     public Insets getInsets() {
         Insets in = super.getInsets();
-        return new Insets(in.top+7, in.left+7+1, in.bottom+7, in.right+7);
+        Insets inner = getInnerGap();
+        return new Insets(in.top+inner.top, in.left+inner.left,
+                in.bottom+inner.bottom, in.right+inner.right);
     }
 
     @Override
@@ -258,10 +271,10 @@ public class RoundWindow extends AlphaJPanel
     public void mousePressed(MouseEvent e) {
        
         if(e.getButton()==MouseEvent.BUTTON1 && e.getX()<sensitiveMouseReaction){
-            getVerboseStream().outputVerboseStream("Resize X side "+getClass().getSimpleName());
+            System.out.println("Resize X side "+getClass().getSimpleName());
             resizeWidthPanel = true;
         }else if(e.getButton()==MouseEvent.BUTTON1 && e.getY()<sensitiveMouseReaction){
-            getVerboseStream().outputVerboseStream("Resize Y side "+getClass().getSimpleName());
+            System.out.println("Resize Y side "+getClass().getSimpleName());
             resizeHeghtPanel = true;
         }
     }
@@ -313,15 +326,23 @@ public class RoundWindow extends AlphaJPanel
     /**
      * @return the decoratePanel
      */
-    public boolean isDecoratePanel() {
-        return decoratePanel;
+    public boolean isDecoratedWindow() {
+        return decoratedWindow;
     }
 
     /**
      * @param decoratePanel the decoratePanel to set
      */
-    public void setDecoratePanel(boolean decoratePanel) {
-        this.decoratePanel = decoratePanel;
+    public void setDecorateWindow(boolean decorated) {
+        if(decorated){
+            if(!this.isAncestorOf(this.decorate)){
+                add(this.decorate,BorderLayout.NORTH);
+            }
+        }else{
+            this.remove(this.decorate);
+        }
+        this.decoratedWindow = decorated;
+        revalidate();
     }
 
     /**
@@ -331,6 +352,18 @@ public class RoundWindow extends AlphaJPanel
         return dynamicRevalidate;
     }
 
+    public boolean setAlphaBorder(float alphaBorder){
+        Border bord = getBorder();
+        if(bord instanceof AlphaBorder){
+            return ((AlphaBorder)bord).setAlpha(alphaBorder);
+        }
+        return false;
+    }
+
+    public void setAlphaToAllRootWindow(float alpha){
+        setAlphaBorder(alpha);
+        setAlpha(alpha);
+    }
     /**
      * @param dynamicRevalidate the dynamicRevalidate to set
      */
@@ -347,9 +380,9 @@ public class RoundWindow extends AlphaJPanel
             if(arg0<mainBorder.getUpperThresholdAlpha()){ 
                 ((OvalBorder)getBorder()).setBorderColor(Utils.colorAlpha(outerColor, arg0));
             }
-            setAlpha(arg0);
+            setAlphaToAllRootWindow(arg0);
             getContentPane().setAlpha(arg0);
-            decorate.setAlpha(arg0);
+            getDecoratePanel().setAlpha(arg0);
             repaint();
         }else
             animator.stop();
@@ -366,6 +399,60 @@ public class RoundWindow extends AlphaJPanel
     }
     @Override
     public void repeat() {
+    }
+
+    /**
+     * @return the decorate
+     */
+    public AbstractDecoratePanel getDecoratePanel() {
+        return decorate;
+    }
+
+    /**
+     * @param decorate the decorate to set
+     */
+    public void setDecoratePanel(AbstractDecoratePanel decorate) {
+        this.decorate = decorate;
+    }
+
+    /**
+     * @return the innerGap
+     */
+    public Insets getInnerGap() {
+        return innerGap;
+    }
+
+    /**
+     * @param innerGap the innerGap to set
+     */
+    public void setInnerGap(Insets innerGap) {
+        this.innerGap = innerGap;
+    }
+
+    public void setRoundCorner(Point2D.Double val){
+        Border bord = getBorder();
+        if(bord instanceof OvalBorder){
+            ((OvalBorder)bord).setRecW(val.getX());
+            ((OvalBorder)bord).setRecH(val.getY());
+        }
+    }
+
+    public Point2D.Double getRoundCorner(){
+        Border bord = getBorder();
+        if(bord instanceof OvalBorder){
+            return new Point2D.Double(((OvalBorder)bord).getRecW(),((OvalBorder)bord).getRecW());
+        }
+        return new Point2D.Double(0, 0);
+    }
+
+    @Override
+    public void focusGained(FocusEvent e) {
+        System.out.println("Focus gained");
+    }
+
+    @Override
+    public void focusLost(FocusEvent e) {
+        System.out.println("Focus lost");
     }
 
     public class MyRepaintManager extends RepaintManager {
