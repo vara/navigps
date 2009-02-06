@@ -6,6 +6,10 @@
 package app.gui.borders;
 
 import app.gui.detailspanel.AlphaInterface;
+import java.awt.AlphaComposite;
+import java.awt.Component;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
 import javax.swing.border.AbstractBorder;
 
 /**
@@ -30,6 +34,13 @@ public abstract class AlphaBorder extends AbstractBorder implements AlphaInterfa
     @Override
     public void setUpperThresholdAlpha(float upperThresholdAlpha) {
         this.upperThresholdAlpha = upperThresholdAlpha;
+    }
+
+    @Override
+    public void paintBorder(Component c, Graphics g, int x, int y, int width, int height) {
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER,getAlpha()));
+        super.paintBorder(c, g2, x, y, width, height);
     }
 
     /**

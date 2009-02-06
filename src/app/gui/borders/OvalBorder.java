@@ -74,15 +74,15 @@ public class OvalBorder extends AlphaBorder{
 
     @Override
      public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-        RoundRectangle2D border = createOuterShape(x,y,w-1,h-1,getRecW(),getRecH(),getInsets());
-        Graphics2D g2 = (Graphics2D)g.create();                
-        AlphaComposite newComposite =
-                AlphaComposite.getInstance(AlphaComposite.SRC_OVER,getAlpha());
-        g2.setComposite(newComposite);
-        g2.setColor(getBorderColor());
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        g2.draw(border);
-        g2.dispose();
+        if(getAlpha()>0){
+            super.paintBorder(c, g, x, y, h, h);
+            RoundRectangle2D border = createOuterShape(x,y,w-1,h-1,getRecW(),getRecH(),getInsets());
+            Graphics2D g2 = (Graphics2D)g.create();
+            g2.setColor(getBorderColor());
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.draw(border);
+            g2.dispose();
+        }
      }
 
     public static RoundRectangle2D.Double createOuterShape(double x, double y, double w, double h,
