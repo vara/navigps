@@ -30,6 +30,7 @@ import sun.swing.SwingUtilities2;
  *
  * @version 1.0 06/02/09
  * @author wara
+ * @comments  dispplay html text not work correct !!!
  */
 public class TitleLabelUI extends BasicLabelUI{
 
@@ -61,7 +62,7 @@ public class TitleLabelUI extends BasicLabelUI{
      * 
      */
     public TitleLabelUI(){
-        setTextLayout(CENTER_VERTICAL);
+        setTextLayout(CENTER_VERTICAL|CENTER_HORIZONTAL);
     }
 
     @Override
@@ -71,7 +72,6 @@ public class TitleLabelUI extends BasicLabelUI{
     @Override
     public void propertyChange(PropertyChangeEvent e){
         super.propertyChange(e);
-        System.out.println("property Change Listener");
     }
     public static ComponentUI createUI(JComponent c) {
         return titleLabelUI;
@@ -84,23 +84,6 @@ public class TitleLabelUI extends BasicLabelUI{
 
     @Override
     protected String layoutCL(JLabel label, FontMetrics fontMetrics, String text, Icon icon, Rectangle viewR, Rectangle iconR, Rectangle textR) {
-
-        String str = SwingUtilities.layoutCompoundLabel(
-            (JComponent) label,
-            fontMetrics,
-            text,
-            icon,
-            label.getVerticalAlignment(),
-            label.getHorizontalAlignment(),
-            label.getVerticalTextPosition(),
-            label.getHorizontalTextPosition(),
-            viewR,
-            iconR,
-            textR,
-            label.getIconTextGap());
-        //paintView is calculated
-        //System.out.println("--------------Before------------------");
-        //showRecs(label);
 
         iconR.x = viewR.x;
         iconR.y = viewR.y;
@@ -121,10 +104,9 @@ public class TitleLabelUI extends BasicLabelUI{
         textR.width = (viewR.width-iconR.width-gap);
         textR.height = viewR.height;
 
-        //System.out.println("----------------After----------------");
         //showRecs(label);
         
-        return str;
+        return text;
 
     }
 
@@ -140,10 +122,8 @@ public class TitleLabelUI extends BasicLabelUI{
         }
         
         FontMetrics fm = SwingUtilities2.getFontMetrics(label, g);
-        String clippedText = layout(label, fm, c.getWidth(), c.getHeight());
-        //g2.draw(paintIconR);
-        //g2.draw(paintViewR);
-        //g2.draw(paintTextR);
+        layout(label, fm, c.getWidth(), c.getHeight());
+        
         if (icon != null) {
             icon.paintIcon(c, g, paintIconR.x, paintIconR.y);
         }
@@ -220,7 +200,8 @@ public class TitleLabelUI extends BasicLabelUI{
 
     public Point findPositionForText(Font f,int mode,String text,FontRenderContext frc){
 
-        TextLayout textTl = new TextLayout(text,f, frc);        
+        TextLayout textTl = new TextLayout(text,f, frc);
+        //textTl.getPixelBounds(frc,0,0) -> this func. is too slow for large string
         Rectangle rec = textTl.getPixelBounds(frc,0,0);
         //string size in pixels
         int strWidthInPix = (int)rec.getWidth();
