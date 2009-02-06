@@ -1,5 +1,6 @@
 package app.gui.detailspanel;
 
+import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -11,6 +12,7 @@ import java.awt.Rectangle;
 import java.io.Serializable;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
+import javax.swing.border.LineBorder;
 
 /**
  *
@@ -142,7 +144,6 @@ public class RoundWindowRootPane extends JComponent{
     @Override
     protected void addImpl(Component comp, Object constraints, int index) {
         super.addImpl(comp, constraints, index);
-        System.out.println("Add impl "+comp);
         /// We are making sure the glassPane is on top.
         if(glassPane != null
             && glassPane.getParent() == this

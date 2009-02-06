@@ -14,6 +14,7 @@ import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -26,6 +27,7 @@ import java.awt.event.MouseMotionListener;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
+import javax.swing.JRootPane;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -44,7 +46,7 @@ public class RoundWindow extends AlphaJPanel
 
     private int sensitiveMouseReaction = 8;    
 
-    private OvalBorder mainBorder = new OvalBorder(20,20,Utils.colorAlpha(100,100,100,.99f));
+    private OvalBorder mainBorder = new OvalBorder(20,20,Utils.colorAlpha(100,100,100,.5f));
 
     private boolean resizeWidthPanel = false;
     private boolean resizeHeghtPanel = false;
@@ -55,7 +57,7 @@ public class RoundWindow extends AlphaJPanel
 
     private Dimension defaultSize = new Dimension(330,400);
 
-    private Color[] colorBorderGlow = {new Color(230,230,230,148),new Color(70,102,146,200),
+    private Color[] colorBorderGlow = {new Color(230,230,230,168),new Color(70,102,146,180),
                                        new Color(190,190,190, 250),new Color(255,255,255, 255)};
 
     private boolean decoratedWindow = true;
@@ -67,6 +69,7 @@ public class RoundWindow extends AlphaJPanel
     private RoundWindowRootPane rootPane;
 
     private Insets innerGap = new Insets(7,7,7,7);
+    private int decorateAndContentGap = 5;
     //uncomment for test root pane
     //ContentPaneForRoundWindow content = new ContentPaneForRoundWindow();
 
@@ -80,8 +83,8 @@ public class RoundWindow extends AlphaJPanel
         setBorder(mainBorder);
         setFocusable(true);
         addFocusListener(this);
-        super.setLayout(new BorderLayout());
-
+        super.setLayout(new BorderLayout(0,getDecorateAndContentGap()));
+        
         animator = new Animator(animationDuration, 1,
                 RepeatBehavior.LOOP, this);
         ((DecoratePanel)decorate).addActionListenerToCloseButton(new CloseAction());
@@ -200,11 +203,6 @@ public class RoundWindow extends AlphaJPanel
         RepaintManager.setCurrentManager(manager);
     }
 
-    @Override
-    public void paintChildren(Graphics g){        
-        super.paintChildren(g);
-    }
-
     protected RoundRectangle2D.Double computeVisibleChildrenArea(){
         Rectangle bounds = getBounds();
         Insets ins = super.getInsets();
@@ -218,33 +216,31 @@ public class RoundWindow extends AlphaJPanel
     }
 
     @Override
-    public void paintComponent(Graphics g){
-        //super.paintComponent(g);
+    public void paintComponent(Graphics g){       
         Container parent = getParent();
         if(isVisible() && parent!=null && parent.isEnabled() && getAlpha()>0){
-            System.out.println("maluje ");
-            Graphics2D g2 = (Graphics2D)g.create();
 
-            GradientPaint gp = new GradientPaint(0.0f, (float) (getHeight()>>1),Utils.colorAlpha(1,51,90,getAlpha()),
-                                                (float)(getWidth()>>1), 80.0f,Utils.colorAlpha(43,105,152,getAlpha()));
+            super.paintComponent(g);
+            Graphics2D g2 = (Graphics2D)g.create();
+            GradientPaint gp = new GradientPaint(0.0f, (float) (getHeight()>>1),new Color(1,51,90,255),
+                                                (float)(getWidth()>>1), 80.0f,new Color(43,105,152,255));
             //GradientPaint gp = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
             //                                    0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
             
             Insets outerIns = super.getInsets();
-            RoundRectangle2D outerBorderShape = OvalBorder.createOuterShape(outerIns.left,outerIns.top,
-                    getWidth()-outerIns.left-outerIns.right,getHeight()-outerIns.top-outerIns.bottom,
+            int x = outerIns.left;
+            int y = outerIns.top;
+            int w = getWidth()-outerIns.left-outerIns.right;
+            int h = getHeight()-outerIns.top-outerIns.bottom;
+
+            RoundRectangle2D outerBorderShape = OvalBorder.createOuterShape(x,y,w,h,
                     mainBorder.getRecW(), mainBorder.getRecH(),outerIns);
             
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_OFF);
-            g2.setPaint(gp);
-            g2.fill(outerBorderShape);
-            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
-            AlphaComposite newComposite =
-              AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
-            g2.setComposite(newComposite);
-
+            g2.setPaint(gp);
+            g2.fill(new RoundRectangle2D.Double(x+1, y+1, w-1, h-1,mainBorder.getRecW(),mainBorder.getRecH()));
+            
             BorderEfects.paintBorderGlow(g2,4,outerBorderShape,colorBorderGlow);
             g2.dispose();
         }        
@@ -453,6 +449,25 @@ public class RoundWindow extends AlphaJPanel
     @Override
     public void focusLost(FocusEvent e) {
         System.out.println("Focus lost");
+    }
+
+    /**
+     * @return the decorateAndContentGap
+     */
+    public int getDecorateAndContentGap() {
+        return decorateAndContentGap;
+    }
+
+    /**
+     * @param decorateAndContentGap the decorateAndContentGap to set
+     */
+    public void setDecorateAndContentGap(int decorateAndContentGap) {
+        LayoutManager lm = getLayout();
+        if(lm instanceof BorderLayout){
+            ((BorderLayout)lm).setVgap(decorateAndContentGap);
+        }
+        this.decorateAndContentGap = decorateAndContentGap;
+        lm.layoutContainer(this);
     }
 
     public class MyRepaintManager extends RepaintManager {

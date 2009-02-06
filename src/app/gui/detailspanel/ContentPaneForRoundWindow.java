@@ -41,18 +41,14 @@ public class ContentPaneForRoundWindow extends AlphaJPanel implements AlphaInter
             RoundRectangle2D borderShape = OvalBorder.createOuterShape(2,2,
                         getWidth()-4,getHeight()-5,20, 20,null);
 
-            GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(50,50,50,getAlpha()),
-                                                    0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
+            GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),new Color(50,50,50,255),
+                                                    0.0f, 0.0f,new Color(90,122,166,255));
             g2.setPaint(gp2);
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                     RenderingHints.VALUE_ANTIALIAS_ON);
 
             g2.fillRoundRect((int)borderShape.getX(), (int)borderShape.getY(),
                              (int)borderShape.getWidth(), (int)borderShape.getHeight(), 20, 20);
-
-            AlphaComposite newComposite =
-                 AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
-            g2.setComposite(newComposite);
 
             BorderEfects.paintBorderShadow(g2,3,borderShape,colorBorderEfect);
             g2.dispose();
