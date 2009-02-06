@@ -33,45 +33,46 @@ public class ContentPaneForRoundWindow extends AlphaJPanel implements AlphaInter
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D)g.create();
-        RoundRectangle2D borderShape = OvalBorder.createOuterShape(2,2,
-                    getWidth()-4,getHeight()-5,20, 20,null);
+    protected void paintComponent(Graphics g) {        
+        if(getAlpha()>0){
+            super.paintComponent(g); //set alpha for content pane
+            
+            Graphics2D g2 = (Graphics2D)g.create();
+            RoundRectangle2D borderShape = OvalBorder.createOuterShape(2,2,
+                        getWidth()-4,getHeight()-5,20, 20,null);
 
-        GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(50,50,50,getAlpha()),
-                                                0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
-        g2.setPaint(gp2);
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                RenderingHints.VALUE_ANTIALIAS_ON);
+            GradientPaint gp2 = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(50,50,50,getAlpha()),
+                                                    0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
+            g2.setPaint(gp2);
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                    RenderingHints.VALUE_ANTIALIAS_ON);
 
-        g2.fillRoundRect((int)borderShape.getX(), (int)borderShape.getY(),
-                         (int)borderShape.getWidth(), (int)borderShape.getHeight(), 20, 20);
+            g2.fillRoundRect((int)borderShape.getX(), (int)borderShape.getY(),
+                             (int)borderShape.getWidth(), (int)borderShape.getHeight(), 20, 20);
 
-        AlphaComposite newComposite =
-             AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
-        g2.setComposite(newComposite);
+            AlphaComposite newComposite =
+                 AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
+            g2.setComposite(newComposite);
 
-        BorderEfects.paintBorderShadow(g2,3,borderShape,colorBorderEfect);
-        g2.dispose();
+            BorderEfects.paintBorderShadow(g2,3,borderShape,colorBorderEfect);
+            g2.dispose();
+        }
     }
 
     @Override
-    public void paintChildren(Graphics g){
-        Graphics2D g2 = (Graphics2D)g;
-        AlphaComposite newComposite =
-              AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha());
-        g2.setComposite(newComposite);
-        
-        Rectangle oldClip = g2.getClipBounds();
-        Rectangle newClip = (Rectangle)oldClip.clone();
-        RoundRectangle2D vis = computeVisibleChildrenArea();
+    public void paintChildren(Graphics g){        
+        if(getAlpha()>0){
+            Graphics2D g2 = (Graphics2D)g;
+            Rectangle oldClip = g2.getClipBounds();
+            Rectangle newClip = (Rectangle)oldClip.clone();
+            RoundRectangle2D vis = computeVisibleChildrenArea();
 
-        SwingUtilities.computeIntersection((int)vis.getX(),(int)vis.getY(),
-                (int)vis.getWidth(),(int)vis.getHeight(), newClip);
-        g.setClip(newClip);
-        super.paintChildren(g2);
-        g.setClip(oldClip);
+            SwingUtilities.computeIntersection((int)vis.getX(),(int)vis.getY(),
+                    (int)vis.getWidth(),(int)vis.getHeight(), newClip);
+            g.setClip(newClip);
+            super.paintChildren(g2);
+            g.setClip(oldClip);
+        }
     }
     public RoundRectangle2D.Double computeVisibleChildrenArea(){
         Rectangle bounds = getBounds();
