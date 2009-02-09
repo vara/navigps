@@ -13,6 +13,12 @@ import java.awt.Graphics;
  * @author vara
  */
 public class EmptyOvalBorder extends OvalBorder{
+
+    public EmptyOvalBorder(){
+    }
+    public EmptyOvalBorder(double recW,double recH){
+        super(recH, recH);
+    }
     @Override
      public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
         

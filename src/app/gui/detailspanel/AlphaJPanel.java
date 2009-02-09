@@ -16,11 +16,14 @@ import javax.swing.JPanel;
  */
 public class AlphaJPanel extends JPanel implements AlphaInterface{
 
+    public static final String ALPHA_CHANGE = "AlphaJPanel.alpha.change";
+    public static final String UPPER_ALPHA_CHANGE = "AlphaJPanel.upper.alpha.change";
+
     private float upperThresholdAlpha = 1f;
     private float alpha = 1f;
 
     @Override
-    public void paint(Graphics g) {        
+    public void paint(Graphics g) {
         super.paint(g);
     }
 
@@ -34,6 +37,13 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
     @Override
     protected void paintBorder(Graphics g) {
         super.paintBorder(g);
+    }
+
+    @Override
+    protected void paintChildren(Graphics g) {
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getAlpha()));
+        super.paintChildren(g);
     }
 
     /**
@@ -50,7 +60,9 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
      */
     @Override
     public void setUpperThresholdAlpha(float upperThresholdAlpha) {
+        float oldVal = this.upperThresholdAlpha;
         this.upperThresholdAlpha = upperThresholdAlpha;
+        firePropertyChange(UPPER_ALPHA_CHANGE, oldVal,upperThresholdAlpha);
     }
 
     /**
@@ -67,7 +79,9 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
     @Override
     public boolean setAlpha(float alpha) {
         if(alpha<=getUpperThresholdAlpha()){
+            float oldVal = this.alpha;
             this.alpha = alpha;
+            firePropertyChange(ALPHA_CHANGE, oldVal,alpha);
             return true;
         }return false;
     }

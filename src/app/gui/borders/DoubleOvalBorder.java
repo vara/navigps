@@ -5,14 +5,10 @@
 
 package app.gui.borders;
 
-import app.gui.detailspanel.AlphaInterface;
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.Insets;
-import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
 
 /**
@@ -21,23 +17,19 @@ import java.awt.geom.RoundRectangle2D;
  */
 public class DoubleOvalBorder extends OvalBorder{
   
-    private double roundInnerX = 20;
-    private double roundInnerY = 20;
+    private OvalBorder innerBorder = new OvalBorder();
     
     private Color colorForInnerBorder = new Color(90, 100, 190, 255);
-    private Insets insetsInner = new Insets(6, 10, 6, 10);
     private int thickness=0;
 
     public DoubleOvalBorder(int arcW, int arcH) {
         super(arcW, arcH);
-        setRoundInnerX(arcW);
-        setRoundInnerY(arcH);
+        innerBorder.setRound(arcW, arcH);
     }
 
     public DoubleOvalBorder(int arcw1, int arch1, Color topColor1,int arcw2, int arch2, Color topColor2) {
        super(arcw1, arch1, topColor1);
-       roundInnerX=arcw2;
-       roundInnerY=arch2;
+       innerBorder.setRound(arcw2, arch2);
        colorForInnerBorder = topColor2;       
     }
 
@@ -58,16 +50,11 @@ public class DoubleOvalBorder extends OvalBorder{
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
         super.paintBorder(c, g, x, y, w, h);
-        RoundRectangle2D innerBorder = DoubleOvalBorder.createInnerShape(x,y,w-1,h-1,
-                getRoundInnerX(),getRoundInnerY(), getInsetsInner());
+        RoundRectangle2D tmpInnerBorder = DoubleOvalBorder.createInnerShape(x,y,w,h,
+                getRoundInnerW(),getRoundInnerH(), getInsetsInner());
 
-        Graphics2D g2 = (Graphics2D)g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);        
-        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_ATOP,getAlpha()));
-        g2.setColor(getColorForInnerBorder());
-        g2.draw(innerBorder);
-
-        g2.dispose();
+        innerBorder.paintBorder(c, g, (int)tmpInnerBorder.getX(), (int)tmpInnerBorder.getY(),
+                (int)tmpInnerBorder.getWidth(), (int)tmpInnerBorder.getHeight());
      }
     
     public static RoundRectangle2D.Double createInnerShape(double x, double y, double w, double h,
@@ -126,14 +113,14 @@ public class DoubleOvalBorder extends OvalBorder{
      * @return the insetsInner
      */
     public Insets getInsetsInner() {
-        return insetsInner;
+        return innerBorder.getInsets();
     }
 
     /**
      * @param insetsInner the insetsInner to set
      */
     public void setInsetsInner(Insets insetsInner) {
-        this.insetsInner = insetsInner;
+        innerBorder.setInsets(insetsInner);
     }
 
     /**
@@ -151,30 +138,30 @@ public class DoubleOvalBorder extends OvalBorder{
     }
 
     /**
-     * @return the roundInnerX
+     * @return the roundInnerW
      */
-    public double getRoundInnerX() {
-        return roundInnerX;
+    public double getRoundInnerW() {
+        return innerBorder.getRecW();
     }
 
     /**
-     * @param roundInnerX the roundInnerX to set
+     * @param roundInnerW the roundInnerX to set
      */
-    public void setRoundInnerX(int roundInnerX) {
-        this.roundInnerX = roundInnerX;
+    public void setRoundInnerW(int recW) {
+        innerBorder.setRecW(recW);
     }
 
     /**
-     * @return the roundInnerY
+     * @return the roundInnerH
      */
-    public double getRoundInnerY() {
-        return roundInnerY;
+    public double getRoundInnerH() {
+        return innerBorder.getRecH();
     }
 
     /**
      * @param roundInnerY the roundInnerY to set
      */
-    public void setRoundInnerY(double roundInnerY) {
-        this.roundInnerY = roundInnerY;
+    public void setRoundInnerH(double arcH) {
+        innerBorder.setRecH(arcH);
     }
 }

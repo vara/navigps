@@ -19,35 +19,28 @@ import java.awt.geom.RoundRectangle2D;
  * @author vara
  */
 
-public class OvalBorder extends AlphaBorder{
-
-     private double recw=0;
-     private double rech=0;
-     private Color borderColor=new Color(90,100,190,255);
-     private Insets insets = new Insets(6, 10, 6, 10);
+public class OvalBorder extends RoundBorder{
      
-     public OvalBorder() {
-             recw=6;
-             rech=6;
-     }
+     private Color borderColor=new Color(90,100,190,255);
+     private Insets insets = new Insets(4, 4, 4, 4);
 
+     public OvalBorder() {
+     }
+     
      public OvalBorder(double recw, double rech) {
-             this.recw=recw;
-             this.rech=rech;
+        super(recw,rech);
      }
 
      public OvalBorder(double recw, double rech, Color topColor) {
-        this.recw=recw;
-        this.rech=rech;
+        this(recw,rech);
         borderColor = topColor;
         setAlpha((float)borderColor.getAlpha()/255);
         setUpperThresholdAlpha(getAlpha());
      }
 
      public OvalBorder(int top, int left, int bottom, int right,double recw, double rech, Color topColor) {
+        this(recw,rech);
         insets = new Insets(top, left, bottom, right);
-        this.recw=recw;
-        this.rech=rech;
         borderColor = topColor;
      }
 
@@ -97,35 +90,7 @@ public class OvalBorder extends AlphaBorder{
         double outerWidth = w;
         double outerHeight = h;
         return new RoundRectangle2D.Double(outerX,outerY,outerWidth,outerHeight,arcx,arcy);
-    }
-
-    /**
-     * @return the recw
-     */
-    public double getRecW() {
-        return recw;
-    }
-
-    /**
-     * @param recw the recw to set
-     */
-    public void setRecW(double recw) {
-        this.recw = recw;
-    }
-
-    /**
-     * @return the rech
-     */
-    public double getRecH() {
-        return rech;
-    }
-
-    /**
-     * @param rech the rech to set
-     */
-    public void setRecH(double rech) {
-        this.rech = rech;
-    }
+    }   
 
     /**
      * @return the borderColor
@@ -153,5 +118,10 @@ public class OvalBorder extends AlphaBorder{
      */
     public void setInsets(Insets insets) {
         this.insets = insets;
+    }
+
+    @Override
+    public void setBorderInsets(Insets ins) {
+        setInsets(ins);
     }
 }

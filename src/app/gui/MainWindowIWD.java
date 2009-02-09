@@ -40,7 +40,6 @@ import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.lang.reflect.InvocationTargetException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -175,7 +174,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
                         "Center your svg map",
                         KeyEvent.VK_F);
         searchServicesAction = new SearchServicesAction("Search Services",
-                        createNavigationIcon("fitToPanel16"),
+                        createNavigationIcon("searchServices16"),
                         "Search services with a certain area",
                         KeyEvent.VK_S);
 
@@ -376,7 +375,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
         toolBarMemMonitor.setMargin(new Insets(4,1,4,1));
         ToolBarToggleButton tb = new ToolBarToggleButton(searchServicesAction,
-                          createNavigationIcon("fitToPanel32"),
+                          createNavigationIcon("searchServices32"),
                           getVerboseStream());
         toolBarSerch.add(tb);
 

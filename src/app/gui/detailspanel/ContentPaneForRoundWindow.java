@@ -6,30 +6,24 @@
 package app.gui.detailspanel;
 
 import app.gui.borders.OvalBorder;
-import app.utils.Utils;
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
-import javax.swing.SwingUtilities;
 
 /**
  *
  * @author wara
  */
-public class ContentPaneForRoundWindow extends AlphaJPanel implements AlphaInterface{
+public class ContentPaneForRoundWindow extends RoundJPanel implements AlphaInterface{
 
 
     private Color [] colorBorderEfect = {new Color(200,200,255,200),
                                          new Color(255,255,255,100)};
 
     public ContentPaneForRoundWindow() {
-        //setOpaque(false);
     }
 
     @Override
@@ -57,41 +51,14 @@ public class ContentPaneForRoundWindow extends AlphaJPanel implements AlphaInter
 
     @Override
     public void paintChildren(Graphics g){        
-        if(getAlpha()>0){
-            Graphics2D g2 = (Graphics2D)g;
-            Rectangle oldClip = g2.getClipBounds();
-            Rectangle newClip = (Rectangle)oldClip.clone();
-            RoundRectangle2D vis = computeVisibleChildrenArea();
-
-            SwingUtilities.computeIntersection((int)vis.getX(),(int)vis.getY(),
-                    (int)vis.getWidth(),(int)vis.getHeight(), newClip);
-            g.setClip(newClip);
-            super.paintChildren(g2);
-            g.setClip(oldClip);
+        if(getAlpha()>0){            
+            super.paintChildren(g);
         }
-    }
-    public RoundRectangle2D.Double computeVisibleChildrenArea(){
-        Rectangle bounds = getBounds();
-        Insets ins = super.getInsets();
-        int canX = ins.left;
-        int canY = ins.top;
-        int canWidth = bounds.width-ins.left-ins.right;
-        int canHeight = bounds.height-ins.top-ins.bottom;
-
-        double arcx = 0;
-        double arcy = 0;
-        if(getBorder() instanceof OvalBorder){
-            arcx = ((OvalBorder)getBorder()).getRecW();
-            arcy = ((OvalBorder)getBorder()).getRecH();
-        }
-        return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
-    }
+    }    
 
     @Override
     protected void paintBorder(Graphics g) {
-        if(getBorder()instanceof AlphaInterface){
-            ((AlphaInterface)getBorder()).setAlpha(getAlpha());
-        }
+        getRoundBorder().setAlpha(getAlpha());
         super.paintBorder(g);
     }
 }

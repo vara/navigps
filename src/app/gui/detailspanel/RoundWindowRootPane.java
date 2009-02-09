@@ -1,6 +1,5 @@
 package app.gui.detailspanel;
 
-import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
 import java.awt.Dimension;
@@ -10,22 +9,20 @@ import java.awt.LayoutManager;
 import java.awt.LayoutManager2;
 import java.awt.Rectangle;
 import java.io.Serializable;
-import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
-import javax.swing.border.LineBorder;
 
 /**
  *
  * @author wara
  */
-public class RoundWindowRootPane extends JComponent{
+public class RoundWindowRootPane extends RoundJPanel{
 
-    private AlphaJPanel glassPane;
+    private RoundJPanel glassPane;
     private ContentPaneForRoundWindow contentPane;
     private JLayeredPane layeredPane;
 
     public RoundWindowRootPane(){
-
+        getRoundBorder().setBorderInsets(new Insets(0,0,0,0));
         setGlassPane(createGlassPane());
         setLayeredPane(createLayeredPane());
         setContentPane(createContentPane());
@@ -50,8 +47,8 @@ public class RoundWindowRootPane extends JComponent{
         return cp;
     }
 
-    protected AlphaJPanel createGlassPane() {
-        AlphaJPanel gp = new AlphaJPanel();
+    protected RoundJPanel createGlassPane() {
+        RoundJPanel gp = new RoundJPanel();
         gp.setName(this.getName()+".glassPane");
         gp.setVisible(false);
         gp.setOpaque(false);
@@ -87,14 +84,14 @@ public class RoundWindowRootPane extends JComponent{
     /**
      * @return the glassPane
      */
-    public AlphaJPanel getGlassPane() {
+    public RoundJPanel getGlassPane() {
         return glassPane;
     }
 
     /**
      * @param glassPane the glassPane to set
      */
-    public void setGlassPane(AlphaJPanel glass) {
+    public void setGlassPane(RoundJPanel glass) {
         if (glass == null) {
             throw new NullPointerException("glassPane cannot be set to null.");
         }

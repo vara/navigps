@@ -5,6 +5,8 @@
 
 package app.gui.searchServices;
 
+import app.gui.MainWindowIWD;
+import app.gui.detailspanel.AlphaJPanel;
 import app.gui.detailspanel.RoundWindow;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
@@ -24,10 +26,11 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
+import java.beans.PropertyChangeEvent;
+import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
-import javax.swing.JButton;
-import javax.swing.JPanel;
 import javax.swing.SwingUtilities;
+import javax.swing.plaf.metal.MetalToolTipUI;
 import odb.inter.ODBridge;
 import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
@@ -39,7 +42,7 @@ import org.apache.batik.swing.gvt.JGVTComponentListener;
  *
  * @author vara
  */
-public class SearchServices extends JPanel implements MouseListener,
+public class SearchServices extends AlphaJPanel implements MouseListener,
 							  MouseMotionListener,ComponentListener{
 
 	private Point.Double centerPoint = new Point.Double(0,0);
@@ -69,6 +72,7 @@ public class SearchServices extends JPanel implements MouseListener,
         setLayout(null);
 	    svgViewListener = new DocumentStateChangedListener();
         detailsPane = new RoundWindow();
+        detailsPane.getDecoratePanel().getContent().setIcon(MainWindowIWD.createNavigationIcon("searchServices32"));
         detailsPane.setDynamicRevalidate(true);
         detailsPane.setUpperThresholdAlpha(0.6f);
         detailsPane.setAlpha(0.0f);
@@ -77,7 +81,16 @@ public class SearchServices extends JPanel implements MouseListener,
         add(detailsPane);
         detailsPane.getContentPane().add(guiForSearchServ);
         detailsPane.setVisible(false);
+        detailsPane.addPropertyChangeListener(new PropertyChangeListener() {
 
+            @Override
+            public void propertyChange(PropertyChangeEvent evt) {
+                if(evt.getPropertyName().equals(ALPHA_CHANGE)){
+                    setAlpha((Float)evt.getNewValue());
+                    repaint();
+                }
+            }
+        });
         //add(new GraphicsVisualVerboseMode());
         addComponentListener(this);
         //don't paint background
@@ -88,11 +101,10 @@ public class SearchServices extends JPanel implements MouseListener,
     @Override
 	public void setEnabled(boolean val){
         //super.setEnabled(val);
-	    enabled = val;
+	    enabled = true;
         detailsPane.setEnabled(val);
-
-	    setCenterPoint(0.0,0.0);
-	    setCurrentPosition(0.0,0.0);
+	    //setCenterPoint(0.0,0.0);
+	    //setCurrentPosition(0.0,0.0);
 	    repaint(visibleRec);
 	}
 	public boolean isEnabledSearchServices(){
@@ -104,7 +116,7 @@ public class SearchServices extends JPanel implements MouseListener,
 	}
 	@Override
 	public void paintComponent(Graphics g){
-	    //super.paintComponent(g);
+	    super.paintComponent(g);
 	    Graphics2D g2 = (Graphics2D)g.create();
 	    g2.draw(visibleRec);
 	    if(isEnabledSearchServices()){

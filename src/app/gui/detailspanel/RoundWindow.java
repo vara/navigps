@@ -2,11 +2,10 @@ package app.gui.detailspanel;
 
 import app.gui.borders.AlphaBorder;
 import app.gui.borders.OvalBorder;
+import app.gui.borders.RoundBorder;
 import app.utils.Utils;
-import java.awt.AlphaComposite;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Container;
 import java.awt.Cursor;
 import java.awt.Dimension;
@@ -15,6 +14,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.LayoutManager;
+import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
@@ -24,10 +24,8 @@ import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
-import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.JComponent;
-import javax.swing.JRootPane;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -40,13 +38,11 @@ import org.jdesktop.animation.timing.TimingTarget;
  * Created on 2008-12-08, 21:25:25
  * @author vara
  */
-public class RoundWindow extends AlphaJPanel
+public class RoundWindow extends RoundJPanel
         implements MouseListener,MouseMotionListener,TimingTarget,FocusListener{
 
 
-    private int sensitiveMouseReaction = 8;    
-
-    private OvalBorder mainBorder = new OvalBorder(20,20,Utils.colorAlpha(100,100,100,.5f));
+    private int sensitiveMouseReaction = 8;        
 
     private boolean resizeWidthPanel = false;
     private boolean resizeHeghtPanel = false;
@@ -70,17 +66,15 @@ public class RoundWindow extends AlphaJPanel
 
     private Insets innerGap = new Insets(7,7,7,7);
     private int decorateAndContentGap = 5;
-    //uncomment for test root pane
-    //ContentPaneForRoundWindow content = new ContentPaneForRoundWindow();
 
     public RoundWindow(){
-        
-        setOpaque(false);
+        super(20,20);
         setSize(defaultSize);
         addMouseListener(this);
         addMouseMotionListener(this);
+        OvalBorder mainBorder = (OvalBorder)getRoundBorder();
         mainBorder.setInsets(new Insets(3,3,3,0));
-        setBorder(mainBorder);
+
         setFocusable(true);
         addFocusListener(this);
         super.setLayout(new BorderLayout(0,getDecorateAndContentGap()));
@@ -91,29 +85,22 @@ public class RoundWindow extends AlphaJPanel
 
         installRepaintManager();
 
-        //contentPane.setOpaque(false);
         //contentPane.setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
           //      mainBorder.getRecH(), mainBorder.getBorderColor()));
 
         add(decorate,BorderLayout.NORTH);
-        //comment for test root pane
         setRootPane(createRootPane());
-        //uncomment for test root pane
-        //add(content,BorderLayout.CENTER);
         getContentPane().setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
                 mainBorder.getRecH(), mainBorder.getBorderColor()));
         super.setEnabled(false);
     }
 
     public RoundRectangle2D getWindowShape(){
-        Border border = getBorder();
-        RoundRectangle2D.Double shape = new RoundRectangle2D.Double(0,0, getWidth(), getHeight(), 0,0);
-        if(border instanceof OvalBorder){
-            shape.arcwidth = ((OvalBorder)border).getRecW();
-            shape.archeight = ((OvalBorder)border).getRecH();
-        }
-        return shape;
+        Point.Double corners = getRoundCorner();
+        return new RoundRectangle2D.Double(
+                0,0, getWidth(), getHeight(),corners.x,corners.y);
     }
+
     protected RoundWindowRootPane createRootPane(){
         rootPane = new RoundWindowRootPane();
         return rootPane;
@@ -123,26 +110,17 @@ public class RoundWindow extends AlphaJPanel
         return rootPane;
     }
 
-
-
     protected void setRootPane(RoundWindowRootPane rp){
         add(rp, BorderLayout.CENTER);
     }
-    public AlphaJPanel getContentPane(){
-        //uncomment for test
-        //return content;
-        //comment for test root pane
+
+    public AlphaJPanel getContentPane(){        
         return rootPane.getContentPane();
     }
 
     public void setTitle(String str){
 
         getDecoratePanel().setTitle(str);
-    }
-
-    @Override
-    protected void addImpl(Component comp, Object constraints, int index) {        
-        super.addImpl(comp, constraints, index);
     }
 
     @Override
@@ -202,18 +180,7 @@ public class RoundWindow extends AlphaJPanel
         MyRepaintManager manager = new MyRepaintManager();
         RepaintManager.setCurrentManager(manager);
     }
-
-    protected RoundRectangle2D.Double computeVisibleChildrenArea(){
-        Rectangle bounds = getBounds();
-        Insets ins = super.getInsets();
-        int canX = ins.left;
-        int canY = ins.top;
-        int canWidth = bounds.width-ins.left-ins.right;
-        int canHeight = bounds.height-ins.top-ins.bottom;
-        double arcx = ((OvalBorder)getBorder()).getRecW();
-        double arcy = ((OvalBorder)getBorder()).getRecH();
-        return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
-    }
+    
 
     @Override
     public void paintComponent(Graphics g){       
@@ -226,7 +193,7 @@ public class RoundWindow extends AlphaJPanel
                                                 (float)(getWidth()>>1), 80.0f,new Color(43,105,152,255));
             //GradientPaint gp = new GradientPaint(0.0f, (float) getHeight(),Utils.colorAlpha(0,0,0,getAlpha()),
             //                                    0.0f, 0.0f,Utils.colorAlpha(90,122,166,getAlpha()));
-            
+            RoundBorder mainBorder = getRoundBorder();
             Insets outerIns = super.getInsets();
             int x = outerIns.left;
             int y = outerIns.top;
@@ -371,14 +338,14 @@ public class RoundWindow extends AlphaJPanel
     public void timingEvent(float arg0) {
         if(arg0>0 && arg0<Math.max(getContentPane().getUpperThresholdAlpha(),
                                    getUpperThresholdAlpha())){
-            Color outerColor = ((OvalBorder)getBorder()).getBorderColor();
+            Color outerColor = ((OvalBorder)getRoundBorder()).getBorderColor();
             
-            if(arg0<mainBorder.getUpperThresholdAlpha()){ 
-                ((OvalBorder)getBorder()).setBorderColor(Utils.colorAlpha(outerColor, arg0));
+            if(arg0<getRoundBorder().getUpperThresholdAlpha()){
+                ((OvalBorder)getRoundBorder()).setBorderColor(Utils.colorAlpha(outerColor, arg0));
             }
             setAlphaToAllRootWindow(arg0);
             getContentPane().setAlpha(arg0);
-            getDecoratePanel().setAlpha(arg0);
+            getDecoratePanel().setAlpha(arg0);            
             repaint();
         }else
             animator.stop();
@@ -423,23 +390,7 @@ public class RoundWindow extends AlphaJPanel
      */
     public void setInnerGap(Insets innerGap) {
         this.innerGap = innerGap;
-    }
-
-    public void setRoundCorner(Point2D.Double val){
-        Border bord = getBorder();
-        if(bord instanceof OvalBorder){
-            ((OvalBorder)bord).setRecW(val.getX());
-            ((OvalBorder)bord).setRecH(val.getY());
-        }
-    }
-
-    public Point2D.Double getRoundCorner(){
-        Border bord = getBorder();
-        if(bord instanceof OvalBorder){
-            return new Point2D.Double(((OvalBorder)bord).getRecW(),((OvalBorder)bord).getRecW());
-        }
-        return new Point2D.Double(0, 0);
-    }
+    }    
 
     @Override
     public void focusGained(FocusEvent e) {
@@ -468,6 +419,8 @@ public class RoundWindow extends AlphaJPanel
         }
         this.decorateAndContentGap = decorateAndContentGap;
         lm.layoutContainer(this);
+        if(isVisible())
+            getRoundWindowRootPane().revalidate();
     }
 
     public class MyRepaintManager extends RepaintManager {
@@ -484,7 +437,7 @@ public class RoundWindow extends AlphaJPanel
                     if (!parent.isVisible() || (parent.getPeer() == null)) {
                         return;
                     }
-                    if (parent instanceof ContentPaneForRoundWindow &&
+                    if (parent instanceof AlphaJPanel &&
                             (((AlphaJPanel)parent).getAlpha() < 1f ||
                             !parent.isOpaque())) {                        
                         x += lastDeltaX;
