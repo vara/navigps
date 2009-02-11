@@ -230,8 +230,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         if(MainConfiguration.isShowDocumentProperties()){
 
             MainDetailsPanel detailsPanel = new MainDetailsPanel(getVerboseStream());
-            detailsPanel.addToUpperContent(new PanelWithBatikJTree(canvas, getVerboseStream()));
-            detailsPanel.addToLowerContent(new DetailsPanel());
+            DetailsPanel displayDetails = new DetailsPanel();
+            PanelWithBatikJTree panelJTree = new PanelWithBatikJTree(displayDetails);
+            canvas.addSVGDocumentLoaderListener(panelJTree.getGVTTreeListener());
+            canvas.addGVTTreeBuilderListener(panelJTree.getGVTTreeListener());
+            detailsPanel.addToUpperContent(panelJTree);
+            detailsPanel.addToLowerContent(displayDetails);
             views.add(new View("Properties", VIEW_ICON,detailsPanel));
         }
         if(MainConfiguration.isModeVerboseGui()){
@@ -702,7 +706,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             setEnabled(false);
         }
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {            
             canvas.resetRenderingTransform();
             getVerboseStream().outputVerboseStream("Fit to panel");
         }	

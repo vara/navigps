@@ -6,27 +6,29 @@
 package app.gui.displayItemsMap;
 
 import app.gui.MainWindowIWD;
-import app.gui.svgComponents.Canvas;
+import app.gui.ScrollBar.ui.LineScrollBarUI;
 import app.gui.svgComponents.DOMDocumentTree;
 import app.gui.svgComponents.DOMDocumentTreeController;
-import app.utils.OutputVerboseStream;
 import app.utils.Utils;
+import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Rectangle;
+import java.util.ArrayList;
+import java.util.Collections;
 import java.util.Enumeration;
+import java.util.List;
 import javax.swing.ImageIcon;
-import javax.swing.JComponent;
+import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTable;
 import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.plaf.metal.MetalScrollBarUI;
+import javax.swing.table.AbstractTableModel;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -41,11 +43,16 @@ import org.apache.batik.dom.xbl.NodeXBL;
 import org.apache.batik.dom.xbl.XBLManager;
 import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
+import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
+import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
+import org.w3c.dom.css.CSSStyleDeclaration;
+import org.w3c.dom.css.ViewCSS;
+import org.w3c.dom.svg.SVGDocument;
 
 /**
  * Created on 2008-12-30, 19:37:03
@@ -54,17 +61,19 @@ import org.w3c.dom.NodeList;
 public class PanelWithBatikJTree extends JScrollPane{
 
     //create only with -s start up parameter(window with properties svg doc)
-    private DOMDocumentTree tree;
-    private OutputVerboseStream verbose;
-    private Canvas canvas;
+    private DOMDocumentTree tree;    
 
-    private JTextArea documentInfo;
 
     public final DOMTreeSelectionListener treeSelectionListener = new DOMTreeSelectionListener();
 
-    public PanelWithBatikJTree(Canvas canvas,OutputVerboseStream verbose){
-        this.verbose = verbose;
-        this.canvas = canvas;
+    private final GVTTreeListener listener = new GVTTreeListener();
+
+    //test
+    protected DetailsPanel attributePanel;
+
+    public PanelWithBatikJTree(DetailsPanel dp){
+
+        attributePanel = dp;
         init();
     }
 
@@ -76,6 +85,7 @@ public class PanelWithBatikJTree extends JScrollPane{
 
         tree = new DOMDocumentTree(null,
                     new DOMDocumentTreeController() {
+            @Override
             public boolean isDNDSupported() {
                 return true;
             }
@@ -87,27 +97,23 @@ public class PanelWithBatikJTree extends JScrollPane{
         tree.setCellRenderer(new NodeRenderer());
 
         setViewportView(tree);
-        canvas.addGVTTreeBuilderListener(new GVTTreeListener());
         JScrollBar scbH = getHorizontalScrollBar();
         JScrollBar scbV = getVerticalScrollBar();
         scbH.setOpaque(false);
         scbV.setOpaque(false);
-        scbV.setUI(new MyScrollBarUI());
-        scbH.setUI(new MyScrollBarUI());
+        scbV.setUI(new LineScrollBarUI());
+        scbH.setUI(new LineScrollBarUI());
 
         scbH.removeAll();
         scbV.removeAll();
     }
 
-    public OutputVerboseStream getVerboseStream(){
-        return verbose;
-    }
-    public void createModelTree(){
+    public void createModelTree(SVGDocument doc){
         long startTime = System.nanoTime();
-        getVerboseStream().outputVerboseStream("----Create content window properties----");
-        getVerboseStream().outputVerboseStream("Build Tree Nodes ...");
-        getVerboseStream().outputVerboseStream("Build Tree Model for Tree Nodes ...");
-        TreeNode root = createTree(canvas.getSVGDocument(),false);
+        System.out.println("----Create content window properties----");
+        System.out.println("Build Tree Nodes ...");
+        System.out.println("Build Tree Model for Tree Nodes ...");
+        TreeNode root = createTree(doc,false);
         DefaultTreeModel model = (DefaultTreeModel)tree.getModel();
         if(model==null){
             model = new DefaultTreeModel(root);
@@ -115,16 +121,25 @@ public class PanelWithBatikJTree extends JScrollPane{
         }else
             model.setRoot(root);
 
-        getVerboseStream().outputVerboseStream("Build Tree Model Completed");
-        getVerboseStream().outputVerboseStream("Build Tree Nodes Completed");
+        System.out.println("Build Tree Model Completed");
+        System.out.println("Build Tree Nodes Completed");
         long stopTime = System.nanoTime();
         String time = Utils.roundsValue(((stopTime-startTime)/1000000),5);
-        getVerboseStream().outputErrorVerboseStream("Time : "+time+" milisec.");
+        System.err.println("Time : "+time+" milisec.");
     }
-    private class GVTTreeListener extends GVTTreeBuilderAdapter{
+
+    public GVTTreeListener getGVTTreeListener(){
+        return listener;
+    }
+
+    private class GVTTreeListener extends GVTTreeBuilderAdapter
+            implements SVGDocumentLoaderListener{
+        
+        private SVGDocument doc;
         @Override
         public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-            createModelTree();
+            if(doc != null)
+                createModelTree(doc);
         }
         @Override
         public void gvtBuildStarted(GVTTreeBuilderEvent e) {
@@ -134,84 +149,16 @@ public class PanelWithBatikJTree extends JScrollPane{
         public void gvtBuildCancelled(GVTTreeBuilderEvent e) {}
         @Override
         public void gvtBuildFailed(GVTTreeBuilderEvent e) {}
-    }
-
-    public static class MyScrollBarUI extends MetalScrollBarUI {
-
-        private Color darkShadowColor = new Color(100,100,100,200);
-        private Color shadowColor = new Color(200,200,200,200);
-        private Color highlightColor = new Color(200,255,200,200);
         @Override
-        protected void installDefaults() {
-            super.installDefaults();
-            scrollBarWidth = 13;
-        }
-
+        public void documentLoadingStarted(SVGDocumentLoaderEvent e) {}
         @Override
-        protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
-            //super.paintTrack(g, c, trackBounds);
-            Graphics2D g2 = (Graphics2D)g;
-            //g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
-            g.translate( trackBounds.x, trackBounds.y );
-            boolean leftToRight = c.getComponentOrientation().isLeftToRight();
-            if ( scrollbar.getOrientation() == JScrollBar.VERTICAL ){
-                if ( !isFreeStanding ) {
-                        trackBounds.width += 2;
-                        if ( !leftToRight ) {
-                            g2.translate( -1, 0 );
-                        }
-                }
-                if ( c.isEnabled() ) {// VERTICAL
-                    g2.setColor(darkShadowColor);
-                    int halfArea = trackBounds.width/2;
-                    g2.drawLine( halfArea, 3,halfArea, trackBounds.height );
-                    g2.setColor(shadowColor);
-                    for(int i=1;i<3;i++){
-                        int delta = i*50;
-                        g2.setColor(Utils.checkColor(darkShadowColor.getRed()+delta,
-                                darkShadowColor.getGreen()+delta,
-                                darkShadowColor.getBlue()+delta));
-                        g2.drawLine( halfArea + i, 3-i, halfArea + i, trackBounds.height - i );
-                    }
-                } else {
-                    //MetalUtils.drawDisabledBorder(g, 0, 0, trackBounds.width, trackBounds.height );
-                }
-
-                if ( !isFreeStanding ) {
-                    trackBounds.width -= 2;
-                    if ( !leftToRight ) {
-                        g2.translate( 1, 0 );
-                    }
-                }
-            }
-            else{  // HORIZONTAL
-
-                if ( !isFreeStanding ) {
-                    trackBounds.height += 2;
-                }
-                if ( c.isEnabled() ) {
-                    g2.setColor( darkShadowColor );
-                    int halfArea = trackBounds.height/2;
-
-                    g2.drawLine( 0,halfArea, trackBounds.width - 3,halfArea);
-                    g2.setColor( shadowColor );
-                    for (int i = 1; i < 3; i++){
-                        int delta = i*50;
-                        g2.setColor(Utils.checkColor(darkShadowColor.getRed()+delta,
-                                darkShadowColor.getGreen()+delta,
-                                darkShadowColor.getBlue()+delta));
-                        g2.drawLine( i,halfArea+i, trackBounds.width-2,halfArea+i);
-                    }
-
-                } else {
-                    //MetalUtils.drawDisabledBorder(g, 0, 0, trackBounds.width, trackBounds.height );
-                }
-                if ( !isFreeStanding ) {
-                    trackBounds.height -= 2;
-                }
-            }
-            g2.translate( -trackBounds.x, -trackBounds.y );
+        public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
+            doc = e.getSVGDocument();
         }
+        @Override
+        public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {}
+        @Override
+        public void documentLoadingFailed(SVGDocumentLoaderEvent e) {}
     }
 
     /**
@@ -313,6 +260,7 @@ public class PanelWithBatikJTree extends JScrollPane{
         /**
          * Called when the selection changes.
          */
+        @Override
         public void valueChanged(TreeSelectionEvent ev) {
             
             
@@ -324,35 +272,26 @@ public class PanelWithBatikJTree extends JScrollPane{
                 return;
             }
 
-            Object nodeInfo = mtn.getUserObject();
-            System.out.println(""+nodeInfo);
+            Object nodeInfo = mtn.getUserObject();            
             if (nodeInfo instanceof NodeInfo) {
-                Node node = ((NodeInfo) nodeInfo).getNode();
-
+                Node node = ((NodeInfo) nodeInfo).getNode();                
                 switch (node.getNodeType()) {
                 case Node.DOCUMENT_NODE:
                     //documentInfo.setText
-                      //  (createDocumentText((Document) node));
-                    System.out.println(""+createDocumentText((Document) node));
+                        //(createDocumentText((Document) node));
                     break;
-                case Node.ELEMENT_NODE:
-                    //propertiesTable.setModel(new NodeCSSValuesModel(node));
-                    //attributePanel.promptForChanges();
-                    //attributePanel.setPreviewElement((Element) node);
-                    //rightPanel.add(elementPanel);
+                case Node.ELEMENT_NODE:                  
+                    attributePanel.setPreviewElement((Element) node);
+
                     break;
                 case Node.COMMENT_NODE:
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    //characterDataPanel.setNode(node);
-                    //characterDataPanel.getTextArea().setText
+                    //attributePanel.getTextArea().setText
                         //(node.getNodeValue());
-                    //rightPanel.add(characterDataPanel);
+                    
                 }
             }
-
-            //splitPane.revalidate();
-            //splitPane.repaint();
         }
 
         protected String createDocumentText(Document doc) {
@@ -505,16 +444,10 @@ public class PanelWithBatikJTree extends JScrollPane{
      */
     protected static class ShadowNodeInfo extends NodeInfo {
 
-        /**
-         * Creates a new ShadowNodeInfo object.
-         */
         public ShadowNodeInfo(Node n) {
             super(n);
         }
 
-        /**
-         * Returns a printable representation of the object.
-         */
         @Override
         public String toString() {
             return "shadow tree";
@@ -527,16 +460,10 @@ public class PanelWithBatikJTree extends JScrollPane{
      */
     protected static class ContentNodeInfo extends NodeInfo {
 
-        /**
-         * Creates a new ContentNodeInfo object.
-         */
         public ContentNodeInfo(Node n) {
             super(n);
         }
 
-        /**
-         * Returns a printable representation of the object.
-         */
         @Override
         public String toString() {
             return "selected content";
