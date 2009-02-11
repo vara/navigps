@@ -71,7 +71,6 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
                                                       0.0f, 0.0f, new Color(124,134,155));
         gradientPressedButtion[1] = new GradientPaint(0.0f, (float) getHeight()/3, new Color(255,255,255),
                                                       0.0f, (float) getHeight(), new Color(74,101,155));
-
         recForGradient[0] = new Rectangle2D.Double(0, 0, getWidth(), getHeight()/3);
         recForGradient[1] = new Rectangle2D.Double(0, getHeight()/3, getWidth(), getHeight());
         borderOnButton    = new RoundRectangle2D.Double(1,2, getWidth()-2, getHeight()-4, roundCorner,roundCorner);
@@ -87,6 +86,9 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
             g2.setColor(getBackground());
             g2.fillRect(0, 0, getWidth(), getHeight());
 
+            int icox= (getWidth()-getIcon().getIconWidth())>>1;
+            int icoy= (getHeight()-getIcon().getIconHeight())>>1;
+
             if(oldSize==null || oldSize.getHeight()!=getHeight() || oldSize.getWidth()!=getWidth())
                 updateMyUI();
 
@@ -99,6 +101,8 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
                 if(mousePressedButton){
                     borderColor = new Color(25, 25, 25);
                     gradient = gradientPressedButtion;
+                    icox+=2;
+                    icoy+=2;
                 }else{
                     borderColor = new Color(155, 155, 155);
                     gradient = gradientOnButton;
@@ -114,8 +118,7 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
                 g2.draw(borderOnButton);
 
             }
-            getIcon().paintIcon(this, g2,(getWidth()-getIcon().getIconWidth())/2,
-                                         (getHeight()-getIcon().getIconHeight())/2);
+            getIcon().paintIcon(this, g2,icox,icoy);
             g2.dispose();
         }else
             super.paintComponent(g);

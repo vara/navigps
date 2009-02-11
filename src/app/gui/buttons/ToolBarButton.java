@@ -87,6 +87,9 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
             g2.setColor(getBackground());
             g2.fillRect(0, 0, getWidth(), getHeight());
 
+            int icox= (getWidth()-getIcon().getIconWidth())>>1;
+            int icoy= (getHeight()-getIcon().getIconHeight())>>1;
+
             if(oldSize==null || oldSize.getHeight()!=getHeight() || oldSize.getWidth()!=getWidth())
                 updateMyUI();
             
@@ -98,7 +101,9 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
                 
                 if(mousePressedButton){
                     borderColor = new Color(25, 25, 25);
-                    gradient = gradientPressedButtion;                    
+                    gradient = gradientPressedButtion;
+                    icox+=2;
+                    icoy+=2;
                 }else{                    
                     borderColor = new Color(155, 155, 155);
                     gradient = gradientOnButton;
@@ -114,8 +119,7 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
                 g2.draw(borderOnButton);
 
             }
-            getIcon().paintIcon(this, g2,(getWidth()-getIcon().getIconWidth())/2,
-                                         (getHeight()-getIcon().getIconHeight())/2);
+            getIcon().paintIcon(this, g2,icox,icoy);
             g2.dispose();
         }else
             super.paintComponent(g);	    
