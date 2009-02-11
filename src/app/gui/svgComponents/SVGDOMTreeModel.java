@@ -26,30 +26,36 @@ public class SVGDOMTreeModel implements TreeModel{
         doc =d;
     }
 
+    @Override
     public Object getRoot() {
         return doc.getDocumentElement();
     }
 
+    @Override
     public Object getChild(Object parent, int index) {
         Node node = (Node)parent;
         NodeList nl = node.getChildNodes();
         return nl.item(index);
     }
 
+    @Override
     public int getChildCount(Object parent) {
         Node node = (Node)parent;
         NodeList nl = node.getChildNodes();
         return nl.getLength();
     }
 
+    @Override
     public boolean isLeaf(Object node) {
         return getChildCount(node)==0;
     }
 
+    @Override
     public void valueForPathChanged(TreePath path, Object newValue) {
 	
     }
 
+    @Override
     public int getIndexOfChild(Object parent, Object child) {
         Node node = (Node)parent;
         NodeList nl = node.getChildNodes();
@@ -60,10 +66,12 @@ public class SVGDOMTreeModel implements TreeModel{
         return -1;
     }
 
+    @Override
     public void addTreeModelListener(TreeModelListener l) {
 
     }
 
+    @Override
     public void removeTreeModelListener(TreeModelListener l) {
 	
     }
