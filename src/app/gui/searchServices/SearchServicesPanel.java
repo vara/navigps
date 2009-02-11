@@ -11,11 +11,10 @@
 
 package app.gui.searchServices;
 
+import app.gui.ScrollBar.ui.LineScrollBarUI;
 import app.gui.detailspanel.RoundWindow;
-import app.gui.displayItemsMap.PanelWithJTree.MyScrollBarUI;
 import java.awt.Component;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.JScrollBar;
@@ -54,8 +53,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         JScrollBar scbV = jScrollPane1.getVerticalScrollBar();
         scbH.setOpaque(false);
         scbV.setOpaque(false);
-        scbV.setUI(new MyScrollBarUI());
-        scbH.setUI(new MyScrollBarUI());
+        scbV.setUI(new LineScrollBarUI());
+        scbH.setUI(new LineScrollBarUI());
 
         scbH.removeAll();
         scbV.removeAll();
