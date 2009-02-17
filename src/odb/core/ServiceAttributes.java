@@ -21,12 +21,12 @@ import org.w3c.dom.UserDataHandler;
  */
 public class ServiceAttributes implements Element {
 
-    String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+    private String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
 
     public ServiceAttributes(Float x, Float y) {
-
-        this.setAttributeNS(svgNS, "x", x.toString());
-        this.setAttributeNS(svgNS, "y", y.toString());
+        
+        this.setAttribute("x", x.toString());
+        this.setAttribute("y", y.toString());
     }
 
     public String getTagName() {

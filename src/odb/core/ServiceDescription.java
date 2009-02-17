@@ -5,13 +5,15 @@ public class ServiceDescription {
     private String serviceNumber;
     private String serviceName;
     private String serviceStreet;
+    private Category category;
     private Subcategory serviceSubCategory;
     private String additionaInfo;
 
-    public ServiceDescription(String number, String name, String street, Subcategory subcategory, String additionalInfo) {
+    public ServiceDescription(String number, String name, String street, Category category, Subcategory subcategory, String additionalInfo) {
         this.serviceNumber = number;
         this.serviceName = name;
         this.serviceStreet = street;
+        this.category = category;
         this.serviceSubCategory = subcategory;
         this.additionaInfo = additionalInfo;
     }
@@ -84,5 +86,19 @@ public class ServiceDescription {
      */
     public void setAdditionaInfo(String additionaInfo) {
         this.additionaInfo = additionaInfo;
+    }
+
+    /**
+     * @return the category
+     */
+    public Category getCategory() {
+        return category;
+    }
+
+    /**
+     * @param category the category to set
+     */
+    public void setCategory(Category category) {
+        this.category = category;
     }
 }

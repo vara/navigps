@@ -11,8 +11,12 @@
 package odb.gui;
 
 import config.DataBaseConfig;
-import javax.swing.JDialog;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
+import javax.swing.JMenu;
+import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
+import javax.swing.JPopupMenu;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.ODBFactory;
 
@@ -20,16 +24,29 @@ import org.neodatis.odb.ODBFactory;
  *
  * @author ACME
  */
-public class Manager extends javax.swing.JDialog {
+public class DatabaseManager extends javax.swing.JDialog {
 
     private ODB odb = null;
+    private JPopupMenu popup;
+    private JMenuItem categoryMenu;
+    private JMenuItem subcategoryMenu;
+    private JMenuItem editMenu;
+    private JMenuItem removeMenu;
+    private JMenu newMenu;
 
     /** Creates new form Manager */
-    public Manager(java.awt.Frame parent, boolean modal) {
+    public DatabaseManager(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
         connectDatabase();
+        loadTreePopup();
+
     //disconnectDatabase();
+    }
+
+    private void addNewService() {
+        ServiceFactory sf = new ServiceFactory(null, true);
+        sf.setVisible(true);
     }
 
     private void connectDatabase() {
@@ -72,17 +89,9 @@ public class Manager extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
-        jScrollPane5 = new javax.swing.JScrollPane();
-        jList3 = new javax.swing.JList();
         jLabel19 = new javax.swing.JLabel();
-        jLabel22 = new javax.swing.JLabel();
-        jLabel27 = new javax.swing.JLabel();
-        jButton10 = new javax.swing.JButton();
-        jButton11 = new javax.swing.JButton();
-        jScrollPane6 = new javax.swing.JScrollPane();
-        jList4 = new javax.swing.JList();
-        jButton1 = new javax.swing.JButton();
-        jButton2 = new javax.swing.JButton();
+        jScrollPane3 = new javax.swing.JScrollPane();
+        jTree1 = new javax.swing.JTree();
 
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Database manager");
@@ -128,10 +137,15 @@ public class Manager extends javax.swing.JDialog {
             .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 167, Short.MAX_VALUE)
         );
 
-        jButton3.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        jButton3.setFont(new java.awt.Font("Verdana", 0, 11));
         jButton3.setText("New ...");
+        jButton3.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton3ActionPerformed(evt);
+            }
+        });
 
-        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "Avaliable services", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
+        jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "Selection", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
 
         jButton4.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jButton4.setText("Edit");
@@ -161,7 +175,7 @@ public class Manager extends javax.swing.JDialog {
                 .addContainerGap(70, Short.MAX_VALUE))
         );
 
-        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "Avaliable services", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
+        jPanel5.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "Attributes", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
 
         jTextArea1.setColumns(20);
         jTextArea1.setRows(5);
@@ -209,62 +223,20 @@ public class Manager extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Services", jPanel1);
 
-        jList3.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList3ValueChanged(evt);
+        jLabel19.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        jLabel19.setText("Category tree:");
+
+        jTree1.setToolTipText("Right-Click for options !");
+        jTree1.setRootVisible(false);
+        jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTree1MousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jTree1MouseReleased(evt);
             }
         });
-        jList3.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jList3FocusGained(evt);
-            }
-        });
-        jScrollPane5.setViewportView(jList3);
-
-        jLabel19.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
-        jLabel19.setText("Categories:");
-
-        jLabel22.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
-        jLabel22.setText("Subcategories:");
-
-        jLabel27.setFont(new java.awt.Font("Verdana", 1, 11)); // NOI18N
-        jLabel27.setText("Selection:");
-
-        jButton10.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
-        jButton10.setText("Remove");
-        jButton10.setEnabled(false);
-        jButton10.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton10ActionPerformed(evt);
-            }
-        });
-
-        jButton11.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
-        jButton11.setText("Edit");
-        jButton11.setEnabled(false);
-        jButton11.addActionListener(new java.awt.event.ActionListener() {
-            public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton11ActionPerformed(evt);
-            }
-        });
-
-        jList4.addListSelectionListener(new javax.swing.event.ListSelectionListener() {
-            public void valueChanged(javax.swing.event.ListSelectionEvent evt) {
-                jList4ValueChanged(evt);
-            }
-        });
-        jList4.addFocusListener(new java.awt.event.FocusAdapter() {
-            public void focusGained(java.awt.event.FocusEvent evt) {
-                jList4FocusGained(evt);
-            }
-        });
-        jScrollPane6.setViewportView(jList4);
-
-        jButton1.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
-        jButton1.setText("New ...");
-
-        jButton2.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
-        jButton2.setText("New ...");
+        jScrollPane3.setViewportView(jTree1);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -273,48 +245,18 @@ public class Manager extends javax.swing.JDialog {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jLabel19)
-                        .addGap(66, 66, 66))
-                    .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE)
-                            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 155, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)))
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
-                    .addComponent(jLabel22)
-                    .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 133, Short.MAX_VALUE)
-                    .addComponent(jButton2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jButton10, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-                    .addComponent(jButton11, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 105, Short.MAX_VALUE)
-                    .addComponent(jLabel27))
+                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
+                    .addComponent(jLabel19))
                 .addContainerGap())
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.BASELINE)
-                    .addComponent(jLabel19)
-                    .addComponent(jLabel22)
-                    .addComponent(jLabel27))
+                .addContainerGap()
+                .addComponent(jLabel19)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jScrollPane6, javax.swing.GroupLayout.DEFAULT_SIZE, 341, Short.MAX_VALUE)
-                            .addComponent(jScrollPane5, javax.swing.GroupLayout.PREFERRED_SIZE, 341, javax.swing.GroupLayout.PREFERRED_SIZE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                            .addComponent(jButton1)
-                            .addComponent(jButton2))
-                        .addGap(38, 38, 38))
-                    .addGroup(jPanel3Layout.createSequentialGroup()
-                        .addComponent(jButton10)
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jButton11)
-                        .addContainerGap())))
+                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
+                .addContainerGap())
         );
 
         jTabbedPane1.addTab("Categories", jPanel3);
@@ -333,30 +275,6 @@ public class Manager extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void jList3ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList3ValueChanged
-        //        updateSubCategoryModel();
-}//GEN-LAST:event_jList3ValueChanged
-
-    private void jList3FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jList3FocusGained
-        //        updateCategoryModel();
-}//GEN-LAST:event_jList3FocusGained
-
-    private void jButton10ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton10ActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_jButton10ActionPerformed
-
-    private void jButton11ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton11ActionPerformed
-        // TODO add your handling code here:
-}//GEN-LAST:event_jButton11ActionPerformed
-
-    private void jList4ValueChanged(javax.swing.event.ListSelectionEvent evt) {//GEN-FIRST:event_jList4ValueChanged
-        // TODO add your handling code here:
-}//GEN-LAST:event_jList4ValueChanged
-
-    private void jList4FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jList4FocusGained
-        // TODO add your handling code here:
-}//GEN-LAST:event_jList4FocusGained
-
     private void jTabbedPane1FocusGained(java.awt.event.FocusEvent evt) {//GEN-FIRST:event_jTabbedPane1FocusGained
         //    updateModel();
         //        updateCategoryModel();
@@ -368,38 +286,27 @@ public class Manager extends javax.swing.JDialog {
         disconnectDatabase();
     }//GEN-LAST:event_formWindowClosing
 
-    /**
-     * @param args the command line arguments
-     */
-    public static void main(String args[]) {
-        java.awt.EventQueue.invokeLater(new Runnable() {
+    private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
+        addNewService();
+    }//GEN-LAST:event_jButton3ActionPerformed
 
-            public void run() {
-                Manager dialog = new Manager(new javax.swing.JFrame(), true);
-                dialog.addWindowListener(new java.awt.event.WindowAdapter() {
+    private void jTree1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MousePressed
+        if (evt.isPopupTrigger()) {
+            popup.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_jTree1MousePressed
 
-                    public void windowClosing(java.awt.event.WindowEvent e) {
-                        System.exit(0);
-                    }
-                });
-                dialog.setVisible(true);
-            }
-        });
-    }
+    private void jTree1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseReleased
+        if (evt.isPopupTrigger()) {
+            popup.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }//GEN-LAST:event_jTree1MouseReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
-    private javax.swing.JButton jButton1;
-    private javax.swing.JButton jButton10;
-    private javax.swing.JButton jButton11;
-    private javax.swing.JButton jButton2;
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
     private javax.swing.JLabel jLabel19;
-    private javax.swing.JLabel jLabel22;
-    private javax.swing.JLabel jLabel27;
-    private javax.swing.JList jList3;
-    private javax.swing.JList jList4;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -407,10 +314,93 @@ public class Manager extends javax.swing.JDialog {
     private javax.swing.JPanel jPanel5;
     private javax.swing.JScrollPane jScrollPane1;
     private javax.swing.JScrollPane jScrollPane2;
-    private javax.swing.JScrollPane jScrollPane5;
-    private javax.swing.JScrollPane jScrollPane6;
+    private javax.swing.JScrollPane jScrollPane3;
     private javax.swing.JTabbedPane jTabbedPane1;
     private javax.swing.JTable jTable1;
     private javax.swing.JTextArea jTextArea1;
+    private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
+
+    private void loadTreePopup() {
+        popup = new JPopupMenu();
+
+        newMenu = new JMenu("New");
+
+        categoryMenu = new JMenuItem("Category");
+        categoryMenu.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                new CategoryCreator(null, true).setVisible(true);
+            }
+        });
+
+        subcategoryMenu = new JMenuItem("Subcategory");
+        subcategoryMenu.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (jTree1.isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "No category selected!", "Error!", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (jTree1.getSelectionPath().getPath().length == 2) {
+                        System.out.println("Creating in: " + jTree1.getLastSelectedPathComponent().toString());
+                        new SubcategoryCreator(null, true).setVisible(true);
+                    } else {
+                        JOptionPane.showMessageDialog(DatabaseManager.this, "Selection is not a category!", "Error!", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+            }
+        });
+
+        newMenu.add(categoryMenu);
+        newMenu.add(subcategoryMenu);
+
+        popup.add(newMenu);
+        popup.add(new JPopupMenu.Separator());
+
+        removeMenu = new JMenuItem("Remove");
+        removeMenu.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (jTree1.isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (jTree1.getSelectionPath().getPath().length == 2) {
+                        System.out.println("Removing category: " + jTree1.getLastSelectedPathComponent().toString());
+                        Object[] options = {"Yes", "No", "Cancel"};
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove category " + jTree1.getLastSelectedPathComponent().toString() + "? Removing category will cause all of its subcategories and services be removed as well!","Prompt",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,null);
+                        if (n == 0) {
+                            System.out.println("remove category");
+                        }
+                    } else if (jTree1.getSelectionPath().getPath().length == 3) {
+                        System.out.println("Removing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
+                        Object[] options = {"Yes", "No", "Cancel"};
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove subcategory " + jTree1.getLastSelectedPathComponent().toString() + "? Removing subcategory will cause all of its services be removed as well!","Prompt",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,null);
+                        if (n == 0) {
+                            System.out.println("remove subcategory");
+                        }
+                    }
+                }
+            }
+        });
+
+        editMenu = new JMenuItem("Edit");
+        editMenu.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (jTree1.isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (jTree1.getSelectionPath().getPath().length == 2) {
+                        new CategoryEditor(null, true).setVisible(true);
+                    } else {
+                        new SubcategoryEditor(null, true).setVisible(true);
+                    }
+                }
+            }
+        });
+
+        popup.add(editMenu);
+        popup.add(removeMenu);
+    }
 }
