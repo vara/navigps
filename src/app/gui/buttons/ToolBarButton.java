@@ -32,8 +32,6 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
     private boolean mouseOnButton = false;
     private boolean mousePressedButton = false;
 
-    private OutputVerboseStream letOfChange;
-
     private GradientPaint[] gradientOnButton = new GradientPaint[2];
     private GradientPaint[] gradientPressedButtion = new GradientPaint[2];
     private Rectangle2D [] recForGradient = new Rectangle2D[2];
@@ -42,10 +40,9 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
 
     private float roundCorner = 12.0f;
 
-    public ToolBarButton(Action a,ImageIcon i,OutputVerboseStream l){
+    public ToolBarButton(Action a,ImageIcon i){
 	
         super(a);
-        setVerboseStream(l);
         setIcon(i);
         setText("");
         setFocusPainted(false);
@@ -54,10 +51,6 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
             addMouseListener(this);
 
         addChangeListener(this);
-    }
-
-    public void setVerboseStream(OutputVerboseStream l){
-        letOfChange = l;
     }
 
     private void updateMyUI(){
@@ -154,10 +147,6 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
         this.mouseOnButton = mouseOnButton;
     }
 
-    protected OutputVerboseStream getVerboseStream() {
-        return letOfChange;
-    }
-
     @Override
     public void setEnabled(boolean b){
         super.setEnabled(b);
@@ -166,10 +155,10 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
         else
             removeMouseListener(this);
         
-        if(getVerboseStream()!=null)
-            getVerboseStream().outputVerboseStream(getAction().getValue(Action.NAME)+" isEnabled "+b);
+        System.out.println(getAction().getValue(Action.NAME)+" isEnabled "+b);
     }
 
+    @Override
     public void stateChanged(ChangeEvent e) {
         System.out.print("ChangeEvent ");
         System.out.println(((JButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((JButton)e.getSource()).isSelected());
