@@ -1,5 +1,6 @@
 package app.gui.detailspanel;
 
+import app.gui.RepaintManager.AlphaRepaintManager;
 import app.gui.borders.AlphaBorder;
 import app.gui.borders.OvalBorder;
 import app.gui.borders.RoundBorder;
@@ -177,7 +178,7 @@ public class RoundWindow extends RoundJPanel
         });
      }
     private void installRepaintManager() {
-        MyRepaintManager manager = new MyRepaintManager();
+        AlphaRepaintManager manager = new AlphaRepaintManager();
         RepaintManager.setCurrentManager(manager);
     }
     
@@ -422,37 +423,6 @@ public class RoundWindow extends RoundJPanel
         if(isVisible())
             getRoundWindowRootPane().revalidate();
     }
-
-    public class MyRepaintManager extends RepaintManager {
-        
-        @Override
-        public void addDirtyRegion(JComponent c, int x, int y, int w, int h) {
-
-            Rectangle dirtyRegion = getDirtyRegion(c);
-            if (dirtyRegion.width == 0 && dirtyRegion.height == 0) {
-                int lastDeltaX = c.getX();
-                int lastDeltaY = c.getY();
-                Container parent = c.getParent();
-                while (parent instanceof JComponent) {
-                    if (!parent.isVisible() || (parent.getPeer() == null)) {
-                        return;
-                    }
-                    if (parent instanceof AlphaJPanel &&
-                            (((AlphaJPanel)parent).getAlpha() < 1f ||
-                            !parent.isOpaque())) {                        
-                        x += lastDeltaX;
-                        y += lastDeltaY;
-                        lastDeltaX = lastDeltaY = 0;
-                        c = (JComponent)parent;             
-                    }
-                    lastDeltaX += parent.getX();
-                    lastDeltaY += parent.getY();
-                    parent = parent.getParent();
-                }
-            }           
-            super.addDirtyRegion(c, x, y, w, h);
-        }
-    }//MyRepaintManager
 
     class CloseAction implements ActionListener,TimingTarget{
         private Animator animator;
