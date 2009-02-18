@@ -11,15 +11,12 @@
 
 package app.gui.displayItemsMap;
 
-import app.gui.borders.OvalBorder;
 import java.awt.BorderLayout;
 import java.awt.Color;
-import java.awt.GridLayout;
 import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.table.DefaultTableModel;
 import org.apache.batik.dom.util.DOMUtilities;
 import org.apache.batik.util.gui.xmleditor.XMLTextEditor;

@@ -71,10 +71,6 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGSVGElement;
 
-/**
- *
- * @author vara
- */
 public class SVGScrollPane extends JPanel{
     
     protected JSVGCanvas canvas;
@@ -229,7 +225,7 @@ public class SVGScrollPane extends JPanel{
         if (vbt == null) vbt = new AffineTransform();
 
         Rectangle r2d = vbt.createTransformedShape(viewBox).getBounds();
-         System.err.println("Pre : " + r2d);
+        System.err.println("Pre : " + r2d);
         int tx = 0, ty = 0;
         if (r2d.x < 0) tx -= r2d.x;
         if (r2d.y < 0) ty -= r2d.y;
@@ -237,12 +233,14 @@ public class SVGScrollPane extends JPanel{
         int deltaX = horizontal.getValue()-tx;
         int deltaY = vertical.getValue()  -ty;
 
-        // System.err.println("tx = "+tx+"; ty = "+ty);
-        // System.err.println("dx = "+deltaX+"; dy = "+deltaY);
-        // System.err.println("Pre CRT: " + crt);
+         //System.err.println("tx = "+tx+"; ty = "+ty);
+         //System.err.println("dx = "+deltaX+"; dy = "+deltaY);
+         //System.err.println("Pre CRT: " + crt);
 
         crt.preConcatenate
             (AffineTransform.getTranslateInstance(-deltaX, -deltaY));
+        //System.err.println("crt.preConcatenate"+
+            //"(AffineTransform.getTranslateInstance(-deltaX, -deltaY) : " + crt);
         canvas.setRenderingTransform(crt);
     }// setScrollPosition()
 
@@ -404,7 +402,7 @@ public class SVGScrollPane extends JPanel{
             }
         }
 
-	@Override
+        @Override
         public void updateCompleted(UpdateManagerEvent e) {
             if (viewBox == null) {
                 resizeScrollBars();
@@ -447,7 +445,7 @@ public class SVGScrollPane extends JPanel{
      */
     protected void resizeScrollBars()
     {
-        // System.out.println("** resizeScrollBars()");
+         //System.out.println("** resizeScrollBars()");
 
         ignoreScrollChange = true;
 
@@ -458,7 +456,7 @@ public class SVGScrollPane extends JPanel{
         if (vbt == null) vbt = new AffineTransform();
 
         Rectangle r2d = vbt.createTransformedShape(viewBox).getBounds();
-        // System.err.println("VB: " + r2d);
+         //System.err.println("VB: " + r2d);
 
         // compute translation
         int maxW = r2d.width;
@@ -469,8 +467,8 @@ public class SVGScrollPane extends JPanel{
         if (r2d.y > 0) maxH += r2d.y;
         else           ty   -= r2d.y;
 
-        // System.err.println("   maxW = "+maxW+"; maxH = "+maxH +
-        //                    " tx = "+tx+"; ty = "+ty);
+         //System.err.println("   maxW = "+maxW+"; maxH = "+maxH +
+         //                   " tx = "+tx+"; ty = "+ty);
 
         // Changing scrollbar visibility may change the
         // canvas's dimensions so get the end result.
@@ -583,11 +581,9 @@ public class SVGScrollPane extends JPanel{
      */
     protected void checkAndSetViewBoxRect() {
         if (viewBox != null) return;
-
         viewBox = getViewBoxRect();
-        // System.out.println("  ** viewBox rect set: "+viewBox);
-        // System.out.println("  ** doc size: "+
-        //                    canvas.getSVGDocumentSize());
+        //System.out.println("  ** viewBox rect set: "+viewBox);
+        //System.out.println("  ** doc size: "+canvas.getSVGDocumentSize());
     }// checkAndSetViewBoxRect()
 
 
