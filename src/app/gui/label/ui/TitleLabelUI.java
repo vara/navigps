@@ -6,6 +6,7 @@
 package app.gui.label.ui;
 
 import java.awt.Color;
+import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.FontMetrics;
 import java.awt.Graphics;
@@ -19,7 +20,6 @@ import java.beans.PropertyChangeEvent;
 import javax.swing.Icon;
 import javax.swing.JComponent;
 import javax.swing.JLabel;
-import javax.swing.SwingUtilities;
 import javax.swing.plaf.ComponentUI;
 import javax.swing.plaf.basic.BasicHTML;
 import javax.swing.plaf.basic.BasicLabelUI;
@@ -45,14 +45,17 @@ public class TitleLabelUI extends BasicLabelUI{
     private int textPosition = 0;
 
     private boolean shadow = true;
-    private Color colorShadow = Color.BLACK;
+    private Color colorShadow = Color.DARK_GRAY;
 
     private static Rectangle paintIconR = new Rectangle();
     private static Rectangle paintTextR = new Rectangle();
     private static Rectangle paintViewR = new Rectangle();
     private static Insets paintViewInsets = new Insets(1, 1, 1, 1);
 
-    protected static BasicLabelUI titleLabelUI = new BasicLabelUI();
+    private int verticalCalibrated = 0;
+    private int horizontalCalibrated = 0;
+
+    protected static TitleLabelUI titleLabelUI = new TitleLabelUI();
 
     public TitleLabelUI(int position){
         setTextLayout(position);
@@ -83,29 +86,33 @@ public class TitleLabelUI extends BasicLabelUI{
     }
 
     @Override
-    protected String layoutCL(JLabel label, FontMetrics fontMetrics, String text, Icon icon, Rectangle viewR, Rectangle iconR, Rectangle textR) {
+    protected String layoutCL(JLabel label, FontMetrics fontMetrics, String text, Icon icon,
+            Rectangle tviewR,
+            Rectangle ticonR,
+            Rectangle ttextR) {
 
-        iconR.x = viewR.x;
-        iconR.y = viewR.y;
+        ticonR.x = tviewR.x;
+        ticonR.y = tviewR.y;
 
         int gap;
 
         if(icon!=null){
-            iconR.setSize(icon.getIconWidth(),viewR.height);
+            ticonR.setSize(icon.getIconWidth(),tviewR.height);
             gap = label.getIconTextGap();
         }
         else{
-            iconR.setSize(0,0);
+            ticonR.setSize(0,0);
             gap = 0;
         }
 
-        textR.x = iconR.x+iconR.width+gap;
-        textR.y = iconR.y;
-        textR.width = (viewR.width-iconR.width-gap);
-        textR.height = viewR.height;
+        ttextR.x = ticonR.x+ticonR.width+gap+getHorizontalCalibrated();
+        ttextR.y = ticonR.y+getVerticalCalibrated();
+        ttextR.width = (tviewR.width-ticonR.width-gap-getHorizontalCalibrated());
+        ttextR.height = (ticonR.height!=0 ? ticonR.height : fontMetrics.getHeight())-getVerticalCalibrated();
 
+        //System.err.println("\t----Rect's -------");
         //showRecs(label);
-        
+      
         return text;
 
     }
@@ -139,7 +146,7 @@ public class TitleLabelUI extends BasicLabelUI{
                         text,g2.getFontRenderContext());
 
                 if(isShadow()){
-                    drawShadow(label, g2, text, pos.x+2,pos.y+2);
+                    drawShadow(label, g2, text, pos.x+1,pos.y+1);
                 }
 
                 if (label.isEnabled()) {
@@ -161,10 +168,14 @@ public class TitleLabelUI extends BasicLabelUI{
     }
 
     public void showRecs(JLabel l){
-        System.out.println("paintViewR "+paintViewR);
-        System.out.println("paintIconR "+paintIconR);
-        System.out.println("paintTextR "+paintTextR);
-        System.out.println("label "+l.getBounds());
+        String retStr ="paintViewR "+paintViewR
+        +"\npaintIconR "+paintIconR
+        +"\npaintTextR "+paintTextR
+        +"\nlabel "+l.getBounds()
+        +"\n\nviewR "+viewR
+        +"\niconR "+iconR
+        +"\nTextR "+textR;
+        System.out.println(retStr);
     }
 
     protected String layout(JLabel label, FontMetrics fm,
@@ -180,6 +191,7 @@ public class TitleLabelUI extends BasicLabelUI{
 
         paintIconR.x = paintIconR.y = paintIconR.width = paintIconR.height = 0;
         paintTextR.x = paintTextR.y = paintTextR.width = paintTextR.height = 0;
+        //System.err.println("**layout");
         return layoutCL(label, fm, text, icon, paintViewR, paintIconR,
                         paintTextR);
     }
@@ -271,5 +283,104 @@ public class TitleLabelUI extends BasicLabelUI{
      */
     public void setColorShadow(Color colorShadow) {
         this.colorShadow = colorShadow;
+    }
+
+    private static Rectangle iconR = new Rectangle();
+    private static Rectangle textR = new Rectangle();
+    private static Rectangle viewR = new Rectangle();
+    private static Insets viewInsets = new Insets(0, 0, 0, 0);
+
+
+    @Override
+    public Dimension getPreferredSize(JComponent c)
+    {
+        JLabel label = (JLabel)c;
+        String text = label.getText();
+        Icon icon = (label.isEnabled()) ? label.getIcon() :
+                                          label.getDisabledIcon();
+        Insets insets = label.getInsets(viewInsets);
+        Font font = label.getFont();
+
+        int dx = insets.left + insets.right;
+        int dy = insets.top + insets.bottom;
+
+        if ((icon == null) &&
+            ((text == null) ||
+             ((text != null) && (font == null)))) {
+            return new Dimension(dx, dy);
+        }
+        else if ((text == null) || ((icon != null) && (font == null))) {
+            return new Dimension(icon.getIconWidth() + dx,
+                                 icon.getIconHeight() + dy);
+        }
+        else {
+            FontMetrics fm = label.getFontMetrics(font);
+
+            iconR.x = iconR.y = iconR.width = iconR.height = 0;
+            textR.x = textR.y = textR.width = textR.height = 0;
+            viewR.x = dx;
+            viewR.y = dy;
+            viewR.width = viewR.height = Short.MAX_VALUE;
+            //System.err.println("**getPreferredSize");
+            layoutCL(label, fm, text, icon, viewR, iconR, textR);
+            int x1 = Math.min(iconR.x, textR.x);
+            int x2 = Math.max(iconR.x + iconR.width, textR.x + textR.width);
+            int y1 = Math.min(iconR.y, textR.y);
+            int y2 = Math.max(iconR.y + iconR.height, textR.y + textR.height);
+            Dimension rv = new Dimension(x2 - x1, y2 - y1);
+
+            rv.width += dx;
+            rv.height += dy;
+            //System.out.println("pref size "+rv);
+            return rv;
+        }
+    }
+
+    @Override
+    public Dimension getMinimumSize(JComponent c) {
+        Dimension d = getPreferredSize(c);
+        View v = (View) c.getClientProperty(BasicHTML.propertyKey);
+        if (v != null) {
+            d.width -= v.getPreferredSpan(View.X_AXIS) - v.getMinimumSpan(View.X_AXIS);
+        }
+        return d;
+    }
+
+    @Override
+    public Dimension getMaximumSize(JComponent c) {
+        Dimension d = getPreferredSize(c);
+        View v = (View) c.getClientProperty(BasicHTML.propertyKey);
+        if (v != null) {
+            d.width += v.getMaximumSpan(View.X_AXIS) - v.getPreferredSpan(View.X_AXIS);
+        }
+        return d;
+    }
+
+    /**
+     * @return the verticalCalibrated
+     */
+    public int getVerticalCalibrated() {
+        return verticalCalibrated;
+    }
+
+    /**
+     * @param verticalCalibrated the verticalCalibrated to set
+     */
+    public void setVerticalCalibrated(int verticalCalibrated) {
+        this.verticalCalibrated = verticalCalibrated;
+    }
+
+    /**
+     * @return the horizontalCalibrated
+     */
+    public int getHorizontalCalibrated() {
+        return horizontalCalibrated;
+    }
+
+    /**
+     * @param horizontalCalibrated the horizontalCalibrated to set
+     */
+    public void setHorizontalCalibrated(int horizontalCalibrated) {
+        this.horizontalCalibrated = horizontalCalibrated;
     }
 }
