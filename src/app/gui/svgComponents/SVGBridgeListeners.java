@@ -5,6 +5,7 @@
 
 package app.gui.svgComponents;
 
+import java.io.File;
 import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
 import org.apache.batik.swing.gvt.GVTTreeRendererListener;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
@@ -20,78 +21,78 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
                     SVGDocumentLoaderListener,
                     GVTTreeBuilderListener,
                     GVTTreeRendererListener	{
-            
     
+    public SVGBridgeListeners(){
+    }
+
     @Override
     public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
         setRederingStatus(true);
-        setTextToCurrentStatus("Document Loading Started ...");
+        currentStatusChanged("Document Loading Started ...");
     }
     @Override
     public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {	
-        setTextToCurrentStatus("Document Loading Completed");
-        setAbsoluteFilePath(e.getSVGDocument().getDocumentURI());
+        currentStatusChanged("Document Loading Completed");
+        setSvgFileObject(new File(e.getSVGDocument().getDocumentURI()));
     }
     @Override
     public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
-        setTextToCurrentStatus("Document Loading Cancelled !");
+        currentStatusChanged("Document Loading Cancelled !");
     }
     @Override
     public void documentLoadingFailed(SVGDocumentLoaderEvent e) {	
-        setTextToCurrentStatus("Document Loading Failed !");
+        currentStatusChanged("Document Loading Failed !");
     }
     
     
     @Override
     public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-        documentBuildCompleted();
-        setTextToCurrentStatus("Document Build Completed");
-
-        getVerboseStream().outputVerboseStream("getBounds \t"+e.getGVTRoot().getBounds());
-        getVerboseStream().outputVerboseStream("getClip \t"+e.getGVTRoot().getClip());
-        getVerboseStream().outputVerboseStream("getcomposite \t"+e.getGVTRoot().getComposite());
-        getVerboseStream().outputVerboseStream("getGeomatryBounds \t"+e.getGVTRoot().getGeometryBounds());
-        getVerboseStream().outputVerboseStream("getGlobalTransform \t"+e.getGVTRoot().getGlobalTransform());
-        getVerboseStream().outputVerboseStream("getInverstranform \t"+e.getGVTRoot().getInverseTransform());
-        getVerboseStream().outputVerboseStream("getMask \t"+e.getGVTRoot().getMask());
-        getVerboseStream().outputVerboseStream("getOutline \t"+e.getGVTRoot().getOutline());
-        getVerboseStream().outputVerboseStream("getBounds \t"+e.getGVTRoot().getBounds());
+        documentPrepareToModification();
+        currentStatusChanged("Document Build Completed");
+        String info = "getBounds \t"+e.getGVTRoot().getBounds()+
+                      "\ngetClip \t"+e.getGVTRoot().getClip()+
+                      "\ngetcomposite \t"+e.getGVTRoot().getComposite()+
+                      "\ngetGeomatryBounds \t"+e.getGVTRoot().getGeometryBounds()+
+                      "\ngetGlobalTransform \t"+e.getGVTRoot().getGlobalTransform()+
+                      "\ngetInverstranform \t"+e.getGVTRoot().getInverseTransform()+
+                      "\ngetMask \t"+e.getGVTRoot().getMask()+
+                      "\ngetOutline \t"+e.getGVTRoot().getOutline()+
+                      "\ngetBounds \t"+e.getGVTRoot().getBounds();
+        System.out.println(info);
     }
     @Override
     public void gvtBuildCancelled(GVTTreeBuilderEvent e) {
-        setTextToCurrentStatus("Document Build Cancelled !");
+        currentStatusChanged("Document Build Cancelled !");
     }
     @Override
     public void gvtBuildFailed(GVTTreeBuilderEvent e) {
-        setTextToCurrentStatus("Document Build Failed !");
+        currentStatusChanged("Document Build Failed !");
     }
     @Override
     public void gvtBuildStarted(GVTTreeBuilderEvent e) {        
-        setTextToCurrentStatus("Documnet Build Started");
-    }
-    
+        currentStatusChanged("Documnet Build Started");
+    }    
     
     @Override
     public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
-        setTextToCurrentStatus("Document Rendering Prepare ...");
+        currentStatusChanged("Document Rendering Prepare ...");
     }
     @Override
     public void gvtRenderingStarted(GVTTreeRendererEvent e) {
-        setTextToCurrentStatus("Document Rendering Started ...");
+        currentStatusChanged("Document Rendering Started ...");
         setRederingStatus(true);
     }
     @Override
     public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
-        setTextToCurrentStatus("Document Rendering Completed");
-        setLabelInformationPosytion(new String("0,0;0,0;0,0"));
+        currentStatusChanged("Document Rendering Completed");
         setRederingStatus(false);
     }
     @Override
     public void gvtRenderingCancelled(GVTTreeRendererEvent e) {
-        setTextToCurrentStatus("Documnet Rendering Cancelled !");
+        currentStatusChanged("Documnet Rendering Cancelled !");
     }
     @Override
     public void gvtRenderingFailed(GVTTreeRendererEvent e) {
-        setTextToCurrentStatus("Documnet Rendering Failed !");
+        currentStatusChanged("Documnet Rendering Failed !");
     }           
 }
