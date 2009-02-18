@@ -5,6 +5,8 @@
 
 package config;
 
+import java.awt.geom.Point2D;
+
 /**
  *
  * @author vara
@@ -21,34 +23,40 @@ public class SVGConfiguration {
     }
     
     public double getZoomInRateX() {
-	return zoomInRateX;
+        return zoomInRateX;
     }
 
     public void setZoomInRateX(double zoomInRateX) {
-	this.zoomInRateX = zoomInRateX;
+        this.zoomInRateX = zoomInRateX;
     }
 
     public double getZoomInRateY() {
-	return zoomInRateY;
+        return zoomInRateY;
     }
 
     public void setZoomInRateY(double zoomInRateY) {
-	this.zoomInRateY = zoomInRateY;
+        this.zoomInRateY = zoomInRateY;
     }
 
     public double getZoomOutRateX() {
-	return zoomOutRateX;
+        return zoomOutRateX;
     }
 
     public void setZoomOutRateX(double zoomOutRateX) {
-	this.zoomOutRateX = zoomOutRateX;
+        this.zoomOutRateX = zoomOutRateX;
     }
 
     public double getZoomOutRateY() {
-	return zoomOutRateY;
+        return zoomOutRateY;
     }
 
     public void setZoomOutRateY(double zoomOutRateY) {
-	this.zoomOutRateY = zoomOutRateY;
+        this.zoomOutRateY = zoomOutRateY;
+    }
+    public Point2D getZoomOutRate(){
+        return new Point2D.Double(zoomOutRateX, zoomOutRateY);
+    }
+    public Point2D getZoomInRate(){
+        return new Point2D.Double(zoomInRateX, zoomInRateY);
     }
 }

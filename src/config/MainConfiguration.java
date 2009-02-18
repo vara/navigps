@@ -7,15 +7,12 @@ package config;
 
 import java.awt.Dimension;
 import java.awt.Toolkit;
-import java.io.PrintStream;
 
 /**
  *
  * @author vara
  */
 public class MainConfiguration {
-    
-    public static final String NAVIGPS_VERSION = "0.5.1";
 
     private static boolean modeVerbose = false;
     private static boolean modeVerboseGui = false;
@@ -101,11 +98,5 @@ public class MainConfiguration {
         ret+="\nShow Document Properties "+showDocumentProperties;
 
         return ret;
-    }
-
-    public static void printVersion(String str,PrintStream out){
-        if(out==null)
-            out = System.out;
-        out.println(str+MainConfiguration.NAVIGPS_VERSION);
     }
 }
