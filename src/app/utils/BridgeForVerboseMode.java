@@ -21,10 +21,10 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
     private LinkedList<OutputVerboseStream> updateComponents =
 			new LinkedList<OutputVerboseStream>();
     
-    private PrintWriter out = new PrintWriter(new MyOutputStream(false),true);
-    private PrintWriter err = new PrintWriter(new MyOutputStream(true),true);
-    private PrintStream sout = new PrintStream(new MyOutputStream(false),true);
-    private PrintStream serr = new PrintStream(new MyOutputStream(true),true);
+    private PrintWriter out = new PrintWriter(new MyOutputStream(false),false);
+    private PrintWriter err = new PrintWriter(new MyOutputStream(true),false);
+    private PrintStream sout = new PrintStream(new MyOutputStream(false),false);
+    private PrintStream serr = new PrintStream(new MyOutputStream(true),false);
 
     public static final Console console =
                         new Console();
@@ -82,6 +82,7 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
         protected int count=0;
         private int lsep;
         private boolean err;
+
         MyOutputStream(boolean err){
             lsep = System.getProperty("line.separator").getBytes()[0];
             this.err = err;
@@ -90,6 +91,8 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
         public void write(int b) throws IOException {           
             if(b!=lsep)
                 addToBuffer(b);
+            else
+                flush();
         }
         @Override
         public void flush(){
