@@ -6,8 +6,10 @@
 package app.gui.detailspanel;
 
 import java.awt.AlphaComposite;
+import java.awt.FlowLayout;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.LayoutManager;
 import javax.swing.JPanel;
 
 /**
@@ -21,6 +23,26 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
 
     private float upperThresholdAlpha = 1f;
     private float alpha = 1f;
+
+    public AlphaJPanel(LayoutManager layout, boolean isDoubleBuffered) {
+        super(layout, isDoubleBuffered);
+    }
+
+    public AlphaJPanel(LayoutManager layout) {
+        this(layout, true);
+    }
+
+    public AlphaJPanel(boolean isDoubleBuffered) {
+        this(new FlowLayout(), isDoubleBuffered);
+    }
+
+    /**
+     * Creates a new <code>JPanel</code> with a double buffer
+     * and a flow layout.
+     */
+    public AlphaJPanel() {
+        this(true);
+    }
 
     @Override
     public void paint(Graphics g) {
