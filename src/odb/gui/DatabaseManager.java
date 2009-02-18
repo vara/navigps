@@ -14,11 +14,13 @@ import config.DataBaseConfig;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
+import javax.swing.ImageIcon;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import odb.core.Category;
 import odb.core.Subcategory;
@@ -52,7 +54,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         refreshTree();
         loadTreePopup();
 
-        //disconnectDatabase();
+    //disconnectDatabase();
     }
 
     private void addNewService() {
@@ -245,8 +247,6 @@ public class DatabaseManager extends javax.swing.JDialog {
         jTree1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Category tree", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
         jTree1.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jTree1.setToolTipText("Right-Click for options !");
-        jTree1.setDragEnabled(true);
-        jTree1.setEditable(true);
         jTree1.setRootVisible(false);
         jTree1.setScrollsOnExpand(false);
         jTree1.setShowsRootHandles(true);
@@ -522,6 +522,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                                     Subcategory s = (Subcategory) subcategory;
                                     if (s.getName().equalsIgnoreCase(jTree1.getLastSelectedPathComponent().toString())) {
                                         s.setName(newsubcat);
+                                        odb.store(c);
+                                        break;
                                     }
                                 }
                             }
@@ -540,12 +542,22 @@ public class DatabaseManager extends javax.swing.JDialog {
     private void refreshTree() {
         Category category;
         Subcategory subcategory;
+        ImageIcon leafIcon = new ImageIcon(DataBaseConfig.getIconPath() + "22.png");
+        ImageIcon openIcon = new ImageIcon(DataBaseConfig.getIconPath() + "8.png");
+        ImageIcon closedIcon = new ImageIcon(DataBaseConfig.getIconPath() + "5.png");
+
         odb = Constants.getDbConnection();
         Objects categories = odb.getObjects(Category.class);
 
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
         jTree1.setModel(new DefaultTreeModel(root));
         DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+
+        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+        renderer.setLeafIcon(leafIcon);
+        renderer.setClosedIcon(closedIcon);
+        renderer.setOpenIcon(openIcon);
+        jTree1.setCellRenderer(renderer);
 
         while (categories.hasNext()) {
             category = (Category) categories.next();
