@@ -9,11 +9,11 @@ package odb.core;
  *
  * @author ACME
  */
-public class Service {
+public class ServiceCore {
     private ServiceAttributes serviceAttributes;
     private ServiceDescription serviceDescription;
 
-    public Service(ServiceAttributes serviceAttributes, ServiceDescription serviceDescription) {
+    public ServiceCore(ServiceAttributes serviceAttributes, ServiceDescription serviceDescription) {
         this.serviceAttributes = serviceAttributes;
         this.serviceDescription = serviceDescription;
     }

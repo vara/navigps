@@ -86,7 +86,7 @@ import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
-import odb.gui.Manager;
+import odb.gui.DatabaseManager;
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.gvt.CanvasGraphicsNode;
@@ -436,7 +436,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             @Override
                 public void actionPerformed(ActionEvent e) {
 
-                    Manager odb = new Manager(MainWindowIWD.this,true);
+                    DatabaseManager odb = new DatabaseManager(MainWindowIWD.this,true);
                     odb.setVisible(true);
                     //throw new UnsupportedOperationException("Unsupported exception!");
                 }
