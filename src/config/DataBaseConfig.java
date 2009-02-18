@@ -11,6 +11,7 @@ package config;
  */
 public class DataBaseConfig {
     private static String defaultDatabasePath = "./resources/odb/";
+    private static String databaseFilename = "neodatis.odb";
 
     /**
      * @return the defaultDatabasePath
@@ -24,5 +25,19 @@ public class DataBaseConfig {
      */
     public static void setDefaultDatabasePath(String aDefaultDatabasePath) {
         defaultDatabasePath = aDefaultDatabasePath;
+    }
+
+    /**
+     * @return the databaseFilename
+     */
+    public static String getDatabaseFilename() {
+        return databaseFilename;
+    }
+
+    /**
+     * @param aDatabaseFilename the databaseFilename to set
+     */
+    public static void setDatabaseFilename(String aDatabaseFilename) {
+        databaseFilename = aDatabaseFilename;
     }
 }

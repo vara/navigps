@@ -13,12 +13,22 @@ package odb.gui;
 import config.DataBaseConfig;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Vector;
 import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import odb.core.Category;
+import odb.core.Subcategory;
+import odb.utils.Constants;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.ODBFactory;
+import org.neodatis.odb.Objects;
+import org.neodatis.odb.core.query.IQuery;
+import org.neodatis.odb.core.query.criteria.Where;
+import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
  *
@@ -39,6 +49,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         super(parent, modal);
         initComponents();
         connectDatabase();
+        refreshTree();
         loadTreePopup();
 
     //disconnectDatabase();
@@ -52,7 +63,9 @@ public class DatabaseManager extends javax.swing.JDialog {
     private void connectDatabase() {
         try {
             System.err.println("ODB: connecting");
-            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + "neodatis.odb");
+            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
+            Constants.setDbConnection(odb);
+            odb = null;
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
         }
@@ -60,7 +73,7 @@ public class DatabaseManager extends javax.swing.JDialog {
 
     private void disconnectDatabase() {
         try {
-            odb.close();
+            Constants.getDbConnection().close();
             System.err.println("ODB: disconnecting");
         } catch (Exception e) {
             JOptionPane.showMessageDialog(this, e.getMessage());
@@ -89,7 +102,6 @@ public class DatabaseManager extends javax.swing.JDialog {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTextArea1 = new javax.swing.JTextArea();
         jPanel3 = new javax.swing.JPanel();
-        jLabel19 = new javax.swing.JLabel();
         jScrollPane3 = new javax.swing.JScrollPane();
         jTree1 = new javax.swing.JTree();
 
@@ -147,11 +159,16 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         jPanel4.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "Selection", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
 
-        jButton4.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        jButton4.setFont(new java.awt.Font("Verdana", 0, 11));
         jButton4.setText("Edit");
         jButton4.setEnabled(false);
+        jButton4.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jButton4ActionPerformed(evt);
+            }
+        });
 
-        jButton5.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        jButton5.setFont(new java.awt.Font("Verdana", 0, 11));
         jButton5.setText("Remove");
         jButton5.setEnabled(false);
 
@@ -223,11 +240,16 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Services", jPanel1);
 
-        jLabel19.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
-        jLabel19.setText("Category tree:");
+        jScrollPane3.setBorder(null);
 
+        jTree1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Category tree", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
+        jTree1.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jTree1.setToolTipText("Right-Click for options !");
+        jTree1.setDragEnabled(true);
+        jTree1.setEditable(true);
         jTree1.setRootVisible(false);
+        jTree1.setScrollsOnExpand(false);
+        jTree1.setShowsRootHandles(true);
         jTree1.addMouseListener(new java.awt.event.MouseAdapter() {
             public void mousePressed(java.awt.event.MouseEvent evt) {
                 jTree1MousePressed(evt);
@@ -242,21 +264,11 @@ public class DatabaseManager extends javax.swing.JDialog {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addGroup(jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 405, Short.MAX_VALUE)
-                    .addComponent(jLabel19))
-                .addContainerGap())
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel3Layout.createSequentialGroup()
-                .addContainerGap()
-                .addComponent(jLabel19)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 355, Short.MAX_VALUE)
-                .addContainerGap())
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Categories", jPanel3);
@@ -290,23 +302,26 @@ public class DatabaseManager extends javax.swing.JDialog {
         addNewService();
     }//GEN-LAST:event_jButton3ActionPerformed
 
-    private void jTree1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MousePressed
-        if (evt.isPopupTrigger()) {
-            popup.show(evt.getComponent(), evt.getX(), evt.getY());
-        }
-    }//GEN-LAST:event_jTree1MousePressed
+    private void jButton4ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton4ActionPerformed
+        new ServiceEditor(null, true).setVisible(true);
+    }//GEN-LAST:event_jButton4ActionPerformed
 
     private void jTree1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseReleased
         if (evt.isPopupTrigger()) {
             popup.show(evt.getComponent(), evt.getX(), evt.getY());
         }
-    }//GEN-LAST:event_jTree1MouseReleased
+}//GEN-LAST:event_jTree1MouseReleased
+
+    private void jTree1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MousePressed
+        if (evt.isPopupTrigger()) {
+            popup.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+}//GEN-LAST:event_jTree1MousePressed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton3;
     private javax.swing.JButton jButton4;
     private javax.swing.JButton jButton5;
-    private javax.swing.JLabel jLabel19;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
     private javax.swing.JPanel jPanel3;
@@ -323,14 +338,41 @@ public class DatabaseManager extends javax.swing.JDialog {
 
     private void loadTreePopup() {
         popup = new JPopupMenu();
-
         newMenu = new JMenu("New");
 
         categoryMenu = new JMenuItem("Category");
         categoryMenu.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                new CategoryCreator(null, true).setVisible(true);
+
+                ODB odb = Constants.getDbConnection();
+                boolean FL_D = false;
+                String newCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new category name", "new category");
+
+                if (newCat == null) {
+                    //cancel
+                } else if (newCat.equals("")) {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "You have to input name!", "Warning", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    Objects categories = odb.getObjects(Category.class);
+                    Category category = null;
+                    if (!categories.isEmpty()) {
+                        while (categories.hasNext()) {
+                            category = (Category) categories.next();
+                            if (category.getName().equalsIgnoreCase(newCat)) {
+                                JOptionPane.showMessageDialog(null, "Category already exists! Change new category name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                                FL_D = true;
+                                break;
+                            }
+                        }
+                        if (!FL_D) {
+                            odb.store(new Category(newCat));
+                        }
+                    } else {
+                        odb.store(new Category(newCat));
+                    }
+                    refreshTree();
+                }
             }
         });
 
@@ -342,8 +384,43 @@ public class DatabaseManager extends javax.swing.JDialog {
                     JOptionPane.showMessageDialog(DatabaseManager.this, "No category selected!", "Error!", JOptionPane.ERROR_MESSAGE);
                 } else {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
-                        System.out.println("Creating in: " + jTree1.getLastSelectedPathComponent().toString());
-                        new SubcategoryCreator(null, true).setVisible(true);
+                        ODB odb = Constants.getDbConnection();
+                        boolean FL_DS = false;
+                        String newsubCat = JOptionPane.showInputDialog(DatabaseManager.this,"Enter new subcategory name:","new subcategory");
+
+                        if (newsubCat == null) {
+                            //cancel
+                        } else if (newsubCat.equals("")) {
+                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to input name!", "Warning", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects categories = odb.getObjects(query);
+                            Category category = (Category) categories.getFirst();
+
+                            if (category.getSubcategories() == null) {
+                                category.setSubcategories(new Vector());
+                                category.addSubcategory(new Subcategory(category, newsubCat));
+                                odb.store(category);
+                            } else {
+                                if (category.getSubcategories().isEmpty()) {
+                                    category.addSubcategory(new Subcategory(category, newsubCat));
+                                } else {
+                                    for (Object sub : category.getSubcategories()) {
+                                        Subcategory sc = (Subcategory) sub;
+                                        if (sc.getName().equalsIgnoreCase(newsubCat)) {
+                                            FL_DS = true;
+                                        }
+                                    }
+                                    if (FL_DS) {
+                                        JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                                    } else {
+                                        category.addSubcategory(new Subcategory(category, newsubCat));
+                                        odb.store(category);
+                                    }
+                                }
+                            }
+                            refreshTree();
+                        }
                     } else {
                         JOptionPane.showMessageDialog(DatabaseManager.this, "Selection is not a category!", "Error!", JOptionPane.ERROR_MESSAGE);
                     }
@@ -368,14 +445,14 @@ public class DatabaseManager extends javax.swing.JDialog {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
                         System.out.println("Removing category: " + jTree1.getLastSelectedPathComponent().toString());
                         Object[] options = {"Yes", "No", "Cancel"};
-                        int n = JOptionPane.showOptionDialog(rootPane, "Remove category " + jTree1.getLastSelectedPathComponent().toString() + "? Removing category will cause all of its subcategories and services be removed as well!","Prompt",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,null);
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove category " + jTree1.getLastSelectedPathComponent().toString() + "? Removing category will cause all of its subcategories and services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
                         if (n == 0) {
                             System.out.println("remove category");
                         }
                     } else if (jTree1.getSelectionPath().getPath().length == 3) {
                         System.out.println("Removing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
                         Object[] options = {"Yes", "No", "Cancel"};
-                        int n = JOptionPane.showOptionDialog(rootPane, "Remove subcategory " + jTree1.getLastSelectedPathComponent().toString() + "? Removing subcategory will cause all of its services be removed as well!","Prompt",JOptionPane.YES_NO_CANCEL_OPTION,JOptionPane.QUESTION_MESSAGE,null,options,null);
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove subcategory " + jTree1.getLastSelectedPathComponent().toString() + "? Removing subcategory will cause all of its services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
                         if (n == 0) {
                             System.out.println("remove subcategory");
                         }
@@ -392,15 +469,43 @@ public class DatabaseManager extends javax.swing.JDialog {
                     JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
                 } else {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
+                        System.out.println("Editing category: " + jTree1.getLastSelectedPathComponent().toString());
                         new CategoryEditor(null, true).setVisible(true);
-                    } else {
+                    } else if (jTree1.getSelectionPath().getPath().length == 3) {
+                        System.out.println("Editing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
                         new SubcategoryEditor(null, true).setVisible(true);
                     }
                 }
             }
         });
-
         popup.add(editMenu);
         popup.add(removeMenu);
+    }
+
+    private void refreshTree() {
+        Category category;
+        Subcategory subcategory;
+        odb = Constants.getDbConnection();
+        Objects categories = odb.getObjects(Category.class);
+
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        jTree1.setModel(new DefaultTreeModel(root));
+        DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+
+        while (categories.hasNext()) {
+            category = (Category) categories.next();
+            DefaultMutableTreeNode cat = new DefaultMutableTreeNode(category.getName());
+            model.insertNodeInto(cat, root, root.getChildCount());
+            if (category.getSubcategories() != null) {
+                for (int i = 0; i < category.getSubcategories().size(); i++) {
+                    subcategory = (Subcategory) category.getSubcategories().get(i);
+                    DefaultMutableTreeNode sub = new DefaultMutableTreeNode(subcategory.getName());
+                    model.insertNodeInto(sub, cat, cat.getChildCount());
+                }
+            }
+//            jTree1.setExpandsSelectedPaths(true);
+//            jTree1.expandPath(jTree1.getSelectionPath());
+        }
+        model.reload();
     }
 }
