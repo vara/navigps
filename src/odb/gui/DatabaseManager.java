@@ -52,7 +52,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         refreshTree();
         loadTreePopup();
 
-    //disconnectDatabase();
+        //disconnectDatabase();
     }
 
     private void addNewService() {
@@ -386,7 +386,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
                         ODB odb = Constants.getDbConnection();
                         boolean FL_DS = false;
-                        String newsubCat = JOptionPane.showInputDialog(DatabaseManager.this,"Enter new subcategory name:","new subcategory");
+                        String newsubCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new subcategory name:", "new subcategory");
 
                         if (newsubCat == null) {
                             //cancel
@@ -465,20 +465,75 @@ public class DatabaseManager extends javax.swing.JDialog {
         editMenu.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
+                boolean FL_D = false;
+                boolean FL_DD = false;
                 if (jTree1.isSelectionEmpty()) {
                     JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
                 } else {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
-                        System.out.println("Editing category: " + jTree1.getLastSelectedPathComponent().toString());
-                        new CategoryEditor(null, true).setVisible(true);
+                        String newcat = JOptionPane.showInputDialog("Please input new name for the selected category " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
+                        if (newcat == null) {
+//                            cancel
+                        } else if (newcat.equalsIgnoreCase("")) {
+                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid category name!", "Warning", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            odb = Constants.getDbConnection();
+                            Objects categories = odb.getObjects(Category.class);
+                            while (categories.hasNext()) {
+                                Category c = (Category) categories.next();
+                                if (c.getName().equalsIgnoreCase(newcat)) {
+                                    FL_D = true;
+                                    break;
+                                }
+                            }
+                            if (FL_D) {
+                                JOptionPane.showMessageDialog(DatabaseManager.this, "Category already exists! Change category name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                                Objects cats = odb.getObjects(query);
+                                Category cat = (Category) cats.getFirst();
+                                cat.setName(newcat);
+                                odb.store(cat);
+                                refreshTree();
+                            }
+                        }
+
                     } else if (jTree1.getSelectionPath().getPath().length == 3) {
-                        System.out.println("Editing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
-                        new SubcategoryEditor(null, true).setVisible(true);
+                        String newsubcat = JOptionPane.showInputDialog("Please input new name for the selected subcategory " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
+                        if (newsubcat == null) {
+//                            cancel
+                        } else if (newsubcat.equalsIgnoreCase("")) {
+                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid subcategory name!", "Warning", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            odb = Constants.getDbConnection();
+                            IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getSelectionPath().getParentPath().getLastPathComponent().toString()));
+                            Objects cats = odb.getObjects(query);
+                            Category c = (Category) cats.getFirst();
+                            for (Object subcategory : c.getSubcategories()) {
+                                Subcategory s = (Subcategory) subcategory;
+                                if (s.getName().equalsIgnoreCase(newsubcat)) {
+                                    FL_DD = true;
+                                }
+                            }
+                            if (FL_DD) {
+                                JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                for (Object subcategory : c.getSubcategories()) {
+                                    Subcategory s = (Subcategory) subcategory;
+                                    if (s.getName().equalsIgnoreCase(jTree1.getLastSelectedPathComponent().toString())) {
+                                        s.setName(newsubcat);
+                                    }
+                                }
+                            }
+                            refreshTree();
+                        }
                     }
                 }
             }
         });
+
         popup.add(editMenu);
+
         popup.add(removeMenu);
     }
 
