@@ -5,27 +5,25 @@
 
 package app.gui.svgComponents;
 
+import app.gui.MainWindowIWD;
 import app.gui.searchServices.SearchServices;
 import app.gui.svgComponents.displayobjects.DisplayManager;
 import app.utils.Utils;
 import config.SVGConfiguration;
 import java.awt.BorderLayout;
-import java.awt.Component;
 import java.awt.Cursor;
-import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Dimension2D;
 import java.awt.geom.Point2D;
 import javax.swing.JLabel;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
-import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
-import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
+import org.apache.batik.swing.svg.SVGLoadEventDispatcherEvent;
+import org.apache.batik.swing.svg.SVGLoadEventDispatcherListener;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -65,49 +63,41 @@ public class Canvas extends JSVGCanvas{
     private JLabel labelViewMousePosyton = new JLabel("");
     private SVGConfiguration svgConfig = new SVGConfiguration();
     
-    private SVGBridgeListeners listeners;
-    private ZoomAndMove zoomListener;
+    private SVGBridgeComponents listeners = MainWindowIWD.
+                        getBridgeInformationPipe();
+
+    private MouseGestures mouseIteractions;
     
     //not used yet
     //private SVGUserAgentGUIAdapter agent;
 
     private SearchServices search;
-    DisplayManager dm;
+    private DisplayManager dm;
 
-    public Canvas(SVGBridgeListeners listeners){
-		
-        //setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
-        setDocumentState(Canvas.ALWAYS_STATIC);
-        //setRecenterOnResize(false);
+    public Canvas(){
+		super(null,false,false);
+
+        setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+        //setDocumentState(Canvas.ALWAYS_STATIC);
         setDoubleBuffered(false);
-
-        addSVGDocumentLoaderListener(listeners);
-        addGVTTreeBuilderListener(listeners);
-        addGVTTreeRendererListener(listeners);
-
-        zoomListener=new  ZoomAndMove();
-         //addMouseListener(zoomListener);
-        addMouseMotionListener(zoomListener);
-        this.listeners = listeners;
-
+        mouseIteractions = new  MouseGestures();
         setLayout(new BorderLayout());
-        search = new SearchServices(listeners.getVerboseStream());
+        search = new SearchServices(this);
         add(search,BorderLayout.CENTER);
         addMouseMotionListener(search);
         addMouseListener(search);
         addJGVTComponentListener(search.getDocumentStateChanged());
-        addGVTTreeRendererListener(listener);
-
-        dm = new DisplayManager(this,listeners.getVerboseStream());
-
+        dm = new DisplayManager(this);
         addGVTTreeRendererListener(dm.getRenderingTreeListener());
-        //for test
+
+        //setEnableZoomInteractor(false);
+        //setEnableImageZoomInteractor(false);
     }
     
     public SearchServices getSearchServices(){
         return search;
     }
-    
+
     @Override
     public void setURI(String uri){	
         super.setURI(uri);
@@ -125,96 +115,149 @@ public class Canvas extends JSVGCanvas{
     public void paintComponent(Graphics g){
         super.paintComponent(g);
     }
-    
-    private class ZoomAndMove extends MouseAdapter{	
-        private boolean zoomAtMousePoit = false;
+
+    public void zoomFromCenterDocumnet(boolean zoomIn){
+        mouseIteractions.zoomFromCenterDocumnet(zoomIn);
+        mouseIteractions.setMode(MouseGestures.ZOOM_ACTION);
+    }
+
+    public void zoomFromMouseCoordinationEnable(boolean setZoom){
+
+        if(setZoom){
+            addMouseListener(mouseIteractions);
+            addMouseMotionListener(mouseIteractions);
+            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        }
+        else{
+            setCursor(Cursor.getDefaultCursor());
+            removeMouseListener(mouseIteractions);
+            removeMouseMotionListener(mouseIteractions);
+        }
+        mouseIteractions.setMode(MouseGestures.ZOOM_ACTION);
+    }
+
+    private class MouseGestures extends MouseAdapter{
+
+        private int xStart;
+        private int yStart;
+        private boolean drag=false;
+
+        public static final byte ZOOM_ACTION   =0;
+        public static final byte PAN_ACTION    =1;
+        public static final byte ROTATE_ACTION =2;
+
+        //none mode
+        private byte mode = -1;
 
         @Override
         public void mouseClicked(MouseEvent evt) {
 
             Point2D p2d = new Point2D.Double(evt.getX(),evt.getY());
-            if(evt.getButton()==1){
-                zoomIn(p2d);
-                search.getVerboseStream().outputVerboseStream("Zoom In\n\tPoint "+p2d+
+            int button = evt.getButton();
+            if(button==MouseEvent.BUTTON1){
+                renderingZoom(p2d,svgConfig.getZoomInRate());
+                System.out.println("Zoom In\n\tPoint "+p2d+
                                 "\n\tRate ["+svgConfig.getZoomInRateX()+","+svgConfig.getZoomInRateY()+"]");
             }
-            else {
-                zoomOut(p2d);
-                search.getVerboseStream().outputVerboseStream("Zoom Out\n\tPoint "+p2d+
+            else if(button == MouseEvent.BUTTON3){
+                renderingZoom(p2d,svgConfig.getZoomOutRate());
+                System.out.println("Zoom Out\n\tPoint "+p2d+
                                 "\n\tRate ["+svgConfig.getZoomOutRateX()+","+svgConfig.getZoomOutRateY()+"]");
             }
         }
         @Override
-        public void mousePressed(MouseEvent e) {}
+        public void mousePressed(MouseEvent e) {
+            xStart = e.getX();
+            yStart = e.getY();
+            if(e.getButton() == MouseEvent.BUTTON1){
+                drag=true;                
+            }                
+        }
+
         @Override
-        public void mouseDragged(MouseEvent e) {
-            mouseMoved(e);
+        public void mouseReleased(MouseEvent e) {
+            if(drag){
+                drag=false;
+                AffineTransform pt = getPaintingTransform();
+                if (pt != null) {
+                    AffineTransform rt = (AffineTransform)getRenderingTransform();
+                    pt.concatenate(rt);
+                    setRenderingTransform(pt);
+                }
+            }
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {            
+            if(drag && getMode()==MouseGestures.ZOOM_ACTION){
+                int dy = e.getY() - yStart;
+                double s;
+                if (dy < 0) {
+                    dy -= 10;
+                    s = (dy > -15) ? 1.0 : -15.0/dy;
+                } else {
+                    dy += 10;
+                    s = (dy <  15) ? 1.0 : dy/15.0;
+                }
+                paintingZoom(new Point(xStart, yStart), new Point2D.Double(s, s));
+            }
         }
 
         @Override
         public void mouseMoved(MouseEvent e) {
-            SVGDocument doc = getSVGDocument();
+            SVGDocument doc = getSVGDocument();            
             if(doc != null && !listeners.isRendering()){
                 SVGOMPoint svgp =Utils.getLocalPointFromDomElement(doc.getRootElement(),e.getX() ,e.getY());
                 //0.position on source component 1.positon on screen 2. posytion on svg doc (root element)
                 String str = e.getX()+","+e.getY()+";"+
                          e.getXOnScreen()+","+e.getYOnScreen()+";"+
                          svgp.getX()+","+svgp.getY();
-
-                listeners.setLabelInformationPosytion(str);
+                //System.out.println(""+str);
+                //listeners.setLabelInformationPosytion(str);
             }
         }
 
-        private void zoomIn(Point2D p2d){
-            AffineTransform at;
-            at = getRenderingTransform();
-            if (at != null) {
-                at.preConcatenate(AffineTransform.getTranslateInstance(-p2d.getX(),-p2d.getY()));
-                at.preConcatenate(AffineTransform.getScaleInstance(svgConfig.getZoomInRateX(),
-                                               svgConfig.getZoomInRateY()));
-                at.preConcatenate(AffineTransform.getTranslateInstance(p2d.getX(),p2d.getY()));
-                setRenderingTransform(at);
-            }else
-                search.getVerboseStream().outputVerboseStream(getClass().getName()+" \t[Exception] Rendering transform == null !!!");
+        public void paintingZoom(Point2D translate,Point2D scale){
+            AffineTransform at = getZoomTransform(translate, scale);            
+            setPaintingTransform(at);
         }
+        public void renderingZoom(Point2D translate,Point2D scale){
 
-        private void zoomOut(Point2D p2d){
-            AffineTransform at;
-            at = getRenderingTransform();
-            if (at != null) {
-                at.preConcatenate(AffineTransform.getTranslateInstance(-p2d.getX(),-p2d.getY()));
-                at.preConcatenate(AffineTransform.getScaleInstance(svgConfig.getZoomOutRateX(),
-                                           svgConfig.getZoomOutRateX()));
-                at.preConcatenate(AffineTransform.getTranslateInstance(p2d.getX(),p2d.getY()));
+            AffineTransform rat = getRenderingTransform();
+            if(rat!=null){
+                AffineTransform at = getZoomTransform(translate, scale);
+                at.concatenate(rat);
                 setRenderingTransform(at);
             }
         }
+        private AffineTransform getZoomTransform(Point2D translate,Point2D scale){            
+            AffineTransform t = AffineTransform.getTranslateInstance(translate.getX(),translate.getY());
+            t.concatenate(AffineTransform.getScaleInstance(scale.getX(),scale.getY()));                
+            t.translate(-translate.getX(),-translate.getY());            
+            return t;
+        }
+
         public void zoomFromCenterDocumnet(boolean zoomIn){
 
-            Point2D p2d = new Point(getSize().width/2,getSize().height/2);
-            if(zoomIn) zoomIn(p2d);
-            else zoomOut(p2d);
-        }	
-    }//class ZoomAndMoveMouseListener
-    
-    
-    public void zoomFromCenterDocumnet(boolean zoomIn){
-	zoomListener.zoomFromCenterDocumnet(zoomIn);
-    }
-    public void zoomFromMouseCoordinationEnable(boolean setZoom){
-		
-        MouseListener[] ml = getMouseListeners();
-        //for (MouseListener mouseListener : ml) {
-            //System.out.println(""+mouseListener);
-        //}
+            Point2D translate = new Point(getSize().width>>1,getSize().height>>1);
+            Point2D scale;
+            if(zoomIn) scale= svgConfig.getZoomInRate();
+            else scale= svgConfig.getZoomOutRate();
+            renderingZoom(translate, scale);
+        }
 
-        if(setZoom){
-            addMouseListener(zoomListener);
-            setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
+        /**
+         * @return the mode
+         */
+        public byte getMode() {
+            return mode;
         }
-        else{
-            setCursor(Cursor.getDefaultCursor());
-            removeMouseListener(zoomListener);
+
+        /**
+         * @param mode the mode to set
+         */
+        public void setMode(byte mode) {
+            this.mode = mode;
         }
-    }    
+    }//class MouseGestures
 }

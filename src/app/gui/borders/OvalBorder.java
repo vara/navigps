@@ -5,7 +5,6 @@
 
 package app.gui.borders;
 
-import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Graphics;
@@ -13,42 +12,34 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.geom.RoundRectangle2D;
-import javax.swing.border.AbstractBorder;
 
 /**
  * Created on 2008-12-09, 04:50:17
  * @author vara
  */
 
-public class OvalBorder extends AbstractBorder {
-
-     private double recw=0;
-     private double rech=0;
+public class OvalBorder extends RoundBorder{
+     
      private Color borderColor=new Color(90,100,190,255);
-     private Insets insets = new Insets(6, 10, 6, 10);
-     private float upperThresholdAlpha = 1f;
+     private Insets insets = new Insets(4, 4, 4, 4);
 
      public OvalBorder() {
-             recw=6;
-             rech=6;
      }
-
+     
      public OvalBorder(double recw, double rech) {
-             this.recw=recw;
-             this.rech=rech;
+        super(recw,rech);
      }
 
      public OvalBorder(double recw, double rech, Color topColor) {
-        this.recw=recw;
-        this.rech=rech;
+        this(recw,rech);
         borderColor = topColor;
-        setUpperThresholdAlpha((float)borderColor.getAlpha()/255);
+        setAlpha((float)borderColor.getAlpha()/255);
+        setUpperThresholdAlpha(getAlpha());
      }
 
      public OvalBorder(int top, int left, int bottom, int right,double recw, double rech, Color topColor) {
+        this(recw,rech);
         insets = new Insets(top, left, bottom, right);
-        this.recw=recw;
-        this.rech=rech;
         borderColor = topColor;
      }
 
@@ -75,16 +66,15 @@ public class OvalBorder extends AbstractBorder {
 
     @Override
      public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
-        RoundRectangle2D border = createOuterShape(x,y,w-1,h-1,getRecW(),getRecH(),getInsets());
-        Graphics2D g2 = (Graphics2D)g.create();
-        g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
-        float alpha = (float)getBorderColor().getAlpha()/255;
-        AlphaComposite newComposite =
-                AlphaComposite.getInstance(AlphaComposite.SRC_OVER,alpha);
-        g2.setComposite(newComposite);
-        g2.setColor(getBorderColor());
-        g2.draw(border);
-        g2.dispose();
+        if(getAlpha()>0){
+            super.paintBorder(c, g, x, y, h, h);
+            RoundRectangle2D border = createOuterShape(x,y,w-1,h-1,getRecW(),getRecH(),getInsets());
+            Graphics2D g2 = (Graphics2D)g.create();
+            g2.setColor(getBorderColor());
+            g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);
+            g2.draw(border);
+            g2.dispose();
+        }
      }
 
     public static RoundRectangle2D.Double createOuterShape(double x, double y, double w, double h,
@@ -99,35 +89,7 @@ public class OvalBorder extends AbstractBorder {
         double outerWidth = w;
         double outerHeight = h;
         return new RoundRectangle2D.Double(outerX,outerY,outerWidth,outerHeight,arcx,arcy);
-    }
-
-    /**
-     * @return the recw
-     */
-    public double getRecW() {
-        return recw;
-    }
-
-    /**
-     * @param recw the recw to set
-     */
-    public void setRecW(double recw) {
-        this.recw = recw;
-    }
-
-    /**
-     * @return the rech
-     */
-    public double getRecH() {
-        return rech;
-    }
-
-    /**
-     * @param rech the rech to set
-     */
-    public void setRecH(double rech) {
-        this.rech = rech;
-    }
+    }   
 
     /**
      * @return the borderColor
@@ -157,18 +119,8 @@ public class OvalBorder extends AbstractBorder {
         this.insets = insets;
     }
 
-    /**
-     * @return the upperThresholdAlpha
-     */
-    public float getUpperThresholdAlpha() {
-        return upperThresholdAlpha;
+    @Override
+    public void setBorderInsets(Insets ins) {
+        setInsets(ins);
     }
-
-    /**
-     * @param upperThresholdAlpha the upperThresholdAlpha to set
-     */
-    public void setUpperThresholdAlpha(float upperThresholdAlpha) {
-        this.upperThresholdAlpha = upperThresholdAlpha;
-    }
-
 }

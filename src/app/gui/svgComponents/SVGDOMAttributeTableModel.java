@@ -17,18 +17,21 @@ public class SVGDOMAttributeTableModel extends AbstractTableModel{
     private NamedNodeMap map;
     
     public SVGDOMAttributeTableModel(NamedNodeMap map){
-	this.map = map;
+        this.map = map;
     }
 
+    @Override
     public int getRowCount() {
-	return map.getLength();
+        return map.getLength();
     }
 
+    @Override
     public int getColumnCount() {
-	return 2;
+        return 2;
     }
 
+    @Override
     public Object getValueAt(int rowIndex, int columnIndex) {
-	return columnIndex==0 ? map.item(rowIndex).getNodeName() : map.item(rowIndex).getNodeValue();
+        return columnIndex==0 ? map.item(rowIndex).getNodeName() : map.item(rowIndex).getNodeValue();
     }
 }

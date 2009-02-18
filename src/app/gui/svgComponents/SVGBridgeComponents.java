@@ -5,125 +5,87 @@
 
 package app.gui.svgComponents;
 
-import app.utils.OutputVerboseStream;
+import app.gui.StatusChangedListener;
+import java.io.File;
 import java.util.LinkedList;
-import javax.swing.JLabel;
 
 /**
  *
  * @author vara
  */
-public class SVGBridgeComponents implements LetComponentsOfChangedDoc{
-
-    private JLabel labCurrentStatus = new JLabel("Choose Documnet");
-    private JLabel mousePosOnSvgComponent = new JLabel("no documnet",JLabel.CENTER);
-    private JLabel pointInSvgDoc = new JLabel("no document",JLabel.CENTER);
-    private String strCurrentStatus ="";
+public class SVGBridgeComponents implements StatusChangedListener,
+                                    UpdateComponentsWhenChangedDoc{
+   
     private boolean rederingStatus = true;
-    private OutputVerboseStream verboseStream = null;
-    private boolean verboseEnabled = false;
 
     private LinkedList<UpdateComponentsWhenChangedDoc> updateComponets = 
 			new LinkedList<UpdateComponentsWhenChangedDoc>();
+
+    private LinkedList<StatusChangedListener> statusChanged =
+			new LinkedList<StatusChangedListener>();
     
-    private String absoluteFilePath="";    
+    private File svgFile= null;
     
-    public SVGBridgeComponents(){	
-    }
+    public SVGBridgeComponents(){}
     
     public boolean isRendering() {
-	return rederingStatus;
-    }
-    
-    protected void documentBuildCompleted(){
-	
-	Thread t = new Thread(new Runnable() {
-
-	    @Override
-	    public void run() {
-            for (UpdateComponentsWhenChangedDoc ucomp : updateComponets) {
-                ucomp.documentPrepareToModification();
-            }
-	    }
-	});
-	t.start();
+        return rederingStatus;
     }
     
     protected void setRederingStatus(boolean rederingStatus) {
-	this.rederingStatus = rederingStatus;
+        this.rederingStatus = rederingStatus;
     }
     
-    protected void setTextToCurrentStatus(String text){
-        labCurrentStatus.setText(text);
-        strCurrentStatus = text;
-        for (UpdateComponentsWhenChangedDoc ucomp : updateComponets) {
-            ucomp.currentStatusChanged(text);
-        }
-        if(getVerboseStream()!=null && isVerboseEnabled())
-           getVerboseStream().outputVerboseStream(text);
-    }
-    
-    @Override
-    public JLabel getLabelWithPosOnSvgComponent() {
-        return mousePosOnSvgComponent;
-    }
-    
-    @Override
-    public JLabel getLabelWithPointInSvgDoc() {
-        return pointInSvgDoc;
-    }
-    
-    public void setLabelInformationPosytion(String pos){
-	
-        String [] str = pos.split(";");
-        if(str.length>2){
-            mousePosOnSvgComponent.setText(str[0]);
-            pointInSvgDoc.setText(str[2]);
-        }
-    }
-
-    @Override
-    public String getStringWithCurrentStatus() {
-        return strCurrentStatus;
-    }
-    
-    @Override
-    public JLabel getLabelWithCurrentStatus() {
-        return labCurrentStatus;
-    }
-    
-    public void setAbsoluteFilePath(String path){
-        absoluteFilePath = path;
+    public void setSvgFileObject(File path){
+        svgFile = path;
     }
     
     public final String getAbsoluteFilePath(){
-        return absoluteFilePath;
+        if(svgFile != null)
+            return svgFile.getName();
+        return "";
     }
     
-    public void addUpdateComponents(UpdateComponentsWhenChangedDoc l){
+    public void addUpdateComponentslisteners(UpdateComponentsWhenChangedDoc l){
 	
         if(l!=null)
             updateComponets.add(l);
-        //System.out.println("Update components size "+updateComponets.size());
     }
-    public void setVerboseStream(OutputVerboseStream v){
-        verboseStream = v;
-    }
-    public OutputVerboseStream getVerboseStream(){
-        return verboseStream;
+    
+    public void addStatusChangedlistener(StatusChangedListener l){
+        if(l!=null)
+             statusChanged.add(l);
     }
 
-    /**
-     * @return the verboseEnabled
-     */
-    protected boolean isVerboseEnabled() {
-        return verboseEnabled;
+    @Override
+    synchronized public void currentStatusChanged(String str) {
+        for (StatusChangedListener ucomp : statusChanged) {
+            ucomp.currentStatusChanged(str);
+        }
+        //System.out.println(str);
     }
 
-    /**
-     * @param verboseEnabled the verboseEnabled to set
-     */
-    protected void verboseEnabled(boolean verboseEnabled) {
-        this.verboseEnabled = verboseEnabled;
+    @Override
+    public void documentPrepareToModification() {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (UpdateComponentsWhenChangedDoc ucomp : updateComponets)
+                    ucomp.documentPrepareToModification();
+            }
+        });
+        t.start();
+    }
+
+    @Override
+    public void documentClosed() {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (UpdateComponentsWhenChangedDoc ucomp : updateComponets)
+                    ucomp.documentClosed();
+            }
+        });
+        t.start();
     }
 }

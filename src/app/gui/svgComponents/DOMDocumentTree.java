@@ -150,6 +150,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
                                                           this);
         }
 
+        @Override
         public void dragGestureRecognized(DragGestureEvent dge) {
             if (!controller.isDNDSupported()) {
                 return;
@@ -305,6 +306,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
             addOnAutoscrollListener(tree);
         }
 
+        @Override
         public void dragEnter(DropTargetDragEvent dtde) {
             JTree tree = (JTree) dtde.getDropTargetContext().getComponent();
             JRootPane rootPane = tree.getRootPane();
@@ -338,6 +340,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
             }
         }
 
+        @Override
         public void dragOver(DropTargetDragEvent dtde) {
             JTree tree = (JTree) dtde.getDropTargetContext().getComponent();
             TreeNode targetTreeNode = getNode(dtde);
@@ -381,9 +384,11 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
             }
         }
 
+        @Override
         public void dropActionChanged(DropTargetDragEvent dtde) {
         }
 
+        @Override
         public void drop(DropTargetDropEvent dtde) {
             Point p = dtde.getLocation();
             DropTargetContext dtc = dtde.getDropTargetContext();
@@ -416,6 +421,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
             dtde.rejectDrop();
         }
 
+        @Override
         public void dragExit(DropTargetEvent dte) {
             setOriginalGlassPane
                 ((JTree) dte.getDropTargetContext().getComponent());
@@ -767,6 +773,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
 
     // Autoscroll support
 
+    @Override
     public void autoscroll(Point point) {
         JViewport viewport =
             (JViewport) SwingUtilities.getAncestorOfClass(JViewport.class,
@@ -811,6 +818,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
         }
     }
 
+    @Override
     public Insets getAutoscrollInsets() {
         int topAndBottom = getHeight();
         int leftAndRight = getWidth();
@@ -858,9 +866,11 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
     public static class DOMDocumentTreeAdapter
             implements DOMDocumentTreeListener {
 
+        @Override
         public void dropCompleted(DOMDocumentTreeEvent event) {
         }
 
+        @Override
         public void onAutoscroll(DOMDocumentTreeEvent event) {
         }
     }

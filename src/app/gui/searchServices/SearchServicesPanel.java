@@ -11,11 +11,10 @@
 
 package app.gui.searchServices;
 
-import app.gui.detailspanel.DetailsPanelForSearchServices;
-import app.gui.displayItemsMap.PanelWithJTree.MyScrollBarUI;
+import app.gui.ScrollBar.ui.LineScrollBarUI;
+import app.gui.detailspanel.RoundWindow;
 import java.awt.Component;
 import java.awt.Point;
-import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.JScrollBar;
@@ -54,8 +53,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         JScrollBar scbV = jScrollPane1.getVerticalScrollBar();
         scbH.setOpaque(false);
         scbV.setOpaque(false);
-        scbV.setUI(new MyScrollBarUI());
-        scbH.setUI(new MyScrollBarUI());
+        scbV.setUI(new LineScrollBarUI());
+        scbH.setUI(new LineScrollBarUI());
 
         scbH.removeAll();
         scbV.removeAll();
@@ -229,8 +228,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
        Component comp;
         for (comp = getParent(); comp!=null; comp=comp.getParent()) {
-            if(comp instanceof DetailsPanelForSearchServices){
-                DetailsPanelForSearchServices det  =(DetailsPanelForSearchServices)comp;
+            if(comp instanceof RoundWindow){
+                RoundWindow det  =(RoundWindow)comp;
                 System.out.println("current alpha "+det.getAlpha());
                 break;
             }

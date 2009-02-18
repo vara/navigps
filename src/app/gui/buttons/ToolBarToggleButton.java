@@ -33,8 +33,6 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
     private boolean mouseOnButton = false;
     private boolean mousePressedButton = false;
 
-    private OutputVerboseStream letOfChange;
-
     private GradientPaint[] gradientOnButton = new GradientPaint[2];
     private GradientPaint[] gradientPressedButtion = new GradientPaint[2];
     private Rectangle2D [] recForGradient = new Rectangle2D[2];
@@ -43,9 +41,8 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
 
     private float roundCorner = 12.0f;
 
-    public ToolBarToggleButton(Action a,ImageIcon i,OutputVerboseStream l){
+    public ToolBarToggleButton(Action a,ImageIcon i){
         super(a);
-        setVerboseStream(l);
         setIcon(i);
         setText("");
         setFocusPainted(false);
@@ -56,10 +53,6 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
         addChangeListener(this);
     }
     
-    public void setVerboseStream(OutputVerboseStream l){
-        letOfChange = l;
-    }
-
     private void updateMyUI(){
         oldSize = getSize();
         gradientOnButton[0] = new GradientPaint(0.0f, (float) getHeight()/4,new Color(250,250,255),
@@ -71,7 +64,6 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
                                                       0.0f, 0.0f, new Color(124,134,155));
         gradientPressedButtion[1] = new GradientPaint(0.0f, (float) getHeight()/3, new Color(255,255,255),
                                                       0.0f, (float) getHeight(), new Color(74,101,155));
-
         recForGradient[0] = new Rectangle2D.Double(0, 0, getWidth(), getHeight()/3);
         recForGradient[1] = new Rectangle2D.Double(0, getHeight()/3, getWidth(), getHeight());
         borderOnButton    = new RoundRectangle2D.Double(1,2, getWidth()-2, getHeight()-4, roundCorner,roundCorner);
@@ -87,6 +79,9 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
             g2.setColor(getBackground());
             g2.fillRect(0, 0, getWidth(), getHeight());
 
+            int icox= (getWidth()-getIcon().getIconWidth())>>1;
+            int icoy= (getHeight()-getIcon().getIconHeight())>>1;
+
             if(oldSize==null || oldSize.getHeight()!=getHeight() || oldSize.getWidth()!=getWidth())
                 updateMyUI();
 
@@ -99,6 +94,8 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
                 if(mousePressedButton){
                     borderColor = new Color(25, 25, 25);
                     gradient = gradientPressedButtion;
+                    icox+=2;
+                    icoy+=2;
                 }else{
                     borderColor = new Color(155, 155, 155);
                     gradient = gradientOnButton;
@@ -114,8 +111,7 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
                 g2.draw(borderOnButton);
 
             }
-            getIcon().paintIcon(this, g2,(getWidth()-getIcon().getIconWidth())/2,
-                                         (getHeight()-getIcon().getIconHeight())/2);
+            getIcon().paintIcon(this, g2,icox,icoy);
             g2.dispose();
         }else
             super.paintComponent(g);
@@ -150,10 +146,6 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
         this.mouseOnButton = mouseOnButton;
     }
 
-    protected OutputVerboseStream getVerboseStream() {
-        return letOfChange;
-    }
-
     @Override
     public void setEnabled(boolean b){
         super.setEnabled(b);
@@ -161,11 +153,11 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
             addMouseListener(this);
         else
             removeMouseListener(this);
-
-        if(getVerboseStream()!=null)
-            getVerboseStream().outputVerboseStream(getAction().getValue(Action.NAME)+" isEnabled "+b);
+        
+        System.out.println(getAction().getValue(Action.NAME)+" isEnabled "+b);
     }
 
+    @Override
     public void stateChanged(ChangeEvent e) {
         System.out.print("ChangeEvent ");
         System.out.println(((AbstractButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((AbstractButton)e.getSource()).isSelected());

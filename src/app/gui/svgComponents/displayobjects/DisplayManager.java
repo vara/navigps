@@ -26,23 +26,22 @@ import org.w3c.dom.svg.SVGDocument;
  */
 public class DisplayManager extends AbstractDisplayManager{
 
-    private OutputVerboseStream vs;
     private SVGDocument doc;
     private UpdateManager updateManager;
     private Canvas can;
-    public DisplayManager(Canvas c,OutputVerboseStream vs) {
-        this.vs =vs;
-        if(!c.isDynamic()){
-            vs.setTimeEnabled(true);
-            vs.outputErrorVerboseStream("Display Manager Disabled !!!\nCanvas isn't dynamic document");
+    public DisplayManager(Canvas c) {
+        if(!c.isDynamic()){            
+            System.err.println("Display Manager Disabled !!!\nCanvas isn't dynamic document");
+        }else{
+            System.err.println("Display manager enabled");
         }
         can = c;
     }
 
-    synchronized private void putText(String txt,SVGOMPoint p){
+    synchronized private void putText(String txt,SVGOMPoint pointOnSVGMap){
 
 		Element svgRoot = doc.getRootElement();
-		SVGOMPoint pointOnSVGMap = Utils.getLocalPointFromDomElement(svgRoot, (int)p.getX(), (int)p.getY());
+		//SVGOMPoint pointOnSVGMap = Utils.getLocalPointFromDomElement(svgRoot, (int)p.getX(), (int)p.getY());
         System.out.println("X "+pointOnSVGMap.getX()+" Y "+pointOnSVGMap.getY());
 		//FontMetrics fm = doc.getFontMetrics(doc.getFont());
 		int strWidth = 40 ;//fm.stringWidth(txt);
@@ -64,7 +63,7 @@ public class DisplayManager extends AbstractDisplayManager{
 		    Element textGraph = doc.createElementNS(svgNS, "text");
 		    textGraph.setAttributeNS(null, "x", Double.toString(pointOnSVGMap.getX()));
 		    textGraph.setAttributeNS(null, "y", Double.toString(pointOnSVGMap.getY()));
-		    textGraph.setAttributeNS(null, "font-size", "12");
+		    textGraph.setAttributeNS(null, "font-size", "22");
 		    Text nodeText = doc.createTextNode(txt);
 
 		    textGraph.appendChild(nodeText);
@@ -84,10 +83,6 @@ public class DisplayManager extends AbstractDisplayManager{
 		}
 	}
 
-    public OutputVerboseStream getVerboseStream(){
-        return vs;
-    }
-
     public GVTTreeRendererListener getRenderingTreeListener(){
         return new RenderingTreeListener();
     }
@@ -95,7 +90,9 @@ public class DisplayManager extends AbstractDisplayManager{
     @Override
     public void putObject(Object object, SVGOMPoint point) {
         if(updateManager != null){
-
+            if(object instanceof String){
+                putText((String)object, point);
+            }
         }
     }
 
@@ -111,6 +108,8 @@ public class DisplayManager extends AbstractDisplayManager{
         @Override
         public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
             updateManager = can.getUpdateManager();
+            doc = can.getSVGDocument();
+            putObject("Test !!!", new SVGOMPoint(520, 400));
         }
         @Override
         public void gvtRenderingCancelled(GVTTreeRendererEvent e) {
@@ -127,37 +126,37 @@ public class DisplayManager extends AbstractDisplayManager{
 
         @Override
         public void managerStarted(UpdateManagerEvent e) {
-            getVerboseStream().outputVerboseStream("managerStarted ");
+            System.err.println("managerStarted ");
         }
 
         @Override
         public void managerSuspended(UpdateManagerEvent e) {
-            getVerboseStream().outputVerboseStream("managerSuspend ");
+            System.err.println("managerSuspend ");
         }
 
         @Override
         public void managerResumed(UpdateManagerEvent e) {
-            getVerboseStream().outputVerboseStream("managerResumed ");
+            System.err.println("managerResumed ");
         }
 
         @Override
         public void managerStopped(UpdateManagerEvent e) {
-            getVerboseStream().outputVerboseStream("managerStoped ");
+            System.err.println("managerStoped ");
         }
 
         @Override
         public void updateStarted(UpdateManagerEvent e) {
-            getVerboseStream().outputVerboseStream("updateStarted ");
+            System.err.println("updateStarted ");
         }
 
         @Override
         public void updateCompleted(UpdateManagerEvent e) {
-            getVerboseStream().outputVerboseStream("updateCompleted ");
+            System.err.println("updateCompleted ");
         }
 
         @Override
         public void updateFailed(UpdateManagerEvent e) {
-            getVerboseStream().outputVerboseStream("updateFailed ");
+            System.err.println("updateFailed ");
         }
     }
 }

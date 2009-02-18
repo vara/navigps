@@ -6,7 +6,6 @@
 package app.gui.displayItemsMap;
 
 import app.gui.borders.OvalBorder;
-import app.utils.OutputVerboseStream;
 import java.awt.BorderLayout;
 import java.awt.Component;
 import javax.swing.JPanel;
@@ -20,19 +19,16 @@ import javax.swing.border.EmptyBorder;
  */
 public class MainDetailsPanel extends JSplitPane{
 
-    private OutputVerboseStream verbose;
-
     private JPanel upperContent = new JPanel(new BorderLayout(20, 20));
     private JPanel lowerContent = new JPanel(new BorderLayout(20, 20));
 
-    public MainDetailsPanel(OutputVerboseStream verbose){
+    public MainDetailsPanel(){
         super(JSplitPane.VERTICAL_SPLIT, true);
         setBorder(null);
         setAlignmentX(5);
         setAlignmentY(10);
         setOneTouchExpandable(true);
         setDividerLocation(0.5);
-        this.verbose = verbose;
         init();
     }
 

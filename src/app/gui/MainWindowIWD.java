@@ -1,19 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.gui;
 
 import app.gui.verboseTextPane.PanelForVerboseWindow;
 import app.gui.buttons.ToolBarButton;
 import app.ArgumentsStartUp;
 import app.Main;
+import app.Version;
 import app.gui.buttons.ToolBarToggleButton;
 import app.gui.displayItemsMap.DetailsPanel;
 import app.gui.displayItemsMap.MainDetailsPanel;
 import app.gui.displayItemsMap.PanelWithBatikJTree;
+import app.gui.label.ui.TitleLabelUI;
 import app.gui.svgComponents.Canvas;
+import app.gui.svgComponents.SVGBridgeComponents;
 import app.gui.svgComponents.SVGBridgeListeners;
 import app.gui.svgComponents.SVGScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
@@ -21,17 +19,19 @@ import app.utils.BridgeForVerboseMode;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
+import app.utils.Utils;
 import config.GUIConfiguration;
 import config.MainConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.DisplayMode;
+import java.awt.Container;
 import java.awt.FlowLayout;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
+import java.awt.GridLayout;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -40,6 +40,8 @@ import java.awt.event.InputEvent;
 import java.awt.event.ItemEvent;
 import java.awt.event.ItemListener;
 import java.awt.event.KeyEvent;
+import java.awt.event.MouseEvent;
+import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.geom.Rectangle2D;
@@ -49,11 +51,13 @@ import java.io.File;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
+import java.util.Date;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.AbstractButton;
 import javax.swing.Action;
+import javax.swing.Box;
 import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
@@ -61,14 +65,14 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
+import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
-import javax.swing.event.ChangeEvent;
-import javax.swing.event.ChangeListener;
+import javax.swing.SwingUtilities;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
@@ -84,10 +88,10 @@ import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
 import odb.gui.DatabaseManager;
 import org.apache.batik.bridge.ViewBox;
+import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.gvt.CanvasGraphicsNode;
 import org.apache.batik.gvt.GraphicsNode;
-import org.apache.batik.swing.svg.GVTTreeBuilderAdapter;
-import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
+import org.apache.batik.swing.svg.AbstractJSVGComponent;
 import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGSVGElement;
@@ -101,11 +105,15 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     private Main core;
     private JPanel panelWithToolBars;
     private StatusPanel statusPanel;
+
+    private StatusInfoPanel statusInfoPanel = new StatusInfoPanel();
+
     private Action openSVGFileAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction,searchServicesAction;
     private Canvas canvas;
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
     private JToolBar toolBarFile,toolBarZoom,toolBarSerch,toolBarMemMonitor;
-    private SVGBridgeListeners svgListeners = new SVGBridgeListeners();
+
+    private static SVGBridgeListeners svgListeners = new SVGBridgeListeners();
     
     private OutputVerboseStream verboseStream = new BridgeForVerboseMode();
     
@@ -115,32 +123,22 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     private RootWindowProperties properties = new RootWindowProperties();
     
     private Vector <View> views = new Vector<View>();
-    private static int ICON_SIZE = 8;
-
-    private GraphicsDevice device = GUIConfiguration.getGraphicDevice();
+    private static int ICON_SIZE = 8;    
 
     //private MySplitPane paneForProperties = new MySplitPane();    
 
     public MainWindowIWD(Main c){
+        super(GUIConfiguration.getGraphicDevice().getDefaultConfiguration());
+        
         System.setOut(getVerboseStream().getOutputStream());
         System.setErr(getVerboseStream().getErrOutputStream());
+
         addWindowFocusListener(this);
-        addPropertyChangeListener(new PropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                System.out.println("prop name "+evt.getPropertyName());
-                System.out.println("New Value "+evt.getNewValue());
-                System.out.println("Old Value "+evt.getOldValue());
-            }
-        });
-
+        
         MyLogger.log.log(Level.FINE,"Constructor "+getClass().toString());
         core = c;
 
-        setSize(GUIConfiguration.getWindowSize());
-        //always center location
-        setLocationRelativeTo(null);
+        setSize(GUIConfiguration.getWindowSize());        
         setLayout(new BorderLayout());
         
         initComponents();
@@ -148,20 +146,21 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         if(MainConfiguration.getPathToChartFile()!=null)
             openSVGDocument(MainConfiguration.getPathToChartFile());
 
-        setTitle("NaviGPS ver. "+MainConfiguration.NAVIGPS_VERSION);
+        setTitle(Version.getVersion());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setDisplayMode();
-        //if winidow init not FULL_SCREEN mode then must be invoke setVisible
-        if(!isVisible())
-            setVisible(true);
     }
 
     public MainWindowIWD(Main c,ArgumentsStartUp arg){
         this(c);
         //openSVGDocument(filePath);
     }
-    
+
+    public static final SVGBridgeComponents getBridgeInformationPipe(){
+        return svgListeners;
+    }
+
     private void initComponents(){
 
         openSVGFileAction = new OpenSVGFileAction("Open SVG document ...",
@@ -184,21 +183,25 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
                         "Center your svg map",
                         KeyEvent.VK_F);
         searchServicesAction = new SearchServicesAction("Search Services",
-                        createNavigationIcon("fitToPanel16"),
+                        createNavigationIcon("searchServices16"),
                         "Search services with a certain area",
                         KeyEvent.VK_S);
 
-        svgListeners.setVerboseStream(getVerboseStream());
-        svgListeners.addUpdateComponents(new UpdateMenuAndToolBars());
+        svgListeners.addUpdateComponentslisteners(new UpdateMenuAndToolBars());
 
-        //init docking RootWindow
+        //init docking RootWindow and create canvas with scrollBars
         createRootWindow();
         setDefaultLayout();
         getContentPane().add(rootWindow, BorderLayout.CENTER);
         creatToolBars();	//must be before creatMenuBar()
         creatMenuBar();
         createStatusPanel();	//must be before createCanvasPanel()
-        //createCanvas();
+
+        canvas.addSVGDocumentLoaderListener(svgListeners);
+        canvas.addGVTTreeBuilderListener(svgListeners);
+        canvas.addGVTTreeRendererListener(svgListeners);
+
+        svgListeners.addStatusChangedlistener(statusInfoPanel);
     }
     
     public OutputVerboseStream getVerboseStream(){
@@ -239,9 +242,13 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         views.add(vRoot);
         if(MainConfiguration.isShowDocumentProperties()){
 
-            MainDetailsPanel detailsPanel = new MainDetailsPanel(getVerboseStream());
-            detailsPanel.addToUpperContent(new PanelWithBatikJTree(canvas, getVerboseStream()));
-            detailsPanel.addToLowerContent(new DetailsPanel());
+            MainDetailsPanel detailsPanel = new MainDetailsPanel();
+            DetailsPanel displayDetails = new DetailsPanel();
+            PanelWithBatikJTree panelJTree = new PanelWithBatikJTree(displayDetails);
+            canvas.addSVGDocumentLoaderListener(panelJTree.getGVTTreeListener());
+            canvas.addGVTTreeBuilderListener(panelJTree.getGVTTreeListener());
+            detailsPanel.addToUpperContent(panelJTree);
+            detailsPanel.addToLowerContent(displayDetails);
             views.add(new View("Properties", VIEW_ICON,detailsPanel));
         }
         if(MainConfiguration.isModeVerboseGui()){
@@ -304,6 +311,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     public static ImageIcon createNavigationIcon(String imageName) {
         return createNavigationIcon(imageName,"png");
     }
+
     public static ImageIcon createNavigationIcon(String imageName,String ext) {
         String imgLocation = "resources/graphics/icons/"
                              + imageName
@@ -319,6 +327,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
 
         }
     }
+
     public static String createNavigationIconPath(String imageName,String ext){
         String imgLocation = "resources/graphics/icons/"
                              + imageName
@@ -331,10 +340,23 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         }
         return imageURL.getPath();
     }
+
     public void createStatusPanel(){
-		
-        statusPanel = new StatusPanel(svgListeners);
-        //statusPanel.setBorder(Utils.createSimpleBorder(0,0,0,0,new Color(174,201,255)));
+		      
+        statusPanel = new StatusPanel();
+        statusPanel.addToPanelFromPosition(statusInfoPanel, StatusPanel.LEFT_PANEL);
+
+        CoordinateInfoPanel cip = new CoordinateInfoPanel();
+        cip.setBorder(StatusPanel.getDefaultBorder());
+        TitleLabelUI titleUi =(TitleLabelUI)cip.getContentText().getUI();
+        titleUi.setTextLayout(TitleLabelUI.CENTER_VERTICAL|TitleLabelUI.CENTER_HORIZONTAL);
+        titleUi.setHorizontalCalibrated(0);
+        
+        canvas.addMouseMotionListener(cip);
+        statusPanel.addToPanelFromPosition(Box.createHorizontalStrut(50), StatusPanel.RIGHT_PANEL);
+        statusPanel.addToPanelFromPosition(cip, StatusPanel.RIGHT_PANEL);
+
+        
         getContentPane().add(getStatusPanel(),BorderLayout.PAGE_END);
     }
     
@@ -368,25 +390,20 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         };
 
         toolBarFile.add(new ToolBarButton(openSVGFileAction,
-                          createNavigationIcon("open32"),
-                          getVerboseStream()));
+                          createNavigationIcon("open32")));
         toolBarZoom.add(new ToolBarButton(zoomInAction,
-                          createNavigationIcon("zoomIn32"),
-                          getVerboseStream()));
+                          createNavigationIcon("zoomIn32")));
         toolBarZoom.add(new ToolBarButton(zoomOutAction,
-                          createNavigationIcon("zoomOut32"),
-                          getVerboseStream()));
+                          createNavigationIcon("zoomOut32")));
         toolBarZoom.add(new ToolBarToggleButton(zoomAction,
-                          createNavigationIcon("zoom32"),
-                          getVerboseStream()));
+                          createNavigationIcon("zoom32")));
         toolBarZoom.add(new ToolBarButton(fitToPanelAction,
-                          createNavigationIcon("fitToPanel32"),
-                          getVerboseStream()));        
+                          createNavigationIcon("fitToPanel32")));
+
         toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
         toolBarMemMonitor.setMargin(new Insets(4,1,4,1));
         ToolBarToggleButton tb = new ToolBarToggleButton(searchServicesAction,
-                          createNavigationIcon("fitToPanel32"),
-                          getVerboseStream());
+                          createNavigationIcon("searchServices32"));
         toolBarSerch.add(tb);
 
         ((SearchServicesAction)searchServicesAction).addToSelectableGroup(tb);
@@ -409,7 +426,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         itemExit.addActionListener(new ActionListener() {
             @Override
             public void actionPerformed(ActionEvent e) {
-            exitApp();
+                exitApp();
             }
         });
 
@@ -429,12 +446,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         JMenuItem itemZoomOut = new JMenuItem(zoomOutAction);
         JMenuItem itemfitToPanel = new JMenuItem(fitToPanelAction);
         JCheckBoxMenuItem itemSearchServices  = new JCheckBoxMenuItem(searchServicesAction);
-        itemSearchServices.addChangeListener(new ChangeListener() {
-
-            public void stateChanged(ChangeEvent e) {
-                System.out.println(((AbstractButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((AbstractButton)e.getSource()).isSelected());
-            }
-        });
+        
         ((SearchServicesAction)searchServicesAction).addToSelectableGroup(itemSearchServices);
 
         JMenu menuFile = new JMenu("File");
@@ -480,13 +492,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     }
     public Canvas createCanvas(){
 	
-        canvas = new Canvas(svgListeners);
-        canvas.addGVTTreeBuilderListener(new GVTTreeBuilderAdapter() {
-            @Override
-            public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-                getVerboseStream().outputErrorVerboseStream("Bounds GVT ROOT"+e.getGVTRoot().getBounds());
-            }
-        });
+        canvas = new Canvas();
         canvas.setBackground(Color.white);
         return canvas;
     }
@@ -534,7 +540,23 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         }
 	
     }
-    public void openSVGDocument(File file){	
+    public void openSVGDocument(File file){
+        if(canvas.getSVGDocument()!=null){
+            System.out.println("Zamykam bieżacy document");
+            svgListeners.documentClosed();
+            try {
+                canvas.getUpdateManager().getUpdateRunnableQueue().invokeAndWait(new Runnable() {
+
+                    @Override
+                    public void run() {
+                        canvas.setURI(null);
+                    }
+                });
+            } catch (InterruptedException ex) {
+                System.err.println(""+ex);
+            }
+            System.out.println("Document zamkniety");
+        }
         canvas.setURI(file.toURI().toString());
     }
     
@@ -555,7 +577,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         dispose();
     }
     
-    public void setComponetsZoomEnable(boolean b){
+    public void setComponetsEnableWhenDocumentLoaded(boolean b){
         zoomAction.setEnabled(b);
         zoomInAction.setEnabled(b);
         zoomOutAction.setEnabled(b);
@@ -712,7 +734,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             setEnabled(false);
         }
         @Override
-        public void actionPerformed(ActionEvent e) {
+        public void actionPerformed(ActionEvent e) {            
             canvas.resetRenderingTransform();
             getVerboseStream().outputVerboseStream("Fit to panel");
         }	
@@ -767,17 +789,16 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             Thread w = new Thread(new Runnable() {
                 @Override
                 public void run() {
-                    setComponetsZoomEnable(true);
+                    setComponetsEnableWhenDocumentLoaded(true);
                     views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());                    
                 }
             });
             w.start();
         }
-
+        
         @Override
         public void documentClosed(){
-
-            setComponetsZoomEnable(false);
+            setComponetsEnableWhenDocumentLoaded(false);
         }
     }
 
@@ -827,18 +848,52 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             boolean en = button.getModel().isSelected();
             putValue(AbstractAction.SELECTED_KEY,new Boolean(en));          
             canvas.getSearchServices().setEnabled(en);
-            getVerboseStream().outputVerboseStream("Search services enabled "+en);
+            String info = "Search services "+(en? "enabled":"disabled");
+            svgListeners.currentStatusChanged(info);
         }
     }
 
     private void setDisplayMode(){
-        if(GUIConfiguration.getModeScreen()==GUIConfiguration.FULL_SCREEN){
-            getVerboseStream().outputVerboseStream("full screen mode "+device.isFullScreenSupported());
-            this.setUndecorated(true);
-            device.setFullScreenWindow(this);
-        }else{
-            device.setFullScreenWindow(null);
-            this.setUndecorated(false);
+        final GraphicsDevice device = GUIConfiguration.getGraphicDevice();
+        synchronized(MainWindowIWD.this){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {                   
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            System.err.println(new Date() +"\n\t Change Display mode !!! ");
+                            if (GUIConfiguration.getModeScreen() == GUIConfiguration.FULL_SCREEN) {
+                                getVerboseStream().outputVerboseStream("full screen mode Supported " + device.isFullScreenSupported());
+                                setVisible(false);
+                                dispose();
+                                try {Thread.sleep(500);} catch (InterruptedException ex){}
+                                setUndecorated(true);                                
+                                device.setFullScreenWindow(MainWindowIWD.this);
+
+                            } else {
+
+                                if(isVisible()){
+                                    System.out.println("Window invisible");
+                                    setVisible(false);
+                                }
+                                device.setFullScreenWindow(null);
+                                try {Thread.sleep(500);} catch (InterruptedException ex){}
+                                if (isUndecorated()) {
+                                    System.out.println("Window must dispose for decorate Frame");
+                                    dispose();                                    
+                                    System.out.println("Window decorate");
+                                    setUndecorated(false);
+                                }
+                                if(!isVisible()){
+                                    System.out.println("Show Window");
+                                    setVisible(true);
+                                }
+                            }
+                        }
+                    });
+                }
+            }).start();
         }
     }
     public void switchDisplayMode(){
@@ -856,8 +911,90 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
                     KeyStroke.getKeyStroke(mnemonic,InputEvent.SHIFT_DOWN_MASK|InputEvent.CTRL_DOWN_MASK));
         }
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             switchDisplayMode();
+            String info = "User set " +
+                    (GUIConfiguration.getModeScreen()==GUIConfiguration.FULL_SCREEN ?
+                    "full screen mode":"frame mode");
+            svgListeners.currentStatusChanged(info);
+        }
+    }
+
+    private class StatusInfoPanel extends DefaultAlphaLabelPanel
+                             implements StatusChangedListener{
+        public StatusInfoPanel(){
+            setAnimatorEnabled(true);
+        }
+        @Override
+        public void currentStatusChanged(String str) {
+            setText(str);
+        }
+    }
+
+    private class CoordinateInfoPanel extends DefaultAlphaLabelPanel
+                                implements MouseMotionListener{
+
+        public static final byte COMPONENT_POSITON = 0;
+        public static final byte SCREEN_POSITION = 1;
+        public static final byte ROOT_SVGELEMENT_POSITION = 2;
+
+        private byte displayPosition =2;
+
+        private JLabel xLabel = new JLabel();
+        private JLabel yLabel = new JLabel();
+
+        public CoordinateInfoPanel(){
+            setAnimatorEnabled(false);
+            Container content = getContent();
+            content.removeAll();
+            content.setLayout(new GridLayout(1,2,1,1));
+            content.add(xLabel);
+            content.add(yLabel);
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {}
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            Object source = e.getSource();            
+            if(source instanceof AbstractJSVGComponent){
+                SVGDocument doc = ((AbstractJSVGComponent)source).getSVGDocument();
+                if(doc != null && !svgListeners.isRendering()){                                  
+                    switch(displayPosition){
+                        case COMPONENT_POSITON:
+                            setTextCoordinate(e.getX()+"",""+e.getY());
+                            break;
+                        case SCREEN_POSITION:
+                            setTextCoordinate(e.getXOnScreen()+"",""+e.getYOnScreen());
+                            break;
+                        case ROOT_SVGELEMENT_POSITION:
+                            SVGOMPoint svgp =
+                                    Utils.getLocalPointFromDomElement(
+                                        doc.getRootElement(),e.getX() ,e.getY());
+                            setTextCoordinate(svgp.getX()+"",""+svgp.getY());
+                            break;
+                    }                    
+                }
+            }
+        }
+        private void setTextCoordinate(String x,String y){
+            xLabel.setText(x);
+            yLabel.setText(y);
+        }
+        /**
+         * @return the displayPosition
+         */
+        public byte getDisplayPosition() {
+            return displayPosition;
+        }
+
+        /**
+         * @param displayPosition the displayPosition to set
+         */
+        public void setDisplayPosition(byte displayPosition) {
+            this.displayPosition = displayPosition;
         }
     }
 }

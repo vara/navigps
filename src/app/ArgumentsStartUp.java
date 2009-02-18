@@ -144,7 +144,7 @@ public class ArgumentsStartUp {
                 break;
             case 'h':
 
-                MainConfiguration.printVersion("NaviGPS version ",null);
+                System.out.println(Version.getVersion());
                 setExitProgram(true);
                 throw new Exception(getHelpInformation());
             case 'w'+'s':
@@ -177,7 +177,7 @@ public class ArgumentsStartUp {
                 }                          
                 break;
             case 'v':
-                MainConfiguration.printVersion("NaviGPS version ",null);
+                System.out.println(Version.getVersion());
                 setExitProgram(true);
                 break;
             case 'f'+'s':
