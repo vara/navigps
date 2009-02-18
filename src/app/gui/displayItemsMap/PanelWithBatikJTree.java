@@ -10,25 +10,16 @@ import app.gui.ScrollBar.ui.LineScrollBarUI;
 import app.gui.svgComponents.DOMDocumentTree;
 import app.gui.svgComponents.DOMDocumentTreeController;
 import app.utils.Utils;
-import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.Enumeration;
-import java.util.List;
 import javax.swing.ImageIcon;
-import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
-import javax.swing.JTable;
-import javax.swing.JTextArea;
 import javax.swing.JTree;
 import javax.swing.SwingUtilities;
 import javax.swing.event.TreeSelectionEvent;
 import javax.swing.event.TreeSelectionListener;
-import javax.swing.table.AbstractTableModel;
-import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
@@ -50,8 +41,6 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.NodeList;
-import org.w3c.dom.css.CSSStyleDeclaration;
-import org.w3c.dom.css.ViewCSS;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -277,18 +266,17 @@ public class PanelWithBatikJTree extends JScrollPane{
                 Node node = ((NodeInfo) nodeInfo).getNode();                
                 switch (node.getNodeType()) {
                 case Node.DOCUMENT_NODE:
-                    //documentInfo.setText
-                        //(createDocumentText((Document) node));
+                    attributePanel.getXMLEditorPanel().getNodeXmlArea().setText(
+                            createDocumentText((Document) node));
                     break;
                 case Node.ELEMENT_NODE:                  
                     attributePanel.setPreviewElement((Element) node);
-
                     break;
                 case Node.COMMENT_NODE:
                 case Node.TEXT_NODE:
                 case Node.CDATA_SECTION_NODE:
-                    //attributePanel.getTextArea().setText
-                        //(node.getNodeValue());
+                   attributePanel.getXMLEditorPanel().getNodeXmlArea().setText(
+                        node.getNodeValue());
                     
                 }
             }
