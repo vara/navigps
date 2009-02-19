@@ -19,10 +19,12 @@ import javax.swing.JMenu;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
+import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
 import javax.swing.tree.DefaultTreeModel;
 import odb.core.Category;
+import odb.core.ServiceCore;
 import odb.core.Subcategory;
 import odb.utils.Constants;
 import org.neodatis.odb.ODB;
@@ -53,6 +55,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         connectDatabase();
         refreshTree();
         loadTreePopup();
+        fillServicesTable();
 
     //disconnectDatabase();
     }
@@ -113,6 +116,9 @@ public class DatabaseManager extends javax.swing.JDialog {
         addWindowListener(new java.awt.event.WindowAdapter() {
             public void windowClosing(java.awt.event.WindowEvent evt) {
                 formWindowClosing(evt);
+            }
+            public void windowOpened(java.awt.event.WindowEvent evt) {
+                formWindowOpened(evt);
             }
         });
 
@@ -242,9 +248,10 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         jTabbedPane1.addTab("Services", jPanel1);
 
+        jPanel3.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Category tree", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
+
         jScrollPane3.setBorder(null);
 
-        jTree1.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Category tree", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
         jTree1.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
         jTree1.setToolTipText("Right-Click for options !");
         jTree1.setRootVisible(false);
@@ -264,11 +271,11 @@ public class DatabaseManager extends javax.swing.JDialog {
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 425, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 413, Short.MAX_VALUE)
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 398, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 371, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Categories", jPanel3);
@@ -296,6 +303,7 @@ public class DatabaseManager extends javax.swing.JDialog {
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
         disconnectDatabase();
+        Constants.setManagerWindow(null);
     }//GEN-LAST:event_formWindowClosing
 
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
@@ -317,6 +325,10 @@ public class DatabaseManager extends javax.swing.JDialog {
             popup.show(evt.getComponent(), evt.getX(), evt.getY());
         }
 }//GEN-LAST:event_jTree1MousePressed
+
+    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
+        Constants.setManagerWindow(this);
+    }//GEN-LAST:event_formWindowOpened
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton3;
@@ -574,5 +586,28 @@ public class DatabaseManager extends javax.swing.JDialog {
 //            jTree1.expandPath(jTree1.getSelectionPath());
         }
         model.reload();
+    }
+
+    public void fillServicesTable() {
+        odb = Constants.getDbConnection();
+        Vector v;
+
+        Objects services = odb.getObjects(ServiceCore.class);
+        Object[] columns = {"Name","Category","Subcategory","X coord","Y coord"};
+
+        DefaultTableModel model = new DefaultTableModel();
+        model.setColumnIdentifiers(columns);
+
+        while (services.hasNext()) {
+            v = new Vector();
+            ServiceCore sc = (ServiceCore) services.next();
+            v.add(sc.getServiceDescription().getServiceName());
+            v.add(sc.getServiceDescription().getCategory().getName());
+            v.add(sc.getServiceDescription().getServiceSubCategory().getName());
+            v.add(sc.getServiceAttributes().getAttribute("x"));
+            v.add(sc.getServiceAttributes().getAttribute("y"));
+            model.addRow(v);
+        }
+        jTable1.setModel(model);
     }
 }
