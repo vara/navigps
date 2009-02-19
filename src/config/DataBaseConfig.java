@@ -12,7 +12,7 @@ package config;
 public class DataBaseConfig {
     private static String defaultDatabasePath = "./resources/odb/";
     private static String databaseFilename = "neodatis.odb";
-    private static String iconPath = "./resources/icons/";
+    private static String iconPath = "resources/graphics/icons/";
 
     /**
      * @return the defaultDatabasePath

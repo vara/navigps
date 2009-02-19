@@ -11,8 +11,10 @@
 package odb.gui;
 
 import config.DataBaseConfig;
+import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.net.URL;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -551,12 +553,27 @@ public class DatabaseManager extends javax.swing.JDialog {
         popup.add(removeMenu);
     }
 
+    public static ImageIcon getIcon(String name){
+        String ext = "png";
+        String imgLocation = DataBaseConfig.getIconPath()
+                             + name
+                             + "."+ext;
+         URL imageURL = DatabaseManager.class.getResource(imgLocation);
+         if (imageURL == null) {
+            System.err.println("Resource not found: "
+                               + imgLocation);
+            return null;
+        } else {
+            return new ImageIcon(imageURL);
+        }
+    }
+
     private void refreshTree() {
         Category category;
         Subcategory subcategory;
-        ImageIcon leafIcon = new ImageIcon(DataBaseConfig.getIconPath() + "22.png");
-        ImageIcon openIcon = new ImageIcon(DataBaseConfig.getIconPath() + "8.png");
-        ImageIcon closedIcon = new ImageIcon(DataBaseConfig.getIconPath() + "5.png");
+        ImageIcon leafIcon = DatabaseManager.getIcon("22");
+        ImageIcon openIcon = DatabaseManager.getIcon("8");
+        ImageIcon closedIcon = DatabaseManager.getIcon("5");
 
         odb = Constants.getDbConnection();
         Objects categories = odb.getObjects(Category.class);
