@@ -43,7 +43,6 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         contentText.setText("");
 
         TitleLabelUI tlui = new TitleLabelUI(TitleLabelUI.LEFT|TitleLabelUI.CENTER_VERTICAL);
-        tlui.setShadow(false);
         tlui.setHorizontalCalibrated(3);
 
         contentText.setUI(tlui);

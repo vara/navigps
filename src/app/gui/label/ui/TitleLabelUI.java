@@ -58,9 +58,13 @@ public class TitleLabelUI extends BasicLabelUI{
     protected static TitleLabelUI titleLabelUI = new TitleLabelUI();
 
     public TitleLabelUI(int position){
-        setTextLayout(position);
+        this(position,false);
     }
-    
+
+    public TitleLabelUI(int position,boolean shadow){
+        setTextLayout(position);
+        setShadow(shadow);
+    }
     /* Default Layout is CENTER_VERTICAL and CENTER_HORIZONTAL
      * 
      */
