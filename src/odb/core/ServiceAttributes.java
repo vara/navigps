@@ -4,6 +4,7 @@
  */
 package odb.core;
 
+import java.util.Hashtable;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.w3c.dom.Attr;
 import org.w3c.dom.DOMException;
@@ -22,11 +23,11 @@ import org.w3c.dom.UserDataHandler;
 public class ServiceAttributes implements Element {
 
     private String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+    private Hashtable hs = new Hashtable();
 
     public ServiceAttributes(Float x, Float y) {
-        
-        this.setAttribute("x", x.toString());
-        this.setAttribute("y", y.toString());
+        hs.put("x", x);
+        hs.put("y", y);
     }
 
     public String getTagName() {
@@ -34,15 +35,15 @@ public class ServiceAttributes implements Element {
     }
 
     public String getAttribute(String name) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        return (hs.get(name).toString());
     }
 
     public void setAttribute(String name, String value) throws DOMException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        hs.put(name, value);
     }
 
     public void removeAttribute(String name) throws DOMException {
-        throw new UnsupportedOperationException("Not supported yet.");
+        hs.remove(name);
     }
 
     public Attr getAttributeNode(String name) {
