@@ -13,7 +13,8 @@ import app.gui.label.ui.TitleLabelUI;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGBridgeComponents;
 import app.gui.svgComponents.SVGBridgeListeners;
-import app.gui.svgComponents.SVGScrollPane;
+import app.gui.svgComponents.SVGCanvasLayers;
+import app.gui.svgComponents.SVGLayerScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
 import app.utils.BridgeForVerboseMode;
 import app.utils.MyFileFilter;
@@ -62,7 +63,6 @@ import javax.swing.Icon;
 import javax.swing.ImageIcon;
 import javax.swing.JButton;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
@@ -109,7 +109,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
     private StatusInfoPanel statusInfoPanel = new StatusInfoPanel();
 
     private Action openSVGFileAction,zoomOutAction,zoomInAction,zoomAction,fitToPanelAction,searchServicesAction;
+    
     private Canvas canvas;
+    private SVGCanvasLayers canvaslayers;
+
     private JCheckBoxMenuItem [] cbmOptionsForToolBars;
     private JToolBar toolBarFile,toolBarZoom,toolBarSerch,toolBarMemMonitor;
 
@@ -353,7 +356,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         titleUi.setHorizontalCalibrated(0);
         
         canvas.addMouseMotionListener(cip);
-        statusPanel.addToPanelFromPosition(Box.createHorizontalStrut(50), StatusPanel.RIGHT_PANEL);
+        statusPanel.addToPanelFromPosition(Box.createHorizontalGlue(), StatusPanel.RIGHT_PANEL);
         statusPanel.addToPanelFromPosition(cip, StatusPanel.RIGHT_PANEL);
 
         
@@ -490,17 +493,18 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         jmb.add(menuODB);
         setJMenuBar(jmb);
     }
-    public Canvas createCanvas(){
-	
-        canvas = new Canvas();
+    public SVGCanvasLayers createCanvas(){
+
+        canvaslayers = new SVGCanvasLayers();
+        canvas = canvaslayers.getSvgCanvas();
         canvas.setBackground(Color.white);
-        return canvas;
+        return canvaslayers;
     }
     
-    public JComponent createCanvasWithScrollPane(){
-        if(canvas == null)
-            return new SVGScrollPane(createCanvas());
-        return new SVGScrollPane(canvas);
+    public SVGLayerScrollPane createCanvasWithScrollPane(){
+        if(canvaslayers == null)
+            return new SVGLayerScrollPane(createCanvas());
+        return new SVGLayerScrollPane(canvaslayers);
     }
     
     private void openFileChoserWindow(){
@@ -939,7 +943,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
         public static final byte SCREEN_POSITION = 1;
         public static final byte ROOT_SVGELEMENT_POSITION = 2;
 
-        private byte displayPosition =2;
+        private static final String SUFFIX = "position";
+        private static final String S_COMPONENT_POSITON = "Component";
+        private static final String S_SCREEN_POSITION = "Screen";
+        private static final String S_ROOT_SVGELEMENT_POSITION = "SVG ROOT";
+
+        private byte displayPosition;
 
         private JLabel xLabel = new JLabel();
         private JLabel yLabel = new JLabel();
@@ -948,9 +957,28 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
             setAnimatorEnabled(false);
             Container content = getContent();
             content.removeAll();
+            setDisplayPosition(ROOT_SVGELEMENT_POSITION);
             content.setLayout(new GridLayout(1,2,1,1));
             content.add(xLabel);
             content.add(yLabel);
+
+            xLabel.setToolTipText("x coordinate");
+            yLabel.setToolTipText("y coordinate");
+
+            xLabel.setUI(new TitleLabelUI(TitleLabelUI.LEFT));
+            yLabel.setUI(new TitleLabelUI(TitleLabelUI.LEFT));
+        }
+
+        public String getStringNamePosition(){
+            switch(displayPosition){
+                case COMPONENT_POSITON:
+                    return S_COMPONENT_POSITON+" "+SUFFIX;
+                case SCREEN_POSITION:
+                    return S_SCREEN_POSITION+" "+SUFFIX;
+                case ROOT_SVGELEMENT_POSITION:
+                    return S_ROOT_SVGELEMENT_POSITION+" "+SUFFIX;
+            }
+            return "";
         }
 
         @Override
@@ -995,6 +1023,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener,ItemLis
          */
         public void setDisplayPosition(byte displayPosition) {
             this.displayPosition = displayPosition;
+            setToolTipText(getStringNamePosition());
         }
     }
 }
