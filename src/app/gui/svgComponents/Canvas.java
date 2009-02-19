@@ -8,22 +8,23 @@ package app.gui.svgComponents;
 import app.gui.MainWindowIWD;
 import app.gui.searchServices.SearchServices;
 import app.gui.svgComponents.displayobjects.DisplayManager;
+import app.gui.svgComponents.thumbnail.Thumbnail;
 import app.utils.Utils;
 import config.SVGConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import javax.swing.AbstractAction;
 import javax.swing.JLabel;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
-import org.apache.batik.swing.svg.SVGLoadEventDispatcherEvent;
-import org.apache.batik.swing.svg.SVGLoadEventDispatcherListener;
 import org.w3c.dom.svg.SVGDocument;
 
 /**
@@ -260,4 +261,19 @@ public class Canvas extends JSVGCanvas{
             this.mode = mode;
         }
     }//class MouseGestures
+
+    class ThumbnailsAction extends AbstractAction{
+        private Thumbnail thumb;
+        private Rectangle recLocation = new Rectangle(20, 20, 100, 70);
+
+        public ThumbnailsAction(){
+            
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+
+        }
+
+    }
 }

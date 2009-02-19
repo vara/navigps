@@ -60,12 +60,12 @@ import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGSVGElement;
 
 /**
- * This class represents a Dialog that displays a Thumbnail of the current SVG
+ * This class represents a alpha panel that displays a Thumbnail of the current SVG
  * document.
  *
  * @author <a href="mailto:tkormann@apache.org">Thierry Kormann</a>
- * @author "modyfi" Grzegorz Warywoda 2009-02-15 13:27
- * @version $Id: ThumbnailDialog.java 592619 2007-11-07 05:47:24Z cam $
+ * @author <a href="mailto:war29@wp.pl">"modyfi" Grzegorz Warywoda 2009-02-15 13:27
+ * @version $Id: Thumbnail.java 592619 2007-11-07 05:47:24Z cam $
  */
 public class Thumbnail extends AlphaJPanel {
   
