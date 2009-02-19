@@ -87,6 +87,7 @@ public class SVGScrollPane extends JPanel{
     protected Rectangle2D viewBox = null; // SVG Root element viewbox
     protected boolean ignoreScrollChange = false;
 
+    public SVGScrollPane(){}
     /**
      * Creates a JSVGScrollPane, which will scroll an JSVGCanvas.
      */
