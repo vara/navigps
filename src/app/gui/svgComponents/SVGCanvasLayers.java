@@ -5,7 +5,7 @@
 
 package app.gui.svgComponents;
 
-import tests.layers.*;
+//import tests.layers.*;
 import app.gui.detailspanel.AlphaJPanel;
 import app.gui.svgComponents.Canvas;
 import java.awt.Component;

@@ -14,16 +14,19 @@ import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import odb.core.Category;
-import odb.core.ServiceAttributes;
 import odb.core.ServiceCore;
 import odb.core.ServiceDescription;
 import odb.core.Subcategory;
 import odb.utils.Constants;
+import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
 import org.neodatis.odb.core.query.criteria.Where;
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
+import org.w3c.dom.DOMImplementation;
+import org.w3c.dom.Document;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -31,6 +34,8 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
  */
 public class ServiceFactory extends javax.swing.JDialog {
 
+    String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+    DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
     private ODB odb = null;
 
     /** Creates new form ServiceFactory */
@@ -293,9 +298,15 @@ public class ServiceFactory extends javax.swing.JDialog {
                     }
                 }
 
-                ServiceAttributes sa = new ServiceAttributes(Float.parseFloat(jTextField4.getText()), Float.parseFloat(jTextField5.getText()));
+                Document doc = impl.createDocument(svgNS, "svg", null);
+                Element svgRoot = doc.getDocumentElement();
+                Element rectangle = doc.createElementNS(svgNS, "rect");
+                rectangle.setAttributeNS(null,"x", jTextField4.getText());
+                rectangle.setAttributeNS(null,"y", jTextField5.getText());
+                svgRoot.appendChild(rectangle);
+
                 ServiceDescription sd = new ServiceDescription(jTextField3.getText(), jTextField1.getText(), jTextField2.getText(), c, s, jTextArea1.getText());
-                ServiceCore sc = new ServiceCore(sa, sd);
+                ServiceCore sc = new ServiceCore(svgRoot, sd);
                 odb.store(sc);
                 Constants.getManagerWindow().fillServicesTable();
                 ServiceFactory.this.dispose();
