@@ -11,7 +11,6 @@
 package odb.gui;
 
 import config.DataBaseConfig;
-import java.awt.Image;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.net.URL;
@@ -552,16 +551,16 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         popup.add(removeMenu);
     }
-
     public static ImageIcon getIcon(String name){
-        String ext = "png";
+        return getIcon(name, "png");
+    }
+    public static ImageIcon getIcon(String name,String ext){
         String imgLocation = DataBaseConfig.getIconPath()
                              + name
                              + "."+ext;
          URL imageURL = DatabaseManager.class.getResource(imgLocation);
          if (imageURL == null) {
-            System.err.println("Resource not found: "
-                               + imgLocation);
+            System.err.println("Resource not found: "+imgLocation);
             return null;
         } else {
             return new ImageIcon(imageURL);
