@@ -5,32 +5,25 @@
 
 package odb.core;
 
+import org.w3c.dom.Element;
+
 /**
  *
  * @author ACME
  */
 public class ServiceCore {
-    private ServiceAttributes serviceAttributes;
+    private Element serviceAttributes;
     private ServiceDescription serviceDescription;
 
-    public ServiceCore(ServiceAttributes serviceAttributes, ServiceDescription serviceDescription) {
+    public ServiceCore(Element serviceAttributes, ServiceDescription serviceDescription) {
         this.serviceAttributes = serviceAttributes;
         this.serviceDescription = serviceDescription;
     }
 
-    /**
-     * @return the serviceAttributes
-     */
-    public ServiceAttributes getServiceAttributes() {
-        return serviceAttributes;
-    }
-
-    /**
-     * @param serviceAttributes the serviceAttributes to set
-     */
-    public void setServiceAttributes(ServiceAttributes serviceAttributes) {
-        this.serviceAttributes = serviceAttributes;
-    }
+//    public ServiceCore(ServiceAttributes serviceAttributes, ServiceDescription serviceDescription) {
+//        this.serviceAttributes = serviceAttributes;
+//        this.serviceDescription = serviceDescription;
+//    }
 
     /**
      * @return the serviceDescription
@@ -44,5 +37,19 @@ public class ServiceCore {
      */
     public void setServiceDescription(ServiceDescription serviceDescription) {
         this.serviceDescription = serviceDescription;
+    }
+
+    /**
+     * @return the serviceAttributes
+     */
+    public Element getServiceAttributes() {
+        return serviceAttributes;
+    }
+
+    /**
+     * @param serviceAttributes the serviceAttributes to set
+     */
+    public void setServiceAttributes(Element serviceAttributes) {
+        this.serviceAttributes = serviceAttributes;
     }
 }

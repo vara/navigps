@@ -577,31 +577,33 @@ public class DatabaseManager extends javax.swing.JDialog {
         odb = Constants.getDbConnection();
         Objects categories = odb.getObjects(Category.class);
 
-        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-        jTree1.setModel(new DefaultTreeModel(root));
-        DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+        if (categories.isEmpty()) {
+            
+        } else {
+            DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+            jTree1.setModel(new DefaultTreeModel(root));
+            DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
 
-        DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-        renderer.setLeafIcon(leafIcon);
-        renderer.setClosedIcon(closedIcon);
-        renderer.setOpenIcon(openIcon);
-        jTree1.setCellRenderer(renderer);
+            DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+            renderer.setLeafIcon(leafIcon);
+            renderer.setClosedIcon(closedIcon);
+            renderer.setOpenIcon(openIcon);
+            jTree1.setCellRenderer(renderer);
 
-        while (categories.hasNext()) {
-            category = (Category) categories.next();
-            DefaultMutableTreeNode cat = new DefaultMutableTreeNode(category.getName());
-            model.insertNodeInto(cat, root, root.getChildCount());
-            if (category.getSubcategories() != null) {
-                for (int i = 0; i < category.getSubcategories().size(); i++) {
-                    subcategory = (Subcategory) category.getSubcategories().get(i);
-                    DefaultMutableTreeNode sub = new DefaultMutableTreeNode(subcategory.getName());
-                    model.insertNodeInto(sub, cat, cat.getChildCount());
+            while (categories.hasNext()) {
+                category = (Category) categories.next();
+                DefaultMutableTreeNode cat = new DefaultMutableTreeNode(category.getName());
+                model.insertNodeInto(cat, root, root.getChildCount());
+                if (category.getSubcategories() != null) {
+                    for (int i = 0; i < category.getSubcategories().size(); i++) {
+                        subcategory = (Subcategory) category.getSubcategories().get(i);
+                        DefaultMutableTreeNode sub = new DefaultMutableTreeNode(subcategory.getName());
+                        model.insertNodeInto(sub, cat, cat.getChildCount());
+                    }
                 }
             }
-//            jTree1.setExpandsSelectedPaths(true);
-//            jTree1.expandPath(jTree1.getSelectionPath());
+            model.reload();
         }
-        model.reload();
     }
 
     public void fillServicesTable() {
@@ -609,7 +611,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         Vector v;
 
         Objects services = odb.getObjects(ServiceCore.class);
-        Object[] columns = {"Name","Category","Subcategory","X coord","Y coord"};
+        Object[] columns = {"Name", "Category", "Subcategory", "X coord", "Y coord"};
 
         DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(columns);
@@ -620,7 +622,7 @@ public class DatabaseManager extends javax.swing.JDialog {
             v.add(sc.getServiceDescription().getServiceName());
             v.add(sc.getServiceDescription().getCategory().getName());
             v.add(sc.getServiceDescription().getServiceSubCategory().getName());
-            v.add(sc.getServiceAttributes().getAttribute("x"));
+            v.add(sc.getServiceAttributes().getChildNodes().getLength());
             v.add(sc.getServiceAttributes().getAttribute("y"));
             model.addRow(v);
         }
