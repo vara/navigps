@@ -21,8 +21,8 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
     public static final String ALPHA_CHANGE = "AlphaJPanel.alpha.change";
     public static final String UPPER_ALPHA_CHANGE = "AlphaJPanel.upper.alpha.change";
 
-    private float upperThresholdAlpha = 1f;
-    private float alpha = 1f;
+    private volatile float upperThresholdAlpha = 1f;
+    private volatile float alpha = 1f;
 
     public AlphaJPanel(LayoutManager layout, boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
@@ -53,7 +53,7 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
     protected void paintComponent(Graphics g) {        
         Graphics2D g2 = (Graphics2D)g;        
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getAlpha()));
-        super.paintComponent(g);
+        super.paintComponent(g2);
     }
 
     @Override
