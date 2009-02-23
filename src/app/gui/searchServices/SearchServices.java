@@ -8,11 +8,13 @@ package app.gui.searchServices;
 import app.gui.MainWindowIWD;
 import app.gui.detailspanel.AlphaJPanel;
 import app.gui.detailspanel.RoundWindow;
+import app.gui.detailspanel.RoundWindowUtils;
 import app.gui.svgComponents.Canvas;
+import app.gui.svgComponents.SVGCanvasLayers;
 import app.utils.MyLogger;
-import app.utils.Utils;
 import java.awt.BasicStroke;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Point;
@@ -20,7 +22,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.event.ComponentEvent;
-import java.awt.event.ComponentListener;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
@@ -31,21 +32,18 @@ import java.awt.geom.Point2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
-import javax.swing.SwingUtilities;
 import odb.inter.ODBridge;
 import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
-import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.gvt.JGVTComponentListener;
-import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
  * @author vara
  */
 public class SearchServices extends AlphaJPanel implements MouseListener,
-							  MouseMotionListener,ComponentListener{
+							  MouseMotionListener{
 
     Canvas can;
 
@@ -72,44 +70,64 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
 	private void init(){
         setLayout(null);
 	    svgViewListener = new DocumentStateChangedListener();
-        detailsPane = new RoundWindow();
-        detailsPane.getDecoratePanel().getContent().setIcon(MainWindowIWD.createNavigationIcon("searchServices32"));
-        detailsPane.setDynamicRevalidate(true);
-        detailsPane.setUpperThresholdAlpha(0.6f);
-        detailsPane.setAlpha(0.0f);
-        detailsPane.getContentPane().setUpperThresholdAlpha(0.75f);
-        detailsPane.setTitle("Search Services");        
-        detailsPane.getContentPane().add(guiForSearchServ);
-        detailsPane.setVisible(false);
-        detailsPane.addPropertyChangeListener(new PropertyChangeListener() {
-
-            @Override
-            public void propertyChange(PropertyChangeEvent evt) {
-                if(evt.getPropertyName().equals(ALPHA_CHANGE)){
-                    float newAlpha = (Float)evt.getNewValue();
-                    
-                    if(setAlpha(newAlpha)){
-                        repaint();
-                    }
-
-                }
-            }
-        });
-
-        add(detailsPane);
-
-        //add(new GraphicsVisualVerboseMode());
-        addComponentListener(this);
+        
         //don't paint background
         setOpaque(false);
 
 	}
-    
+
+    protected void installRoundWindow(RoundWindow rw){
+
+        if(detailsPane == null || !detailsPane.equals(rw)){
+            System.out.println("Initial round window and fill content");
+            detailsPane = rw;
+            detailsPane.getDecoratePanel().getContent().setIcon(MainWindowIWD.createNavigationIcon("searchServices32"));
+            detailsPane.setDynamicRevalidate(true);
+            detailsPane.setUpperThresholdAlpha(0.6f);
+            detailsPane.setAlpha(0.0f);
+            detailsPane.getContentPane().setUpperThresholdAlpha(0.75f);
+            detailsPane.setTitle("Search Services");
+            detailsPane.getContentPane().add(guiForSearchServ);
+            detailsPane.setVisible(false);
+            detailsPane.addPropertyChangeListener(new PropertyChangeListener() {
+                @Override
+                public void propertyChange(PropertyChangeEvent evt) {
+                    if(evt.getPropertyName().equals(ALPHA_CHANGE)){
+                        float newAlpha = (Float)evt.getNewValue();
+                        if(setAlpha(newAlpha)){
+                            repaint();
+                        }else if(newAlpha < .1f){                            
+                            enabled = false;
+                        }
+
+                    }
+                }
+            });
+        }else{
+            System.out.println(getClass().getCanonicalName()+"-> content roundWin no changed");
+        }
+        detailsPane.setEnabled(true);
+    }
+
     @Override
 	public void setEnabled(boolean val){
-        //super.setEnabled(val);
-	    enabled = true;
-        detailsPane.setEnabled(val);
+        //super.setEnabled(val);	    
+        if(val){
+            enabled = val;
+            Container parent = can.getParent();
+            if(parent instanceof SVGCanvasLayers){
+                Container cont = RoundWindowUtils.getRoundWindowFromContainer(parent);
+                if(cont != null){
+                    installRoundWindow((RoundWindow)cont);
+                }
+
+            }else{
+                String info = getClass().getCanonicalName()+" method init -> " +
+                        "parent SVGCanvasLayers no detect, details window will not be displayed !";
+                System.err.println(info);
+            }
+        }else
+            detailsPane.setEnabled(false);
 	    //setCenterPoint(0.0,0.0);
 	    //setCurrentPosition(0.0,0.0);
 	    repaint(visibleRec);
@@ -265,37 +283,6 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
 	}	
 	@Override
 	public void mouseMoved(MouseEvent e) {}
-
-    @Override
-    public void componentResized(ComponentEvent e) {        
-        new Thread(new Runnable() {
-            @Override
-            public void run() {
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {                        
-                        detailsPane.updateMyUI();
-                    }
-                });
-            }
-        }).start();
-        
-    }
-
-    @Override
-    public void componentMoved(ComponentEvent e) {
-        System.out.println(""+getClass()+" component Moved "+getBounds());
-    }
-
-    @Override
-    public void componentShown(ComponentEvent e) {
-        System.out.println(""+getClass()+" component Shown "+getBounds());
-    }
-
-    @Override
-    public void componentHidden(ComponentEvent e) {
-        System.out.println(""+getClass()+" component Hidden "+getBounds());
-    }
 
     /**
      * @return the dragged
