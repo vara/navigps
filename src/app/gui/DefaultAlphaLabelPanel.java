@@ -58,12 +58,20 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         return content;
     }
 
-    public void setText(String txt){
-        if(isEnabled() && isAnimatorEnabled()){
-            startTimer();
-        }
-        content.setAlpha(content.getUpperThresholdAlpha());
-        getContentText().setText(txt);
+    public void setText(final String txt){
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                content.setAlpha(content.getUpperThresholdAlpha());
+                boolean needrepaint = txt.equals(getContentText().getText());
+                if(needrepaint) repaint();
+                else getContentText().setText(txt);
+
+                if(isEnabled() && isAnimatorEnabled()){
+                    startTimer();
+                }
+            }
+        });
     }
     protected void startTimer(){
 
