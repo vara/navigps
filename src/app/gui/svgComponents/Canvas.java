@@ -56,7 +56,6 @@ import org.apache.batik.swing.JSVGCanvas;
 
 public class Canvas extends JSVGCanvas{
 
-    private JLabel labelViewMousePosyton = new JLabel("");
     private SVGConfiguration svgConfig = new SVGConfiguration();
     
     private SVGBridgeComponents listeners = MainWindowIWD.
@@ -82,8 +81,8 @@ public class Canvas extends JSVGCanvas{
 
     public Canvas(){
 		super(null,false,false);
-        //setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
-        setDocumentState(Canvas.ALWAYS_STATIC);
+        setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+        //setDocumentState(Canvas.ALWAYS_STATIC);
         mouseIteraction = new  MouseGestures();
         setLayout(new BorderLayout());
         search = new SearchServices(this);
@@ -129,24 +128,10 @@ public class Canvas extends JSVGCanvas{
         return search;
     }
 
-    @Override
-    public void setURI(String uri){	
-        super.setURI(uri);
-        
-    }
     public boolean isDocumentSet(){ 
         return (getSVGDocument() != null);
     }
     
-    public JLabel getLabelViewMousePosition() {
-        return labelViewMousePosyton;
-    }
-    
-    @Override
-    public void paintComponent(Graphics g){
-        super.paintComponent(g);
-    }
-
     public void zoomFromCenterDocumnet(boolean zoomIn){
         mouseIteraction.zoomFromCenterDocumnet(zoomIn);
         mouseIteraction.setMode(MouseGestures.ZOOM_ACTION);
@@ -199,7 +184,7 @@ public class Canvas extends JSVGCanvas{
         public void mousePressed(MouseEvent e) {
             xStart = e.getX();
             yStart = e.getY();
-            if(e.getButton() == MouseEvent.BUTTON1){
+            if(e.getButton() == MouseEvent.BUTTON1 && !e.isShiftDown()){
                 drag=true;                
             }                
         }

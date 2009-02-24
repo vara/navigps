@@ -77,7 +77,7 @@ public class SVGCanvasLayers extends JLayeredPane{
         thumb.setAlpha(0.0f);
         thumb.setUpperThresholdAlpha(0.77f);
         ThumbnailPanel tmp = new ThumbnailPanel(thumb);
-        tmp.setUpperThresholdAlpha(0.2f);
+        tmp.setUpperThresholdAlpha(0.4f);
         tmp.setAlpha(0.0f);
         tmp.setBackground(Color.BLACK);
         tmp.setBounds(50, 50, 200, 100);
