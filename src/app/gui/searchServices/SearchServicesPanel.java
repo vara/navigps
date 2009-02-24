@@ -30,6 +30,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {
         initComponents();
+        initValue();
 
         Vector<String> val = new Vector<String>();
 //        val.add("a");
@@ -64,9 +65,13 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         panelForJTree.add(jScrollPane1);
 
         setServices(new Search().getCategories());
-
     }
 
+    private void initValue(){
+        setRadius(0);
+        setCenterPoint(new Point.Double(0, 0));
+        setCurrentPos(new Point.Double(0, 0));
+    }
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -229,7 +234,6 @@ public class SearchServicesPanel extends javax.swing.JPanel {
            double radius = ((Number)gRadius.getValue()).doubleValue();
            double cx = ((Number)gCenterX.getValue()).doubleValue();
            double cy = ((Number)gCenterY.getValue()).doubleValue();
-
            
            subResult = new Search().getSubcategories(jTree1.getLastSelectedPathComponent().toString());
            System.out.println(subResult);
