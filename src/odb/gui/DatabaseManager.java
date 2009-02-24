@@ -52,6 +52,7 @@ public class DatabaseManager extends javax.swing.JDialog {
     /** Creates new form Manager */
     public DatabaseManager(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        setLocationRelativeTo(parent);
         initComponents();
         connectDatabase();
         refreshTree();
