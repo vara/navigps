@@ -52,6 +52,7 @@ public class DatabaseManager extends javax.swing.JDialog {
     /** Creates new form Manager */
     public DatabaseManager(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
+        setLocationRelativeTo(parent);
         initComponents();
 //        connectDatabase();
         refreshTree();
@@ -549,13 +550,16 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         popup.add(removeMenu);
     }
-
-    public static ImageIcon getIcon(String name) {
-        String ext = "png";
-        String imgLocation = DataBaseConfig.getIconPath() + name + "." + ext;
-        URL imageURL = DatabaseManager.class.getResource(imgLocation);
-        if (imageURL == null) {
-            System.err.println("Resource not found: " + imgLocation);
+    public static ImageIcon getIcon(String name){
+        return getIcon(name, "png");
+    }
+    public static ImageIcon getIcon(String name,String ext){
+        String imgLocation = DataBaseConfig.getIconPath()
+                             + name
+                             + "."+ext;
+         URL imageURL = DatabaseManager.class.getResource(imgLocation);
+         if (imageURL == null) {
+            System.err.println("Resource not found: "+imgLocation);
             return null;
         } else {
             return new ImageIcon(imageURL);

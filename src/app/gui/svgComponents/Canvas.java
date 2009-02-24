@@ -1,31 +1,26 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.gui.svgComponents;
 
 import app.gui.MainWindowIWD;
 import app.gui.searchServices.SearchServices;
 import app.gui.svgComponents.displayobjects.DisplayManager;
-import app.gui.svgComponents.thumbnail.Thumbnail;
-import app.utils.Utils;
 import config.SVGConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
+import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
-import java.awt.geom.Point2D;
+ import java.awt.geom.Point2D;
 import javax.swing.AbstractAction;
 import javax.swing.JLabel;
-import org.apache.batik.dom.svg.SVGOMPoint;
+import javax.swing.KeyStroke;
 import org.apache.batik.swing.JSVGCanvas;
-import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -67,7 +62,7 @@ public class Canvas extends JSVGCanvas{
     private SVGBridgeComponents listeners = MainWindowIWD.
                         getBridgeInformationPipe();
 
-    private MouseGestures mouseIteractions;
+    private MouseGestures mouseIteraction;
     
     //not used yet
     //private SVGUserAgentGUIAdapter agent;
@@ -75,13 +70,21 @@ public class Canvas extends JSVGCanvas{
     private SearchServices search;
     private DisplayManager dm;
 
+    private boolean isFocus = false;
+
+    MouseListener requestFocus = new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent mouseEvent) {
+            if(!isFocus)
+                requestFocusInWindow();             
+        }
+    };
+
     public Canvas(){
 		super(null,false,false);
-
-        setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
-        //setDocumentState(Canvas.ALWAYS_STATIC);
-        setDoubleBuffered(false);
-        mouseIteractions = new  MouseGestures();
+        //setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+        setDocumentState(Canvas.ALWAYS_STATIC);
+        mouseIteraction = new  MouseGestures();
         setLayout(new BorderLayout());
         search = new SearchServices(this);
         add(search,BorderLayout.CENTER);
@@ -93,8 +96,35 @@ public class Canvas extends JSVGCanvas{
 
         //setEnableZoomInteractor(false);
         //setEnableImageZoomInteractor(false);
+
+        setRequestFocusOnWindow(true);
+        addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                isFocus = true;
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                isFocus = false;
+            }
+        });
+    }
+
+    @Override
+    public boolean isFocusable() {
+        return true;
     }
     
+    public void setRequestFocusOnWindow(boolean val){
+        if(val){
+            addMouseListener(requestFocus);
+        }else{
+            removeMouseListener(requestFocus);
+        }
+    }
+
     public SearchServices getSearchServices(){
         return search;
     }
@@ -118,23 +148,23 @@ public class Canvas extends JSVGCanvas{
     }
 
     public void zoomFromCenterDocumnet(boolean zoomIn){
-        mouseIteractions.zoomFromCenterDocumnet(zoomIn);
-        mouseIteractions.setMode(MouseGestures.ZOOM_ACTION);
+        mouseIteraction.zoomFromCenterDocumnet(zoomIn);
+        mouseIteraction.setMode(MouseGestures.ZOOM_ACTION);
     }
 
     public void zoomFromMouseCoordinationEnable(boolean setZoom){
 
         if(setZoom){
-            addMouseListener(mouseIteractions);
-            addMouseMotionListener(mouseIteractions);
+            addMouseListener(mouseIteraction);
+            addMouseMotionListener(mouseIteraction);
             setCursor(Cursor.getPredefinedCursor(Cursor.HAND_CURSOR));
         }
         else{
             setCursor(Cursor.getDefaultCursor());
-            removeMouseListener(mouseIteractions);
-            removeMouseMotionListener(mouseIteractions);
+            removeMouseListener(mouseIteraction);
+            removeMouseMotionListener(mouseIteraction);
         }
-        mouseIteractions.setMode(MouseGestures.ZOOM_ACTION);
+        mouseIteraction.setMode(MouseGestures.ZOOM_ACTION);
     }
 
     private class MouseGestures extends MouseAdapter{
@@ -152,7 +182,6 @@ public class Canvas extends JSVGCanvas{
 
         @Override
         public void mouseClicked(MouseEvent evt) {
-
             Point2D p2d = new Point2D.Double(evt.getX(),evt.getY());
             int button = evt.getButton();
             if(button==MouseEvent.BUTTON1){
@@ -204,24 +233,11 @@ public class Canvas extends JSVGCanvas{
             }
         }
 
-        @Override
-        public void mouseMoved(MouseEvent e) {
-            SVGDocument doc = getSVGDocument();            
-            if(doc != null && !listeners.isRendering()){
-                SVGOMPoint svgp =Utils.getLocalPointFromDomElement(doc.getRootElement(),e.getX() ,e.getY());
-                //0.position on source component 1.positon on screen 2. posytion on svg doc (root element)
-                String str = e.getX()+","+e.getY()+";"+
-                         e.getXOnScreen()+","+e.getYOnScreen()+";"+
-                         svgp.getX()+","+svgp.getY();
-                //System.out.println(""+str);
-                //listeners.setLabelInformationPosytion(str);
-            }
-        }
-
         public void paintingZoom(Point2D translate,Point2D scale){
             AffineTransform at = getZoomTransform(translate, scale);            
             setPaintingTransform(at);
         }
+
         public void renderingZoom(Point2D translate,Point2D scale){
 
             AffineTransform rat = getRenderingTransform();
@@ -231,6 +247,7 @@ public class Canvas extends JSVGCanvas{
                 setRenderingTransform(at);
             }
         }
+
         private AffineTransform getZoomTransform(Point2D translate,Point2D scale){            
             AffineTransform t = AffineTransform.getTranslateInstance(translate.getX(),translate.getY());
             t.concatenate(AffineTransform.getScaleInstance(scale.getX(),scale.getY()));                
@@ -239,7 +256,6 @@ public class Canvas extends JSVGCanvas{
         }
 
         public void zoomFromCenterDocumnet(boolean zoomIn){
-
             Point2D translate = new Point(getSize().width>>1,getSize().height>>1);
             Point2D scale;
             if(zoomIn) scale= svgConfig.getZoomInRate();
@@ -262,18 +278,18 @@ public class Canvas extends JSVGCanvas{
         }
     }//class MouseGestures
 
-    class ThumbnailsAction extends AbstractAction{
-        private Thumbnail thumb;
-        private Rectangle recLocation = new Rectangle(20, 20, 100, 70);
+    protected class ThumbnailAction extends AbstractAction{
+        public ThumbnailAction(Integer mnemonic) {
+            super();
 
-        public ThumbnailsAction(){
-            
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+            putValue(AbstractAction.ACCELERATOR_KEY,
+                    KeyStroke.getKeyStroke(mnemonic,InputEvent.SHIFT_DOWN_MASK|InputEvent.CTRL_DOWN_MASK));
         }
 
         @Override
         public void actionPerformed(ActionEvent e) {
-
+            
         }
-
     }
 }

@@ -19,6 +19,7 @@
 package app.gui.svgComponents.thumbnail;
 
 import app.gui.detailspanel.AlphaJPanel;
+import app.utils.GraphicsUtilities;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -35,12 +36,10 @@ import java.awt.geom.Dimension2D;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.util.Iterator;
 import java.util.List;
-
-import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
-
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.gvt.CanvasGraphicsNode;
 import org.apache.batik.gvt.CompositeGraphicsNode;
@@ -53,9 +52,6 @@ import org.apache.batik.swing.gvt.Overlay;
 import org.apache.batik.swing.svg.SVGDocumentLoaderAdapter;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.util.SVGConstants;
-
-import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.timing.TimingTarget;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGSVGElement;
 
@@ -74,54 +70,36 @@ public class Thumbnail extends AlphaJPanel {
     protected boolean documentChanged;
     protected AreaOfInterestOverlay overlay;
     protected AreaOfInterestListener aoiListener;
-    protected boolean interactionEnabled = true;
-
-    private Animator animator;
-    private int animationDuration = 2000;
+    protected boolean interactionEnabled = false;
 
     public Thumbnail(JSVGCanvas svgCanvas) {
 
         super(new BorderLayout());
+        setOpaque(false);
         this.svgCanvas = svgCanvas;
         svgCanvas.addGVTTreeRendererListener(new ThumbnailGVTListener());
         svgCanvas.addSVGDocumentLoaderListener(new ThumbnailDocumentListener());
         svgCanvas.addComponentListener(new ThumbnailCanvasComponentListener());
 
         // create the thumbnail
-        svgThumbnailCanvas = new JGVTComponent(){
-
-            @Override
-            public void paintComponent(Graphics g) {
-                Graphics2D g2d = (Graphics2D)g;
-
-                if (image != null) {
-                    if (paintingTransform != null) {
-                        g2d.transform(paintingTransform);
-                    }
-                    g2d.drawRenderedImage(image, null);
-                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
-                                         RenderingHints.VALUE_ANTIALIAS_OFF);
-                    Iterator it = overlays.iterator();
-                    while (it.hasNext()) {
-                        ((Overlay)it.next()).paint(g);
-                    }
-                }
-            }
-
-        };
+        svgThumbnailCanvas = new SVGThumbnailCanvas();
 
         overlay = new AreaOfInterestOverlay();
         svgThumbnailCanvas.getOverlays().add(overlay);
         svgThumbnailCanvas.addComponentListener(new ThumbnailComponentListener());
-        aoiListener = new AreaOfInterestListener();
-        svgThumbnailCanvas.addMouseListener(aoiListener);
-        svgThumbnailCanvas.addMouseMotionListener(aoiListener);
-        add(svgThumbnailCanvas, BorderLayout.CENTER);
-
         svgThumbnailCanvas.addGVTTreeRendererListener(new ThumbnailGVTListener());
+        aoiListener = new AreaOfInterestListener();
+
+        add(svgThumbnailCanvas, BorderLayout.CENTER);       
+    }
+
+    @Override
+    protected void paintComponent(Graphics g) {
+        super.paintComponent(g);
     }
 
     public void setInteractionEnabled(boolean b) {
+
         if (b == interactionEnabled) return;
         interactionEnabled = b;
         if (b) {
@@ -162,6 +140,7 @@ public class Thumbnail extends AlphaJPanel {
      * Updates the thumbnail component rendering transform.
      */
     protected void updateThumbnailRenderingTransform() {
+        System.out.println("update ThumbnailRenderingTransform");
         SVGDocument svgDocument = svgCanvas.getSVGDocument();
         if (svgDocument != null) {
             SVGSVGElement elt = svgDocument.getRootElement();
@@ -203,6 +182,42 @@ public class Thumbnail extends AlphaJPanel {
 
             svgThumbnailCanvas.setRenderingTransform(Tx);
             overlay.synchronizeAreaOfInterest();
+        }
+    }
+
+    class SVGThumbnailCanvas extends JGVTComponent{
+
+        private BufferedImage bi;
+        @Override
+        public void paintComponent(Graphics g) {
+            Graphics2D g2d = (Graphics2D)g;
+
+            if(getAlpha()!=0){
+                if (image != null ) {
+                    if(bi == null){
+                        bi = GraphicsUtilities.toCompatibleImage(image);
+                    }
+                    if (paintingTransform != null) {
+                        g2d.transform(paintingTransform);
+                    }
+                    g2d.drawRenderedImage(image, null);
+                    g2d.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
+                                         RenderingHints.VALUE_ANTIALIAS_OFF);
+                    Iterator it = overlays.iterator();
+                    while (it.hasNext()) {
+                        ((Overlay)it.next()).paint(g2d);
+                    }
+                }else{
+                    if(bi != null){
+                        g2d.drawRenderedImage(bi, null);
+                    }
+                }
+            }
+        }
+
+        @Override
+        protected boolean updateRenderingTransform() {
+            return super.updateRenderingTransform();
         }
     }
 
@@ -264,6 +279,7 @@ public class Thumbnail extends AlphaJPanel {
                     at.preConcatenate
                         (AffineTransform.getTranslateInstance(tx, ty));
                     svgCanvas.setRenderingTransform(at);
+                    updateThumbnailRenderingTransform();
                 } catch (NoninvertibleTransformException ex) { }
             }
         }
@@ -380,26 +396,7 @@ public class Thumbnail extends AlphaJPanel {
         }
     }
 
-    protected class AnimatorBehaviour implements TimingTarget{
-
-        @Override
-        public void timingEvent(float arg0) {
-            if(!setAlpha(arg0)){
-                animator.stop();
-            }else{
-                SwingUtilities.invokeLater(new Runnable() {
-                    @Override
-                    public void run() {
-                        repaint();
-                    }
-                });
-            }
-        }
-        @Override
-        public void begin() {}
-        @Override
-        public void end() {}
-        @Override
-        public void repeat() {}
+    public boolean isDisplay(){
+        return getAlpha()!=0.0f;
     }
 }

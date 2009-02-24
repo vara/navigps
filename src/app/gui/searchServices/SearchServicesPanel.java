@@ -19,6 +19,10 @@ import java.util.Vector;
 import javax.swing.JOptionPane;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.JTree.DynamicUtilTreeNode;
+import javax.swing.tree.DefaultMutableTreeNode;
+import javax.swing.tree.DefaultTreeModel;
+import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import odb.core.Search;
 
@@ -237,6 +241,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 break;
             }
         }
+
         catResult = new Search().getCategories();
         if (jTree1.getSelectionModel().isSelectionEmpty()) {
             JOptionPane.showMessageDialog(SearchServicesPanel.this, "You need to select category!", "Warning", JOptionPane.ERROR_MESSAGE);
@@ -245,6 +250,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             System.out.println(subResult);
         }
             System.out.println(catResult);
+
     }//GEN-LAST:event_jButton1ActionPerformed
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFormattedTextField gCenterX;
@@ -279,5 +285,12 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     public void setCurrentPos(Point.Double val) {
         gCurrentX.setValue(val.getX());
         gCurrentY.setValue(val.getY());
+    }
+
+    public void setServices(Vector <String> value){
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+        DynamicUtilTreeNode.createChildren(root, value);
+        DefaultTreeModel dtm = new DefaultTreeModel(root, false);
+        jTree1.setModel(dtm);
     }
 }

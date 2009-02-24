@@ -5,10 +5,16 @@
 
 package app.gui.svgComponents;
 
-//import tests.layers.*;
 import app.gui.detailspanel.AlphaJPanel;
-import app.gui.svgComponents.Canvas;
+import app.gui.detailspanel.RoundWindow;
+import app.gui.detailspanel.RoundWindowUtils;
+import app.gui.svgComponents.thumbnail.Thumbnail;
+import app.gui.svgComponents.thumbnail.ThumbnailPanel;
+import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.OverlayLayout;
@@ -37,12 +43,46 @@ public class SVGCanvasLayers extends JLayeredPane{
     private void createDefaultContainers(){
         modalContainer = new AlphaJPanel(null);
         getModalContainer().setOpaque(false);
+        createRoundWindowProperties();
 
         componentContainer = new AlphaJPanel(null);
         getComponentContainer().setOpaque(false);
+        createThumbnails();
 
         add(getModalContainer(),MODAL_LAYER);
         add(getComponentContainer(),DEFAULT_LAYER);
+    }
+
+    private void createRoundWindowProperties(){
+        RoundWindow detailsPane = new RoundWindow();
+        detailsPane.setDynamicRevalidate(true);
+        detailsPane.setUpperThresholdAlpha(0.6f);
+        detailsPane.setAlpha(0.0f);
+        detailsPane.getContentPane().setUpperThresholdAlpha(0.75f);
+        detailsPane.setVisible(false);
+        getModalContainer().add(detailsPane);
+        getModalContainer().addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Container cont = RoundWindowUtils.getRoundWindowFromContainer((Container)e.getSource());
+                if(cont != null){
+                    ((RoundWindow)cont).updateMyUI();
+                }
+            }
+        });
+    }
+
+    private void createThumbnails(){
+        Thumbnail thumb = new Thumbnail(svgCanvas);
+        thumb.setAlpha(0.0f);
+        thumb.setUpperThresholdAlpha(0.77f);
+        ThumbnailPanel tmp = new ThumbnailPanel(thumb);
+        tmp.setUpperThresholdAlpha(0.2f);
+        tmp.setAlpha(0.0f);
+        tmp.setBackground(Color.BLACK);
+        tmp.setBounds(50, 50, 200, 100);
+        getComponentContainer().add(tmp);
+        tmp.displayThumbnail(true);
     }
 
     private Canvas createSVGCanvas(){

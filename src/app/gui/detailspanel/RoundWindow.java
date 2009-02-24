@@ -16,7 +16,6 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Point;
-import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -26,7 +25,6 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
-import javax.swing.JComponent;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -40,7 +38,7 @@ import org.jdesktop.animation.timing.TimingTarget;
  * @author vara
  */
 public class RoundWindow extends RoundJPanel
-        implements MouseListener,MouseMotionListener,TimingTarget,FocusListener{
+        implements MouseListener,MouseMotionListener,FocusListener{
 
 
     private int sensitiveMouseReaction = 8;        
@@ -81,8 +79,9 @@ public class RoundWindow extends RoundJPanel
         super.setLayout(new BorderLayout(0,getDecorateAndContentGap()));
         
         animator = new Animator(animationDuration, 1,
-                RepeatBehavior.LOOP, this);
-        ((DecoratePanel)decorate).addActionListenerToCloseButton(new CloseAction());
+                RepeatBehavior.LOOP, new WindowDisplayBehavior());
+
+        //((DecoratePanel)decorate).addActionListenerToCloseButton(new CloseAction());
 
         installRepaintManager();
 
@@ -96,6 +95,10 @@ public class RoundWindow extends RoundJPanel
         super.setEnabled(false);
     }
 
+    public boolean isEmpty(){
+        return !(getRoundWindowRootPane().getContentPane().getComponents().length>0);
+    }
+    
     public RoundRectangle2D getWindowShape(){
         Point.Double corners = getRoundCorner();
         return new RoundRectangle2D.Double(
@@ -135,10 +138,6 @@ public class RoundWindow extends RoundJPanel
         });        
     }
 
-    @Override
-    public void setVisible(boolean aFlag) {
-        super.setVisible(aFlag);
-    }
     public void displayPanel(boolean val){
         
         float frac = .0f;
@@ -184,9 +183,8 @@ public class RoundWindow extends RoundJPanel
     
 
     @Override
-    public void paintComponent(Graphics g){       
-        Container parent = getParent();
-        if(isVisible() && parent!=null && parent.isEnabled() && getAlpha()>0){
+    public void paintComponent(Graphics g){
+        if(isVisible() && getAlpha()>0){
 
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D)g.create();
@@ -207,7 +205,7 @@ public class RoundWindow extends RoundJPanel
             g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,
                                 RenderingHints.VALUE_ANTIALIAS_ON);
             g2.setPaint(gp);
-            g2.fill(new RoundRectangle2D.Double(x+1, y+1, w-1, h-1,mainBorder.getRecW(),mainBorder.getRecH()));
+            g2.fillRoundRect(x+1, y+1, w-1, h-1,(int)mainBorder.getRecW(),(int)mainBorder.getRecH());
             
             BorderEfects.paintBorderGlow(g2,4,outerBorderShape,colorBorderGlow);
             g2.dispose();
@@ -333,37 +331,7 @@ public class RoundWindow extends RoundJPanel
      */
     public void setDynamicRevalidate(boolean dynamicRevalidate) {
         this.dynamicRevalidate = dynamicRevalidate;
-    }
-
-    @Override
-    public void timingEvent(float arg0) {
-        if(arg0>0 && arg0<Math.max(getContentPane().getUpperThresholdAlpha(),
-                                   getUpperThresholdAlpha())){
-            Color outerColor = ((OvalBorder)getRoundBorder()).getBorderColor();
-            
-            if(arg0<getRoundBorder().getUpperThresholdAlpha()){
-                ((OvalBorder)getRoundBorder()).setBorderColor(Utils.colorAlpha(outerColor, arg0));
-            }
-            setAlphaToAllRootWindow(arg0);
-            getContentPane().setAlpha(arg0);
-            getDecoratePanel().setAlpha(arg0);            
-            repaint();
-        }else
-            animator.stop();
-    }
-    @Override
-    public void begin() {
-        if(isEnabled())
-            setVisible(isEnabled());
-    }
-    @Override
-    public void end() {
-        if(!isEnabled())
-            setVisible(isEnabled());
-    }
-    @Override
-    public void repeat() {
-    }
+    }   
 
     /**
      * @return the decorate
@@ -424,6 +392,49 @@ public class RoundWindow extends RoundJPanel
             getRoundWindowRootPane().revalidate();
     }
 
+    @Override
+    public boolean equals(Object obj) {
+        boolean retVal = false;
+        if(!(obj instanceof RoundWindow))
+            return retVal;
+        RoundWindow tmp = (RoundWindow)obj;
+        retVal = getDecoratePanel().getTitle().equals(tmp.getDecoratePanel().getTitle());
+        
+        return retVal;
+    }
+
+    private class WindowDisplayBehavior implements TimingTarget{
+        @Override
+        public void timingEvent(float arg0) {
+            if(arg0>0 && arg0<Math.max(getContentPane().getUpperThresholdAlpha(),
+                                       getUpperThresholdAlpha())){
+                Color outerColor = ((OvalBorder)getRoundBorder()).getBorderColor();
+
+                if(arg0<getRoundBorder().getUpperThresholdAlpha()){
+                    ((OvalBorder)getRoundBorder()).setBorderColor(Utils.colorAlpha(outerColor, arg0));
+                }
+                setAlphaToAllRootWindow(arg0);
+                getContentPane().setAlpha(arg0);
+                getDecoratePanel().setAlpha(arg0);
+                repaint();
+            }else
+                animator.stop();
+        }
+        @Override
+        public void begin() {
+            if(isEnabled())
+                setVisible(isEnabled());
+        }
+        @Override
+        public void end() {
+            if(!isEnabled())
+                setVisible(isEnabled());
+        }
+        @Override
+        public void repeat() {
+        }
+    }
+/*
     class CloseAction implements ActionListener,TimingTarget{
         private Animator animator;
 
@@ -456,4 +467,5 @@ public class RoundWindow extends RoundJPanel
         @Override
         public void repeat() {}
     }
+ */
 }
