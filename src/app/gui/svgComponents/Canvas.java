@@ -9,9 +9,12 @@ import java.awt.Cursor;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
+import java.awt.event.FocusEvent;
+import java.awt.event.FocusListener;
 import java.awt.event.InputEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
  import java.awt.geom.Point2D;
 import javax.swing.AbstractAction;
@@ -67,6 +70,16 @@ public class Canvas extends JSVGCanvas{
     private SearchServices search;
     private DisplayManager dm;
 
+    private boolean isFocus = false;
+
+    MouseListener requestFocus = new MouseAdapter() {
+        @Override
+        public void mousePressed(MouseEvent mouseEvent) {
+            if(!isFocus)
+                requestFocusInWindow();             
+        }
+    };
+
     public Canvas(){
 		super(null,false,false);
         //setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
@@ -83,8 +96,35 @@ public class Canvas extends JSVGCanvas{
 
         //setEnableZoomInteractor(false);
         //setEnableImageZoomInteractor(false);
+
+        setRequestFocusOnWindow(true);
+        addFocusListener(new FocusListener() {
+
+            @Override
+            public void focusGained(FocusEvent e) {
+                isFocus = true;
+            }
+
+            @Override
+            public void focusLost(FocusEvent e) {
+                isFocus = false;
+            }
+        });
+    }
+
+    @Override
+    public boolean isFocusable() {
+        return true;
     }
     
+    public void setRequestFocusOnWindow(boolean val){
+        if(val){
+            addMouseListener(requestFocus);
+        }else{
+            removeMouseListener(requestFocus);
+        }
+    }
+
     public SearchServices getSearchServices(){
         return search;
     }
@@ -142,7 +182,6 @@ public class Canvas extends JSVGCanvas{
 
         @Override
         public void mouseClicked(MouseEvent evt) {
-
             Point2D p2d = new Point2D.Double(evt.getX(),evt.getY());
             int button = evt.getButton();
             if(button==MouseEvent.BUTTON1){
