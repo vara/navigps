@@ -7,6 +7,7 @@ import javax.swing.JTree;
 import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
+import javax.swing.tree.TreeSelectionModel;
 
 public class JCheckBoxTree extends JTree{
     Vector checkedPaths = new Vector();
@@ -37,6 +38,14 @@ public class JCheckBoxTree extends JTree{
 
     public JCheckBoxTree() {
         super();
+        init();
+    }
+
+    private void init(){
+        getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        checkBoxCellRenderer= new JCheckBoxTreeRenderer();
+        setCellRenderer(checkBoxCellRenderer);
+        addMouseListener(new JCheckBoxTreeMouseListener(this));
     }
 
     public void setChecked(TreePath path) {
@@ -91,10 +100,6 @@ public class JCheckBoxTree extends JTree{
         if ((path != null) && (checkedPaths != null)) {
             for(int i=0; i < checkedPaths.size(); i++) {
                 TreePath checkedPath = (TreePath)checkedPaths.elementAt(i);
-                if(checkedPath==null){
-                    System.err.println("checkedPath == null");
-                    return false;
-                }
                 if(path.isDescendant(checkedPath)) {
                     return true;
                 }
@@ -155,5 +160,5 @@ public class JCheckBoxTree extends JTree{
         if(pathRect != null){
             repaint(pathRect.x, pathRect.y, pathRect.width, pathRect.height);
         }
-    }    
+    }
 }
