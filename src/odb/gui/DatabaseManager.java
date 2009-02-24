@@ -373,9 +373,11 @@ public class DatabaseManager extends javax.swing.JDialog {
                         }
                         if (!FL_D) {
                             odb.store(new Category(newCat));
+                            odb.commit();
                         }
                     } else {
                         odb.store(new Category(newCat));
+                        odb.commit();
                     }
                     refreshTree();
                 }
@@ -407,6 +409,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 category.setSubcategories(new Vector());
                                 category.addSubcategory(new Subcategory(category, newsubCat));
                                 odb.store(category);
+                                odb.commit();
                             } else {
                                 if (category.getSubcategories().isEmpty()) {
                                     category.addSubcategory(new Subcategory(category, newsubCat));
@@ -422,6 +425,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                                     } else {
                                         category.addSubcategory(new Subcategory(category, newsubCat));
                                         odb.store(category);
+                                        odb.commit();
                                     }
                                 }
                             }
@@ -500,6 +504,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 Category cat = (Category) cats.getFirst();
                                 cat.setName(newcat);
                                 odb.store(cat);
+                                odb.commit();
                                 refreshTree();
                             }
                         }
@@ -507,7 +512,6 @@ public class DatabaseManager extends javax.swing.JDialog {
                     } else if (jTree1.getSelectionPath().getPath().length == 3) {
                         String newsubcat = JOptionPane.showInputDialog("Please input new name for the selected subcategory " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
                         if (newsubcat == null) {
-//                            cancel
                         } else if (newsubcat.equalsIgnoreCase("")) {
                             JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid subcategory name!", "Warning", JOptionPane.ERROR_MESSAGE);
                         } else {
@@ -529,6 +533,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                                     if (s.getName().equalsIgnoreCase(jTree1.getLastSelectedPathComponent().toString())) {
                                         s.setName(newsubcat);
                                         odb.store(c);
+                                        odb.commit();
                                         break;
                                     }
                                 }
@@ -571,7 +576,6 @@ public class DatabaseManager extends javax.swing.JDialog {
         Objects categories = odb.getObjects(Category.class);
 
         if (categories.isEmpty()) {
-            
         } else {
             DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
             jTree1.setModel(new DefaultTreeModel(root));
