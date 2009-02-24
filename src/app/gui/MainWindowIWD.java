@@ -46,6 +46,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseMotionListener;
 import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
+import java.awt.event.WindowStateListener;
 import java.awt.geom.Rectangle2D;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
@@ -105,7 +106,7 @@ import org.w3c.dom.svg.SVGSVGElement;
  *
  * @author vara
  */
-public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemListener {
+public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemListener, WindowStateListener {
 
     private Main core;
     private JPanel panelWithToolBars;
@@ -139,7 +140,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
         setSize(GUIConfiguration.getWindowSize());
         setLayout(new BorderLayout());
-
+        connectDatabase();
         initComponents();
 
         if (MainConfiguration.getPathToChartFile() != null) {
@@ -150,6 +151,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
         setDisplayMode();
+        
     }
 
     public MainWindowIWD(Main c, ArgumentsStartUp arg) {
@@ -159,6 +161,17 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
     public static final SVGBridgeComponents getBridgeInformationPipe() {
         return svgListeners;
+    }
+
+    private void connectDatabase() {
+        try {
+            System.err.println("ODB: connecting");
+            ODB odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
+            Constants.setDbConnection(odb);
+            odb = null;
+        } catch (Exception ex) {
+            JOptionPane.showMessageDialog(MainWindowIWD.this, ex.getMessage());
+        }
     }
 
     private void initComponents() {
@@ -441,22 +454,6 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             }
         });
 
-        JMenuItem odbConn = new JMenuItem("Connect");
-        odbConn.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                try {
-                    System.err.println("ODB: connecting");
-                    ODB odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
-                    Constants.setDbConnection(odb);
-                    odb = null;
-                } catch (Exception ex) {
-                    JOptionPane.showMessageDialog(MainWindowIWD.this, ex.getMessage());
-                }
-            }
-        });
-
         JMenuItem odbDisc = new JMenuItem("Disconnect");
         odbDisc.addActionListener(new ActionListener() {
 
@@ -513,7 +510,6 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         menuView.addSeparator();
         menuView.add(dispFull);
         menuODB.add(odbManager);
-        menuODB.add(odbConn);
         menuODB.add(odbDisc);
 
         jmb.add(menuFile);
@@ -693,6 +689,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
     @Override
     public void windowLostFocus(WindowEvent e) {
         getVerboseStream().outputVerboseStream("windowLostFocus");
+    }
+
+    public void windowStateChanged(WindowEvent e) {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 
     private class OpenSVGFileAction extends AbstractAction {

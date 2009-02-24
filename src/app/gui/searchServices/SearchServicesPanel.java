@@ -22,7 +22,6 @@ import javax.swing.JScrollPane;
 import javax.swing.JTree.DynamicUtilTreeNode;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
-import javax.swing.tree.TreeModel;
 import javax.swing.tree.TreeSelectionModel;
 import odb.core.Search;
 
@@ -39,12 +38,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     public SearchServicesPanel() {
         initComponents();
 
-        //for test
         Vector<String> val = new Vector<String>();
-        val.add("Streets");
-        val.add("Schools");
-        val.add("Bars");
-
+//        val.add("a");
+//        val.add("b");
+        
         jTree1 = new JCheckBoxTree(val);
         jTree1.setCellRenderer(new JCheckBoxTreeRenderer());
         jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -69,6 +66,9 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jTree1.setFocusable(false);
 
         panelForJTree.add(jScrollPane1);
+
+        setServices(new Search().getCategories());
+
     }
 
     /** This method is called from within the constructor to
@@ -137,27 +137,22 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         gRadius.setCaretColor(new java.awt.Color(151, 151, 151));
         gRadius.setOpaque(false);
-        gRadius.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gRadius, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 170, -1));
 
         gCurrentX.setCaretColor(new java.awt.Color(151, 151, 151));
         gCurrentX.setOpaque(false);
-        gCurrentX.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCurrentX, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 80, -1));
 
         gCurrentY.setCaretColor(new java.awt.Color(151, 151, 151));
         gCurrentY.setOpaque(false);
-        gCurrentY.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCurrentY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 80, 80, -1));
 
         gCenterX.setCaretColor(new java.awt.Color(151, 151, 151));
         gCenterX.setOpaque(false);
-        gCenterX.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCenterX, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 80, -1));
 
         gCenterY.setCaretColor(new java.awt.Color(151, 151, 151));
         gCenterY.setOpaque(false);
-        gCenterY.setSelectedTextColor(new java.awt.Color(255, 255, 255));
         jPanel1.add(gCenterY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 140, 80, -1));
 
         jPanel3.setOpaque(false);
@@ -173,7 +168,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 121, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addGap(69, 69, 69))
         );
@@ -201,9 +196,9 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                             .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                                .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 123, Short.MAX_VALUE)
+                                .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 124, Short.MAX_VALUE)
                                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE))))
+                                .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 193, Short.MAX_VALUE))))
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                         .addGap(141, 141, 141)
                         .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 192, Short.MAX_VALUE)))
@@ -220,7 +215,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                         .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
                         .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE))
-                    .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
+                    .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 256, Short.MAX_VALUE))
                 .addContainerGap())
         );
 
@@ -249,9 +244,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             subResult = new Search().getSubcategories(jTree1.getLastSelectedPathComponent().toString());
             System.out.println(subResult);
         }
-            System.out.println(catResult);
+        System.out.println(catResult);
 
     }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFormattedTextField gCenterX;
     private javax.swing.JFormattedTextField gCenterY;
@@ -287,7 +283,9 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         gCurrentY.setValue(val.getY());
     }
 
-    public void setServices(Vector <String> value){
+    public void setServices(Vector<String> value) {
+        
+
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
         DynamicUtilTreeNode.createChildren(root, value);
         DefaultTreeModel dtm = new DefaultTreeModel(root, false);
