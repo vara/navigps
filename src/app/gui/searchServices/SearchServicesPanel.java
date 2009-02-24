@@ -30,17 +30,12 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {
         initComponents();
-
+        initValue();
         Vector<String> val = new Vector<String>();
-// val.add("a");
-// val.add("b");
 
         jTree1 = new JCheckBoxTree();
         jTree1.setRootVisible(false);
         jTree1.setShowsRootHandles(true);
-        //jTree1.setCellRenderer(new JCheckBoxTreeRenderer());
-        //jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        //jTree1.addMouseListener(new JCheckBoxTreeMouseListener(jTree1));
         setServices(val);
 
         jScrollPane1 = new JScrollPane(jTree1);
@@ -224,16 +219,13 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         Vector subResult = null;
         Vector<String> services = getSelectedServices();
-        if (!services.isEmpty()) {
-            if (!gRadius.getText().equalsIgnoreCase("")) {
-                double radius = ((Number) gRadius.getValue()).doubleValue();
-                double cx = ((Number) gCenterX.getValue()).doubleValue();
-                double cy = ((Number) gCenterY.getValue()).doubleValue();
-                subResult = new Search().getSubcategories(jTree1.getLastSelectedPathComponent().toString());
-                System.out.println(subResult);
-            } else {
-                MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("You need to select an area !");
-            }
+        if (!services.isEmpty()) {            
+            double radius = ((Number) gRadius.getValue()).doubleValue();
+            double cx = ((Number) gCenterX.getValue()).doubleValue();
+            double cy = ((Number) gCenterY.getValue()).doubleValue();
+            subResult = new Search().getSubcategories(jTree1.getLastSelectedPathComponent().toString());
+            System.out.println(subResult);
+            
         } else {
             MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Please select a service !");
         }
@@ -259,6 +251,12 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPanel panelForJTree;
     // End of variables declaration//GEN-END:variables
+
+    private void initValue(){
+        setRadius(0);
+        setCenterPoint(new Point.Double(0, 0));
+        setCurrentPos(new Point.Double(0, 0));
+    }
 
     public void setRadius(double val) {
         gRadius.setValue(new Double(val));
