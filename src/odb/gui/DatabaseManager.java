@@ -54,12 +54,10 @@ public class DatabaseManager extends javax.swing.JDialog {
         super(parent, modal);
         setLocationRelativeTo(parent);
         initComponents();
-        connectDatabase();
+//        connectDatabase();
         refreshTree();
         loadTreePopup();
         fillServicesTable();
-
-    //disconnectDatabase();
     }
 
     private void addNewService() {
@@ -67,25 +65,25 @@ public class DatabaseManager extends javax.swing.JDialog {
         sf.setVisible(true);
     }
 
-    private void connectDatabase() {
-        try {
-            System.err.println("ODB: connecting");
-            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
-            Constants.setDbConnection(odb);
-            odb = null;
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        }
-    }
+//    private void connectDatabase() {
+//        try {
+//            System.err.println("ODB: connecting");
+//            odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
+//            Constants.setDbConnection(odb);
+//            odb = null;
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(this, e.getMessage());
+//        }
+//    }
 
-    private void disconnectDatabase() {
-        try {
-            Constants.getDbConnection().close();
-            System.err.println("ODB: disconnecting");
-        } catch (Exception e) {
-            JOptionPane.showMessageDialog(this, e.getMessage());
-        }
-    }
+//    private void disconnectDatabase() {
+//        try {
+//            Constants.getDbConnection().close();
+//            System.err.println("ODB: disconnecting");
+//        } catch (Exception e) {
+//            JOptionPane.showMessageDialog(this, e.getMessage());
+//        }
+//    }
 
     /** This method is called from within the constructor to
      * initialize the form.
@@ -304,7 +302,7 @@ public class DatabaseManager extends javax.swing.JDialog {
 }//GEN-LAST:event_jTabbedPane1FocusGained
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        disconnectDatabase();
+//        disconnectDatabase();
         Constants.setManagerWindow(null);
     }//GEN-LAST:event_formWindowClosing
 
