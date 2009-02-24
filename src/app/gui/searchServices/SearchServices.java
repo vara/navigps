@@ -74,7 +74,7 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
     protected void installRoundWindow(RoundWindow rw) {
 
         if (detailsPane == null || !detailsPane.equals(rw)) {
-            System.out.println("Initial round window and fill content");
+            //System.out.println("Initial round window and fill content");
             detailsPane = rw;
             detailsPane.getDecoratePanel().getContent().setIcon(MainWindowIWD.createNavigationIcon("searchServices32"));
             detailsPane.setDynamicRevalidate(true);
