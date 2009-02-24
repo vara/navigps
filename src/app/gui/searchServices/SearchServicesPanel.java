@@ -11,6 +11,7 @@
 
 package app.gui.searchServices;
 
+import app.gui.MainWindowIWD;
 import app.gui.ScrollBar.ui.LineScrollBarUI;
 import app.gui.detailspanel.RoundWindow;
 import java.awt.Component;
@@ -23,7 +24,6 @@ import javax.swing.JTree.DynamicUtilTreeNode;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
-import javax.swing.tree.TreeSelectionModel;
 
 /**
  *
@@ -43,10 +43,13 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         val.add("Schools");
         val.add("Bars");
         
-        jTree1 = new JCheckBoxTree(val);
-        jTree1.setCellRenderer(new JCheckBoxTreeRenderer());
-        jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
-        jTree1.addMouseListener(new JCheckBoxTreeMouseListener(jTree1));
+        jTree1 = new JCheckBoxTree();
+        jTree1.setRootVisible(false);
+        jTree1.setShowsRootHandles(true);
+        //jTree1.setCellRenderer(new JCheckBoxTreeRenderer());
+        //jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
+        //jTree1.addMouseListener(new JCheckBoxTreeMouseListener(jTree1));
+        setServices(val);
 
         jScrollPane1 = new JScrollPane(jTree1);
         jScrollPane1.setOpaque(false);
@@ -230,14 +233,19 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       Component comp;
-        for (comp = getParent(); comp!=null; comp=comp.getParent()) {
-            if(comp instanceof RoundWindow){
-                RoundWindow det  =(RoundWindow)comp;
-                System.out.println("current alpha "+det.getAlpha());
-                break;
-            }
-        }
+      
+       Vector<String> services = getSelectedServices();
+       if(!services.isEmpty()){
+
+           double radius = ((Number)gRadius.getValue()).doubleValue();
+           double cx = ((Number)gCenterX.getValue()).doubleValue();
+           double cy = ((Number)gCenterY.getValue()).doubleValue();
+           
+           
+       }else{
+           MainWindowIWD.getBridgeInformationPipe().currentStatusChanged(
+                   "Please select a service !");
+       }
     }//GEN-LAST:event_jButton1ActionPerformed
 
 
@@ -263,15 +271,45 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     // End of variables declaration//GEN-END:variables
 
     public void setRadius(double val){
-        gRadius.setValue(val);
+        gRadius.setValue(new Double(val));
     }
     public void setCenterPoint(Point.Double val){
-        gCenterX.setValue(val.getX());
-        gCenterY.setValue(val.getY());
+        gCenterX.setValue(new Double(val.getX()));
+        gCenterY.setValue(new Double(val.getY()));
     }
     public void setCurrentPos(Point.Double val){
-        gCurrentX.setValue(val.getX());
-        gCurrentY.setValue(val.getY());
+        gCurrentX.setValue(new Double(val.getX()));
+        gCurrentY.setValue(new Double(val.getY()));
+    }
+
+    /*
+     * This method implies that jtree model contais String objects
+     */
+
+    public Vector<String> getSelectedServices(){
+       Vector<String> val = new Vector<String>(10,10);
+       boolean checked = false;
+       boolean anyChecked = false;
+
+       int selRows = jTree1.getRowCount();
+        for (int i=0;i<selRows ;i++) {
+            if(!(checked=((JCheckBoxTree)jTree1).isChecked(jTree1.getPathForRow(i)))){
+                anyChecked = ((JCheckBoxTree)jTree1).isAnyChildChecked(jTree1.getPathForRow(i));
+            }
+            if(checked || anyChecked ){
+                TreeModel model = jTree1.getModel();
+                Object child = model.getChild(model.getRoot(), i);
+                if(child instanceof DefaultMutableTreeNode){
+                    Object data = ((DefaultMutableTreeNode)child).getUserObject();
+                    if(data instanceof String){
+                        val.add(((String)data));
+                    }else{
+                        System.err.println("Child ["+data+"] is not a String object !!! ");
+                    }
+                }
+            }
+        }
+        return val;
     }
 
     public void setServices(Vector <String> value){
