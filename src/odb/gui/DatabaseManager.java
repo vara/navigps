@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * Manager.java
  *
  * Created on 2009-02-02, 05:29:01
@@ -29,7 +24,6 @@ import odb.core.ServiceCore;
 import odb.core.Subcategory;
 import odb.utils.Constants;
 import org.neodatis.odb.ODB;
-import org.neodatis.odb.ODBFactory;
 import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
 import org.neodatis.odb.core.query.criteria.Where;
@@ -54,7 +48,6 @@ public class DatabaseManager extends javax.swing.JDialog {
         super(parent, modal);
         setLocationRelativeTo(parent);
         initComponents();
-//        connectDatabase();
         refreshTree();
         loadTreePopup();
         fillServicesTable();
@@ -84,7 +77,6 @@ public class DatabaseManager extends javax.swing.JDialog {
 //            JOptionPane.showMessageDialog(this, e.getMessage());
 //        }
 //    }
-
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -253,6 +245,8 @@ public class DatabaseManager extends javax.swing.JDialog {
         jScrollPane3.setBorder(null);
 
         jTree1.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        javax.swing.tree.DefaultMutableTreeNode treeNode1 = new javax.swing.tree.DefaultMutableTreeNode("root");
+        jTree1.setModel(new javax.swing.tree.DefaultTreeModel(treeNode1));
         jTree1.setToolTipText("Right-Click for options !");
         jTree1.setRootVisible(false);
         jTree1.setScrollsOnExpand(false);
@@ -550,16 +544,16 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         popup.add(removeMenu);
     }
-    public static ImageIcon getIcon(String name){
+
+    public static ImageIcon getIcon(String name) {
         return getIcon(name, "png");
     }
-    public static ImageIcon getIcon(String name,String ext){
-        String imgLocation = DataBaseConfig.getIconPath()
-                             + name
-                             + "."+ext;
-         URL imageURL = DatabaseManager.class.getResource(imgLocation);
-         if (imageURL == null) {
-            System.err.println("Resource not found: "+imgLocation);
+
+    public static ImageIcon getIcon(String name, String ext) {
+        String imgLocation = DataBaseConfig.getIconPath() + name + "." + ext;
+        URL imageURL = DatabaseManager.class.getResource(imgLocation);
+        if (imageURL == null) {
+            System.err.println("Resource not found: " + imgLocation);
             return null;
         } else {
             return new ImageIcon(imageURL);
@@ -614,17 +608,19 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(columns);
-
-        while (services.hasNext()) {
-            v = new Vector();
-            ServiceCore sc = (ServiceCore) services.next();
-            v.add(sc.getServiceDescription().getServiceName());
-            v.add(sc.getServiceDescription().getCategory().getName());
-            v.add(sc.getServiceDescription().getServiceSubCategory().getName());
-            v.add(sc.getServiceAttributes().getChildNodes().getLength());
-            v.add(sc.getServiceAttributes().getAttribute("y"));
-            model.addRow(v);
+        if (!services.isEmpty()) {
+            while (services.hasNext()) {
+                v = new Vector();
+                ServiceCore sc = (ServiceCore) services.next();
+                v.add(sc.getServiceDescription().getServiceName());
+                v.add(sc.getServiceDescription().getCategory().getName());
+                v.add(sc.getServiceDescription().getServiceSubCategory().getName());
+                v.add(sc.getServiceAttributes().getChildNodes().getLength());
+                v.add(sc.getServiceAttributes().getAttribute("y"));
+                model.addRow(v);
+            }
+        } else {
+            jTable1.setModel(model);
         }
-        jTable1.setModel(model);
     }
 }
