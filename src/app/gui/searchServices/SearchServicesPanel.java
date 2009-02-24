@@ -8,7 +8,6 @@
  *
  * Created on 2008-12-10, 03:21:56
  */
-
 package app.gui.searchServices;
 
 import app.gui.ScrollBar.ui.LineScrollBarUI;
@@ -17,9 +16,11 @@ import java.awt.Component;
 import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.util.Vector;
+import javax.swing.JOptionPane;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.tree.TreeSelectionModel;
+import odb.core.Search;
 
 /**
  *
@@ -29,6 +30,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     private JScrollPane jScrollPane1;
     private JCheckBoxTree jTree1;
+
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {
         initComponents();
@@ -38,7 +40,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         val.add("Streets");
         val.add("Schools");
         val.add("Bars");
-        
+
         jTree1 = new JCheckBoxTree(val);
         jTree1.setCellRenderer(new JCheckBoxTreeRenderer());
         jTree1.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
@@ -221,25 +223,29 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, 300));
     }// </editor-fold>//GEN-END:initComponents
 
-    public void addActionForSearchButton(ActionListener al){
+    public void addActionForSearchButton(ActionListener al) {
         jButton1.addActionListener(al);
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-       Component comp;
-        for (comp = getParent(); comp!=null; comp=comp.getParent()) {
-            if(comp instanceof RoundWindow){
-                RoundWindow det  =(RoundWindow)comp;
-                System.out.println("current alpha "+det.getAlpha());
+        Component comp;
+        Vector catResult, subResult = null;
+        for (comp = getParent(); comp != null; comp = comp.getParent()) {
+            if (comp instanceof RoundWindow) {
+                RoundWindow det = (RoundWindow) comp;
+                System.out.println("current alpha " + det.getAlpha());
                 break;
             }
         }
-
-
-
+        catResult = new Search().getCategories();
+        if (jTree1.getSelectionModel().isSelectionEmpty()) {
+            JOptionPane.showMessageDialog(SearchServicesPanel.this, "You need to select category!", "Warning", JOptionPane.ERROR_MESSAGE);
+        } else {
+            subResult = new Search().getSubcategories(jTree1.getLastSelectedPathComponent().toString());
+            System.out.println(subResult);
+        }
+            System.out.println(catResult);
     }//GEN-LAST:event_jButton1ActionPerformed
-
-
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFormattedTextField gCenterX;
     private javax.swing.JFormattedTextField gCenterY;
@@ -261,14 +267,16 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private javax.swing.JPanel panelForJTree;
     // End of variables declaration//GEN-END:variables
 
-    public void setRadius(double val){
+    public void setRadius(double val) {
         gRadius.setValue(val);
     }
-    public void setCenterPoint(Point.Double val){
+
+    public void setCenterPoint(Point.Double val) {
         gCenterX.setValue(val.getX());
         gCenterY.setValue(val.getY());
     }
-    public void setCurrentPos(Point.Double val){
+
+    public void setCurrentPos(Point.Double val) {
         gCurrentX.setValue(val.getX());
         gCurrentY.setValue(val.getY());
     }

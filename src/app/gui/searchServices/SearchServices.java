@@ -32,7 +32,7 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.util.logging.Level;
 import javax.swing.SwingUtilities;
-import odb.inter.ODBridge;
+import bridge.ODBridge;
 import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
 import org.apache.batik.dom.svg.SVGOMPoint;

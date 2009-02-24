@@ -300,7 +300,7 @@ public class ServiceFactory extends javax.swing.JDialog {
 
                 Document doc = impl.createDocument(svgNS, "svg", null);
                 Element svgRoot = doc.getDocumentElement();
-                Element rectangle = doc.createElementNS(svgNS, "rect");
+                Element rectangle = doc.createElementNS(svgNS, jTextField1.getText());
                 rectangle.setAttributeNS(null,"x", jTextField4.getText());
                 rectangle.setAttributeNS(null,"y", jTextField5.getText());
                 svgRoot.appendChild(rectangle);
