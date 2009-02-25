@@ -25,8 +25,8 @@ import org.neodatis.odb.core.query.IQuery;
 import org.neodatis.odb.core.query.criteria.Where;
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Document;
 import org.w3c.dom.Element;
+import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -34,6 +34,7 @@ import org.w3c.dom.Element;
  */
 public class ServiceFactory extends javax.swing.JDialog {
 
+    private SVGDocument doc = null;
     String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
     DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
     private ODB odb = null;
@@ -279,6 +280,7 @@ public class ServiceFactory extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
         if (jTextField4.getText().equalsIgnoreCase("")) {
             JOptionPane.showMessageDialog(ServiceFactory.this, "You have to input required data!", "Warning", JOptionPane.ERROR_MESSAGE);
         } else {
@@ -298,15 +300,12 @@ public class ServiceFactory extends javax.swing.JDialog {
                     }
                 }
 
-                Document doc = impl.createDocument(svgNS, "svg", null);
-                Element svgRoot = doc.getDocumentElement();
-                Element rectangle = doc.createElementNS(svgNS, jTextField1.getText());
-                rectangle.setAttributeNS(null,"x", jTextField4.getText());
-                rectangle.setAttributeNS(null,"y", jTextField5.getText());
-                svgRoot.appendChild(rectangle);
+                Element service = doc.createElementNS(svgNS, jTextField1.getText());
+                service.setAttributeNS(null,"x", jTextField4.getText());
+                service.setAttributeNS(null,"y", jTextField5.getText());
 
                 ServiceDescription sd = new ServiceDescription(jTextField3.getText(), jTextField1.getText(), jTextField2.getText(), c, s, jTextArea1.getText());
-                ServiceCore sc = new ServiceCore(svgRoot, sd);
+                ServiceCore sc = new ServiceCore(service, sd);
                 odb.store(sc);
                 Constants.getManagerWindow().fillServicesTable();
                 ServiceFactory.this.dispose();
