@@ -29,7 +29,7 @@ public class Search implements ODBridge {
     public Vector<String> getCategories() {
         odb = Constants.getDbConnection();
         Vector<String> v = new Vector<String>();
-        //if data base not connected then odb ==null FIXED !
+        //null pointer exception if data base not connected FIXED !
         if(odb!=null){
             Objects categories = odb.getObjects(Category.class);
             while (categories.hasNext()) {
@@ -45,6 +45,7 @@ public class Search implements ODBridge {
     public Vector<String> getSubcategories(String category) {
         odb = Constants.getDbConnection();
         Vector<String> v = new Vector<String>();
+        //null pointer exception if data base not connected FIXED !
         if(odb !=null){
             IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", category));
             Objects categories = odb.getObjects(query1);
@@ -55,6 +56,20 @@ public class Search implements ODBridge {
             }
         }else System.err.println("No database initialized");
         
+        return v;
+    }
+
+    @Override
+    public Vector<String> getSubcategories(Vector<String> category) {
+        Vector<String> v = new Vector<String>();
+        if(!category.isEmpty()){
+            for (String string : category) {
+                Vector<String> tmpVec = getSubcategories(string);
+                if(!tmpVec.isEmpty()){
+                    v.addAll(tmpVec);
+                }
+            }
+        }
         return v;
     }
 }

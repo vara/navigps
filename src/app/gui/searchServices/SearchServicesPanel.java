@@ -223,7 +223,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             double radius = ((Number) gRadius.getValue()).doubleValue();
             double cx = ((Number) gCenterX.getValue()).doubleValue();
             double cy = ((Number) gCenterY.getValue()).doubleValue();
-            subResult = new Search().getSubcategories(jTree1.getLastSelectedPathComponent().toString());
+            subResult = new Search().getSubcategories(services);
             System.out.println(subResult);
             
         } else {
