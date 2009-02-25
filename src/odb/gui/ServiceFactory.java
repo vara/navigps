@@ -1,9 +1,4 @@
 /*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
  * ServiceFactory.java
  *
  * Created on 2009-02-16, 22:31:10
@@ -299,8 +294,10 @@ public class ServiceFactory extends javax.swing.JDialog {
                         break;
                     }
                 }
-
-                Element service = doc.createElementNS(svgNS, jTextField1.getText());
+/*
+ *FIXME create ELement from doc instance (get instNCE)
+ */
+                Element service = doc.createElementNS(svgNS,"service");
                 service.setAttributeNS(null,"x", jTextField4.getText());
                 service.setAttributeNS(null,"y", jTextField5.getText());
 
