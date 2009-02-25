@@ -49,10 +49,14 @@ public class Search implements ODBridge {
         if(odb !=null){
             IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", category));
             Objects categories = odb.getObjects(query1);
-            Category c = (Category) categories.getFirst();
-            for (Object obj : c.getSubcategories()) {
-                Subcategory sub = (Subcategory) obj;
-                v.add((String)sub.getName());
+//Exception in thread "AWT-EventQueue-0" java.lang.IndexOutOfBoundsException:
+//Index: 0, Size: 0 ( categories.getFirst() )FIXED !!!
+            if(categories.hasNext()){
+                Category c = (Category) categories.getFirst();
+                for (Object obj : c.getSubcategories()) {
+                    Subcategory sub = (Subcategory) obj;
+                    v.add((String)sub.getName());
+                }
             }
         }else System.err.println("No database initialized");
         
