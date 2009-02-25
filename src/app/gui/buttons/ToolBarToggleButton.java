@@ -154,12 +154,12 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
         else
             removeMouseListener(this);
         
-        System.out.println(getAction().getValue(Action.NAME)+" isEnabled "+b);
+        //System.out.println(getAction().getValue(Action.NAME)+" isEnabled "+b);
     }
 
     @Override
     public void stateChanged(ChangeEvent e) {
-        System.out.print("ChangeEvent ");
-        System.out.println(((AbstractButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((AbstractButton)e.getSource()).isSelected());
+        //System.out.print("ChangeEvent ");
+        //System.out.println(((AbstractButton)e.getSource()).getAction().getValue(Action.NAME)+" is selected "+((AbstractButton)e.getSource()).isSelected());
     }
 }

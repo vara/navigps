@@ -23,6 +23,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
+import javax.swing.Icon;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
 import javax.swing.border.Border;
@@ -118,6 +119,16 @@ public class RoundWindow extends RoundJPanel
 
     public AlphaJPanel getContentPane(){        
         return rootPane.getContentPane();
+    }
+
+    public void clearWindow(){
+        setIcon(null);
+        setTitle("");
+        getContentPane().removeAll();
+    }
+
+    public void setIcon(Icon icon){
+        getDecoratePanel().getContent().setIcon(icon);
     }
 
     public void setTitle(String str){

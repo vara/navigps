@@ -457,6 +457,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         JMenuItem odbDisc = new JMenuItem("Disconnect");
         odbDisc.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 try {
@@ -691,6 +692,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         getVerboseStream().outputVerboseStream("windowLostFocus");
     }
 
+    @Override
     public void windowStateChanged(WindowEvent e) {
         throw new UnsupportedOperationException("Not supported yet.");
     }

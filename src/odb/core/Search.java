@@ -20,46 +20,41 @@ public class Search implements ODBridge {
     private float wspX;
     private float wspY;
 
+    @Override
     public Vector<Element> searchCategoryRadius(String category, float x, float y) {
         throw new UnsupportedOperationException("Not supported yet.");
     }
 
+    @Override
     public Vector<String> getCategories() {
         odb = Constants.getDbConnection();
-        Vector v = new Vector();
-        Objects categories = odb.getObjects(Category.class);
-
-        if (categories.isEmpty()) {
-            v.add(null);
-        } else {
+        Vector<String> v = new Vector<String>();
+        //if data base not connected then odb ==null FIXED !
+        if(odb!=null){
+            Objects categories = odb.getObjects(Category.class);
             while (categories.hasNext()) {
                 Category c = (Category) categories.next();
-                v.add(c.getName());
+                v.add((String)c.getName());
             }
-        }
+        }else System.err.println("No database initialized");
+
         return v;
     }
 
+    @Override
     public Vector<String> getSubcategories(String category) {
         odb = Constants.getDbConnection();
-        Vector v = new Vector();
-
-        IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", category));
-        Objects categories = odb.getObjects(query1);
-        if (categories.isEmpty()) {
-            v.add(null);
-        } else {
+        Vector<String> v = new Vector<String>();
+        if(odb !=null){
+            IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", category));
+            Objects categories = odb.getObjects(query1);
             Category c = (Category) categories.getFirst();
-
-            if (c.getSubcategories().isEmpty()) {
-                v.add(null);
-            } else {
-                for (Object obj : c.getSubcategories()) {
-                    Subcategory sub = (Subcategory) obj;
-                    v.add(sub.getName());
-                }
+            for (Object obj : c.getSubcategories()) {
+                Subcategory sub = (Subcategory) obj;
+                v.add((String)sub.getName());
             }
-        }
+        }else System.err.println("No database initialized");
+        
         return v;
     }
 }
