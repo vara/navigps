@@ -13,6 +13,7 @@ import java.util.Vector;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree.DynamicUtilTreeNode;
+import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -40,6 +41,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         jScrollPane1 = new JScrollPane(jTree1);
         jScrollPane1.setOpaque(false);
+        jScrollPane1.setBorder(null);
         jScrollPane1.getViewport().setOpaque(false);
         jScrollPane1.getViewport().setBorder(null);
 
