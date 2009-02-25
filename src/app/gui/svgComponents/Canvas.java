@@ -6,7 +6,6 @@ import app.gui.svgComponents.displayobjects.DisplayManager;
 import config.SVGConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
-import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.FocusEvent;
@@ -18,7 +17,6 @@ import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
  import java.awt.geom.Point2D;
 import javax.swing.AbstractAction;
-import javax.swing.JLabel;
 import javax.swing.KeyStroke;
 import org.apache.batik.swing.JSVGCanvas;
 

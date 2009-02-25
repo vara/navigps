@@ -51,7 +51,7 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
     private DocumentStateChangedListener svgViewListener;
     private boolean enabled = false;
     private ODBridge odbConnector = null;
-    private RoundWindow detailsPane;
+    private RoundWindow roundWindowInstace;
     private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
     private Rectangle visibleRec = new Rectangle(0, 0, 0, 0);
     private boolean needRepaint = false;
@@ -73,18 +73,18 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
 
     protected void installRoundWindow(RoundWindow rw) {
 
-        if (detailsPane == null || !detailsPane.equals(rw)) {
+        if (roundWindowInstace == null || !roundWindowInstace.equals(rw)) {
             //System.out.println("Initial round window and fill content");
-            detailsPane = rw;
-            detailsPane.getDecoratePanel().getContent().setIcon(MainWindowIWD.createNavigationIcon("searchServices32"));
-            detailsPane.setDynamicRevalidate(true);
-            detailsPane.setUpperThresholdAlpha(0.6f);
-            detailsPane.setAlpha(0.0f);
-            detailsPane.getContentPane().setUpperThresholdAlpha(0.75f);
-            detailsPane.setTitle("Search Services");
-            detailsPane.getContentPane().add(guiForSearchServ);
-            detailsPane.setVisible(false);
-            detailsPane.addPropertyChangeListener(new PropertyChangeListener() {
+            roundWindowInstace = rw;
+            roundWindowInstace.setIcon(MainWindowIWD.createNavigationIcon("searchServices32"));
+            roundWindowInstace.setDynamicRevalidate(true);
+            roundWindowInstace.setUpperThresholdAlpha(0.6f);
+            roundWindowInstace.setAlpha(0.0f);
+            roundWindowInstace.getContentPane().setUpperThresholdAlpha(0.75f);
+            roundWindowInstace.setTitle("Search Services");
+            roundWindowInstace.getContentPane().add(guiForSearchServ);
+            roundWindowInstace.setVisible(false);
+            roundWindowInstace.addPropertyChangeListener(new PropertyChangeListener() {
 
                 @Override
                 public void propertyChange(PropertyChangeEvent evt) {
@@ -102,7 +102,7 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
         } else {
             System.out.println(getClass().getCanonicalName() + "-> content roundWin no changed");
         }
-        detailsPane.setEnabled(true);
+        roundWindowInstace.setEnabled(true);
     }
 
     @Override
@@ -123,7 +123,7 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
                 System.err.println(info);
             }
         } else {
-            detailsPane.setEnabled(false);
+            roundWindowInstace.setEnabled(false);
         }
         //setCenterPoint(0.0,0.0);
         //setCurrentPosition(0.0,0.0);

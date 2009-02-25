@@ -70,7 +70,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     @SuppressWarnings("unchecked")
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
- 
+
         jPanel2 = new javax.swing.JPanel();
         jButton1 = new javax.swing.JButton();
         jPanel1 = new javax.swing.JPanel();
@@ -89,15 +89,15 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jLabel6 = new javax.swing.JLabel();
         jLabel7 = new javax.swing.JLabel();
         panelForJTree = new javax.swing.JPanel();
- 
+
         setDoubleBuffered(false);
         setFocusable(false);
         setOpaque(false);
         setRequestFocusEnabled(false);
         setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
- 
+
         jPanel2.setOpaque(false);
- 
+
         jButton1.setText("Search");
         jButton1.setFocusPainted(false);
         jButton1.addActionListener(new java.awt.event.ActionListener() {
@@ -105,53 +105,53 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 jButton1ActionPerformed(evt);
             }
         });
- 
+
         jPanel1.setBorder(javax.swing.BorderFactory.createMatteBorder(1, 1, 1, 1, new java.awt.Color(204, 219, 255)));
         jPanel1.setOpaque(false);
         jPanel1.setLayout(new org.netbeans.lib.awtextra.AbsoluteLayout());
- 
+
         jLabel3.setText("x");
         jPanel1.add(jLabel3, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 170, -1, -1));
- 
+
         jLabel4.setText("y");
         jPanel1.add(jLabel4, new org.netbeans.lib.awtextra.AbsoluteConstraints(140, 170, -1, -1));
         jPanel1.add(jSeparator1, new org.netbeans.lib.awtextra.AbsoluteConstraints(20, 190, 150, -1));
- 
+
         jLabel5.setText("Current Point");
         jPanel1.add(jLabel5, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 60, -1, -1));
- 
+
         jLabel2.setText("Center Point");
         jPanel1.add(jLabel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(50, 110, -1, -1));
- 
+
         jLabel1.setText("Radius");
         jPanel1.add(jLabel1, new org.netbeans.lib.awtextra.AbsoluteConstraints(70, 10, -1, -1));
- 
+
         gRadius.setCaretColor(new java.awt.Color(151, 151, 151));
         gRadius.setOpaque(false);
         jPanel1.add(gRadius, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 30, 170, -1));
- 
+
         gCurrentX.setCaretColor(new java.awt.Color(151, 151, 151));
         gCurrentX.setOpaque(false);
         jPanel1.add(gCurrentX, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 80, 80, -1));
- 
+
         gCurrentY.setCaretColor(new java.awt.Color(151, 151, 151));
         gCurrentY.setOpaque(false);
         jPanel1.add(gCurrentY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 80, 80, -1));
- 
+
         gCenterX.setCaretColor(new java.awt.Color(151, 151, 151));
         gCenterX.setOpaque(false);
         jPanel1.add(gCenterX, new org.netbeans.lib.awtextra.AbsoluteConstraints(10, 140, 80, -1));
- 
+
         gCenterY.setCaretColor(new java.awt.Color(151, 151, 151));
         gCenterY.setOpaque(false);
         jPanel1.add(gCenterY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 140, 80, -1));
- 
+
         jPanel3.setOpaque(false);
- 
+
         jLabel6.setText("Services");
- 
+
         jLabel7.setText("Parameters");
- 
+
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
         jPanel3Layout.setHorizontalGroup(
@@ -159,7 +159,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel6)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 149, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 138, Short.MAX_VALUE)
                 .addComponent(jLabel7)
                 .addGap(69, 69, 69))
         );
@@ -169,13 +169,13 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 .addComponent(jLabel6, javax.swing.GroupLayout.PREFERRED_SIZE, 15, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addComponent(jLabel7))
         );
- 
+
         panelForJTree.setAlignmentX(0.0F);
         panelForJTree.setAlignmentY(0.0F);
         panelForJTree.setFocusable(false);
         panelForJTree.setOpaque(false);
         panelForJTree.setLayout(new java.awt.BorderLayout());
- 
+
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
         jPanel2.setLayout(jPanel2Layout);
         jPanel2Layout.setHorizontalGroup(
@@ -185,12 +185,12 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
                     .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                     .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
-                        .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 137, Short.MAX_VALUE)
+                        .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 131, Short.MAX_VALUE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                         .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING, false)
                             .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                             .addComponent(jPanel1, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
-                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 11, Short.MAX_VALUE)))
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, 6, Short.MAX_VALUE)))
                 .addContainerGap())
         );
         jPanel2Layout.setVerticalGroup(
@@ -207,8 +207,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                     .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 257, Short.MAX_VALUE))
                 .addContainerGap())
         );
- 
-        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, -1, 300));
+
+        add(jPanel2, new org.netbeans.lib.awtextra.AbsoluteConstraints(0, 10, 350, 300));
     }// </editor-fold>//GEN-END:initComponents
 
     public void addActionForSearchButton(ActionListener al) {

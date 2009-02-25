@@ -63,7 +63,7 @@ public class ThumbnailPanel extends RoundJPanel{
     }
 
     protected void initAnimator(float fraction,Direction direct){
-        System.err.println("Init animator <Thombnail panel>");
+        System.err.println("Init animator <Thumbnail panel>");
         if(fraction == -1){
             fraction = getAlpha();
         }
@@ -85,7 +85,7 @@ public class ThumbnailPanel extends RoundJPanel{
         @Override
         public void timingEvent(float arg0) {
             if(setAlpha(arg0)){
-                System.out.println("Thumbnail panel alpha "+getAlpha());
+                //System.out.println("Thumbnail panel alpha "+getAlpha());
             }
 
             if(!thumbnail.setAlpha(arg0)){
@@ -101,12 +101,12 @@ public class ThumbnailPanel extends RoundJPanel{
         }
         @Override
         public void begin() {
-            System.out.println("Thumbnail alpha "+getAlpha()+" upper alpha "+getUpperThresholdAlpha());
+            //System.out.println("Thumbnail alpha "+getAlpha()+" upper alpha "+getUpperThresholdAlpha());
             thumbnail.setInteractionEnabled(!thumbnail.isDisplay());
         }
         @Override
         public void end() {
-            System.out.println("Thumbnail end -> alpha "+getAlpha()+" upper alpha "+getUpperThresholdAlpha());
+            //System.out.println("Thumbnail end -> alpha "+getAlpha()+" upper alpha "+getUpperThresholdAlpha());
             
         }
         @Override
