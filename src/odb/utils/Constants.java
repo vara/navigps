@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package odb.utils;
 
 import odb.gui.DatabaseManager;
@@ -44,5 +39,4 @@ public class Constants {
     public static void setManagerWindow(DatabaseManager aManagerWindow) {
         managerWindow = aManagerWindow;
     }
-
 }

@@ -755,7 +755,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             getVerboseStream().outputVerboseStream("Zoom out");
         }
     }
-
+    
     private class ZoomAction extends AbstractAction {
 
         public ZoomAction(String text, ImageIcon icon,
@@ -1105,5 +1105,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             this.displayPosition = displayPosition;
             setToolTipText(getStringNamePosition());
         }
+    }
+
+    public SVGDocument getDocument() {
+        return canvas.getSVGDocument();
     }
 }

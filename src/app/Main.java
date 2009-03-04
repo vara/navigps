@@ -2,8 +2,10 @@ package app;
 
 import app.gui.MainWindowIWD;
 import app.utils.MyLogger;
+import config.DataBaseConfig;
 import java.util.logging.Level;
 import javax.swing.SwingUtilities;
+import odb.utils.Constants;
 
 /**
  *
@@ -31,7 +33,8 @@ public class Main {
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                new MainWindowIWD(m);
+                MainWindowIWD mw = new MainWindowIWD(m);
+                DataBaseConfig.setMw(mw);
             }
         });
     }
