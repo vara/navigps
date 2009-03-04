@@ -10,6 +10,7 @@ import app.gui.displayItemsMap.DetailsPanel;
 import app.gui.displayItemsMap.MainDetailsPanel;
 import app.gui.displayItemsMap.PanelWithBatikJTree;
 import app.gui.label.ui.TitleLabelUI;
+import app.gui.searchServices.SearchServices;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGBridgeComponents;
 import app.gui.svgComponents.SVGBridgeListeners;
@@ -76,6 +77,7 @@ import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
+import javax.swing.border.EmptyBorder;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
@@ -353,6 +355,8 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
     public void createStatusPanel() {
 
         statusPanel = new StatusPanel();
+
+        statusInfoPanel.getBumpArea().setVisible(false);
         statusPanel.addToPanelFromPosition(statusInfoPanel, StatusPanel.LEFT_PANEL);
 
         CoordinateInfoPanel cip = new CoordinateInfoPanel();
@@ -364,7 +368,6 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         canvas.addMouseMotionListener(cip);
         statusPanel.addToPanelFromPosition(Box.createHorizontalGlue(), StatusPanel.RIGHT_PANEL);
         statusPanel.addToPanelFromPosition(cip, StatusPanel.RIGHT_PANEL);
-
 
         getContentPane().add(getStatusPanel(), BorderLayout.PAGE_END);
     }
@@ -520,7 +523,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
     }
 
     public SVGCanvasLayers createCanvas() {
-
+        
         canvaslayers = new SVGCanvasLayers();
         canvas = canvaslayers.getSvgCanvas();
         canvas.setBackground(Color.white);
@@ -906,7 +909,16 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             AbstractButton button = (AbstractButton) e.getSource();
             boolean en = button.getModel().isSelected();
             putValue(AbstractAction.SELECTED_KEY, new Boolean(en));
-            canvas.getSearchServices().setEnabled(en);
+            SearchServices ss = canvas.getSearchServices();
+            ss.setEnabled(en);
+            if(en){
+                canvaslayers.add(ss,SVGCanvasLayers.SEARCH_SERVICES_LAYER);
+            }
+            /*else{
+                canvaslayers.remove(ss);
+                canvaslayers.repaint();
+            }   
+            */
             String info = "Search services " + (en ? "enabled" : "disabled");
             svgListeners.currentStatusChanged(info);
         }
@@ -1030,6 +1042,8 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
             xLabel.setUI(new TitleLabelUI(TitleLabelUI.LEFT));
             yLabel.setUI(new TitleLabelUI(TitleLabelUI.LEFT));
+
+            getBumpArea().setBorder(new EmptyBorder(1, 0, 1, 4));
         }
 
         public String getStringNamePosition() {

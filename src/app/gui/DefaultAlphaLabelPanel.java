@@ -2,6 +2,8 @@ package app.gui;
 
 import app.gui.detailspanel.AlphaJPanel;
 import app.gui.label.ui.TitleLabelUI;
+import java.awt.BorderLayout;
+import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -30,14 +32,22 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
 
     private boolean animatorEnabled = false;
 
+    private BumpArea bumpArea = new BumpArea();
+
     public DefaultAlphaLabelPanel(){
 
         setOpaque(false);
-        setLayout(new GridLayout(0,1,0,0));
-        add(content);
+        //setLayout(new GridLayout(0,1,0,0));
+        setLayout(new BorderLayout());
+
+        add(content,BorderLayout.CENTER);
+        add(bumpArea,BorderLayout.WEST);
+
+        bumpArea.setMaximumSize(new Dimension(4,20));
+        bumpArea.setMinimumSize(new Dimension(4,20));
 
         content.setOpaque(false);
-        content.setLayout(new GridLayout(0,1,0,2));
+        content.setLayout(new GridLayout(0,1));
 
         content.add(contentText);
         contentText.setText("");
@@ -56,6 +66,10 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
 
     public AlphaJPanel getContent() {
         return content;
+    }
+
+    public BumpArea getBumpArea(){
+        return bumpArea;
     }
 
     public void setText(final String txt){
