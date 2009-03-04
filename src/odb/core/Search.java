@@ -65,13 +65,11 @@ public class Search implements ODBridge {
 
     @Override
     public Vector<String> getSubcategories(Vector<String> category) {
-        Vector<String> v = new Vector<String>();
-        if(!category.isEmpty()){
-            for (String string : category) {
-                Vector<String> tmpVec = getSubcategories(string);
-                if(!tmpVec.isEmpty()){
-                    v.addAll(tmpVec);
-                }
+        Vector<String> v = new Vector<String>();        
+        for (String string : category) {
+            Vector<String> tmpVec = getSubcategories(string);
+            if(!tmpVec.isEmpty()){
+                v.addAll(tmpVec);
             }
         }
         return v;
