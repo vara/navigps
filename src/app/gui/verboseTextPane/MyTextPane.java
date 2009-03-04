@@ -10,6 +10,7 @@ import app.utils.MyLogger;
 import app.utils.OutputVerboseStreamAdapter;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
@@ -60,8 +61,11 @@ public class MyTextPane extends JTextPane{
 
     private boolean autoRoll = true;
 
+    public static final Font DEFAULT_FONT = new Font("monospaced",Font.PLAIN,12);
+
     public MyTextPane(){
 
+        setFont(DEFAULT_FONT);
         StyleContext context = new StyleContext();
         Style style = context.getStyle(StyleContext.DEFAULT_STYLE);
         StyleConstants.setAlignment(style, StyleConstants.ALIGN_LEFT);

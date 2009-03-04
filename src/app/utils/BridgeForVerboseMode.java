@@ -80,16 +80,16 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
         
         protected char buf[] = new char[512];
         protected int count=0;
-        private int lsep;
+        //private int lsep;
         private boolean err;
 
         MyOutputStream(boolean err){
-            lsep = System.getProperty("line.separator").getBytes()[0];
+            //lsep = System.getProperty("line.separator").getBytes()[0];
             this.err = err;
         }
         @Override
         public void write(int b) throws IOException {           
-            if(b!=lsep)
+            if(b!=10 && b!=13) //FIXED !!! bug. with '\n' 10 Linux 13 Winshit
                 addToBuffer(b);
             else
                 flush();

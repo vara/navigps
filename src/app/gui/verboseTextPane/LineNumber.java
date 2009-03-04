@@ -118,7 +118,7 @@ public class LineNumber extends JComponent{
 		int localLineHeight = getLineHeight();
 		int startOffset = getStartOffset();
 		Rectangle drawHere = g.getClipBounds();
-
+        //Console.err.println("localLineHeight "+localLineHeight);
 		// Paint the background
 
 		g2.setColor( getBackground() );
@@ -196,6 +196,7 @@ public class LineNumber extends JComponent{
 
     class ShowLineNumberAction extends AbstractAction{
 
+        @Override
         public void actionPerformed(ActionEvent e) {
             
             final float startAlpha = isShowNumber() ? 1.0f : 0.0f;
@@ -203,6 +204,7 @@ public class LineNumber extends JComponent{
             final float incUnit = isShowNumber() ? -0.01f : 0.01f;
 
             new Thread(new Runnable() {
+                @Override
                 public void run() {
 
                     boolean disableShowNumber = false;
@@ -227,22 +229,27 @@ public class LineNumber extends JComponent{
 
     class MyMouseListener implements MouseListener{
 
+        @Override
         public void mouseClicked(MouseEvent e) {
 
         }
 
+        @Override
         public void mousePressed(MouseEvent e) {
             showNum.actionPerformed(null);
         }
 
+        @Override
         public void mouseReleased(MouseEvent e) {
 
         }
 
+        @Override
         public void mouseEntered(MouseEvent e) {
 
         }
 
+        @Override
         public void mouseExited(MouseEvent e) {
 
         }
