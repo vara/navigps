@@ -608,7 +608,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         Vector v;
 
         Objects services = odb.getObjects(ServiceCore.class);
-        Object[] columns = {"Name", "Category", "Subcategory", "X coord", "Y coord"};
+        Object[] columns = {"Name", "Category", "Subcategory", "X", "Y"};
 
         DefaultTableModel model = new DefaultTableModel();
         model.setColumnIdentifiers(columns);
@@ -619,10 +619,11 @@ public class DatabaseManager extends javax.swing.JDialog {
                 v.add(sc.getServiceDescription().getServiceName());
                 v.add(sc.getServiceDescription().getCategory().getName());
                 v.add(sc.getServiceDescription().getServiceSubCategory().getName());
-                v.add(sc.getServiceAttributes().getChildNodes().getLength());
-                v.add(sc.getServiceAttributes().getAttribute("y"));
+                v.add(sc.getServiceAttributes().getX());
+                v.add(sc.getServiceAttributes().getY());
                 model.addRow(v);
             }
+            jTable1.setModel(model);
         } else {
             jTable1.setModel(model);
         }

@@ -8,6 +8,7 @@ public class ServiceDescription {
     private Category category;
     private Subcategory serviceSubCategory;
     private String additionaInfo;
+    private ServiceCore sc;
 
     public ServiceDescription(String number, String name, String street, Category category, Subcategory subcategory, String additionalInfo) {
         this.serviceNumber = number;
@@ -100,5 +101,19 @@ public class ServiceDescription {
      */
     public void setCategory(Category category) {
         this.category = category;
+    }
+
+    /**
+     * @return the sc
+     */
+    public ServiceCore getServiceCore() {
+        return sc;
+    }
+
+    /**
+     * @param sc the sc to set
+     */
+    public void setServiceCore(ServiceCore sc) {
+        this.sc = sc;
     }
 }

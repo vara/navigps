@@ -7,17 +7,21 @@ package app.gui.searchServices;
 
 import app.gui.MainWindowIWD;
 import app.gui.ScrollBar.ui.LineScrollBarUI;
+import config.DataBaseConfig;
 import java.awt.Point;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree.DynamicUtilTreeNode;
-import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import odb.core.Search;
+import odb.core.ServiceCore;
+import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.w3c.dom.Element;
+import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -27,6 +31,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     private JScrollPane jScrollPane1;
     private JCheckBoxTree jTree1;
+    private String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+    private SVGDocument doc;
 
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {
@@ -218,18 +224,26 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-
+        ServiceCore sc;
+        doc = DataBaseConfig.getMw().getDocument();
         Vector subResult = null;
         Vector<String> services = getSelectedServices();
-        if (!services.isEmpty()) {            
+        Vector<Element> serviceElements = new Vector(); //result elements
+        if (!services.isEmpty()) {
             double radius = ((Number) gRadius.getValue()).doubleValue();
             double cx = ((Number) gCenterX.getValue()).doubleValue();
             double cy = ((Number) gCenterY.getValue()).doubleValue();
-            subResult = new Search().getSubcategories(services);
-            System.out.println(subResult);
-            
+            subResult = new Search().searchCategoryRadius(services, cx, cy, radius);
+
+            for (int i = 0; i < subResult.size(); i++) {
+                sc = (ServiceCore) subResult.get(i);
+                Element service = doc.createElementNS(svgNS, "rect");
+                service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
+                service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
+                serviceElements.add(service);
+            }
         } else {
-            MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Please select a service !");
+            MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Please select a service category!");
         }
     //System.out.println(catResult);
     }//GEN-LAST:event_jButton1ActionPerformed
@@ -254,7 +268,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private javax.swing.JPanel panelForJTree;
     // End of variables declaration//GEN-END:variables
 
-    private void initValue(){
+    private void initValue() {
         setRadius(0);
         setCenterPoint(new Point.Double(0, 0));
         setCurrentPos(new Point.Double(0, 0));

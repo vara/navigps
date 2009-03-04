@@ -1,27 +1,19 @@
-/*
- * ServiceFactory.java
- *
- * Created on 2009-02-16, 22:31:10
- */
 package odb.gui;
 
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
 import javax.swing.JOptionPane;
 import odb.core.Category;
+import odb.core.ServiceAttributes;
 import odb.core.ServiceCore;
 import odb.core.ServiceDescription;
 import odb.core.Subcategory;
 import odb.utils.Constants;
-import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
 import org.neodatis.odb.core.query.criteria.Where;
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
-import org.w3c.dom.DOMImplementation;
-import org.w3c.dom.Element;
-import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -29,9 +21,6 @@ import org.w3c.dom.svg.SVGDocument;
  */
 public class ServiceFactory extends javax.swing.JDialog {
 
-    private SVGDocument doc = null;
-    String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-    DOMImplementation impl = SVGDOMImplementation.getDOMImplementation();
     private ODB odb = null;
 
     /** Creates new form ServiceFactory */
@@ -294,16 +283,16 @@ public class ServiceFactory extends javax.swing.JDialog {
                         break;
                     }
                 }
-/*
- *FIXME create ELement from doc instance (get instNCE)
- */
-                Element service = doc.createElementNS(svgNS,"service");
-                service.setAttributeNS(null,"x", jTextField4.getText());
-                service.setAttributeNS(null,"y", jTextField5.getText());
-
+                
+                ServiceAttributes service = new ServiceAttributes();
+                service.setX(Float.parseFloat(jTextField4.getText()));
+                service.setY(Float.parseFloat(jTextField5.getText()));
                 ServiceDescription sd = new ServiceDescription(jTextField3.getText(), jTextField1.getText(), jTextField2.getText(), c, s, jTextArea1.getText());
                 ServiceCore sc = new ServiceCore(service, sd);
+                sc.getServiceAttributes().setServiceCore(sc);
+                sc.getServiceDescription().setServiceCore(sc);
                 odb.store(sc);
+                odb.commit();
                 Constants.getManagerWindow().fillServicesTable();
                 ServiceFactory.this.dispose();
             }

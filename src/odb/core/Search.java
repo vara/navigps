@@ -8,7 +8,6 @@ import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
 import org.neodatis.odb.core.query.criteria.Where;
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
-import org.w3c.dom.Element;
 
 /**
  *
@@ -21,22 +20,19 @@ public class Search implements ODBridge {
     private float wspY;
 
     @Override
-    public Vector<Element> searchCategoryRadius(String category, float x, float y) {
-        throw new UnsupportedOperationException("Not supported yet.");
-    }
-
-    @Override
     public Vector<String> getCategories() {
         odb = Constants.getDbConnection();
         Vector<String> v = new Vector<String>();
         //null pointer exception if data base not connected FIXED !
-        if(odb!=null){
+        if (odb != null) {
             Objects categories = odb.getObjects(Category.class);
             while (categories.hasNext()) {
                 Category c = (Category) categories.next();
-                v.add((String)c.getName());
+                v.add((String) c.getName());
             }
-        }else System.err.println("No database initialized");
+        } else {
+            System.err.println("No database initialized");
+        }
 
         return v;
     }
@@ -46,33 +42,54 @@ public class Search implements ODBridge {
         odb = Constants.getDbConnection();
         Vector<String> v = new Vector<String>();
         //null pointer exception if data base not connected FIXED !
-        if(odb !=null){
+        if (odb != null) {
             IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", category));
             Objects categories = odb.getObjects(query1);
 //Exception in thread "AWT-EventQueue-0" java.lang.IndexOutOfBoundsException:
 //Index: 0, Size: 0 ( categories.getFirst() )FIXED !!!
-            if(categories.hasNext()){
+            if (categories.hasNext()) {
                 Category c = (Category) categories.getFirst();
                 for (Object obj : c.getSubcategories()) {
                     Subcategory sub = (Subcategory) obj;
-                    v.add((String)sub.getName());
+                    v.add((String) sub.getName());
                 }
             }
-        }else System.err.println("No database initialized");
-        
+        } else {
+            System.err.println("No database initialized");
+        }
+
         return v;
     }
 
     @Override
     public Vector<String> getSubcategories(Vector<String> category) {
         Vector<String> v = new Vector<String>();
-        if(!category.isEmpty()){
+        if (!category.isEmpty()) {
             for (String string : category) {
                 Vector<String> tmpVec = getSubcategories(string);
-                if(!tmpVec.isEmpty()){
+                if (!tmpVec.isEmpty()) {
                     v.addAll(tmpVec);
                 }
             }
+        }
+        return v;
+    }
+
+    @Override
+    public Vector<ServiceCore> searchCategoryRadius(Vector category, double x, double y, double radius) {
+        Vector v = new Vector();
+        odb = Constants.getDbConnection();
+        if (odb != null) {
+            for (int i=0;i<category.size();i++) {
+                IQuery query1 = new CriteriaQuery(ServiceDescription.class, Where.equal("category.name", category.get(i)));
+                Objects res = odb.getObjects(query1);
+                while (res.hasNext()) {
+                    ServiceDescription obj = (ServiceDescription) res.next();
+                    v.add(odb.getObjectFromId(odb.getObjectId(obj.getServiceCore())));
+                }
+            }
+        } else {
+            System.err.println("No database initialized");
         }
         return v;
     }

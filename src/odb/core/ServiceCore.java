@@ -1,21 +1,14 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package odb.core;
-
-import org.w3c.dom.Element;
 
 /**
  *
  * @author ACME
  */
 public class ServiceCore {
-    private Element serviceAttributes;
+    private ServiceAttributes serviceAttributes;
     private ServiceDescription serviceDescription;
 
-    public ServiceCore(Element serviceAttributes, ServiceDescription serviceDescription) {
+    public ServiceCore(ServiceAttributes serviceAttributes, ServiceDescription serviceDescription) {
         this.serviceAttributes = serviceAttributes;
         this.serviceDescription = serviceDescription;
     }
@@ -42,14 +35,14 @@ public class ServiceCore {
     /**
      * @return the serviceAttributes
      */
-    public Element getServiceAttributes() {
+    public ServiceAttributes getServiceAttributes() {
         return serviceAttributes;
     }
 
     /**
      * @param serviceAttributes the serviceAttributes to set
      */
-    public void setServiceAttributes(Element serviceAttributes) {
+    public void setServiceAttributes(ServiceAttributes serviceAttributes) {
         this.serviceAttributes = serviceAttributes;
     }
 }
