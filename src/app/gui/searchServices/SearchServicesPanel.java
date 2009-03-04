@@ -246,7 +246,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             }
 
             Date stop = new Date();
-            System.out.println("Query finished, execution time: " + (stop.getTime() - start.getTime()) / 1000 + " s"+" got "+serviceElements.size()+" services");
+            System.out.println("Query finished, execution time: " + (stop.getTime() - start.getTime()) / 1000 + " s" + " got " + serviceElements.size() + " services");
         } else {
             MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Please select a service category!");
         }
