@@ -140,40 +140,46 @@ public class Thumbnail extends AlphaJPanel {
      * Updates the thumbnail component rendering transform.
      */
     protected void updateThumbnailRenderingTransform() {
-        System.out.println("update ThumbnailRenderingTransform");
+        System.out.println("****update ThumbnailRenderingTransform");
         SVGDocument svgDocument = svgCanvas.getSVGDocument();
         if (svgDocument != null) {
             SVGSVGElement elt = svgDocument.getRootElement();
             Dimension dim = svgThumbnailCanvas.getSize();
-            System.out.println("Dim size "+dim);
+            //System.out.println("Dim size "+dim);
             // XXX Update this to use the animated values of 'viewBox'
             //     and 'preserveAspectRatio'.
             String viewBox = elt.getAttributeNS
                 (null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
-
+            //System.out.println("ViewBox SVG_VIEW_BOX_ATTRIBUTE ->"+viewBox);
             AffineTransform Tx;
             if (viewBox.length() != 0) {
                 String aspectRatio = elt.getAttributeNS
                     (null, SVGConstants.SVG_PRESERVE_ASPECT_RATIO_ATTRIBUTE);
+                //System.out.println("aspectRatio SVG_PRESERVE_ASPECT_RATIO_ATTRIBUTE ->"+aspectRatio);
                 Tx = ViewBox.getPreserveAspectRatioTransform
                     (elt, viewBox, aspectRatio, dim.width, dim.height, null);
+                //System.out.println("Tx ViewBox.getPreserveAspectRatioTransform -> "+Tx);
             } else {
                 // no viewBox has been specified, create a scale transform
+                //System.out.println("no viewBox has been specified, create a scale transform");
                 Dimension2D docSize = svgCanvas.getSVGDocumentSize();
                 double sx = dim.width / docSize.getWidth();
                 double sy = dim.height / docSize.getHeight();
                 double s = Math.min(sx, sy);
                 Tx = AffineTransform.getScaleInstance(s, s);
+                 //System.out.println("Tx -> "+Tx);
             }
 
             GraphicsNode gn = svgCanvas.getGraphicsNode();
             CanvasGraphicsNode cgn = getCanvasGraphicsNode(gn);
             if (cgn != null) {
                 AffineTransform vTx = cgn.getViewingTransform();
+                //System.out.println("ViewingTransform vtx "+vTx);
                 if ((vTx != null) && !vTx.isIdentity()) {
                     try {
                         AffineTransform invVTx = vTx.createInverse();
                         Tx.concatenate(invVTx);
+                        //System.out.println("Tx.concatenate(invVTx) "+Tx);
                     } catch (NoninvertibleTransformException nite) {
                         /* nothing */
                     }
