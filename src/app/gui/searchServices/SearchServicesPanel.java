@@ -10,6 +10,7 @@ import app.gui.ScrollBar.ui.LineScrollBarUI;
 import config.DataBaseConfig;
 import java.awt.Point;
 import java.awt.event.ActionListener;
+import java.util.Date;
 import java.util.Vector;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -224,6 +225,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+        Date start = new Date();
         ServiceCore sc;
         doc = DataBaseConfig.getMw().getDocument();
         Vector subResult = null;
@@ -242,6 +244,9 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
                 serviceElements.add(service);
             }
+
+            Date stop = new Date();
+            System.out.println("Query finished, execution time: " + (stop.getTime() - start.getTime()) / 1000 + " s"+" got "+serviceElements.size()+" services");
         } else {
             MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Please select a service category!");
         }

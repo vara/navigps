@@ -85,7 +85,7 @@ public class Search implements ODBridge {
                 Objects res = odb.getObjects(query1);
                 while (res.hasNext()) {
                     ServiceDescription obj = (ServiceDescription) res.next();
-                    v.add(odb.getObjectFromId(odb.getObjectId(obj.getServiceCore())));
+                    v.add(obj.getServiceCore());
                 }
             }
         } else {
