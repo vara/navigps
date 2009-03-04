@@ -81,13 +81,14 @@ public class Canvas extends JSVGCanvas{
 		super(null,false,false);
         setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
         //setDocumentState(Canvas.ALWAYS_STATIC);
+        setDoubleBuffered(true);
+        setDoubleBufferedRendering(true);
+
         mouseIteraction = new  MouseGestures();
         setLayout(new BorderLayout());
         search = new SearchServices(this);
-        add(search,BorderLayout.CENTER);
-        addMouseMotionListener(search);
-        addMouseListener(search);
-        addJGVTComponentListener(search.getDocumentStateChanged());
+        //add(search,BorderLayout.CENTER);
+        
         dm = new DisplayManager(this);
         addGVTTreeRendererListener(dm.getRenderingTreeListener());
 

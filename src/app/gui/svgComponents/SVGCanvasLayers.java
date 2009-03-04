@@ -26,6 +26,7 @@ import javax.swing.OverlayLayout;
 public class SVGCanvasLayers extends JLayeredPane{
 
     public static final String SVG_CANVAS_CHANGED = "svgcanvas.changed";
+    public static final Integer SEARCH_SERVICES_LAYER = new Integer(JLayeredPane.FRAME_CONTENT_LAYER+100);
 
     private Canvas svgCanvas;
 
@@ -97,9 +98,10 @@ public class SVGCanvasLayers extends JLayeredPane{
 
     @Override
     protected void addImpl(Component comp, Object constraints, int index) {
-        if(comp instanceof JComponent){
+        /*if(comp instanceof JComponent){
             ((JComponent)comp).setOpaque(false);
         }
+         */
         super.addImpl(comp, constraints, index);
     }
 

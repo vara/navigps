@@ -42,6 +42,8 @@ public class Utils {
     
     public static SVGOMPoint getLocalPointFromDomElement(Element element, int x, int y){	    
 	    SVGMatrix mat = ((SVGLocatable) element).getScreenCTM();
+        //System.out.println("mat [["+mat.getA()+","+mat.getC()+","+mat.getE()+"]" +
+        //                        "["+mat.getB()+","+mat.getD()+","+mat.getF()+"]]");
 	    SVGMatrix imat = mat.inverse(); // screen -> elem
 	    SVGOMPoint pt = new SVGOMPoint(x, y);
 	    return (SVGOMPoint) pt.matrixTransform(imat);

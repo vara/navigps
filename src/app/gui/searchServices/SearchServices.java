@@ -4,36 +4,31 @@
  */
 package app.gui.searchServices;
 
+import app.gui.searchServices.swing.SearchServicesPanel;
 import app.gui.MainWindowIWD;
 import app.gui.detailspanel.AlphaJPanel;
 import app.gui.detailspanel.RoundWindow;
 import app.gui.detailspanel.RoundWindowUtils;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGCanvasLayers;
-import app.utils.MyLogger;
+import app.utils.NaviPoint;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
-import java.awt.Shape;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Ellipse2D;
-import java.awt.geom.NoninvertibleTransformException;
-import java.awt.geom.Point2D;
+import bridge.ODBridge;
+import java.awt.Point;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import java.util.logging.Level;
-import bridge.ODBridge;
-import org.apache.batik.bridge.UpdateManagerEvent;
-import org.apache.batik.bridge.UpdateManagerListener;
+import javax.swing.event.MouseInputAdapter;
+import org.apache.batik.dom.svg.AbstractSVGMatrix;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.gvt.JGVTComponentListener;
 
@@ -41,34 +36,86 @@ import org.apache.batik.swing.gvt.JGVTComponentListener;
  *
  * @author vara
  */
-public class SearchServices extends AlphaJPanel implements MouseListener,
-        MouseMotionListener {
+public class SearchServices extends AlphaJPanel{
 
-    Canvas can;
-    private Point.Double centerPoint = new Point.Double(0, 0);
-    private Point.Double currentPos = new Point.Double(0, 0);
+    private Canvas svgCanvas;
+
+    private NaviPoint centerPoint = new NaviPoint(0, 0);
+    private NaviPoint currentPos = new NaviPoint(0, 0);
     private double radius = 0;
-    private DocumentStateChangedListener svgViewListener;
+
+    private NaviPoint paintCenterPoint = new NaviPoint(0,0);
+    private NaviPoint paintCurrentPos = new NaviPoint(0,0);
+    private double paintRadius = 0;
+
+    private DocumentStateChangedListener svgViewListener = new DocumentStateChangedListener();
     private boolean enabled = false;
     private ODBridge odbConnector = null;
+
     private RoundWindow roundWindowInstace;
+    
     private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
     private Rectangle visibleRec = new Rectangle(0, 0, 0, 0);
     private boolean needRepaint = false;
-    private boolean dragged = false;
+    private SSMouseEvents me = new SSMouseEvents();
+    //private AreaOverLay paintArea = new AreaOverLay();
+
+    PropertyChangeListener removeContent = new PropertyChangeListener(){
+
+        @Override
+        public void propertyChange(PropertyChangeEvent evt) {
+            if (evt.getPropertyName().equals(ALPHA_CHANGE)) {
+                float newAlpha = (Float) evt.getNewValue();
+                float oldAlpha = (Float) evt.getOldValue();
+
+                System.out.println("new Alpa "+newAlpha);
+                if (setAlpha(newAlpha)) {
+                    repaint();
+                }
+                if (newAlpha < .01f && oldAlpha>newAlpha) {
+                    enabled = false;
+                    uninstall();
+                }
+            }
+        }
+    };
 
     public SearchServices(Canvas canvas) {
-        can = canvas;
-        init();
+        svgCanvas = canvas;
+        setOpaque(false);
+        //setAlpha(0.5f);
+        //install();
     }
 
-    private void init() {
-        setLayout(null);
-        svgViewListener = new DocumentStateChangedListener();
+    private void install() {
 
-        //don't paint background
-        setOpaque(false);
+        //svgCanvas.add(this,BorderLayout.CENTER);        
+        svgCanvas.addMouseMotionListener(me);
+        svgCanvas.addMouseListener(me);
+        svgCanvas.addJGVTComponentListener(svgViewListener);
+        if(roundWindowInstace != null){
+            roundWindowInstace.addPropertyChangeListener(removeContent);
+            roundWindowInstace.getContentPane().add(guiForSearchServ);
+        }else{
+            // probably never will have a place
+            System.err.println(getClass().getCanonicalName()+" method [install] msg: [roundWindowInstace null]");
+        }
+        System.out.println(getClass().getCanonicalName()+" [install components]");
+    }
 
+    public void uninstall(){
+
+        svgCanvas.removeMouseMotionListener(me);
+        svgCanvas.removeMouseListener(me);
+        svgCanvas.removeJGVTComponentListener(svgViewListener);
+        roundWindowInstace.getContentPane().remove(guiForSearchServ);
+        roundWindowInstace.removePropertyChangeListener(removeContent);
+        Container parent = getParent();
+        if(parent!=null){
+            parent.remove(this);
+            parent.repaint();
+        }
+        System.out.println(getClass().getCanonicalName()+" [uninstall components]");
     }
 
     protected void installRoundWindow(RoundWindow rw) {
@@ -81,40 +128,26 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
             roundWindowInstace.setUpperThresholdAlpha(0.6f);
             roundWindowInstace.setAlpha(0.0f);
             roundWindowInstace.getContentPane().setUpperThresholdAlpha(0.75f);
-            roundWindowInstace.setTitle("Search Services");
-            roundWindowInstace.getContentPane().add(guiForSearchServ);
-            roundWindowInstace.setVisible(false);
-            roundWindowInstace.addPropertyChangeListener(new PropertyChangeListener() {
-
-                @Override
-                public void propertyChange(PropertyChangeEvent evt) {
-                    if (evt.getPropertyName().equals(ALPHA_CHANGE)) {
-                        float newAlpha = (Float) evt.getNewValue();
-                        if (setAlpha(newAlpha)) {
-                            repaint();
-                        } else if (newAlpha < .1f) {
-                            enabled = false;
-                        }
-
-                    }
-                }
-            });
+            roundWindowInstace.setTitle("Search Services");            
+            roundWindowInstace.setVisible(false);                        
         } else {
-            System.out.println(getClass().getCanonicalName() + "-> content roundWin no changed");
+            System.out.println(getClass().getCanonicalName() + " [content roundWin no changed]");
         }
         roundWindowInstace.setEnabled(true);
     }
 
     @Override
     public void setEnabled(boolean val) {
-        //super.setEnabled(val);	    
-        if (val) {
-            enabled = val;
-            Container parent = can.getParent();
+        //enabled = val;
+        
+        if (val) {            
+            Container parent = svgCanvas.getParent();
+            enabled = true;
             if (parent instanceof SVGCanvasLayers) {
                 Container cont = RoundWindowUtils.getRoundWindowFromContainer(parent);
-                if (cont != null) {
+                if (cont != null) {                                        
                     installRoundWindow((RoundWindow) cont);
+                    install();
                 }
 
             } else {
@@ -124,10 +157,13 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
             }
         } else {
             roundWindowInstace.setEnabled(false);
+            //uninstall();
         }
+        //can.getOverlays().add(paintArea);
         //setCenterPoint(0.0,0.0);
         //setCurrentPosition(0.0,0.0);
-        repaint(visibleRec);
+        
+        //repaint(visibleRec);
     }
 
     public boolean isEnabledSearchServices() {
@@ -141,29 +177,17 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);
-        Graphics2D g2 = (Graphics2D) g.create();
-        if (isEnabledSearchServices()) {
+        if(isEnabledSearchServices()){
+            Graphics2D g2 = (Graphics2D) g.create();
 
-            AffineTransform dispTr = svgViewListener.getRenderingTransform();
-            dispTr.preConcatenate(g2.getTransform());
-            //System.out.println("Dispplay Transform "+dispTr);
-            Shape shape = dispTr.createTransformedShape(getPaintingShape());
-            Point2D centPoint = dispTr.transform(getCenterPoint(), null);
-
-            g2.translate(centPoint.getX(), centPoint.getY());
-            g2.draw(shape);
-            g2.translate(-centPoint.getX(), -centPoint.getY());
-
+            //g2.setTransform(svgViewListener.getAffinetransform());
+            //paintCircle(g2, getRadius(), getCenterPoint(),getCurrentPosition());
+            paintCircle(g2, paintRadius, paintCenterPoint,paintCurrentPos);
+            g2.dispose();
         }
-        g2.draw(visibleRec);
-        g2.dispose();
-    }
+    }    
 
-    public Shape getPaintingShape() {
-        return new Ellipse2D.Double(-radius, -radius, radius * 2, radius * 2);
-    }
-
-    protected static void paintCircle(Graphics2D g2, double radius, Point.Double center, Point.Double currPos) {
+    protected static void paintCircle(Graphics2D g2, double radius, NaviPoint center, NaviPoint currPos) {
 
         float dash[] = {10.0f};
         float widthStroke = 1.0f;
@@ -171,221 +195,201 @@ public class SearchServices extends AlphaJPanel implements MouseListener,
         BasicStroke bsCircle = new BasicStroke(widthStroke, BasicStroke.CAP_BUTT, BasicStroke.JOIN_MITER, 10.0f, dash, 0.0f);
         Color fillBacgroundColor = new Color(0, 150, 255, 100);
         Ellipse2D circle = new Ellipse2D.Double(-radius, -radius, radius * 2, radius * 2);
-        Ellipse2D centerCircle = new Ellipse2D.Double(center.x - 2, center.y - 2, 4, 4);
+        Ellipse2D centerCircle = new Ellipse2D.Double(center.getX() - 2, center.getY() - 2, 4, 4);
 
         g2.setStroke(bsLine);
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING, RenderingHints.VALUE_ANTIALIAS_ON);
         g2.setColor(Color.GREEN);
         g2.fill(centerCircle);
         g2.setColor(Color.BLACK);
-        g2.drawLine((int) center.x, (int) center.y, (int) currPos.x, (int) currPos.y);
+        g2.drawLine((int) center.getX(), (int) center.getY(), (int) currPos.getX(), (int) currPos.getY());
         g2.setStroke(bsCircle);
-        g2.translate(center.x, center.y);
+        g2.translate(center.getX(), center.getY());
         g2.draw(circle);
 
         g2.setColor(fillBacgroundColor);
         g2.fill(circle);
-        g2.translate(-center.x, -center.y);
+        g2.translate(-center.getX(), -center.getY());
         g2.setStroke(bsLine);
     }
 
-    public DocumentStateChangedListener getDocumentStateChanged() {
-        return svgViewListener;
-    }
-
-    public void setCenterPoint(double x, double y) {
+    public void setCenterPoint(float x, float y) {
         centerPoint.setLocation(x, y);
-        guiForSearchServ.setCenterPoint(getCenterPoint());
+        paintCenterPoint.setLocation(x, y);
+        //guiForSearchServ.setCenterPoint(getCenterPoint());
+        guiForSearchServ.setCenterPoint(paintCenterPoint);
     }
 
     public void setRadius(double r) {
         radius = r;
+        paintRadius = r;
     }
 
     public double getRadius() {
         return radius;
     }
 
-    public void setCurrentPosition(double x, double y) {
+    public void setCurrentPosition(float x, float y) {
         currentPos.setLocation(x, y);
+        paintCurrentPos.setLocation(x,y);
         double rad = centerPoint.distance(getCurrentPosition());
         setRadius(rad);
-        guiForSearchServ.setRadius(getRadius());
-        guiForSearchServ.setCurrentPos(getCurrentPosition());
+        //guiForSearchServ.setRadius(getRadius());
+        //guiForSearchServ.setCurrentPos(getCurrentPosition());
+        guiForSearchServ.setRadius(paintRadius);
+        guiForSearchServ.setCurrentPos(paintCurrentPos);
     }
 
-    public Point.Double getCenterPoint() {
+    public NaviPoint getCenterPoint() {
         return centerPoint;
     }
 
-    public Point2D.Double getCurrentPosition() {
+    public NaviPoint getCurrentPosition() {
         return currentPos;
     }
 
-    @Override
-    public void mouseClicked(MouseEvent e) {
-    }
+    /*
+    *     Mouse listener for search services
+    */
 
-    @Override
-    public void mousePressed(MouseEvent e) {
-        if (e.getButton() == MouseEvent.BUTTON1 && !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && isEnabledSearchServices()) {
-
-            Point2D p = transformPoint(e.getPoint());
-            setCenterPoint(p.getX(), p.getY());
-            needRepaint = true;
-            setDragged(true);
-        //System.out.println(""+e.getX()+","+ e.getY() +" -> "+getCenterPoint().getX()+","+getCenterPoint().getY());
-        }
-    }
-
-    public Point2D transformPoint(Point2D p) {
-        return p;
-    }
-
-    @Override
-    public void mouseReleased(MouseEvent e) {
-        setDragged(false);
-    }
-
-    @Override
-    public void mouseEntered(MouseEvent e) {
-        //System.out.println("Search services component size "+getSize());
-        //System.out.println(getClass().getCanonicalName()+" rendering transform "+listeners.getRenderingTransform());
-        //System.out.println("Search services component size "+getSize()+"\nVisible rect "+getVisibleRect());
-    }
-
-    @Override
-    public void mouseExited(MouseEvent e) {
-    }
-
-    @Override
-    public void mouseDragged(MouseEvent e) {
-
-        if (isEnabledSearchServices() && isDragged()) {
-
-            Point2D p = transformPoint(e.getPoint());
-            setCurrentPosition(p.getX(), p.getY());
-            /*
-            int gap = 10;
-            int x = (int)(getCenterPoint().getX()-getRadius()-gap);
-            int y = (int)(getCenterPoint().getY()-getRadius()-gap);
-            int w = (int)(getRadius()*2+gap*2);
-            int h = w;
-
-            if(x<0){ w+=x; x=0; }
-            if(y<0){ h+=y; y=0; }
-            
-            if(visibleRec.getWidth()>w || visibleRec.getHeight()>h || needRepaint){
-            repaint(visibleRec);
-            needRepaint = false;
+    private class SSMouseEvents extends MouseInputAdapter{
+        
+        private boolean dragged;
+        
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if (e.getButton() == MouseEvent.BUTTON1 && !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && isEnabledSearchServices()) {
+                
+                NaviPoint p = new NaviPoint(e.getX(),e.getY());
+                setCenterPoint(p.getX(), p.getY());
+                needRepaint = true;
+                setDragged(true);                
             }
-            //System.out.println("Search Services : Visible Rect. "+visibleRec);
-            visibleRec = new Rectangle(x,y,w,h);
-            repaint(visibleRec);
-             */
-            repaint();
+        }
+        
+        @Override
+        public void mouseDragged(MouseEvent e) {
+
+            if (isEnabledSearchServices() && isDragged()) {
+
+                NaviPoint p = new NaviPoint(e.getX(),e.getY());
+                setCurrentPosition(p.getX(),p.getY());
+                /*
+                int gap = 10;
+                int x = (int)(getCenterPoint().getX()-getRadius()-gap);
+                int y = (int)(getCenterPoint().getY()-getRadius()-gap);
+                int w = (int)(getRadius()*2+gap*2);
+                int h = w;
+
+                if(x<0){ w+=x; x=0; }
+                if(y<0){ h+=y; y=0; }
+
+                if(visibleRec.getWidth()>w || visibleRec.getHeight()>h || needRepaint){
+                    repaint(visibleRec);
+                    needRepaint = false;
+                }
+                //System.out.println("Search Services : Visible Rect. "+visibleRec);
+                visibleRec = new Rectangle(x,y,w,h);
+                */
+                //svgViewListener.resetTransform();
+                //svgViewListener.updatePos();
+                //repaint(visibleRec);                                
+                repaint();
+            }
+        }
+        
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            setDragged(false);
+        }
+        
+        /**
+         * @return the dragged
+         */
+        private boolean isDragged() {
+            return dragged;
+        }
+        
+        /**
+         * @param dragged the dragged to set
+         */
+        private void setDragged(boolean dragged) {
+            this.dragged = dragged;
         }
     }
 
-    @Override
-    public void mouseMoved(MouseEvent e) {
+    /*
+     *  Test for OverLay's list (not worked)
+     *
+    private class AreaOverLay implements Overlay{
+
+        @Override
+        public void paint(Graphics g) {
+            Graphics2D g2 = (Graphics2D) g.create();            
+
+            Shape shape = getPaintingShape();
+            NaviPoint centPoint = getCenterPoint();
+            g2.translate(centPoint.getX(), centPoint.getY());
+            g2.draw(shape);
+            g2.translate(-centPoint.getX(), -centPoint.getY());
+
+            g2.dispose();
+       }
+
     }
-
-    /**
-     * @return the dragged
-     */
-    private boolean isDragged() {
-        return dragged;
-    }
-
-    /**
-     * @param dragged the dragged to set
-     */
-    private void setDragged(boolean dragged) {
-        this.dragged = dragged;
-    }
-
-    public class DocumentStateChangedListener implements JGVTComponentListener,
-            UpdateManagerListener {
-
-        private AffineTransform rendTransform = new AffineTransform();
-        private AffineTransform invTransform = new AffineTransform();
+    */
+    private class DocumentStateChangedListener implements JGVTComponentListener{
+        
+        private AffineTransform svgCanvasTr = new AffineTransform();
 
         public DocumentStateChangedListener() {
-        }
-
-        @Override
-        public void managerStarted(UpdateManagerEvent e) {
-        }
-
-        @Override
-        public void managerSuspended(UpdateManagerEvent e) {
-        }
-
-        @Override
-        public void managerResumed(UpdateManagerEvent e) {
-        }
-
-        @Override
-        public void managerStopped(UpdateManagerEvent e) {
-        }
-
-        @Override
-        public void updateStarted(UpdateManagerEvent e) {
-        }
-
-        @Override
-        public void updateCompleted(UpdateManagerEvent e) {
-        }
-
-        @Override
-        public void updateFailed(UpdateManagerEvent e) {
+            resetTransform();
         }
 
         //JGVTComponentListener
         @Override
         public void componentTransformChanged(ComponentEvent event) {
-
+            System.err.println("***component Transformed changed");
             JSVGCanvas canvas = (JSVGCanvas) event.getComponent();
-            AffineTransform at = canvas.getRenderingTransform();
-            setRenderingTransform(at);
-            if (at.getDeterminant() != 0) {
-                try {
-                    AffineTransform inv = at.createInverse();
-                    setInvTransform(inv);
-                } catch (NoninvertibleTransformException ex) {
-                    MyLogger.log.log(Level.SEVERE, null, ex);
-                    System.err.println("" + ex);
-                }
-            } else {
-                setInvTransform(at);
-            }
-
+            svgCanvasTr = canvas.getRenderingTransform();      
+            //System.err.println("concaten "+svgCanvasTr);
+            //Matrix tmpMatr = new Matrix(svgCanvasTr);
+            
+            //updatePos(tmpMatr);
         }
 
-        public synchronized AffineTransform getRenderingTransform() {
-            return new AffineTransform(rendTransform);
+        public NaviPoint translatePoint(Point p){
+            NaviPoint np = new NaviPoint((float)p.getX(), (float)p.getY());
+            return np.matrixTransform(new Matrix(svgCanvasTr));
         }
 
-        /**
-         * @param renderingTranform the renderingTranform to set
-         */
-        public void setRenderingTransform(AffineTransform renderingTranform) {
-            this.rendTransform = renderingTranform;
+        public void resetTransform(){
+            //matrix = new Matrix(new AffineTransform());
+            //renderingTransform = svgCanvasTr;
         }
 
-        /**
-         * @return the invTransform
-         */
-        public AffineTransform getInvTransform() {
-            return new AffineTransform(invTransform);
+        public AffineTransform getAffinetransform(){
+            return svgCanvasTr;
         }
 
-        /**
-         * @param invTransform the invTransform to set
-         */
-        public void setInvTransform(AffineTransform invTransform) {
-            this.invTransform = invTransform;
-        }
     }//DocumentStateChangedListener
+
+    private class Matrix extends AbstractSVGMatrix{
+
+        private AffineTransform matrixTransform;
+
+        public Matrix(AffineTransform at){
+            matrixTransform = at;
+        }
+
+        @Override
+        protected AffineTransform getAffineTransform() {
+            return matrixTransform;
+        }
+
+        @Override
+        public String toString() {
+            return ""+getAffineTransform();
+        }
+    }
 }

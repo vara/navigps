@@ -1,4 +1,4 @@
-package app.gui.searchServices;
+package app.gui.searchServices.swing;
 
 import java.awt.Rectangle;
 import java.util.Hashtable;

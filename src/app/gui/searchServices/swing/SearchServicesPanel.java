@@ -3,17 +3,16 @@
  *
  * Created on 2008-12-10, 03:21:56
  */
-package app.gui.searchServices;
+package app.gui.searchServices.swing;
 
 import app.gui.MainWindowIWD;
 import app.gui.ScrollBar.ui.LineScrollBarUI;
-import java.awt.Point;
+import app.utils.NaviPoint;
 import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree.DynamicUtilTreeNode;
-import javax.swing.border.LineBorder;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
@@ -222,9 +221,9 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         Vector subResult = null;
         Vector<String> services = getSelectedServices();
         if (!services.isEmpty()) {            
-            double radius = ((Number) gRadius.getValue()).doubleValue();
-            double cx = ((Number) gCenterX.getValue()).doubleValue();
-            double cy = ((Number) gCenterY.getValue()).doubleValue();
+            float radius = ((Number) gRadius.getValue()).floatValue();
+            float cx = ((Number) gCenterX.getValue()).floatValue();
+            float cy = ((Number) gCenterY.getValue()).floatValue();
             subResult = new Search().getSubcategories(services);
             System.out.println(subResult);
             
@@ -256,22 +255,22 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     private void initValue(){
         setRadius(0);
-        setCenterPoint(new Point.Double(0, 0));
-        setCurrentPos(new Point.Double(0, 0));
+        setCenterPoint(new NaviPoint(0, 0));
+        setCurrentPos(new NaviPoint(0, 0));
     }
 
     public void setRadius(double val) {
         gRadius.setValue(new Double(val));
     }
 
-    public void setCenterPoint(Point.Double val) {
-        gCenterX.setValue(new Double(val.getX()));
-        gCenterY.setValue(new Double(val.getY()));
+    public void setCenterPoint(NaviPoint val) {
+        gCenterX.setValue(new Float(val.getX()));
+        gCenterY.setValue(new Float(val.getY()));
     }
 
-    public void setCurrentPos(Point.Double val) {
-        gCurrentX.setValue(new Double(val.getX()));
-        gCurrentY.setValue(new Double(val.getY()));
+    public void setCurrentPos(NaviPoint val) {
+        gCurrentX.setValue(new Float(val.getX()));
+        gCurrentY.setValue(new Float(val.getY()));
     }
 
     /*

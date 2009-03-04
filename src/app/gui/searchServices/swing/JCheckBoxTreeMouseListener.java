@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package app.gui.searchServices;
+package app.gui.searchServices.swing;
 
 import java.awt.Rectangle;
 import java.awt.event.MouseAdapter;
