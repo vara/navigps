@@ -82,7 +82,7 @@ public class Canvas extends JSVGCanvas{
         setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
         //setDocumentState(Canvas.ALWAYS_STATIC);
         setDoubleBuffered(true);
-        setDoubleBufferedRendering(true);
+        //setDoubleBufferedRendering(true);
 
         mouseIteraction = new  MouseGestures();
         setLayout(new BorderLayout());
