@@ -12,6 +12,7 @@ import app.gui.detailspanel.RoundWindowUtils;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGCanvasLayers;
 import app.utils.NaviPoint;
+import app.utils.Utils;
 import java.awt.BasicStroke;
 import java.awt.Color;
 import java.awt.Container;
@@ -29,8 +30,10 @@ import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import org.apache.batik.dom.svg.AbstractSVGMatrix;
+import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.gvt.JGVTComponentListener;
+import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -213,31 +216,45 @@ public class SearchServices extends AlphaJPanel{
         g2.setStroke(bsLine);
     }
 
-    public void setCenterPoint(float x, float y) {
-        centerPoint.setLocation(x, y);
+    public void setCenterPoint(float x, float y) {        
         paintCenterPoint.setLocation(x, y);
-        //guiForSearchServ.setCenterPoint(getCenterPoint());
-        guiForSearchServ.setCenterPoint(paintCenterPoint);
+        SVGDocument doc = svgCanvas.getSVGDocument();
+        if(doc!=null){
+            SVGOMPoint svgPoint = 
+                    Utils.getLocalPointFromDomElement(doc.getRootElement(),(int) x,(int) y);
+            centerPoint.setLocation(svgPoint.getX(), svgPoint.getY());
+        }
+
+        guiForSearchServ.setCenterPoint(getCenterPoint());
+        //guiForSearchServ.setCenterPoint(paintCenterPoint);
     }
 
     public void setRadius(double r) {
         radius = r;
-        paintRadius = r;
     }
 
     public double getRadius() {
         return radius;
     }
 
-    public void setCurrentPosition(float x, float y) {
-        currentPos.setLocation(x, y);
+    public void setCurrentPosition(float x, float y) {        
         paintCurrentPos.setLocation(x,y);
+        SVGDocument doc = svgCanvas.getSVGDocument();
+        if(doc!=null){
+            SVGOMPoint svgPoint =
+                    Utils.getLocalPointFromDomElement(doc.getRootElement(),(int) x,(int) y);
+            currentPos.setLocation(svgPoint.getX(), svgPoint.getY());
+        }
+
         double rad = centerPoint.distance(getCurrentPosition());
         setRadius(rad);
-        //guiForSearchServ.setRadius(getRadius());
-        //guiForSearchServ.setCurrentPos(getCurrentPosition());
-        guiForSearchServ.setRadius(paintRadius);
-        guiForSearchServ.setCurrentPos(paintCurrentPos);
+        double radPaint = paintCenterPoint.distance(paintCurrentPos);
+        paintRadius = radPaint;
+
+        guiForSearchServ.setRadius(getRadius());
+        guiForSearchServ.setCurrentPos(getCurrentPosition());
+        //guiForSearchServ.setRadius(paintRadius);
+        //guiForSearchServ.setCurrentPos(paintCurrentPos);
     }
 
     public NaviPoint getCenterPoint() {
