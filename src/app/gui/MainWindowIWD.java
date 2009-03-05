@@ -18,6 +18,8 @@ import app.gui.svgComponents.SVGCanvasLayers;
 import app.gui.svgComponents.SVGLayerScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
 import app.utils.BridgeForVerboseMode;
+import app.utils.Console;
+import app.utils.GraphicsUtilities;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
@@ -35,6 +37,7 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
+import java.awt.Image;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
@@ -49,9 +52,11 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowStateListener;
 import java.awt.geom.Rectangle2D;
+import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
+import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -152,6 +157,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         setTitle(Version.getVersion());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
+        ImageIcon img = MainWindowIWD.createNavigationIcon("test/NaviGPS4");
+        if(img!=null){
+            setIconImage(img.getImage());
+        }
         setDisplayMode();
         
     }
@@ -342,14 +351,14 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         }
     }
 
-    public static String createNavigationIconPath(String imageName, String ext) {
+    public static URL createNavigationIconPath(String imageName, String ext) {
         String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
         URL imageURL = MainWindowIWD.class.getResource(imgLocation);
         if (imageURL == null) {
             System.err.println("Resource not found: " + imgLocation);
             return null;
         }
-        return imageURL.getPath();
+        return imageURL;
     }
 
     public void createStatusPanel() {
@@ -1075,7 +1084,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
                         case SCREEN_POSITION:
                             setTextCoordinate(e.getXOnScreen() + "", "" + e.getYOnScreen());
                             break;
-                        case ROOT_SVGELEMENT_POSITION:
+                        case ROOT_SVGELEMENT_POSITION:                            
                             SVGOMPoint svgp =
                                     Utils.getLocalPointFromDomElement(
                                     doc.getRootElement(), e.getX(), e.getY());

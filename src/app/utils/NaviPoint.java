@@ -77,4 +77,9 @@ public class NaviPoint extends SVGOMPoint{
         bits ^= java.lang.Float.floatToIntBits(getY()) * 31;
         return (((int) bits) ^ ((int) (bits >> 32)));
     }
+
+    @Override
+    public String toString() {
+        return "x: "+getX()+" y: "+getY();
+    }
 }

@@ -40,13 +40,30 @@ public class Utils {
 			    BorderFactory.createLineBorder(colFrame));
     }
     
-    public static SVGOMPoint getLocalPointFromDomElement(Element element, int x, int y){	    
+    public static NaviPoint getLocalPointFromDomElement(Element element, float x, float y){
 	    SVGMatrix mat = ((SVGLocatable) element).getScreenCTM();
-        //System.out.println("mat [["+mat.getA()+","+mat.getC()+","+mat.getE()+"]" +
-        //                        "["+mat.getB()+","+mat.getD()+","+mat.getF()+"]]");
 	    SVGMatrix imat = mat.inverse(); // screen -> elem
-	    SVGOMPoint pt = new SVGOMPoint(x, y);
-	    return (SVGOMPoint) pt.matrixTransform(imat);
+	    NaviPoint pt = new NaviPoint(x, y);
+	    return pt.matrixTransform(imat);
+    }
+    
+    public static NaviPoint getComponentPointRelativeToDomElement(Element element, NaviPoint p){
+	    SVGMatrix mat = ((SVGLocatable) element).getScreenCTM();
+	    return p.matrixTransform(mat);
+    }
+
+    public static NaviPoint[] getComponentPointRelativeToDomElement(Element element, NaviPoint []src,NaviPoint[]dest){
+
+        if(dest==null){
+            dest = new NaviPoint[src.length];
+        }
+        
+        SVGMatrix mat = ((SVGLocatable) element).getScreenCTM();
+        for (int i = 0; i < src.length; i++) {
+            dest[i] = src[i].matrixTransform(mat);
+
+        }
+	    return dest;
     }
 
     public static String roundsValue(double val,int fraction,int mul){
