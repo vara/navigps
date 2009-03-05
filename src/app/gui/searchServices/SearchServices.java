@@ -23,6 +23,7 @@ import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import bridge.ODBridge;
+import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -92,7 +93,9 @@ public class SearchServices extends AlphaJPanel{
         svgCanvas.addJGVTComponentListener(svgViewListener);
         if(roundWindowInstace != null){
             roundWindowInstace.addPropertyChangeListener(removeContent);
-            roundWindowInstace.getContentPane().add(guiForSearchServ);
+            Container cont = roundWindowInstace.getContentPane();
+            cont.setLayout(new BorderLayout());
+            cont.add(guiForSearchServ,BorderLayout.CENTER);
         }else{
             // probably never will have a place
             System.err.println(getClass().getCanonicalName()+" method [install] msg: [roundWindowInstace null]");
