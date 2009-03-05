@@ -116,4 +116,14 @@ public class ServiceDescription {
     public void setServiceCore(ServiceCore sc) {
         this.sc = sc;
     }
+
+    @Override
+    public String toString() {
+        String msg = getClass().getCanonicalName()+
+                " [ Category : "+getCategory()+" [ Number :"+getServiceNumber()+
+                " Name : "+getServiceName()+" Streat : "+getServiceStreet()+" ]]";
+        return msg;
+    }
+
+
 }

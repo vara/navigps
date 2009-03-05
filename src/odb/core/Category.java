@@ -35,4 +35,10 @@ public class Category {
     public void removeSubcategory(Subcategory subcategory) {
         subcategories.remove(subcategory);
     }
+
+    @Override
+    public String toString() {
+        String msg = getClass().getCanonicalName()+" [ Name : "+getName()+" ]";
+        return msg;
+    }
 }

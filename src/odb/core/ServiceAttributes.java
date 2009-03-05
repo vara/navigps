@@ -57,4 +57,11 @@ public class ServiceAttributes {
         this.sc = sc;
     }
 
+    @Override
+    public String toString() {
+        String msg = getClass().getCanonicalName()+
+                " [ x : "+getX()+" y : "+getY()+
+                " ServiceCore : "+getServiceCore()+" ]";
+        return msg;
+    }
 }

@@ -246,14 +246,17 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                                     new Search(),"searchCategoryRadius",pt,obj);
                     Vector subResult = (Vector)rv.getRet();
 
+                    //for test
+                    System.out.println(" Attributes : "+((ServiceCore) subResult.get(0)).getServiceAttributes()+
+                                " Description : "+((ServiceCore) subResult.get(0)).getServiceDescription());
+
                     for (int i = 0; i < subResult.size(); i++) {
                         ServiceCore sc = (ServiceCore) subResult.get(i);
                         Element service = doc.createElementNS(svgNS, "rect");
                         service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
-                        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
+                        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));                        
                         serviceElements.add(service);
                     }
-
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + " got " + serviceElements.size() + " services");
                 }
             }).start();
@@ -325,7 +328,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                     if (data instanceof String) {
                         val.add(((String) data));
                     } else {
-                        System.err.println("Child [" + data + "] is not a String object !!! ");
+                        System.err.println(getClass().getCanonicalName()+
+                                " method : getSelectedServices , Child [" + data + "] is not a String object !!! ");
                     }
                 }
             }
