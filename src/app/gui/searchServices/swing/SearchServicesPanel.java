@@ -7,10 +7,11 @@ package app.gui.searchServices.swing;
 
 import app.gui.MainWindowIWD;
 import app.gui.ScrollBar.ui.LineScrollBarUI;
+import app.utils.InvokeUtils;
+import app.utils.InvokeUtils.ReturnValue;
 import app.utils.NaviPoint;
 import config.DataBaseConfig;
 import java.awt.event.ActionListener;
-import java.util.Date;
 import java.util.Vector;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
@@ -225,28 +226,39 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        Date start = new Date();
-        ServiceCore sc;
+        
         doc = DataBaseConfig.getMw().getDocument();
-        Vector subResult = null;
-        Vector<String> services = getSelectedServices();
-        Vector<Element> serviceElements = new Vector(); //result elements
+        
+        final Vector<String> services = getSelectedServices();
         if (!services.isEmpty()) {
-            double radius = ((Number) gRadius.getValue()).doubleValue();
-            double cx = ((Number) gCenterX.getValue()).doubleValue();
-            double cy = ((Number) gCenterY.getValue()).doubleValue();
-            subResult = new Search().searchCategoryRadius(services, cx, cy, radius);
+            final double radius = ((Number) gRadius.getValue()).doubleValue();
+            final double cx = ((Number) gCenterX.getValue()).doubleValue();
+            final double cy = ((Number) gCenterY.getValue()).doubleValue();
+            new Thread(new Runnable() {
 
-            for (int i = 0; i < subResult.size(); i++) {
-                sc = (ServiceCore) subResult.get(i);
-                Element service = doc.createElementNS(svgNS, "rect");
-                service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
-                service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
-                serviceElements.add(service);
-            }
+                @Override
+                public void run() {
 
-            Date stop = new Date();
-            System.out.println("Query finished, execution time: " + (stop.getTime() - start.getTime()) / 1000 + " s" + " got " + serviceElements.size() + " services");
+                    Vector<Element> serviceElements = new Vector(); //result elements
+                    Object obj [] = {services, cx, cy, radius};
+                    Class[] pt = {Vector.class,double.class,double.class,double.class};
+                    //test reflection
+                    ReturnValue rv = InvokeUtils.invokeWithTime(
+                                    new Search(),"searchCategoryRadius",pt,obj);
+                    Vector subResult = (Vector)rv.getRet();
+
+                    for (int i = 0; i < subResult.size(); i++) {
+                        ServiceCore sc = (ServiceCore) subResult.get(i);
+                        Element service = doc.createElementNS(svgNS, "rect");
+                        service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
+                        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
+                        serviceElements.add(service);
+                    }
+
+                    System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + " got " + serviceElements.size() + " services");
+                }
+            }).start();
+
         } else {
             MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Please select a service category!");
         }
