@@ -272,7 +272,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-                
+
         final Vector<String> services = getSelectedServices();
         if (!services.isEmpty()) {
             final double radius = ((Number) gRadius.getValue()).doubleValue();
@@ -284,26 +284,31 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 public void run() {
 
                     Vector<Element> serviceElements = new Vector(); //result elements
-                    Object obj [] = {services, cx, cy, radius};
-                    Class[] pt = {Vector.class,double.class,double.class,double.class};
+                    Object obj[] = {services, cx, cy, radius};
+                    Class[] pt = {Vector.class, double.class, double.class, double.class};
                     //test reflection
                     ReturnValue rv = InvokeUtils.invokeWithTime(
-                                    new Search(),"searchCategoryRadius",pt,obj);
-                    Vector subResult = (Vector)rv.getRet();
+                            new Search(), "searchCategoryRadius", pt, obj);
+                    Vector subResult = (Vector) rv.getRet();
 
                     //for test
-                    System.out.println(" Attributes : "+((ServiceCore) subResult.get(0)).getServiceAttributes()+
-                                " Description : "+((ServiceCore) subResult.get(0)).getServiceDescription());
+                    if (!subResult.isEmpty()) {
+                        System.out.println(" Attributes : " + ((ServiceCore) subResult.get(0)).getServiceAttributes() +
+                                " Description : " + ((ServiceCore) subResult.get(0)).getServiceDescription());
 
-                    for (int i = 0; i < subResult.size(); i++) {
-                        ServiceCore sc = (ServiceCore) subResult.get(i);
-                        Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "rect");
-                        service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
-                        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));                        
-                        serviceElements.add(service);
+                        for (int i = 0; i < subResult.size(); i++) {
+                            ServiceCore sc = (ServiceCore) subResult.get(i);
+                            Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "rect");
+                            service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
+                            service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
+                            serviceElements.add(service);
+                        }
+                        System.out.println("Query finished, execution time: " + (rv.getTimeNano() / 1000000) + " mili sec " + " got " + serviceElements.size() + " services");
+                    } else {
+                        System.out.println("Query finished, execution time: " + (rv.getTimeNano() / 1000000) + " mili sec " + " got " + serviceElements.size() + " services");
                     }
-                    System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + " got " + serviceElements.size() + " services");
-                    
+
+
                 }
             }).start();
 
@@ -377,7 +382,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                     if (data instanceof String) {
                         val.add(((String) data));
                     } else {
-                        System.err.println(getClass().getCanonicalName()+
+                        System.err.println(getClass().getCanonicalName() +
                                 " method : getSelectedServices , Child [" + data + "] is not a String object !!! ");
                     }
                 }
