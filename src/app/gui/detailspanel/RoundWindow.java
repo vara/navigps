@@ -94,6 +94,10 @@ public class RoundWindow extends RoundJPanel
         super.setEnabled(false);
     }
 
+    public void pack(){        
+        validate();
+    }
+
     public boolean isEmpty(){
         return !(getRoundWindowRootPane().getContentPane().getComponents().length>0);
     }

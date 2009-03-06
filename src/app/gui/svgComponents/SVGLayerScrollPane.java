@@ -5,7 +5,9 @@
 
 package app.gui.svgComponents;
 
+import app.gui.svgComponents.thumbnail.ThumbnailPanel;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Dimension;
 import javax.swing.Box;
 import javax.swing.JPanel;
@@ -62,5 +64,19 @@ public class SVGLayerScrollPane extends SVGScrollPane{
         canvas.addJGVTComponentListener  (xlistener);
         canvas.addGVTTreeBuilderListener (xlistener);
         canvas.addUpdateManagerListener  (xlistener);
+    }
+
+    @Override
+    public void scaleChange(float scale) {
+        super.scaleChange(scale);
+        SVGCanvasLayers parent = (SVGCanvasLayers)canvas.getParent();
+        Component[] comp = parent.getThumbnailContainer().getComponents();
+        for (int i = 0; i < comp.length; i++) {
+            Component component = comp[i];
+            if(component instanceof ThumbnailPanel){
+                ThumbnailPanel tmp = (ThumbnailPanel)component;
+                tmp.getThumbnail().updateThumbnailRenderingTransform();
+            }
+        }
     }
 }

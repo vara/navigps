@@ -16,6 +16,7 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.Point2D;
+import java.util.LinkedList;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
 import org.apache.batik.swing.JSVGCanvas;
@@ -69,6 +70,9 @@ public class Canvas extends JSVGCanvas{
 
     private boolean isFocus = false;
 
+    private LinkedList<PaintingTransformIterface> paintingTranformListener =
+            new LinkedList<PaintingTransformIterface>();
+
     MouseListener requestFocus = new MouseAdapter() {
         @Override
         public void mousePressed(MouseEvent mouseEvent) {
@@ -110,6 +114,26 @@ public class Canvas extends JSVGCanvas{
         });
     }
 
+    public void addPaintingTranformListener(PaintingTransformIterface pt){
+        paintingTranformListener.add(pt);
+    }
+
+    @Override
+    public void setPaintingTransform(AffineTransform at) {
+        /*
+        new Thread(new Runnable() {
+
+            @Override
+            public void run() {
+                for (Object o : paintingTranformListener) {
+                    ((PaintingTransformIterface)o).setPaintingTransform(at);
+                }
+            }
+        }).start();
+        */
+        super.setPaintingTransform(at);        
+    }
+    
     @Override
     public boolean isFocusable() {
         return true;

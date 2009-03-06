@@ -18,8 +18,6 @@ import app.gui.svgComponents.SVGCanvasLayers;
 import app.gui.svgComponents.SVGLayerScrollPane;
 import app.gui.svgComponents.UpdateComponentsAdapter;
 import app.utils.BridgeForVerboseMode;
-import app.utils.Console;
-import app.utils.GraphicsUtilities;
 import app.utils.MyFileFilter;
 import app.utils.MyLogger;
 import app.utils.OutputVerboseStream;
@@ -37,8 +35,8 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
-import java.awt.Image;
 import java.awt.Insets;
+import java.awt.MenuItem;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -52,11 +50,9 @@ import java.awt.event.WindowEvent;
 import java.awt.event.WindowFocusListener;
 import java.awt.event.WindowStateListener;
 import java.awt.geom.Rectangle2D;
-import java.awt.image.BufferedImage;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import java.io.File;
-import java.io.IOException;
 import java.net.URI;
 import java.net.URISyntaxException;
 import java.net.URL;
@@ -83,6 +79,7 @@ import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
 import javax.swing.border.EmptyBorder;
+import javax.swing.event.MouseInputAdapter;
 import net.infonode.docking.RootWindow;
 import net.infonode.docking.SplitWindow;
 import net.infonode.docking.TabWindow;
@@ -462,7 +459,6 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
                 DatabaseManager odb = new DatabaseManager(MainWindowIWD.this, true);
                 odb.setVisible(true);
-            //throw new UnsupportedOperationException("Unsupported exception!");
             }
         });
 
@@ -586,20 +582,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
     public void openSVGDocument(File file) {
         if (canvas.getSVGDocument() != null) {
-            System.out.println("Zamykam bieżacy document");
-            svgListeners.documentClosed();
-            try {
-                canvas.getUpdateManager().getUpdateRunnableQueue().invokeAndWait(new Runnable() {
-
-                    @Override
-                    public void run() {
-                        canvas.setURI(null);
-                    }
-                });
-            } catch (InterruptedException ex) {
-                System.err.println("" + ex);
-            }
-            System.out.println("Document zamkniety");
+            svgListeners.documentClosed();            
         }
         canvas.setURI(file.toURI().toString());
     }
@@ -628,6 +611,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         zoomOutAction.setEnabled(b);
         fitToPanelAction.setEnabled(b);
         searchServicesAction.setEnabled(b);
+    }
+
+    public SVGDocument getDocument() {
+        return canvas.getSVGDocument();
     }
 
     @Override
@@ -1029,10 +1016,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         public static final byte COMPONENT_POSITON = 0;
         public static final byte SCREEN_POSITION = 1;
         public static final byte ROOT_SVGELEMENT_POSITION = 2;
+
         private static final String SUFFIX = "position";
         private static final String S_COMPONENT_POSITON = "Component";
         private static final String S_SCREEN_POSITION = "Screen";
         private static final String S_ROOT_SVGELEMENT_POSITION = "SVG ROOT";
+
         private byte displayPosition;
         private JLabel xLabel = new JLabel();
         private JLabel yLabel = new JLabel();
@@ -1052,11 +1041,16 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             xLabel.setUI(new TitleLabelUI(TitleLabelUI.LEFT));
             yLabel.setUI(new TitleLabelUI(TitleLabelUI.LEFT));
 
-            getBumpArea().setBorder(new EmptyBorder(1, 0, 1, 4));
+            getBumpArea().setBorder(new EmptyBorder(0, 0, 0, 4));
+            getBumpArea().addMouseListener(new BumpAreaListener());
         }
 
-        public String getStringNamePosition() {
-            switch (displayPosition) {
+        public byte [] getTabPosition(){
+            return new byte [] {COMPONENT_POSITON,SCREEN_POSITION,ROOT_SVGELEMENT_POSITION};
+        }
+
+        public String getStringNamePosition(byte position) {
+            switch (position) {
                 case COMPONENT_POSITON:
                     return S_COMPONENT_POSITON + " " + SUFFIX;
                 case SCREEN_POSITION:
@@ -1065,6 +1059,16 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
                     return S_ROOT_SVGELEMENT_POSITION + " " + SUFFIX;
             }
             return "";
+        }
+        // this function ;}}}} (i dont have time !)
+        public byte getNumPosition(String str){
+            byte [] tabPos = getTabPosition();
+            for (int i = 0; i < tabPos.length; i++) {
+                if(str.equals(getStringNamePosition(tabPos[i]))){
+                    return tabPos[i];
+                }
+            }
+            return COMPONENT_POSITON; //default ;}
         }
 
         @Override
@@ -1094,7 +1098,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
                 }
             }
         }
-
+        
         private void setTextCoordinate(String x, String y) {
             xLabel.setText(x);
             yLabel.setText(y);
@@ -1112,11 +1116,30 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
          */
         public void setDisplayPosition(byte displayPosition) {
             this.displayPosition = displayPosition;
-            setToolTipText(getStringNamePosition());
+            String strTooltip = getStringNamePosition(displayPosition);
+            setToolTipText(strTooltip);
+            getBumpArea().setToolTipText(strTooltip);
         }
-    }
 
-    public SVGDocument getDocument() {
-        return canvas.getSVGDocument();
+        private class BumpAreaListener extends MouseInputAdapter implements ActionListener{
+            @Override
+            public void mousePressed(MouseEvent e){
+                byte [] tabPos = getTabPosition();
+                MyPopupMenu popup = new MyPopupMenu();
+                for (int i = 0; i < tabPos.length; i++) {
+                    JMenuItem mi= new JMenuItem(getStringNamePosition(tabPos[i]));
+                    mi.addActionListener(this);
+                    popup.add(mi);
+                }
+                popup.show(e.getComponent(), e.getX(), e.getY());
+            }
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                JMenuItem mi = (JMenuItem)e.getSource();
+                byte pos = getNumPosition(mi.getText());
+                setDisplayPosition(pos);
+            }
+        }
     }
 }

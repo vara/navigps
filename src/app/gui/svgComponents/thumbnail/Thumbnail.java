@@ -19,6 +19,8 @@
 package app.gui.svgComponents.thumbnail;
 
 import app.gui.detailspanel.AlphaJPanel;
+import app.gui.svgComponents.Canvas;
+import app.gui.svgComponents.PaintingTransformIterface;
 import app.utils.GraphicsUtilities;
 import java.awt.BasicStroke;
 import java.awt.BorderLayout;
@@ -44,7 +46,6 @@ import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.gvt.CanvasGraphicsNode;
 import org.apache.batik.gvt.CompositeGraphicsNode;
 import org.apache.batik.gvt.GraphicsNode;
-import org.apache.batik.swing.JSVGCanvas;
 import org.apache.batik.swing.gvt.GVTTreeRendererAdapter;
 import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
 import org.apache.batik.swing.gvt.JGVTComponent;
@@ -65,14 +66,14 @@ import org.w3c.dom.svg.SVGSVGElement;
  */
 public class Thumbnail extends AlphaJPanel {
   
-    protected JSVGCanvas svgCanvas;
+    protected Canvas svgCanvas;
     protected JGVTComponent svgThumbnailCanvas;
     protected boolean documentChanged;
     protected AreaOfInterestOverlay overlay;
     protected AreaOfInterestListener aoiListener;
     protected boolean interactionEnabled = false;
 
-    public Thumbnail(JSVGCanvas svgCanvas) {
+    public Thumbnail(Canvas svgCanvas) {
 
         super(new BorderLayout());
         setOpaque(false);
@@ -80,14 +81,18 @@ public class Thumbnail extends AlphaJPanel {
         svgCanvas.addGVTTreeRendererListener(new ThumbnailGVTListener());
         svgCanvas.addSVGDocumentLoaderListener(new ThumbnailDocumentListener());
         svgCanvas.addComponentListener(new ThumbnailCanvasComponentListener());
+        
+        //when svg document state is ALWAYS_DINAMIC then Thumbnail not perform
+        //at pan iterator (;f does not work as I wanted)
+        //svgCanvas.addPaintingTranformListener(new PaintingTransformListener());
 
         // create the thumbnail
         svgThumbnailCanvas = new SVGThumbnailCanvas();
 
         overlay = new AreaOfInterestOverlay();
         svgThumbnailCanvas.getOverlays().add(overlay);
-        svgThumbnailCanvas.addComponentListener(new ThumbnailComponentListener());
-        svgThumbnailCanvas.addGVTTreeRendererListener(new ThumbnailGVTListener());
+        //svgThumbnailCanvas.addComponentListener(new ThumbnailComponentListener());
+        //svgThumbnailCanvas.addGVTTreeRendererListener(new ThumbnailGVTListener());
         aoiListener = new AreaOfInterestListener();
 
         add(svgThumbnailCanvas, BorderLayout.CENTER);       
@@ -139,8 +144,8 @@ public class Thumbnail extends AlphaJPanel {
     /**
      * Updates the thumbnail component rendering transform.
      */
-    protected void updateThumbnailRenderingTransform() {
-        System.out.println("****update ThumbnailRenderingTransform");
+    public void updateThumbnailRenderingTransform() {
+        //System.out.println("****update ThumbnailRenderingTransform");
         SVGDocument svgDocument = svgCanvas.getSVGDocument();
         if (svgDocument != null) {
             SVGSVGElement elt = svgDocument.getRootElement();
@@ -163,6 +168,10 @@ public class Thumbnail extends AlphaJPanel {
                 // no viewBox has been specified, create a scale transform
                 //System.out.println("no viewBox has been specified, create a scale transform");
                 Dimension2D docSize = svgCanvas.getSVGDocumentSize();
+                if(docSize == null){
+                    //not build yet
+                    return;
+                }
                 double sx = dim.width / docSize.getWidth();
                 double sy = dim.height / docSize.getHeight();
                 double s = Math.min(sx, sy);
@@ -194,6 +203,7 @@ public class Thumbnail extends AlphaJPanel {
     class SVGThumbnailCanvas extends JGVTComponent{
 
         private BufferedImage bi;
+
         @Override
         public void paintComponent(Graphics g) {
             Graphics2D g2d = (Graphics2D)g;
@@ -201,6 +211,7 @@ public class Thumbnail extends AlphaJPanel {
             if(getAlpha()!=0){
                 if (image != null ) {
                     if(bi == null){
+                        System.err.println("GraphicsUtilities.toCompatibleImage");
                         bi = GraphicsUtilities.toCompatibleImage(image);
                     }
                     if (paintingTransform != null) {
@@ -219,6 +230,13 @@ public class Thumbnail extends AlphaJPanel {
                     }
                 }
             }
+        }
+
+        @Override
+        public void setGraphicsNode(GraphicsNode gn) {
+            bi = null;
+            image = null;
+            super.setGraphicsNode(gn);
         }
 
         @Override
@@ -348,6 +366,17 @@ public class Thumbnail extends AlphaJPanel {
         }
     }
 
+    /*when svg document state is ALWAYS_DINAMIC then Thumbnail not perform
+     *at pan iterator
+     */
+
+    protected class PaintingTransformListener implements PaintingTransformIterface{
+
+        @Override
+        public void setPaintingTransform(AffineTransform pt) {
+            updateThumbnailRenderingTransform();
+        }
+    }
     /**
      * An overlay that represents the current area of interest.
      */

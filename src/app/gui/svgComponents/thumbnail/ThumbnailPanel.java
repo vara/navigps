@@ -76,9 +76,16 @@ public class ThumbnailPanel extends RoundJPanel{
             if(!thumbnail.isDisplay())
                 initAnimator(0,Direction.FORWARD);
         }else{
-            if(thumbnail.isDisplay())
+            if(getThumbnail().isDisplay())
                 initAnimator(-1,Direction.BACKWARD);
         }
+    }
+
+    /**
+     * @return the thumbnail
+     */
+    public Thumbnail getThumbnail() {
+        return thumbnail;
     }
     protected class AnimatorBehaviour implements TimingTarget{
 
@@ -102,7 +109,7 @@ public class ThumbnailPanel extends RoundJPanel{
         @Override
         public void begin() {
             //System.out.println("Thumbnail alpha "+getAlpha()+" upper alpha "+getUpperThresholdAlpha());
-            thumbnail.setInteractionEnabled(!thumbnail.isDisplay());
+            getThumbnail().setInteractionEnabled(!thumbnail.isDisplay());
         }
         @Override
         public void end() {

@@ -10,6 +10,7 @@ import app.gui.detailspanel.AlphaJPanel;
 import app.gui.detailspanel.RoundWindow;
 import app.gui.detailspanel.RoundWindowUtils;
 import app.gui.svgComponents.Canvas;
+import app.gui.svgComponents.PaintingTransformIterface;
 import app.gui.svgComponents.SVGCanvasLayers;
 import app.utils.NaviPoint;
 import app.utils.Utils;
@@ -24,8 +25,10 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import bridge.ODBridge;
 import java.awt.BorderLayout;
+import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
+import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.gvt.JGVTComponentListener;
@@ -59,6 +62,8 @@ public class SearchServices extends AlphaJPanel{
     private SSMouseEvents me = new SSMouseEvents();
     //private AreaOverLay paintArea = new AreaOverLay();
 
+    private SynchronizePaintingTransform synch = new SynchronizePaintingTransform();
+
     PropertyChangeListener removeContent = new PropertyChangeListener(){
 
         @Override
@@ -87,7 +92,7 @@ public class SearchServices extends AlphaJPanel{
 
     private void install() {
 
-        //svgCanvas.add(this,BorderLayout.CENTER);        
+        //svgCanvas.add(synch,BorderLayout.CENTER);
         svgCanvas.addMouseMotionListener(me);
         svgCanvas.addMouseListener(me);
         svgCanvas.addJGVTComponentListener(svgViewListener);
@@ -105,6 +110,7 @@ public class SearchServices extends AlphaJPanel{
 
     public void uninstall(){
 
+        //svgCanvas.remove(synch);
         svgCanvas.removeMouseMotionListener(me);
         svgCanvas.removeMouseListener(me);
         svgCanvas.removeJGVTComponentListener(svgViewListener);
@@ -133,6 +139,7 @@ public class SearchServices extends AlphaJPanel{
         } else {
             System.out.println(getClass().getCanonicalName() + " [content roundWin no changed]");
         }
+        roundWindowInstace.pack();
         roundWindowInstace.setEnabled(true);
     }
 
@@ -170,9 +177,15 @@ public class SearchServices extends AlphaJPanel{
 
     @Override
     public void paintComponent(Graphics g) {
-        super.paintComponent(g);
+        super.paintComponent(g);                
         if(isEnabledSearchServices() && (int)paintRadius>0){
-            Graphics2D g2 = (Graphics2D) g.create();            
+            Graphics2D g2 = (Graphics2D) g.create();
+            AffineTransform pt = svgCanvas.getPaintingTransform();
+            if(pt!=null){
+                AffineTransform orgT = g2.getTransform();
+                orgT.concatenate(pt);
+                g2.setTransform(orgT);
+            }
             paintCircle(g2, paintRadius, paintCenterPoint,paintCurrentPos);
             g2.dispose();
         }
@@ -202,6 +215,14 @@ public class SearchServices extends AlphaJPanel{
         g2.fill(circle);
         g2.translate(-center.getX(), -center.getY());
         g2.setStroke(bsLine);
+    }
+
+    public void setCenterPoint(NaviPoint p){
+        setCenterPoint(p.getX(), p.getY());
+    }
+
+    public void setCurrentPosition(NaviPoint p) {
+        setCurrentPosition(p.getX(), p.getY());
     }
 
     public void setCenterPoint(float x, float y) {        
@@ -270,13 +291,13 @@ public class SearchServices extends AlphaJPanel{
     private class SSMouseEvents extends MouseInputAdapter{
         
         private boolean dragged;
-        
+        private NaviPoint startPoint = new NaviPoint(0,0);
+
         @Override
         public void mousePressed(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && isEnabledSearchServices()) {
                 
-                //NaviPoint p = new NaviPoint(e.getX(),e.getY());
-                setCenterPoint(e.getX(), e.getY());
+                startPoint.setLocation(e.getX(), e.getY());
                 //needRepaint = true;
                 setDragged(true);                
             }
@@ -286,8 +307,7 @@ public class SearchServices extends AlphaJPanel{
         public void mouseDragged(MouseEvent e) {
 
             if (isEnabledSearchServices() && isDragged()) {
-
-                //NaviPoint p = new NaviPoint(e.getX(),e.getY());
+                setCenterPoint(startPoint);                
                 setCurrentPosition(e.getX(),e.getY());
                 /*
                 int gap = 10;
@@ -361,4 +381,20 @@ public class SearchServices extends AlphaJPanel{
             updatePoint();
         }
     }//DocumentStateChangedListener
+
+    private class SynchronizePaintingTransform extends JComponent
+        implements PaintingTransformIterface{
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            SearchServices.this.paintComponent(g);
+        }
+
+        @Override
+        public void setPaintingTransform(AffineTransform pt) {
+
+        }
+
+    }
 }

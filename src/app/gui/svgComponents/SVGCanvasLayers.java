@@ -27,11 +27,13 @@ public class SVGCanvasLayers extends JLayeredPane{
 
     public static final String SVG_CANVAS_CHANGED = "svgcanvas.changed";
     public static final Integer SEARCH_SERVICES_LAYER = new Integer(JLayeredPane.FRAME_CONTENT_LAYER+100);
+    public static final Integer THUMBNAIL_LAYER = new Integer(JLayeredPane.DEFAULT_LAYER+10);
 
     private Canvas svgCanvas;
 
     private AlphaJPanel componentContainer;
     private AlphaJPanel modalContainer;
+    private AlphaJPanel thumbnailContainer;
 
     public SVGCanvasLayers(){
 
@@ -48,10 +50,15 @@ public class SVGCanvasLayers extends JLayeredPane{
 
         componentContainer = new AlphaJPanel(null);
         getComponentContainer().setOpaque(false);
-        createThumbnails();
 
+        thumbnailContainer = new AlphaJPanel(null);
+        getThumbnailContainer().setOpaque(false);
+        
         add(getModalContainer(),MODAL_LAYER);
         add(getComponentContainer(),DEFAULT_LAYER);
+        add(thumbnailContainer, THUMBNAIL_LAYER);
+
+        createThumbnails();
     }
 
     private void createRoundWindowProperties(){
@@ -81,8 +88,8 @@ public class SVGCanvasLayers extends JLayeredPane{
         tmp.setUpperThresholdAlpha(0.4f);
         tmp.setAlpha(0.0f);
         tmp.setBackground(Color.BLACK);
-        tmp.setBounds(50, 50, 200, 100);
-        getComponentContainer().add(tmp);
+        tmp.setBounds(50, 50, 200, 100);        
+        getThumbnailContainer().add(tmp);
         tmp.displayThumbnail(true);
     }
 
@@ -133,5 +140,12 @@ public class SVGCanvasLayers extends JLayeredPane{
      */
     public AlphaJPanel getModalContainer() {
         return modalContainer;
+    }
+
+    /**
+     * @return the thumbnailContainer
+     */
+    public AlphaJPanel getThumbnailContainer() {
+        return thumbnailContainer;
     }
 }

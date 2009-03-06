@@ -45,7 +45,6 @@ import java.awt.geom.AffineTransform;
 import java.awt.geom.Rectangle2D;
 import javax.swing.BoundedRangeModel;
 import javax.swing.Box;
-import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.JScrollBar;
 import javax.swing.event.ChangeEvent;
