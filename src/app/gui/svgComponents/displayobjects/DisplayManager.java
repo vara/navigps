@@ -29,12 +29,7 @@ public class DisplayManager extends AbstractDisplayManager{
     private SVGDocument doc;
     private UpdateManager updateManager;
     private Canvas can;
-    public DisplayManager(Canvas c) {
-        if(!c.isDynamic()){            
-            System.err.println("Display Manager Disabled !!!\nCanvas isn't dynamic document");
-        }else{
-            System.err.println("Display manager enabled");
-        }
+    public DisplayManager(Canvas c) {        
         can = c;
     }
 

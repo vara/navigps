@@ -5,8 +5,6 @@
 
 package config;
 
-import app.gui.MainWindowIWD;
-
 /**
  *
  * @author wara
@@ -15,7 +13,6 @@ public class DataBaseConfig {
     private static String defaultDatabasePath = "./resources/odb/";
     private static String databaseFilename = "neodatis.odb";
     private static String iconPath = "resources/graphics/icons/";
-    private static MainWindowIWD mw;
 
     /**
      * @return the defaultDatabasePath
@@ -57,19 +54,5 @@ public class DataBaseConfig {
      */
     public static void setIconPath(String aIconPath) {
         iconPath = aIconPath;
-    }
-
-    /**
-     * @return the mw
-     */
-    public static MainWindowIWD getMw() {
-        return mw;
-    }
-
-    /**
-     * @param aMw the mw to set
-     */
-    public static void setMw(MainWindowIWD aMw) {
-        mw = aMw;
     }
 }

@@ -34,7 +34,6 @@ public class Main {
             @Override
             public void run() {
                 MainWindowIWD mw = new MainWindowIWD(m);
-                DataBaseConfig.setMw(mw);
             }
         });
     }

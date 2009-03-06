@@ -34,7 +34,6 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private JScrollPane jScrollPane1;
     private JCheckBoxTree jTree1;
     private String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-    private SVGDocument doc;
 
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {
@@ -273,9 +272,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        
-        doc = DataBaseConfig.getMw().getDocument();
-        
+                
         final Vector<String> services = getSelectedServices();
         if (!services.isEmpty()) {
             final double radius = ((Number) gRadius.getValue()).doubleValue();
@@ -300,12 +297,13 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < subResult.size(); i++) {
                         ServiceCore sc = (ServiceCore) subResult.get(i);
-                        Element service = doc.createElementNS(svgNS, "rect");
+                        Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "rect");
                         service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
                         service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));                        
                         serviceElements.add(service);
                     }
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + " got " + serviceElements.size() + " services");
+                    
                 }
             }).start();
 

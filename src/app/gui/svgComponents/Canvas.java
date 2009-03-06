@@ -114,6 +114,10 @@ public class Canvas extends JSVGCanvas{
         });
     }
 
+    public DisplayManager getDisplayManager(){
+        return dm;
+    }
+
     public void addPaintingTranformListener(PaintingTransformIterface pt){
         paintingTranformListener.add(pt);
     }

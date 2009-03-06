@@ -36,7 +36,6 @@ import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.MenuItem;
 import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
@@ -117,8 +116,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
     private StatusPanel statusPanel;
     private StatusInfoPanel statusInfoPanel = new StatusInfoPanel();
     private Action openSVGFileAction,  zoomOutAction,  zoomInAction,  zoomAction,  fitToPanelAction,  searchServicesAction;
-    private Canvas canvas;
-    private SVGCanvasLayers canvaslayers;
+    
+    private static SVGCanvasLayers canvaslayers;
+
     private JCheckBoxMenuItem[] cbmOptionsForToolBars;
     private JToolBar toolBarFile,  toolBarZoom,  toolBarSerch,  toolBarMemMonitor;
     private static SVGBridgeListeners svgListeners = new SVGBridgeListeners();
@@ -218,9 +218,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         creatMenuBar();
         createStatusPanel();	//must be before createCanvasPanel()
 
-        canvas.addSVGDocumentLoaderListener(svgListeners);
-        canvas.addGVTTreeBuilderListener(svgListeners);
-        canvas.addGVTTreeRendererListener(svgListeners);
+        getSVGCanvas().addSVGDocumentLoaderListener(svgListeners);
+        getSVGCanvas().addGVTTreeBuilderListener(svgListeners);
+        getSVGCanvas().addGVTTreeRendererListener(svgListeners);
 
         svgListeners.addStatusChangedlistener(statusInfoPanel);
     }
@@ -268,8 +268,8 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             MainDetailsPanel detailsPanel = new MainDetailsPanel();
             DetailsPanel displayDetails = new DetailsPanel();
             PanelWithBatikJTree panelJTree = new PanelWithBatikJTree(displayDetails);
-            canvas.addSVGDocumentLoaderListener(panelJTree.getGVTTreeListener());
-            canvas.addGVTTreeBuilderListener(panelJTree.getGVTTreeListener());
+            getSVGCanvas().addSVGDocumentLoaderListener(panelJTree.getGVTTreeListener());
+            getSVGCanvas().addGVTTreeBuilderListener(panelJTree.getGVTTreeListener());
             detailsPanel.addToUpperContent(panelJTree);
             detailsPanel.addToLowerContent(displayDetails);
             views.add(new View("Properties", VIEW_ICON, detailsPanel));
@@ -371,7 +371,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         titleUi.setTextLayout(TitleLabelUI.CENTER_VERTICAL | TitleLabelUI.CENTER_HORIZONTAL);
         titleUi.setHorizontalCalibrated(0);
 
-        canvas.addMouseMotionListener(cip);
+        getSVGCanvas().addMouseMotionListener(cip);
         statusPanel.addToPanelFromPosition(Box.createHorizontalGlue(), StatusPanel.RIGHT_PANEL);
         statusPanel.addToPanelFromPosition(cip, StatusPanel.RIGHT_PANEL);
 
@@ -527,15 +527,14 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         setJMenuBar(jmb);
     }
 
-    public SVGCanvasLayers createCanvas() {
+    protected SVGCanvasLayers createCanvas() {
         
-        canvaslayers = new SVGCanvasLayers();
-        canvas = canvaslayers.getSvgCanvas();
-        canvas.setBackground(Color.white);
+        canvaslayers = new SVGCanvasLayers();        
+        getSVGCanvas().setBackground(Color.white);
         return canvaslayers;
     }
 
-    public SVGLayerScrollPane createCanvasWithScrollPane() {
+    protected SVGLayerScrollPane createCanvasWithScrollPane() {
         if (canvaslayers == null) {
             return new SVGLayerScrollPane(createCanvas());
         }
@@ -547,10 +546,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         String fileFilter = "svg";
         chooser.addChoosableFileFilter(new MyFileFilter(new String[]{"svg"}, fileFilter));
         chooser.setAcceptAllFileFilterUsed(false);
-        if (canvas.isDocumentSet()) {
+        if (getSVGCanvas().isDocumentSet()) {
 
             try {
-                String lastPath = canvas.getSVGDocument().getDocumentURI();
+                String lastPath = getSVGCanvas().getSVGDocument().getDocumentURI();
                 URI uri = new URI(lastPath);
                 chooser.setCurrentDirectory(new File(uri));
             } catch (URISyntaxException ex) {
@@ -581,10 +580,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
     }
 
     public void openSVGDocument(File file) {
-        if (canvas.getSVGDocument() != null) {
+        if (getSVGCanvas().getSVGDocument() != null) {
             svgListeners.documentClosed();            
         }
-        canvas.setURI(file.toURI().toString());
+        getSVGCanvas().setURI(file.toURI().toString());
     }
 
     protected StatusPanel getStatusPanel() {
@@ -613,8 +612,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         searchServicesAction.setEnabled(b);
     }
 
-    public SVGDocument getDocument() {
-        return canvas.getSVGDocument();
+    public static SVGCanvasLayers getSVGCanvasLayers() {
+        return canvaslayers;
+    }
+
+    public static Canvas getSVGCanvas(){
+        return getSVGCanvasLayers().getSvgCanvas();
     }
 
     @Override
@@ -728,7 +731,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            canvas.zoomFromCenterDocumnet(true);
+            getSVGCanvas().zoomFromCenterDocumnet(true);
             getVerboseStream().outputVerboseStream("Zoom in");
         }
     }
@@ -747,7 +750,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            canvas.zoomFromCenterDocumnet(false);
+            getSVGCanvas().zoomFromCenterDocumnet(false);
             getVerboseStream().outputVerboseStream("Zoom out");
         }
     }
@@ -768,7 +771,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         public void actionPerformed(ActionEvent e) {
             AbstractButton button = (AbstractButton) e.getSource();
             boolean selected = button.isSelected();
-            canvas.zoomFromMouseCoordinationEnable(selected);
+            getSVGCanvas().zoomFromMouseCoordinationEnable(selected);
             getVerboseStream().outputVerboseStream("Zoom from mouse position " + (selected ? "Disabled" : "Enabled"));
         }
     }
@@ -787,7 +790,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            canvas.resetRenderingTransform();
+            getSVGCanvas().resetRenderingTransform();
             getVerboseStream().outputVerboseStream("Fit to panel");
         }
     }
@@ -806,23 +809,23 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         @Override
         public void actionPerformed(ActionEvent e) {
 
-            SVGDocument doc = canvas.getSVGDocument();
+            SVGDocument doc = getSVGCanvas().getSVGDocument();
             SVGSVGElement el = doc.getRootElement();
             String viewBoxStr = el.getAttributeNS(null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
             float[] rect = ViewBox.parseViewBoxAttribute(el, viewBoxStr, null);
             Rectangle2D rect2d = new Rectangle2D.Float(rect[0], rect[1], rect[2], rect[3]);
-            GraphicsNode gn = canvas.getGraphicsNode();
+            GraphicsNode gn = getSVGCanvas().getGraphicsNode();
             Rectangle2D bounds = gn.getBounds();
 
-            CanvasGraphicsNode cgn = canvas.getCanvasGraphicsNode();
+            CanvasGraphicsNode cgn = getSVGCanvas().getCanvasGraphicsNode();
             getVerboseStream().outputVerboseStream("-------- Transform SVG Document --------");
             getVerboseStream().outputVerboseStream("\t" + getClass().getName() + "");
-            getVerboseStream().outputVerboseStream("ViewingTransform\t" + canvas.getViewingTransform());
-            getVerboseStream().outputVerboseStream("ViewBoxTransform\t" + canvas.getViewBoxTransform());
-            getVerboseStream().outputVerboseStream("RenderingTransform\t" + canvas.getRenderingTransform());
-            getVerboseStream().outputVerboseStream("PaintingTransform\t" + canvas.getPaintingTransform());
-            getVerboseStream().outputVerboseStream("InitialTransform\t" + canvas.getInitialTransform());
-            getVerboseStream().outputVerboseStream("Visible Rect\t" + canvas.getVisibleRect());
+            getVerboseStream().outputVerboseStream("ViewingTransform\t" + getSVGCanvas().getViewingTransform());
+            getVerboseStream().outputVerboseStream("ViewBoxTransform\t" + getSVGCanvas().getViewBoxTransform());
+            getVerboseStream().outputVerboseStream("RenderingTransform\t" + getSVGCanvas().getRenderingTransform());
+            getVerboseStream().outputVerboseStream("PaintingTransform\t" + getSVGCanvas().getPaintingTransform());
+            getVerboseStream().outputVerboseStream("InitialTransform\t" + getSVGCanvas().getInitialTransform());
+            getVerboseStream().outputVerboseStream("Visible Rect\t" + getSVGCanvas().getVisibleRect());
             getVerboseStream().outputVerboseStream("ViewBox Rect\t" + rect2d + "\t" + bounds);
             getVerboseStream().outputVerboseStream("-------- Transform Graphics Nood -------");
             getVerboseStream().outputVerboseStream("PositionTransform\t" + cgn.getPositionTransform());
@@ -905,7 +908,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             AbstractButton button = (AbstractButton) e.getSource();
             boolean en = button.getModel().isSelected();
             putValue(AbstractAction.SELECTED_KEY, new Boolean(en));
-            SearchServices ss = canvas.getSearchServices();
+            SearchServices ss = getSVGCanvas().getSearchServices();
             ss.setEnabled(en);
             if(en){
                 canvaslayers.add(ss,SVGCanvasLayers.SEARCH_SERVICES_LAYER);
