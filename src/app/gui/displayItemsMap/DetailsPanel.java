@@ -13,6 +13,7 @@ package app.gui.displayItemsMap;
 
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.event.ActionListener;
 import java.util.Vector;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
@@ -107,6 +108,10 @@ public class DetailsPanel extends javax.swing.JPanel {
         updateAttributesTable(elem);
     }
 
+    public void addActionToButton(ActionListener al){
+        jButton1.addActionListener(al);
+    }
+
     /** This method is called from within the constructor to
      * initialize the form.
      * WARNING: Do NOT modify this code. The content of this method is
@@ -119,6 +124,7 @@ public class DetailsPanel extends javax.swing.JPanel {
         jScrollPane2 = new javax.swing.JScrollPane();
         jTable1 = new javax.swing.JTable();
         jPanelXmlEditor = new javax.swing.JPanel();
+        jButton1 = new javax.swing.JButton();
 
         jScrollPane2.setBorder(null);
         jScrollPane2.setOpaque(false);
@@ -144,14 +150,17 @@ public class DetailsPanel extends javax.swing.JPanel {
         );
         jPanelXmlEditorLayout.setVerticalGroup(
             jPanelXmlEditorLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 162, Short.MAX_VALUE)
+            .addGap(0, 155, Short.MAX_VALUE)
         );
+
+        jButton1.setText("reload tree");
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(this);
         this.setLayout(layout);
         layout.setHorizontalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jScrollPane2, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
+            .addComponent(jButton1, javax.swing.GroupLayout.DEFAULT_SIZE, 281, Short.MAX_VALUE)
             .addComponent(jPanelXmlEditor, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
         );
         layout.setVerticalGroup(
@@ -159,12 +168,15 @@ public class DetailsPanel extends javax.swing.JPanel {
             .addGroup(layout.createSequentialGroup()
                 .addComponent(jScrollPane2, javax.swing.GroupLayout.PREFERRED_SIZE, 97, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jPanelXmlEditor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addComponent(jPanelXmlEditor, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
+                .addComponent(jButton1))
         );
     }// </editor-fold>//GEN-END:initComponents
 
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JButton jButton1;
     private javax.swing.JPanel jPanelXmlEditor;
     private javax.swing.JScrollPane jScrollPane2;
     private javax.swing.JTable jTable1;

@@ -12,10 +12,11 @@ import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGOMPoint;
-import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
-import org.apache.batik.swing.gvt.GVTTreeRendererListener;
+import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
+import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
+import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -29,62 +30,93 @@ public class DisplayManager extends AbstractDisplayManager{
     private UpdateManager updateManager;
     private Canvas can;
 
+
+    public static final String SERVICES_NAME = "GroupServices";
+
     public DisplayManager(Canvas c) {        
         can = c;
     }
 
-    synchronized private void putText(String txt,SVGOMPoint pointOnSVGMap){
+    private void putElement(Element e){
 
-		Element svgRoot = doc.getRootElement();
-		//SVGOMPoint pointOnSVGMap = Utils.getLocalPointFromDomElement(svgRoot, (int)p.getX(), (int)p.getY());
-        //System.out.println("X "+pointOnSVGMap.getX()+" Y "+pointOnSVGMap.getY());
-		//FontMetrics fm = doc.getFontMetrics(doc.getFont());
-		int strWidth = 40 ;//fm.stringWidth(txt);
+        Element gServ = getGroupServices();
+        //if doc == null then gServ == null
+        if(gServ!=null){
+            gServ.appendChild(e);
+        }
+    }
+    private void putText(String txt,SVGOMPoint pointOnSVGMap){
+		
+		Element gServ = getGroupServices();
+        //if doc == null then gServ == null
+        if(gServ!=null){
+            String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+            Element textGraph = doc.createElementNS(svgNS, "text");
+            textGraph.setAttributeNS(null, "x", Double.toString(pointOnSVGMap.getX()));
+            textGraph.setAttributeNS(null, "y", Double.toString(pointOnSVGMap.getY()));
+            textGraph.setAttributeNS(null, "font-size", "4");
+            Text nodeText = doc.createTextNode(txt);
+            textGraph.appendChild(nodeText);
 
-		Element gTekst = doc.getElementById("grupaTekst");
-		if(gTekst==null)
-		{
-		    String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
-		    Element grupaTekst = doc.createElementNS(svgNS, "g");
-		    grupaTekst.setAttributeNS(null, "id", "grupaServices");
-
-		    Element rectangle = doc.createElementNS(svgNS, "rect");
-		    rectangle.setAttributeNS(null, "x", "" + (pointOnSVGMap.getX()) );
-		    rectangle.setAttributeNS(null, "y", "" + (pointOnSVGMap.getY()) );
-		    rectangle.setAttributeNS(null, "width", ""+(strWidth+10));
-		    rectangle.setAttributeNS(null, "height", "15");
-		    rectangle.setAttributeNS(null, "style", "fill:red");
-
-		    Element textGraph = doc.createElementNS(svgNS, "text");
-		    textGraph.setAttributeNS(null, "x", Double.toString(pointOnSVGMap.getX()));
-		    textGraph.setAttributeNS(null, "y", Double.toString(pointOnSVGMap.getY()));
-		    textGraph.setAttributeNS(null, "font-size", "22");
-		    Text nodeText = doc.createTextNode(txt);
-
-		    textGraph.appendChild(nodeText);
-		    //grupaTekst.appendChild(rectangle);
-		    grupaTekst.appendChild(textGraph);
-		    svgRoot.appendChild(grupaTekst);
-
-		}else
-		{
-		    Element textGraph = (Element)gTekst.getFirstChild();
-
-		    textGraph.setAttributeNS(null, "x", Double.toString(pointOnSVGMap.getX()));
-		    textGraph.setAttributeNS(null, "y", Double.toString(pointOnSVGMap.getY()));
-		    Node oldNodeText = textGraph.getFirstChild();
-		    Text nodeText = doc.createTextNode(txt);
-		    textGraph.replaceChild(nodeText,oldNodeText);
-		}
+            gServ.appendChild(textGraph);
+        }
 	}
+    public Element getGroupServices(){
+        Element gServ = null;
+        if(doc!=null){
+            gServ = doc.getElementById(SERVICES_NAME);
+            if(gServ==null){
+                return createGroupServices();
+            }
+        }
+        return gServ;
+    }
 
-    public GVTTreeRendererListener getRenderingTreeListener(){
-        return new RenderingTreeListener();
+    private Element createGroupServices(){
+        Element servGroup = null;
+        if(doc != null){
+            Element svgRoot = doc.getRootElement();
+            String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+            servGroup = doc.createElementNS(svgNS, "g");
+            servGroup.setAttributeNS(null, "id", SERVICES_NAME);
+            svgRoot.appendChild(servGroup);
+        }
+        return servGroup;
+    }
+
+    public void removeLastServices(){
+        if(checkDisplaManager()){
+            updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
+                @Override
+                public void run(){
+                    if(doc!=null){
+                        Element gTekst = doc.getElementById(SERVICES_NAME);
+                        if(gTekst!=null){
+                            NodeList nl = gTekst.getChildNodes();
+
+                            for (int i = 0; i < nl.getLength(); i++) {
+                                Node child =nl.item(i);
+                                System.out.println("node value : "+child.getNodeValue());
+                                gTekst.removeChild(child);
+
+                            }
+                            System.err.println("Removed "+nl.getLength()+" last services");
+                        }else{
+                            System.err.println("Group "+SERVICES_NAME+" does not exist !");
+                        }
+                    }
+                }
+            });
+        }
+    }
+
+    public SVGDocumentLoaderListener getRenderingTreeListener(){
+        return new LoaderTreeListener();
     }
 
     @Override
     public void putObject(final Object object, final SVGOMPoint point) {
-        if(updateManager != null){
+        if(checkDisplaManager()){
             updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
                 @Override
                 public void run(){
@@ -97,40 +129,45 @@ public class DisplayManager extends AbstractDisplayManager{
         }
     }
 
+    public boolean checkDisplaManager(){
+        if(updateManager==null){
+            updateManager = can.getUpdateManager();
+        }
+        return updateManager!=null;
+    }
 
     public void putObject(final Vector<Element> object) {
-        if(updateManager != null){
+        if(checkDisplaManager()){
             updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
                 @Override
                 public void run(){
-
+                    for (Element element : object) {
+                        putElement(element);
+                    }
                 }
             });
         }
     }
 
-    protected class RenderingTreeListener implements GVTTreeRendererListener{
-        @Override
-        public void gvtRenderingPrepare(GVTTreeRendererEvent e) {
+    protected class LoaderTreeListener implements SVGDocumentLoaderListener{
 
-        }
         @Override
-        public void gvtRenderingStarted(GVTTreeRendererEvent e) {
+        public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
+        }
 
-        }
         @Override
-        public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
-            updateManager = can.getUpdateManager();
-            doc = can.getSVGDocument();
+        public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
+            updateManager = null;
+            doc = e.getSVGDocument();
             putObject("Test !!!", new SVGOMPoint(520, 400));
         }
-        @Override
-        public void gvtRenderingCancelled(GVTTreeRendererEvent e) {
 
+        @Override
+        public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
         }
-        @Override
-        public void gvtRenderingFailed(GVTTreeRendererEvent e) {
 
+        @Override
+        public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
         }
     }
 

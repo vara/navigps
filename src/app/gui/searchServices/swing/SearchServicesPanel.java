@@ -6,25 +6,34 @@
 package app.gui.searchServices.swing;
 
 import app.gui.MainWindowIWD;
+import app.gui.MyPopupMenu;
 import app.gui.ScrollBar.ui.LineScrollBarUI;
 import app.gui.svgComponents.displayobjects.DisplayManager;
 import app.utils.InvokeUtils;
 import app.utils.InvokeUtils.ReturnValue;
 import app.utils.NaviPoint;
-import config.DataBaseConfig;
+import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.Vector;
+import java.util.logging.Level;
+import java.util.logging.Logger;
+import javax.swing.AbstractAction;
+import javax.swing.JMenuItem;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree.DynamicUtilTreeNode;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
 import odb.core.Search;
 import odb.core.ServiceCore;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
-import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
@@ -52,6 +61,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jScrollPane1.setBorder(null);
         jScrollPane1.getViewport().setOpaque(false);
         jScrollPane1.getViewport().setBorder(null);
+        jTree1.addMouseListener(new MouseEventReloadJTree());
 
         JScrollBar scbH = jScrollPane1.getHorizontalScrollBar();
         JScrollBar scbV = jScrollPane1.getVerticalScrollBar();
@@ -68,7 +78,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         panelForJTree.add(jScrollPane1);
 
-        setServices(new Search().getCategories());
+        reloadCategory();
 
     }
 
@@ -102,6 +112,8 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         panelForJTree = new javax.swing.JPanel();
         jPanel6 = new javax.swing.JPanel();
         jLabel6 = new javax.swing.JLabel();
+        jPanel3 = new javax.swing.JPanel();
+        jRadioButton1 = new javax.swing.JRadioButton();
 
         setDoubleBuffered(false);
         setFocusable(false);
@@ -221,7 +233,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel6)
-                .addContainerGap(103, Short.MAX_VALUE))
+                .addContainerGap(94, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -233,15 +245,38 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panelForJTree, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 165, Short.MAX_VALUE)
+            .addComponent(panelForJTree, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 258, Short.MAX_VALUE)
-                .addContainerGap())
+                .addComponent(panelForJTree, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
+        );
+
+        jPanel3.setOpaque(false);
+
+        jRadioButton1.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jRadioButton1.setText("Remove Last search");
+        jRadioButton1.setContentAreaFilled(false);
+        jRadioButton1.setFocusPainted(false);
+        jRadioButton1.setOpaque(false);
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addComponent(jRadioButton1)
+                .addContainerGap(27, Short.MAX_VALUE))
+        );
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel3Layout.createSequentialGroup()
+                .addGap(20, 20, 20)
+                .addComponent(jRadioButton1)
+                .addContainerGap(25, Short.MAX_VALUE))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -250,7 +285,9 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
-                .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+                    .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -260,9 +297,12 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             .addGroup(jPanel2Layout.createSequentialGroup()
                 .addContainerGap()
                 .addGroup(jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                    .addGroup(jPanel2Layout.createSequentialGroup()
+                        .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
+                        .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(13, 13, 13))
+                .addGap(63, 63, 63))
         );
 
         add(jPanel2);
@@ -291,18 +331,29 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                     ReturnValue rv = InvokeUtils.invokeWithTime(
                             new Search(), "searchCategoryRadius", pt, obj);
                     Vector subResult = (Vector) rv.getRet();
-
                     DisplayManager dm = MainWindowIWD.getSVGCanvas().getDisplayManager();
+
+                    if(jRadioButton1.isSelected()){
+                        dm.removeLastServices();
+                    }
+                    String xlinkNS = SVGConstants.XLINK_NAMESPACE_URI;
+
                     for (int i = 0; i < subResult.size(); i++) {
                         ServiceCore sc = (ServiceCore) subResult.get(i);
-                        Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "rect");
+                        Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "image");
                         service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
                         service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
+                        service.setAttributeNS(null, "width", "32");
+                        service.setAttributeNS(null, "height", "32");
+                        service.setAttributeNS(null, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+                        String path = "";
+                        try {
+                            path = MainWindowIWD.createNavigationIconPath("/test/cpn","png").toURI().toString();
+                        } catch (URISyntaxException ex) {}
+                        service.setAttributeNS(xlinkNS, SVGConstants.XLINK_HREF_QNAME,path);
                         serviceElements.add(service);
-                        
-                        dm.putObject(sc.getServiceDescription().getServiceName(),
-                                new NaviPoint(sc.getServiceAttributes().getX(),sc.getServiceAttributes().getY()));
                     }
+                    dm.putObject(serviceElements);
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec got " + serviceElements.size() + " services");
                     //MainWindowIWD.getSVGCanvas().getDisplayManager()
 
@@ -314,6 +365,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         }
     //System.out.println(catResult);
     }//GEN-LAST:event_jButton1ActionPerformed
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFormattedTextField gCenterX;
     private javax.swing.JFormattedTextField gCenterY;
@@ -330,10 +382,12 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private javax.swing.JLabel jLabel7;
     private javax.swing.JPanel jPanel1;
     private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     private javax.swing.JPanel jPanel4;
     private javax.swing.JPanel jPanel5;
     private javax.swing.JPanel jPanel6;
     private javax.swing.JPanel jPanel7;
+    private javax.swing.JRadioButton jRadioButton1;
     private javax.swing.JSeparator jSeparator1;
     private javax.swing.JPanel panelForJTree;
     // End of variables declaration//GEN-END:variables
@@ -342,6 +396,11 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         setRadius(0);
         setCenterPoint(new NaviPoint(0, 0));
         setCurrentPos(new NaviPoint(0, 0));
+    }
+
+    public void reloadCategory(){
+        setServices(new Search().getCategories());
+        MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Category Tree reload");
     }
 
     public void setRadius(double val) {
@@ -393,6 +452,31 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         DynamicUtilTreeNode.createChildren(root, value);
         DefaultTreeModel dtm = new DefaultTreeModel(root, false);
         jTree1.setModel(dtm);
+    }
+
+    class ReloadJTree extends AbstractAction{
+
+        public ReloadJTree(String name) {
+            super(name);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            reloadCategory();
+        }
+    }
+
+    class MouseEventReloadJTree extends MouseInputAdapter{
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON3){
+                MyPopupMenu myPop = new MyPopupMenu();
+                JMenuItem mi = new JMenuItem(new ReloadJTree("Reload Services"));
+                myPop.add(mi);
+                myPop.show(e.getComponent(), e.getX(), e.getY());
+            }
+        }
+
     }
 }
  
