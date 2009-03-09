@@ -27,24 +27,6 @@ class Generator {
         odb.store(c);
         odb.commit();
         
-        ServiceAttributes servicae = new ServiceAttributes();
-        servicae.setX((float) Math.random());
-        servicae.setY((float) Math.random());
-        ServiceDescription sdx = new ServiceDescription("indexer", "indexer", "indexer", c, s, "indexer");
-        ServiceCore sca = new ServiceCore(servicae, sdx);
-        sca.getServiceAttributes().setServiceCore(sca);
-        sca.getServiceDescription().setServiceCore(sca);
-        
-        odb.store(sca);
-        odb.commit();
-
-        String[] fieldNamesss = {"name"};
-        String[] fieldNames = {"serviceNumber","serviceName","serviceStreet","additionaInfo"};
-        String[] fieldNamess = {"x", "y"};
-        odb.getClassRepresentation(ServiceDescription.class).addUniqueIndexOn("serviceD-index", fieldNames, true);
-        odb.getClassRepresentation(ServiceAttributes.class).addUniqueIndexOn("serviceA-index", fieldNamess, true);
-        odb.getClassRepresentation(Category.class).addUniqueIndexOn("CAT-index", fieldNamesss, true);
-
         Date start = new Date();
         for (int i = 0; i < 1000; i++) {
             ServiceAttributes service = new ServiceAttributes();

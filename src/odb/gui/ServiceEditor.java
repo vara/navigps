@@ -1,15 +1,18 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
-/*
- * ServiceFactory.java
- *
- * Created on 2009-02-16, 22:31:10
- */
-
 package odb.gui;
+
+import java.util.Vector;
+import javax.swing.DefaultComboBoxModel;
+import odb.core.Category;
+import odb.core.ServiceAttributes;
+import odb.core.ServiceCore;
+import odb.core.ServiceDescription;
+import odb.core.Subcategory;
+import odb.utils.Constants;
+import org.neodatis.odb.ODB;
+import org.neodatis.odb.Objects;
+import org.neodatis.odb.core.query.IQuery;
+import org.neodatis.odb.core.query.criteria.Where;
+import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
  *
@@ -17,10 +20,20 @@ package odb.gui;
  */
 public class ServiceEditor extends javax.swing.JDialog {
 
+    private ODB odb = null;
+    private ServiceCore sc;
+
     /** Creates new form ServiceFactory */
     public ServiceEditor(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();
+    }
+
+    ServiceEditor(java.awt.Frame parent, boolean modal, ServiceCore sc) {
+        super(parent, modal);
+        this.sc = sc;
+        initComponents();
+        updateFields(sc);
     }
 
     /** This method is called from within the constructor to
@@ -60,6 +73,11 @@ public class ServiceEditor extends javax.swing.JDialog {
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(null, "Description", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
 
         jComboBox1.setEnabled(false);
+        jComboBox1.addActionListener(new java.awt.event.ActionListener() {
+            public void actionPerformed(java.awt.event.ActionEvent evt) {
+                jComboBox1ActionPerformed(evt);
+            }
+        });
 
         jComboBox2.setEnabled(false);
 
@@ -173,7 +191,7 @@ public class ServiceEditor extends javax.swing.JDialog {
                 .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
-        jButton1.setFont(new java.awt.Font("Verdana", 0, 11)); // NOI18N
+        jButton1.setFont(new java.awt.Font("Verdana", 0, 11));
         jButton1.setText("Edit service ...");
         jButton1.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
@@ -220,8 +238,46 @@ public class ServiceEditor extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
-        //create ServiceCore,Description and Attributes
+
+        odb = Constants.getDbConnection();
+        Vector v = new Vector();
+        Subcategory s = null;
+        IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
+
+        Objects cat = odb.getObjects(query);
+        Category c = (Category) cat.getFirst();
+        if (!(c.getSubcategories() == null || c.getSubcategories().isEmpty())) {
+            for(Object sub : c.getSubcategories()) {
+                s = (Subcategory) sub;
+                if(s.getName().equals(jComboBox2.getSelectedItem())) {
+                    break;
+                }
+            }
+        }
+        ServiceDescription sd = sc.getServiceDescription();
+        sd.setServiceName(jTextField1.getText());
+        sd.setServiceStreet(jTextField2.getText());
+        sd.setServiceNumber(jTextField3.getText());
+        sd.setCategory(c);
+        sd.setServiceSubCategory(s);
+        sd.setAdditionaInfo(jTextArea1.getText());
+        
+        ServiceAttributes sa = sc.getServiceAttributes();
+        sa.setX(Float.parseFloat(jTextField4.getText()));
+        sa.setY(Float.parseFloat(jTextField5.getText()));
+
+        odb.store(sc);
+        odb.commit();
+        Constants.getManagerWindow().initServicesTable();
+        ServiceEditor.this.dispose();
+        /*
+         * FIXME double edit window after 1st edit
+         */
     }//GEN-LAST:event_jButton1ActionPerformed
+
+    private void jComboBox1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jComboBox1ActionPerformed
+        fillSubcategoryCombo();
+    }//GEN-LAST:event_jComboBox1ActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton1;
@@ -247,4 +303,55 @@ public class ServiceEditor extends javax.swing.JDialog {
     private javax.swing.JTextField jTextField5;
     // End of variables declaration//GEN-END:variables
 
+    private void updateFields(ServiceCore sc) {
+        jTextField1.setText(sc.getServiceDescription().getServiceName());
+        jTextField2.setText(sc.getServiceDescription().getServiceStreet());
+        jTextField3.setText(sc.getServiceDescription().getServiceNumber());
+        jTextArea1.setText(sc.getServiceDescription().getAdditionaInfo());
+        jTextField4.setText(String.valueOf(sc.getServiceAttributes().getX()));
+        jTextField5.setText(String.valueOf(sc.getServiceAttributes().getY()));
+
+        fillCategoryCombo(sc);
+        fillSubcategoryCombo();
+    }
+
+    private void fillCategoryCombo(ServiceCore sc) {
+        odb = Constants.getDbConnection();
+        Vector v = new Vector();
+        Objects categories = odb.getObjects(Category.class);
+
+        while (categories.hasNext()) {
+            Category c = (Category) categories.next();
+            v.add(c.getName());
+        }
+        jComboBox1.setModel(new DefaultComboBoxModel(v));
+        jComboBox1.setEnabled(true);
+
+        for (int i = 0; i < jComboBox1.getItemCount(); i++) {
+            if (jComboBox1.getModel().getElementAt(i).equals(sc.getServiceDescription().getCategory().getName())) {
+                jComboBox1.setSelectedItem(jComboBox1.getModel().getElementAt(i));
+                break;
+            }
+        }
+    }
+
+    private void fillSubcategoryCombo() {
+        odb = Constants.getDbConnection();
+        Vector v = new Vector();
+
+        IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
+        Objects cat = odb.getObjects(query);
+        Category c = (Category) cat.getFirst();
+        if (c.getSubcategories() == null || c.getSubcategories().isEmpty()) {
+            System.out.println("empty category");
+            jComboBox2.setModel(new DefaultComboBoxModel(v));
+        } else {
+            for (Object obj : c.getSubcategories()) {
+                Subcategory sub = (Subcategory) obj;
+                v.add(sub.getName());
+            }
+            jComboBox2.setModel(new DefaultComboBoxModel(v));
+            jComboBox2.setEnabled(true);
+        }
+    }
 }
