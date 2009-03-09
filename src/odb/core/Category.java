@@ -1,15 +1,19 @@
 package odb.core;
 
+import config.DataBaseConfig;
 import java.util.Vector;
 
 public class Category {
     
     private String name;
     private Vector subcategories;
+    private String icoPath;
+    private String defaultIconExtension = ".png";
     
     public Category(String name) {
         this.name = name;
         subcategories = null;
+        this.icoPath = DataBaseConfig.getIconPath()+name+defaultIconExtension;
     }
 
     public String getName() {
@@ -40,5 +44,19 @@ public class Category {
     public String toString() {
         String msg = getClass().getCanonicalName()+" [ Name : "+getName()+" ]";
         return msg;
+    }
+
+    /**
+     * @return the icoPath
+     */
+    public String getIcoPath() {
+        return icoPath;
+    }
+
+    /**
+     * @param icoPath the icoPath to set
+     */
+    public void setIcoPath(String icoPath) {
+        this.icoPath = icoPath;
     }
 }
