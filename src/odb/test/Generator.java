@@ -1,10 +1,7 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package odb.test;
 
 import java.util.Date;
+import java.util.Vector;
 import odb.core.Category;
 import odb.core.ServiceAttributes;
 import odb.core.ServiceCore;
@@ -25,6 +22,11 @@ class Generator {
 
     public Generator() {
 
+        c.setSubcategories(new Vector());
+        c.addSubcategory(s);
+        odb.store(c);
+        odb.commit();
+        
         ServiceAttributes servicae = new ServiceAttributes();
         servicae.setX((float) Math.random());
         servicae.setY((float) Math.random());
@@ -32,8 +34,7 @@ class Generator {
         ServiceCore sca = new ServiceCore(servicae, sdx);
         sca.getServiceAttributes().setServiceCore(sca);
         sca.getServiceDescription().setServiceCore(sca);
-        odb.store(c);
-        odb.store(s);
+        
         odb.store(sca);
         odb.commit();
 

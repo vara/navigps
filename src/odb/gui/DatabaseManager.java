@@ -148,7 +148,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 251, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
         );
 
         jButton3.setFont(new java.awt.Font("Verdana", 0, 11));
@@ -180,12 +180,12 @@ public class DatabaseManager extends javax.swing.JDialog {
         jPanel1.setLayout(jPanel1Layout);
         jPanel1Layout.setHorizontalGroup(
             jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGroup(jPanel1Layout.createSequentialGroup()
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
-                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-                    .addComponent(jPanel2, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jPanel5, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton3, javax.swing.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE))
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
+                    .addComponent(jButton3, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 549, Short.MAX_VALUE)
+                    .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(jPanel5, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
                 .addContainerGap())
         );
         jPanel1Layout.setVerticalGroup(
@@ -193,8 +193,8 @@ public class DatabaseManager extends javax.swing.JDialog {
             .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel1Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jPanel2, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton3)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(jButton3, javax.swing.GroupLayout.PREFERRED_SIZE, 30, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
                 .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
@@ -231,7 +231,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 473, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Categories", jPanel3);
@@ -244,7 +244,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         );
         layout.setVerticalGroup(
             layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 524, Short.MAX_VALUE)
+            .addComponent(jTabbedPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 539, Short.MAX_VALUE)
         );
 
         pack();
@@ -564,6 +564,7 @@ public class DatabaseManager extends javax.swing.JDialog {
     public void fillServicesTable() {
         odb = Constants.getDbConnection();
         Vector v = null;
+        Vector vc = new Vector();
 
         jTable1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
         if (odb != null) {
@@ -578,7 +579,11 @@ public class DatabaseManager extends javax.swing.JDialog {
                     ServiceCore sc = (ServiceCore) services.next();
                     v.add(sc.getServiceDescription().getServiceName());
                     v.add(sc.getServiceDescription().getCategory().getName());
-                    v.add(sc.getServiceDescription().getServiceSubCategory().getName());
+                    if (sc.getServiceDescription().getServiceSubCategory() == null) {
+                        v.add("empty");
+                    } else {
+                        v.add(sc.getServiceDescription().getServiceSubCategory().getName());
+                    }
                     v.add(sc.getServiceAttributes().getX());
                     v.add(sc.getServiceAttributes().getY());
                     model.addRow(v);
@@ -587,19 +592,21 @@ public class DatabaseManager extends javax.swing.JDialog {
                 jTable1.getModel().addTableModelListener(new ServicesTableListener());
             } else {
                 jTable1.setModel(model);
-                jTable1.getModel().addTableModelListener(new ServicesTableListener());
             }
-            v.removeAllElements();
+
             TableColumn categoryColumn = jTable1.getColumnModel().getColumn(1);
             JComboBox tableCategoryCombo = new JComboBox();
             Objects categories = odb.getObjects(Category.class);
-            while (categories.hasNext()) {
-                Category c = (Category) categories.next();
-                v.add(c.getName());
+            if (!categories.isEmpty()) {
+                while (categories.hasNext()) {
+                    Category c = (Category) categories.next();
+                    vc.add(c.getName());
+                    tableCategoryCombo.setModel(new DefaultComboBoxModel(vc));
+                    categoryColumn.setCellEditor(new DefaultCellEditor(tableCategoryCombo));
+                }
+            } else {
+                System.out.println("no categories present");
             }
-            tableCategoryCombo.setModel(new DefaultComboBoxModel(v));
-            categoryColumn.setCellEditor(new DefaultCellEditor(tableCategoryCombo));
-
         } else {
             System.out.println("DB not initialized");
         }
