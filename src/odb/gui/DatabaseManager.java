@@ -563,7 +563,7 @@ public class DatabaseManager extends javax.swing.JDialog {
 
     public void fillServicesTable() {
         odb = Constants.getDbConnection();
-        Vector v = new Vector();
+        Vector v = null;
         Vector vc = new Vector();
 
         jTable1.setSelectionMode(ListSelectionModel.MULTIPLE_INTERVAL_SELECTION);
@@ -574,12 +574,16 @@ public class DatabaseManager extends javax.swing.JDialog {
             DefaultTableModel model = new DefaultTableModel();
             model.setColumnIdentifiers(columns);
             if (!services.isEmpty()) {
-                v.removeAllElements();
                 while (services.hasNext()) {
+                    v = new Vector();
                     ServiceCore sc = (ServiceCore) services.next();
                     v.add(sc.getServiceDescription().getServiceName());
                     v.add(sc.getServiceDescription().getCategory().getName());
-                    v.add(sc.getServiceDescription().getServiceSubCategory().getName());
+                    if (sc.getServiceDescription().getServiceSubCategory() == null) {
+                        v.add("empty");
+                    } else {
+                        v.add(sc.getServiceDescription().getServiceSubCategory().getName());
+                    }
                     v.add(sc.getServiceAttributes().getX());
                     v.add(sc.getServiceAttributes().getY());
                     model.addRow(v);
@@ -589,7 +593,7 @@ public class DatabaseManager extends javax.swing.JDialog {
             } else {
                 jTable1.setModel(model);
             }
-            
+
             TableColumn categoryColumn = jTable1.getColumnModel().getColumn(1);
             JComboBox tableCategoryCombo = new JComboBox();
             Objects categories = odb.getObjects(Category.class);

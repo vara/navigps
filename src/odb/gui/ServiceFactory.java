@@ -49,12 +49,17 @@ public class ServiceFactory extends javax.swing.JDialog {
         IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
         Objects cat = odb.getObjects(query);
         Category c = (Category) cat.getFirst();
-        for (Object obj : c.getSubcategories()) {
-            Subcategory sub = (Subcategory) obj;
-            v.add(sub.getName());
+        if (c.getSubcategories() == null || c.getSubcategories().isEmpty()) {
+            System.out.println("empty category");
+            jComboBox2.setModel(new DefaultComboBoxModel(v));
+        } else {
+            for (Object obj : c.getSubcategories()) {
+                Subcategory sub = (Subcategory) obj;
+                v.add(sub.getName());
+            }
+            jComboBox2.setModel(new DefaultComboBoxModel(v));
+            jComboBox2.setEnabled(true);
         }
-        jComboBox2.setModel(new DefaultComboBoxModel(v));
-        jComboBox2.setEnabled(true);
     }
 
     /** This method is called from within the constructor to
@@ -277,13 +282,17 @@ public class ServiceFactory extends javax.swing.JDialog {
                 IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
                 Objects cat = odb.getObjects(query1);
                 Category c = (Category) cat.getFirst();
-                for (Object obj : c.getSubcategories()) {
-                    s = (Subcategory) obj;
-                    if (s.getName().equalsIgnoreCase(jComboBox2.getSelectedItem().toString())) {
-                        break;
+                if (c.getSubcategories() == null || c.getSubcategories().isEmpty()) {
+                    System.out.println("creating service with empty subcategory");
+                } else {
+                    for (Object obj : c.getSubcategories()) {
+                        s = (Subcategory) obj;
+                        if (s.getName().equalsIgnoreCase(jComboBox2.getSelectedItem().toString())) {
+                            break;
+                        }
                     }
                 }
-                
+
                 ServiceAttributes service = new ServiceAttributes();
                 service.setX(Float.parseFloat(jTextField4.getText()));
                 service.setY(Float.parseFloat(jTextField5.getText()));
