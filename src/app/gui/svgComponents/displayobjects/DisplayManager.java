@@ -6,8 +6,7 @@
 package app.gui.svgComponents.displayobjects;
 
 import app.gui.svgComponents.Canvas;
-import app.utils.OutputVerboseStream;
-import app.utils.Utils;
+import java.util.Vector;
 import org.apache.batik.bridge.UpdateManager;
 import org.apache.batik.bridge.UpdateManagerEvent;
 import org.apache.batik.bridge.UpdateManagerListener;
@@ -29,6 +28,7 @@ public class DisplayManager extends AbstractDisplayManager{
     private SVGDocument doc;
     private UpdateManager updateManager;
     private Canvas can;
+
     public DisplayManager(Canvas c) {        
         can = c;
     }
@@ -37,7 +37,7 @@ public class DisplayManager extends AbstractDisplayManager{
 
 		Element svgRoot = doc.getRootElement();
 		//SVGOMPoint pointOnSVGMap = Utils.getLocalPointFromDomElement(svgRoot, (int)p.getX(), (int)p.getY());
-        System.out.println("X "+pointOnSVGMap.getX()+" Y "+pointOnSVGMap.getY());
+        //System.out.println("X "+pointOnSVGMap.getX()+" Y "+pointOnSVGMap.getY());
 		//FontMetrics fm = doc.getFontMetrics(doc.getFont());
 		int strWidth = 40 ;//fm.stringWidth(txt);
 
@@ -49,8 +49,8 @@ public class DisplayManager extends AbstractDisplayManager{
 		    grupaTekst.setAttributeNS(null, "id", "grupaServices");
 
 		    Element rectangle = doc.createElementNS(svgNS, "rect");
-		    rectangle.setAttributeNS(null, "x", "" + (pointOnSVGMap.getX()-5) );
-		    rectangle.setAttributeNS(null, "y", "" + (pointOnSVGMap.getY()-5) );
+		    rectangle.setAttributeNS(null, "x", "" + (pointOnSVGMap.getX()) );
+		    rectangle.setAttributeNS(null, "y", "" + (pointOnSVGMap.getY()) );
 		    rectangle.setAttributeNS(null, "width", ""+(strWidth+10));
 		    rectangle.setAttributeNS(null, "height", "15");
 		    rectangle.setAttributeNS(null, "style", "fill:red");
@@ -83,11 +83,29 @@ public class DisplayManager extends AbstractDisplayManager{
     }
 
     @Override
-    public void putObject(Object object, SVGOMPoint point) {
+    public void putObject(final Object object, final SVGOMPoint point) {
         if(updateManager != null){
-            if(object instanceof String){
-                putText((String)object, point);
-            }
+            updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
+                @Override
+                public void run(){
+
+                    if(object instanceof String){
+                        putText((String)object, point);
+                    }
+                }
+            });
+        }
+    }
+
+
+    public void putObject(final Vector<Element> object) {
+        if(updateManager != null){
+            updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
+                @Override
+                public void run(){
+
+                }
+            });
         }
     }
 

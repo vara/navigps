@@ -7,6 +7,7 @@ package app.gui.searchServices.swing;
 
 import app.gui.MainWindowIWD;
 import app.gui.ScrollBar.ui.LineScrollBarUI;
+import app.gui.svgComponents.displayobjects.DisplayManager;
 import app.utils.InvokeUtils;
 import app.utils.InvokeUtils.ReturnValue;
 import app.utils.NaviPoint;
@@ -291,19 +292,19 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                                     new Search(),"searchCategoryRadius",pt,obj);
                     Vector subResult = (Vector)rv.getRet();
 
-                    //for test
-                    System.out.println(" Attributes : "+((ServiceCore) subResult.get(0)).getServiceAttributes()+
-                                " Description : "+((ServiceCore) subResult.get(0)).getServiceDescription());
-
+                    DisplayManager dm = MainWindowIWD.getSVGCanvas().getDisplayManager();
                     for (int i = 0; i < subResult.size(); i++) {
                         ServiceCore sc = (ServiceCore) subResult.get(i);
                         Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "rect");
                         service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
-                        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));                        
+                        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
                         serviceElements.add(service);
+                        
+                        dm.putObject(sc.getServiceDescription().getServiceName(),
+                                new NaviPoint(sc.getServiceAttributes().getX(),sc.getServiceAttributes().getY()));
                     }
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + " got " + serviceElements.size() + " services");
-                    
+                    //MainWindowIWD.getSVGCanvas().getDisplayManager()
                 }
             }).start();
 
