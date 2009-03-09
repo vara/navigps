@@ -94,7 +94,7 @@ public class Canvas extends JSVGCanvas{
         //add(search,BorderLayout.CENTER);
         
         dm = new DisplayManager(this);
-        addGVTTreeRendererListener(dm.getRenderingTreeListener());
+        addSVGDocumentLoaderListener(dm.getRenderingTreeListener());
 
         //setEnableZoomInteractor(false);
         //setEnableImageZoomInteractor(false);

@@ -12,6 +12,8 @@ import app.gui.svgComponents.DOMDocumentTreeController;
 import app.utils.Utils;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.util.Enumeration;
 import javax.swing.ImageIcon;
 import javax.swing.JScrollBar;
@@ -54,7 +56,6 @@ public class PanelWithBatikJTree extends JScrollPane{
 
 
     public final DOMTreeSelectionListener treeSelectionListener = new DOMTreeSelectionListener();
-
     private final GVTTreeListener listener = new GVTTreeListener();
 
     //test
@@ -64,6 +65,10 @@ public class PanelWithBatikJTree extends JScrollPane{
 
         attributePanel = dp;
         init();
+    }
+
+    public void reloadTree(){
+        getGVTTreeListener().reload();
     }
 
     private void init(){
@@ -95,6 +100,13 @@ public class PanelWithBatikJTree extends JScrollPane{
 
         scbH.removeAll();
         scbV.removeAll();
+
+        attributePanel.addActionToButton(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                reloadTree();
+            }
+        });
     }
 
     public void createModelTree(SVGDocument doc){
@@ -125,10 +137,10 @@ public class PanelWithBatikJTree extends JScrollPane{
             implements SVGDocumentLoaderListener{
         
         private SVGDocument doc;
+
         @Override
         public void gvtBuildCompleted(GVTTreeBuilderEvent e) {
-            if(doc != null)
-                createModelTree(doc);
+            reload();
         }
         @Override
         public void gvtBuildStarted(GVTTreeBuilderEvent e) {
@@ -148,6 +160,12 @@ public class PanelWithBatikJTree extends JScrollPane{
         public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {}
         @Override
         public void documentLoadingFailed(SVGDocumentLoaderEvent e) {}
+
+        public void reload(){
+            if(doc!=null){
+                createModelTree(doc);
+            }
+        }
     }
 
     /**
