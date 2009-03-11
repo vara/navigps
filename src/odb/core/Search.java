@@ -41,12 +41,9 @@ public class Search implements ODBridge {
     public Vector<String> getSubcategories(String category) {
         odb = Constants.getDbConnection();
         Vector<String> v = new Vector<String>();
-        //null pointer exception if data base not connected FIXED !
         if (odb != null) {
             IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", category));
             Objects categories = odb.getObjects(query1);
-//Exception in thread "AWT-EventQueue-0" java.lang.IndexOutOfBoundsException:
-//Index: 0, Size: 0 ( categories.getFirst() )FIXED !!!
             if (categories.hasNext()) {
                 Category c = (Category) categories.getFirst();
                 for (Object obj : c.getSubcategories()) {

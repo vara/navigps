@@ -13,11 +13,6 @@ public class ServiceCore {
         this.serviceDescription = serviceDescription;
     }
 
-//    public ServiceCore(ServiceAttributes serviceAttributes, ServiceDescription serviceDescription) {
-//        this.serviceAttributes = serviceAttributes;
-//        this.serviceDescription = serviceDescription;
-//    }
-
     /**
      * @return the serviceDescription
      */

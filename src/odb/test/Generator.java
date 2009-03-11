@@ -28,7 +28,7 @@ class Generator {
         odb.commit();
         
         Date start = new Date();
-        for (int i = 0; i < 1000; i++) {
+        for (int i = 0; i < 30000; i++) {
             ServiceAttributes service = new ServiceAttributes();
             service.setX(i);
             service.setY(i);

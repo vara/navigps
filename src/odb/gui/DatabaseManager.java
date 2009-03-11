@@ -13,6 +13,8 @@ import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
+import javax.swing.event.ListSelectionEvent;
+import javax.swing.event.ListSelectionListener;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -20,6 +22,7 @@ import javax.swing.tree.DefaultTreeModel;
 import odb.core.Category;
 import odb.core.ServiceAttributes;
 import odb.core.ServiceCore;
+import odb.core.ServiceDescription;
 import odb.core.Subcategory;
 import odb.utils.Constants;
 import org.neodatis.odb.ODB;
@@ -524,6 +527,27 @@ public class DatabaseManager extends javax.swing.JDialog {
 
         jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jTable1.setToolTipText("Double click to edit!");
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            public void valueChanged(ListSelectionEvent e) {
+                jTextArea1.setText("");
+                if(odb != null) {
+                    IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and()
+                                .add(Where.equal("x", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 3)))
+                                .add(Where.equal("y", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 4))));
+                        Objects cats = odb.getObjects(query);
+                        if(!cats.isEmpty()) {
+                                ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
+                                ServiceDescription sd = sa.getServiceCore().getServiceDescription();
+                                jTextArea1.setText("Attributes:\nService at x: "+sa.getX()+" y: "+sa.getY()+"\nDescription:\nName: "+sd.getServiceName()+"\nStreet: "+sd.getServiceStreet()+"\nNumber: "+sd.getServiceNumber()+"\nCategory: "+sd.getCategory().getName()+"\nSubcategory: "+sd.getServiceSubCategory().getName()+"\nAdditional: "+sd.getAdditionaInfo());
+                        } else {
+                            System.out.println("empty selection");
+                        }
+                } else {
+                    System.out.println("db not initialized!");
+                }
+            }
+        });
 
         if (odb != null) {
             Objects services = odb.getObjects(ServiceCore.class);
@@ -581,6 +605,5 @@ public class DatabaseManager extends javax.swing.JDialog {
         } else {
             System.out.println("DB not initialized");
         }
-
     }
 }
