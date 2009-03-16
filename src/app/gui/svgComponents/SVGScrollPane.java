@@ -70,25 +70,63 @@ import org.w3c.dom.events.EventListener;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGSVGElement;
 
+/**
+ *
+ * @author wara
+ */
 public class SVGScrollPane extends JPanel{
     
+    /**
+     *
+     */
     protected JSVGCanvas canvas;
 
+    /**
+     *
+     */
     protected JPanel horizontalPanel;
+    /**
+     *
+     */
     protected JScrollBar vertical;
+    /**
+     *
+     */
     protected JScrollBar horizontal;
+    /**
+     *
+     */
     protected Component cornerBox;
+    /**
+     *
+     */
     protected boolean scrollbarsAlwaysVisible = false;
 
+    /**
+     *
+     */
     protected SBListener hsbListener;
+    /**
+     *
+     */
     protected SBListener vsbListener;
 
+    /**
+     *
+     */
     protected Rectangle2D viewBox = null; // SVG Root element viewbox
+    /**
+     *
+     */
     protected boolean ignoreScrollChange = false;
 
+    /**
+     *
+     */
     public SVGScrollPane(){}
     /**
      * Creates a JSVGScrollPane, which will scroll an JSVGCanvas.
+     * @param canvas
      */
     public SVGScrollPane(Canvas canvas) {
         super();
@@ -138,10 +176,18 @@ public class SVGScrollPane extends JPanel{
         canvas.addUpdateManagerListener  (xlistener);        
     }// JSVGScrollPane()
 
+    /**
+     *
+     * @return
+     */
     public boolean getScrollbarsAlwaysVisible() {
         return scrollbarsAlwaysVisible;
     }
 
+    /**
+     *
+     * @param vis
+     */
     public void setScrollbarsAlwaysVisible(boolean vis) {
         scrollbarsAlwaysVisible = vis;
         resizeScrollBars();
@@ -150,6 +196,8 @@ public class SVGScrollPane extends JPanel{
     /**
      * Scrollbar listener factory method so subclasses can
      * override the default SBListener behaviour.
+     * @param isVertical
+     * @return
      */
     protected SBListener createScrollBarListener(boolean isVertical) {
         return new SBListener(isVertical);
@@ -157,6 +205,7 @@ public class SVGScrollPane extends JPanel{
 
     /**
      * Factory method so subclasses can override the default listener behaviour
+     * @return
      */
     protected ScrollListener createScrollListener() {
         return new ScrollListener();
@@ -165,11 +214,16 @@ public class SVGScrollPane extends JPanel{
 
     /**
      * Factory method so subclasses can override the default load listener.
+     * @return
      */
     protected SVGDocumentLoaderListener createLoadListener() {
         return new SVGScrollDocumentLoaderListener();
     }
 
+    /**
+     *
+     * @return
+     */
     public JSVGCanvas getCanvas() {
         return canvas;
     }
@@ -297,11 +351,24 @@ public class SVGScrollPane extends JPanel{
     protected class SBListener implements ChangeListener
     {
         // 'true' if we are in a drag (versus a click)
+        /**
+         *
+         */
         protected boolean inDrag = false;
+        /**
+         *
+         */
         protected int startValue;
 
+        /**
+         *
+         */
         protected boolean isVertical;
 
+        /**
+         *
+         * @param vertical
+         */
         public SBListener(boolean vertical)
         {
             isVertical = vertical;
@@ -355,6 +422,9 @@ public class SVGScrollPane extends JPanel{
         implements JGVTComponentListener, GVTTreeBuilderListener,
                    GVTTreeRendererListener, UpdateManagerListener
     {
+        /**
+         *
+         */
         protected boolean isReady = false;
 
         public void componentTransformChanged(ComponentEvent evt)
@@ -372,20 +442,32 @@ public class SVGScrollPane extends JPanel{
         }// componentResized()
 
 
-	@Override
+    /**
+     *
+     * @param e
+     */
+    @Override
         public void gvtBuildStarted  (GVTTreeBuilderEvent e) {
             isReady = false;
             // Start by assuming we won't need them.
             updateScrollbarState(false, false);
         }
-	@Override
+    /**
+     *
+     * @param e
+     */
+    @Override
         public void gvtBuildCompleted(GVTTreeBuilderEvent e)
         {
             isReady = true;
             viewBox = null;   // new document forget old viewBox if any.
         }// gvtRenderingCompleted()
 
-	@Override
+    /**
+     *
+     * @param e
+     */
+    @Override
         public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
             if (viewBox == null) {
                 resizeScrollBars();
@@ -402,7 +484,11 @@ public class SVGScrollPane extends JPanel{
             }
         }
 
-        @Override
+    /**
+     *
+     * @param e
+     */
+    @Override
         public void updateCompleted(UpdateManagerEvent e) {
             if (viewBox == null) {
                 resizeScrollBars();
@@ -420,19 +506,67 @@ public class SVGScrollPane extends JPanel{
         }
 
 
+        /**
+         *
+         * @param e
+         */
         public void gvtBuildCancelled(GVTTreeBuilderEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void gvtBuildFailed   (GVTTreeBuilderEvent e) { }
 
+        /**
+         *
+         * @param e
+         */
         public void gvtRenderingPrepare  (GVTTreeRendererEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void gvtRenderingStarted  (GVTTreeRendererEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void gvtRenderingCancelled(GVTTreeRendererEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void gvtRenderingFailed   (GVTTreeRendererEvent e) { }
 
+        /**
+         *
+         * @param e
+         */
         public void managerStarted  (UpdateManagerEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void managerSuspended(UpdateManagerEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void managerResumed  (UpdateManagerEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void managerStopped  (UpdateManagerEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void updateStarted   (UpdateManagerEvent e) { }
+        /**
+         *
+         * @param e
+         */
         public void updateFailed    (UpdateManagerEvent e) { }
 
     }// inner class ScrollListener
@@ -498,6 +632,14 @@ public class SVGScrollPane extends JPanel{
         //System.out.println("  -- end resizeScrollBars()");
     }// resizeScrollBars()
 
+    /**
+     *
+     * @param tx
+     * @param ty
+     * @param maxW
+     * @param maxH
+     * @return
+     */
     protected Dimension updateScrollbarVisibility(int tx, int ty,
                                                   int maxW, int maxH) {
         // display scrollbars, if appropriate
@@ -559,6 +701,11 @@ public class SVGScrollPane extends JPanel{
         return ret;
     }
 
+    /**
+     *
+     * @param hNeeded
+     * @param vNeeded
+     */
     protected void updateScrollbarState(boolean hNeeded, boolean vNeeded) {
         horizontal.setEnabled(hNeeded);
         vertical  .setEnabled(vNeeded);
@@ -587,6 +734,10 @@ public class SVGScrollPane extends JPanel{
     }// checkAndSetViewBoxRect()
 
 
+    /**
+     *
+     * @return
+     */
     protected Rectangle2D getViewBoxRect() {
         SVGDocument doc = canvas.getSVGDocument();
         if (doc == null) return null;
@@ -614,6 +765,7 @@ public class SVGScrollPane extends JPanel{
      * (1.0 == original size). By default, this method does
      * nothing, but may be overidden to display a scale
      * (zoom) factor in a status bar, for example.
+     * @param scale 
      */
     public void scaleChange(float scale) {
        System.err.println("Scale changed "+scale);

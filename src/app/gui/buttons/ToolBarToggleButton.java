@@ -41,6 +41,11 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
 
     private float roundCorner = 12.0f;
 
+    /**
+     *
+     * @param a
+     * @param i
+     */
     public ToolBarToggleButton(Action a,ImageIcon i){
         super(a);
         setIcon(i);
@@ -138,10 +143,18 @@ public class ToolBarToggleButton extends JToggleButton implements MouseListener,
         setMouseOnButton(false);
     }
 
+    /**
+     *
+     * @return
+     */
     protected boolean isMouseOnButton() {
         return mouseOnButton;
     }
 
+    /**
+     *
+     * @param mouseOnButton
+     */
     protected void setMouseOnButton(boolean mouseOnButton) {
         this.mouseOnButton = mouseOnButton;
     }

@@ -10,10 +10,20 @@ import javax.swing.JPanel;
 import javax.swing.JTree;
 import javax.swing.tree.DefaultTreeCellRenderer;
 
+/**
+ *
+ * @author wara
+ */
 public class JCheckBoxTreeRenderer extends DefaultTreeCellRenderer {
     private JPanel panel = new JPanel();
+    /**
+     *
+     */
     public JCheckBox checkBox  = new JCheckBox();
 
+    /**
+     *
+     */
     public JCheckBoxTreeRenderer() {
         super();
         panel.setLayout(new BorderLayout(3, 0));

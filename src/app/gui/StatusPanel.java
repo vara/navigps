@@ -23,8 +23,17 @@ import javax.swing.border.Border;
  */
 public class StatusPanel extends AlphaJPanel {
 
+    /**
+     *
+     */
     public static final String LEFT_PANEL = "left.panel";
+    /**
+     *
+     */
     public static final String CENTER_PANEL = "center.panel";
+    /**
+     *
+     */
     public static final String RIGHT_PANEL = "right.panel";
 
     /**
@@ -59,6 +68,9 @@ public class StatusPanel extends AlphaJPanel {
     private static Color lowColor = new Color(174,201,255);
     private static Color highColor = new Color(255, 255, 255);
 
+    /**
+     *
+     */
     public StatusPanel(){
         initComponents();
         setLayout(new GridLayout(1,panels.length,1,1));
@@ -66,6 +78,10 @@ public class StatusPanel extends AlphaJPanel {
         setBackground(Color.WHITE);
     }
    
+    /**
+     *
+     * @return
+     */
     public static Border getDefaultBorder(){
         return Utils.createOutsiderBorder(1,1,1,1,new Color(174,201,255));
     }
@@ -82,6 +98,10 @@ public class StatusPanel extends AlphaJPanel {
         }        	
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Dimension getPreferredSize() {
         Dimension dim =  super.getPreferredSize();
@@ -103,6 +123,11 @@ public class StatusPanel extends AlphaJPanel {
         return null;
     }
 
+    /**
+     *
+     * @param comp
+     * @param position
+     */
     public void addToPanelFromPosition(Component comp,String position){
         AlphaJPanel ap = getPanel(position);
         if(ap!=null){                    
@@ -110,6 +135,10 @@ public class StatusPanel extends AlphaJPanel {
         }
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     public void paintComponent(Graphics g){
         final Graphics2D g2 = (Graphics2D) g;

@@ -33,7 +33,11 @@ public class ArgumentsStartUp {
                     "\n\t-fs  \t(Display root window in full screen mode)"+
 				    "\n\t-h  \t(Show this text)";
     
-    public ArgumentsStartUp(String [] arg){	
+    /**
+     *
+     * @param arg
+     */
+    public ArgumentsStartUp(String [] arg){
         if(arg.length>0){
             try {
                 checkParameters(arg);                
@@ -121,6 +125,11 @@ public class ArgumentsStartUp {
         }//while        
     }
     
+    /**
+     *
+     * @param p
+     * @throws java.lang.Exception
+     */
     public void orderCommands(Parameter p) throws Exception{
 	
         switch(p.getCharParam()){
@@ -189,18 +198,34 @@ public class ArgumentsStartUp {
         }
     }
     
+    /**
+     *
+     * @return
+     */
     public String getHelpInformation(){
         return infoParameters;
     }
     
+    /**
+     *
+     * @return
+     */
     public boolean isArguments(){
         return isArguments;
     }
     
+    /**
+     *
+     * @param val
+     */
     public void setExitProgram(boolean val){
         exitProgram = val;
     }
     
+    /**
+     *
+     * @return
+     */
     public boolean exitProgram(){
         return exitProgram;
     }
@@ -209,14 +234,24 @@ public class ArgumentsStartUp {
         isArguments = true;
     }
 
+    /**
+     *
+     * @param text
+     */
     protected void helpInformation(String text){
         System.out.println(""+text);        
     }
 
+    /**
+     *
+     */
     public class ValidateParameter {
 
         private HashMap <String,Integer> map = new HashMap<String,Integer>();
 
+        /**
+         *
+         */
         public ValidateParameter(){
 
             map.put("Vg",0);
@@ -229,6 +264,11 @@ public class ArgumentsStartUp {
             map.put("v",0);
             map.put("fs",0);
         }
+        /**
+         *
+         * @param val
+         * @return
+         */
         public Integer getInformationOnParameter(String val){
             return map.get(val);
         }

@@ -26,12 +26,19 @@ public class BumpArea extends AlphaJPanel{
                                       BasicStroke.CAP_BUTT,
                                       BasicStroke.JOIN_BEVEL,
                                       1.0f, dash1, 0.0f);
+    /**
+     *
+     */
     public BumpArea(){
         setOpaque(false);
         setAlpha(0.6f);
         //setBorder(new EmptyBorder(4,4,4,4));
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);

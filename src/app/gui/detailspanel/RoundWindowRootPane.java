@@ -21,6 +21,9 @@ public class RoundWindowRootPane extends RoundJPanel{
     private ContentPaneForRoundWindow contentPane;
     private JLayeredPane layeredPane;
 
+    /**
+     *
+     */
     public RoundWindowRootPane(){
         getRoundBorder().setBorderInsets(new Insets(0,0,0,0));
         setGlassPane(createGlassPane());
@@ -35,6 +38,10 @@ public class RoundWindowRootPane extends RoundJPanel{
      *
      */
 
+    /**
+     *
+     * @return
+     */
     protected ContentPaneForRoundWindow createContentPane(){
         ContentPaneForRoundWindow cp = new ContentPaneForRoundWindow(){
 
@@ -47,6 +54,10 @@ public class RoundWindowRootPane extends RoundJPanel{
         return cp;
     }
 
+    /**
+     *
+     * @return
+     */
     protected RoundJPanel createGlassPane() {
         RoundJPanel gp = new RoundJPanel();
         gp.setName(this.getName()+".glassPane");
@@ -55,22 +66,36 @@ public class RoundWindowRootPane extends RoundJPanel{
         return gp;
     }
 
+    /**
+     *
+     * @return
+     */
     protected JLayeredPane createLayeredPane() {
         JLayeredPane p = new JLayeredPane();
         p.setName(this.getName()+".layeredPane");
         return p;
     }
 
+    /**
+     *
+     * @return
+     */
     protected LayoutManager createRootLayout() {
         return new RootLayout();
     }
     
-    /*************************************************/
+    /************************************************
+     * @return
+     */
 
     public JLayeredPane getLayeredPane(){
         return layeredPane;
     }
 
+    /**
+     *
+     * @param layered
+     */
     public void setLayeredPane(JLayeredPane layered) {
         if(layered == null)
             throw new IllegalComponentStateException("layeredPane cannot be set to null.");
@@ -89,7 +114,7 @@ public class RoundWindowRootPane extends RoundJPanel{
     }
 
     /**
-     * @param glassPane the glassPane to set
+     * @param glass
      */
     public void setGlassPane(RoundJPanel glass) {
         if (glass == null) {
@@ -117,7 +142,7 @@ public class RoundWindowRootPane extends RoundJPanel{
     }
 
     /**
-     * @param contentPane the contentPane to set
+     * @param content
      */
     public void setContentPane(ContentPaneForRoundWindow content) {
         if(content == null)
@@ -138,6 +163,12 @@ public class RoundWindowRootPane extends RoundJPanel{
     }
      */
 
+    /**
+     *
+     * @param comp
+     * @param constraints
+     * @param index
+     */
     @Override
     protected void addImpl(Component comp, Object constraints, int index) {
         super.addImpl(comp, constraints, index);
@@ -149,6 +180,9 @@ public class RoundWindowRootPane extends RoundJPanel{
         }
     }
 
+    /**
+     *
+     */
     protected class RootLayout implements LayoutManager2, Serializable
     {
         /**

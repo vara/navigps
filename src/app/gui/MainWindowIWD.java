@@ -131,6 +131,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
     private static int ICON_SIZE = 8;
 
     //private MySplitPane paneForProperties = new MySplitPane();    
+    /**
+     *
+     * @param c
+     */
     public MainWindowIWD(Main c) {
         super(GUIConfiguration.getGraphicDevice().getDefaultConfiguration());
 
@@ -158,10 +162,15 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         if(img!=null){
             setIconImage(img.getImage());
         }
-        setDisplayMode();
+        setDisplayMode();        
         
     }
 
+    /**
+     *
+     * @param c
+     * @param arg
+     */
     public MainWindowIWD(Main c, ArgumentsStartUp arg) {
         this(c);
     //openSVGDocument(filePath);
@@ -331,10 +340,21 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         prop.setDockEnabled(!freeze);
     }
 
+    /**
+     *
+     * @param imageName
+     * @return
+     */
     public static ImageIcon createNavigationIcon(String imageName) {
         return createNavigationIcon(imageName, "png");
     }
 
+    /**
+     *
+     * @param imageName
+     * @param ext
+     * @return
+     */
     public static ImageIcon createNavigationIcon(String imageName, String ext) {
         String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
         URL imageURL = MainWindowIWD.class.getResource(imgLocation);
@@ -348,6 +368,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         }
     }
 
+    /**
+     *
+     * @param imageName
+     * @param ext
+     * @return
+     */
     public static URL createNavigationIconPath(String imageName, String ext) {
         String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
         URL imageURL = MainWindowIWD.class.getResource(imgLocation);
@@ -358,6 +384,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         return imageURL;
     }
 
+    /**
+     *
+     */
     public void createStatusPanel() {
 
         statusPanel = new StatusPanel();
@@ -378,6 +407,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         getContentPane().add(getStatusPanel(), BorderLayout.PAGE_END);
     }
 
+    /**
+     *
+     */
     public void creatToolBars() {
 
         panelWithToolBars = new JPanel(new FlowLayout(0, 0, 0)) {
@@ -437,6 +469,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
     }
 
+    /**
+     *
+     */
     public void creatMenuBar() {
 
         JMenuBar jmb = new JMenuBar();
@@ -567,6 +602,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         }
     }
 
+    /**
+     *
+     * @param path
+     */
     public void openSVGDocument(String path) {
 
         File file = new File(path);
@@ -579,6 +618,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
 
     }
 
+    /**
+     *
+     * @param file
+     */
     public void openSVGDocument(File file) {
         if (getSVGCanvas().getSVGDocument() != null) {
             svgListeners.documentClosed();            
@@ -590,6 +633,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         return statusPanel;
     }
 
+    /**
+     *
+     */
     public void exitApp() {
         //do something before exit app !!!
 
@@ -604,6 +650,10 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         dispose();
     }
 
+    /**
+     *
+     * @param b
+     */
     public void setComponetsEnableWhenDocumentLoaded(boolean b) {
         zoomAction.setEnabled(b);
         zoomInAction.setEnabled(b);
@@ -860,15 +910,27 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         }
     }
 
+    /**
+     *
+     */
     public abstract class ActionNotifyALLCompGroup extends AbstractAction {
 
         private Vector<AbstractButton> vecToggle = new Vector<AbstractButton>();
 
+        /**
+         *
+         * @param text
+         * @param icon
+         */
         public ActionNotifyALLCompGroup(String text, ImageIcon icon) {
             super(text, icon);
             addPropertyChangeListener(new Listener());
         }
 
+        /**
+         *
+         * @param ab
+         */
         public void addToSelectableGroup(AbstractButton ab) {
             vecToggle.add(ab);
         }
@@ -975,6 +1037,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         }
     }
 
+    /**
+     *
+     */
     public void switchDisplayMode() {
         GUIConfiguration.setModeScreen((byte) (0x01 & ~GUIConfiguration.getModeScreen()));
         setDisplayMode();

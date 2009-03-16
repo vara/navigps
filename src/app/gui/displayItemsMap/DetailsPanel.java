@@ -31,6 +31,9 @@ import org.w3c.dom.Node;
  */
 public class DetailsPanel extends javax.swing.JPanel {
     
+    /**
+     *
+     */
     protected XMLEditorPanel nodeXmlArea;
 
 
@@ -57,10 +60,18 @@ public class DetailsPanel extends javax.swing.JPanel {
         //return jTextArea1;
     //}
 
+    /**
+     *
+     * @return
+     */
     public JTable getJTable(){
         return jTable1;
     }
 
+    /**
+     *
+     * @return
+     */
     public XMLEditorPanel getXMLEditorPanel(){
         return nodeXmlArea;
     }
@@ -102,12 +113,20 @@ public class DetailsPanel extends javax.swing.JPanel {
         getXMLEditorPanel().getNodeXmlArea().setText(DOMUtilities.getXML(node));
     }
 
+    /**
+     *
+     * @param elem
+     */
     public void setPreviewElement(Element elem) {
        
         updateNodeXmlArea(elem);
         updateAttributesTable(elem);
     }
 
+    /**
+     *
+     * @param al
+     */
     public void addActionToButton(ActionListener al){
         jButton1.addActionListener(al);
     }
@@ -182,7 +201,15 @@ public class DetailsPanel extends javax.swing.JPanel {
     private javax.swing.JTable jTable1;
     // End of variables declaration//GEN-END:variables
 
+    /**
+     *
+     */
     public static class AttributesTableModel extends DefaultTableModel {
+        /**
+         *
+         * @param rowCount
+         * @param columnCount
+         */
         public AttributesTableModel(int rowCount, int columnCount) {
             super(rowCount, columnCount);
         }
@@ -201,6 +228,7 @@ public class DetailsPanel extends javax.swing.JPanel {
          *
          * @param attrName
          *            The given attribute name
+         * @return
          */
         public Object getValueForName(Object attrName) {
             for (int i = 0; i < getRowCount(); i++) {
@@ -214,6 +242,8 @@ public class DetailsPanel extends javax.swing.JPanel {
 
         /**
          * Gets the name of the attribute with the table row.
+         * @param i
+         * @return
          */
         public Object getAttrNameAt(int i) {
             return getValueAt(i, 0);
@@ -221,6 +251,8 @@ public class DetailsPanel extends javax.swing.JPanel {
 
         /**
          * Gets the value of the attribute with the table row.
+         * @param i 
+         * @return
          */
         public Object getAttrValueAt(int i) {
             return getValueAt(i, 1);
@@ -229,6 +261,7 @@ public class DetailsPanel extends javax.swing.JPanel {
         /**
          * Gets the first row where the given attribute name appears.
          * @param attrName    The given attribute name
+         * @return
          */
         public int getRow(Object attrName) {
             for (int i = 0; i < getRowCount(); i++) {
@@ -241,6 +274,9 @@ public class DetailsPanel extends javax.swing.JPanel {
         }
     }
 
+    /**
+     *
+     */
     protected class XMLEditorPanel extends JPanel {
 
         /**

@@ -8,6 +8,11 @@ public class ServiceCore {
     private ServiceAttributes serviceAttributes;
     private ServiceDescription serviceDescription;
 
+    /**
+     *
+     * @param serviceAttributes
+     * @param serviceDescription
+     */
     public ServiceCore(ServiceAttributes serviceAttributes, ServiceDescription serviceDescription) {
         this.serviceAttributes = serviceAttributes;
         this.serviceDescription = serviceDescription;

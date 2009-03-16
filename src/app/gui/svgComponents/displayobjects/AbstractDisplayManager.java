@@ -12,5 +12,10 @@ import org.apache.batik.dom.svg.SVGOMPoint;
  * @author wara
  */
 public abstract class AbstractDisplayManager {
+    /**
+     *
+     * @param object
+     * @param point
+     */
     public abstract void putObject(Object object,SVGOMPoint point);
 }

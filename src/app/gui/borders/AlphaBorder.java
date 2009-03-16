@@ -53,6 +53,7 @@ public abstract class AlphaBorder extends AbstractBorder implements AlphaInterfa
 
     /**
      * @param alpha the alpha to set
+     * @return
      */
     @Override
     public boolean setAlpha(float alpha) {

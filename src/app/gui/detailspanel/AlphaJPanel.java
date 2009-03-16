@@ -18,20 +18,39 @@ import javax.swing.JPanel;
  */
 public class AlphaJPanel extends JPanel implements AlphaInterface{
 
+    /**
+     *
+     */
     public static final String ALPHA_CHANGE = "AlphaJPanel.alpha.change";
+    /**
+     *
+     */
     public static final String UPPER_ALPHA_CHANGE = "AlphaJPanel.upper.alpha.change";
 
     private volatile float upperThresholdAlpha = 1f;
     private volatile float alpha = 1f;
 
+    /**
+     *
+     * @param layout
+     * @param isDoubleBuffered
+     */
     public AlphaJPanel(LayoutManager layout, boolean isDoubleBuffered) {
         super(layout, isDoubleBuffered);
     }
 
+    /**
+     *
+     * @param layout
+     */
     public AlphaJPanel(LayoutManager layout) {
         this(layout, true);
     }
 
+    /**
+     *
+     * @param isDoubleBuffered
+     */
     public AlphaJPanel(boolean isDoubleBuffered) {
         this(new FlowLayout(), isDoubleBuffered);
     }
@@ -97,6 +116,7 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
 
     /**
      * @param alpha the alpha to set
+     * @return
      */
     @Override
     public boolean setAlpha(float alpha) {

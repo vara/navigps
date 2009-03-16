@@ -21,6 +21,10 @@ public class RoundButton extends OpacityButton{
     private double roundX=0;
     private double roundY=0;
 
+    /**
+     *
+     * @param label
+     */
     public RoundButton(String label){
 	
         super(label);
@@ -29,12 +33,22 @@ public class RoundButton extends OpacityButton{
         
     }
 
+    /**
+     *
+     * @param a
+     */
     public RoundButton(Action a){
         super(a);
         setFocusPainted(false);
         setBorder(null);
     }
 
+    /**
+     *
+     * @param label
+     * @param arcw
+     * @param arch
+     */
     public RoundButton(String label,double arcw,double arch){
         this(label);
         roundX = arcw;
@@ -42,6 +56,10 @@ public class RoundButton extends OpacityButton{
         setDefaultBorder();
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     public void paint(Graphics g){
         visibleRec = new RoundRectangle2D.Double(0,0,getWidth(),getHeight(),getRoundX(), getRoundY());
@@ -49,11 +67,19 @@ public class RoundButton extends OpacityButton{
         super.paint(g);
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     public void paintComponent(Graphics g){	
 		super.paintComponent(g);
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintBorder(Graphics g) {        
         super.paintBorder(g);
@@ -86,11 +112,19 @@ public class RoundButton extends OpacityButton{
     public void setRoundY(double roundY) {
         this.roundY = roundY;
     }
+    /**
+     *
+     * @param arcw
+     * @param arch
+     */
     public void setRound(double arcw,double arch){
         setRoundX(arcw);
         setRoundY(arch);
     }
 
+    /**
+     *
+     */
     public void setDefaultBorder(){
         setBorder(new OvalBorder(6,8,6,8,getRoundX(),getRoundY(),new Color(80,80,100)));
     }

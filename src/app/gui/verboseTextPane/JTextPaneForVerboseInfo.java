@@ -22,6 +22,9 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
     private MyTextPane textPane = new MyTextPane();
     
     
+    /**
+     *
+     */
     public JTextPaneForVerboseInfo(){
 
         add(textPane);
@@ -43,10 +46,18 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
         });
 
     }
+    /**
+     *
+     * @return
+     */
     public JTextPane getTextEditor(){
         return getTextPane();
     }   
 
+    /**
+     *
+     * @return
+     */
     public DocumentStatus getInforamtionPipe(){
         return textPane.getDocumentStatus();
     }

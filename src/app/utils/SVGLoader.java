@@ -20,16 +20,31 @@ import org.w3c.dom.svg.SVGDocument;
  */
 public class SVGLoader {
 
-	public SVGLoader()
+    /**
+     *
+     */
+    public SVGLoader()
 	{}
 
-	public static SVGDocument getSVGDocumentFromPath(String path) throws IOException
+    /**
+     *
+     * @param path
+     * @return
+     * @throws java.io.IOException
+     */
+    public static SVGDocument getSVGDocumentFromPath(String path) throws IOException
 	{
 		File file = new File(path);
 		return getSVGDocumentFromFile(file);
 	}
 
-	public static SVGDocument getSVGDocumentFromInputStream(InputStream in) throws IOException
+    /**
+     *
+     * @param in
+     * @return
+     * @throws java.io.IOException
+     */
+    public static SVGDocument getSVGDocumentFromInputStream(InputStream in) throws IOException
 	{	if(in!=null)
 			{
 			try {
@@ -47,7 +62,13 @@ public class SVGLoader {
 		return null;
 	}
 	
-	public static SVGDocument getSVGDocumentFromFile(File file) throws IOException
+    /**
+     *
+     * @param file
+     * @return
+     * @throws java.io.IOException
+     */
+    public static SVGDocument getSVGDocumentFromFile(File file) throws IOException
 	{
 		if(file.isFile()){		    
 		    try {

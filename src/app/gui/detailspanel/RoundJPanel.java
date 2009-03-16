@@ -21,21 +21,37 @@ import javax.swing.border.Border;
  */
 public class RoundJPanel extends AlphaJPanel{
 
+    /**
+     *
+     */
     public RoundJPanel(){
         this(20,20);
         setOpaque(false);
     }
 
+    /**
+     *
+     * @param recW
+     * @param recH
+     */
     public RoundJPanel(double recW,double recH){
         setOpaque(false);
         setBorder(new EmptyOvalBorder(recW,recH));
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
     }
     
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintChildren(Graphics g) {
 
@@ -55,6 +71,10 @@ public class RoundJPanel extends AlphaJPanel{
     }
 
 
+    /**
+     *
+     * @return
+     */
     protected RoundRectangle2D.Double computeVisibleChildrenArea(){
         Rectangle bounds = getBounds();
         Insets ins = super.getInsets();
@@ -67,35 +87,66 @@ public class RoundJPanel extends AlphaJPanel{
         return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
     }
 
+    /**
+     *
+     * @param arcW
+     * @param arcH
+     */
     public void setRoundCorner(double arcW,double arcH){
         RoundBorder bord = getRoundBorder();
         bord.setRecW(arcW);
         bord.setRecH(arcH);
     }
 
+    /**
+     *
+     * @param val
+     */
     public void setRoundCorner(Point2D.Double val){
         setRoundCorner(val.getX(),val.getY());
     }
 
+    /**
+     *
+     * @return
+     */
     public Point2D.Double getRoundCorner(){
         RoundBorder bord = getRoundBorder();
         return new Point2D.Double(bord.getRecW(),bord.getRecH());
     }
 
+    /**
+     *
+     * @param border
+     */
     public void setBorder(RoundBorder border) {
         super.setBorder(border);
     }
 
+    /**
+     *
+     * @return
+     */
     public RoundBorder getRoundBorder() {
         return (RoundBorder)super.getBorder();
     }
 
+    /**
+     *
+     * @return
+     * @deprecated
+     */
     @Deprecated
     @Override
     public Border getBorder() {
         return super.getBorder();
     }
 
+    /**
+     *
+     * @param border
+     * @deprecated
+     */
     @Deprecated
     @Override
     public void setBorder(Border border) {

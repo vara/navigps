@@ -23,13 +23,27 @@ public class OvalBorder extends RoundBorder{
      private Color borderColor=new Color(90,100,190,255);
      private Insets insets = new Insets(4, 4, 4, 4);
 
+     /**
+      *
+      */
      public OvalBorder() {
      }
      
+     /**
+      *
+      * @param recw
+      * @param rech
+      */
      public OvalBorder(double recw, double rech) {
         super(recw,rech);
      }
 
+     /**
+      *
+      * @param recw
+      * @param rech
+      * @param topColor
+      */
      public OvalBorder(double recw, double rech, Color topColor) {
         this(recw,rech);
         borderColor = topColor;
@@ -37,34 +51,86 @@ public class OvalBorder extends RoundBorder{
         setUpperThresholdAlpha(getAlpha());
      }
 
+     /**
+      *
+      * @param top
+      * @param left
+      * @param bottom
+      * @param right
+      * @param recw
+      * @param rech
+      * @param topColor
+      */
      public OvalBorder(int top, int left, int bottom, int right,double recw, double rech, Color topColor) {
         this(recw,rech);
         insets = new Insets(top, left, bottom, right);
         borderColor = topColor;
      }
 
+     /**
+      *
+      * @param top
+      * @param left
+      * @param bottom
+      * @param right
+      * @param topColor
+      */
      public OvalBorder(int top, int left, int bottom, int right,Color topColor) {
         insets = new Insets(top, left, bottom, right);
         borderColor = topColor;
      }
 
+     /**
+      *
+      * @param top
+      * @param left
+      * @param bottom
+      * @param right
+      */
      public OvalBorder(int top, int left, int bottom, int right) {
         insets = new Insets(top, left, bottom, right);
      }
+     /**
+      *
+      * @param top
+      * @param left
+      * @param bottom
+      * @param right
+      * @param recw
+      * @param rech
+      */
      public OvalBorder(int top, int left, int bottom, int right,double recw, double rech) {
         this(top, left, bottom, right);
         setRecH(rech);
         setRecW(recw);
      }
-    @Override
+     /**
+      *
+      * @param c
+      * @return
+      */
+     @Override
      public Insets getBorderInsets(Component c) {
         return getInsets();
      }
 
-    @Override
+     /**
+      *
+      * @return
+      */
+     @Override
      public boolean isBorderOpaque() { return true; }
 
-    @Override
+     /**
+      *
+      * @param c
+      * @param g
+      * @param x
+      * @param y
+      * @param w
+      * @param h
+      */
+     @Override
      public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
         if(getAlpha()>0){
             super.paintBorder(c, g, x, y, h, h);
@@ -77,6 +143,17 @@ public class OvalBorder extends RoundBorder{
         }
      }
 
+    /**
+     *
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @param arcx
+     * @param arcy
+     * @param insetsOuter
+     * @return
+     */
     public static RoundRectangle2D.Double createOuterShape(double x, double y, double w, double h,
             double arcx,double arcy,Insets insetsOuter){
 
@@ -119,6 +196,10 @@ public class OvalBorder extends RoundBorder{
         this.insets = insets;
     }
 
+    /**
+     *
+     * @param ins
+     */
     @Override
     public void setBorderInsets(Insets ins) {
         setInsets(ins);

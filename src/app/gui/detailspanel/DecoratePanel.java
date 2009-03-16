@@ -23,12 +23,19 @@ public class DecoratePanel extends AbstractDecoratePanel{
     private JButton closeButton = new JButton("X");
     private JLabel content = new JLabel();
 
+    /**
+     *
+     */
     public DecoratePanel(){
         setOpaque(false);
         setPreferredSize(new Dimension(10,30));
         init();
     }
 
+    /**
+     *
+     * @param al
+     */
     public void addActionListenerToCloseButton(ActionListener al){
         closeButton.addActionListener(al);
     }
@@ -46,6 +53,10 @@ public class DecoratePanel extends AbstractDecoratePanel{
         add(getContent(),BorderLayout.CENTER);
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     public void paintComponent(Graphics g){
         super.paintComponent(g);
@@ -54,21 +65,37 @@ public class DecoratePanel extends AbstractDecoratePanel{
     }   
 
     
+    /**
+     *
+     * @return
+     */
     @Override
     public String getTitle() {
         return getContent().getText();
     }
 
+    /**
+     *
+     * @param text
+     */
     @Override
     public void setTitle(String text) {
          getContent().setText(text);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public JLabel getContent() {
         return content;
     }
 
+    /**
+     *
+     * @param content
+     */
     @Override
     public void setContent(JLabel content) {
         this.content = content;

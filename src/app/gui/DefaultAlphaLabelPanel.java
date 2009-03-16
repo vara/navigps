@@ -34,6 +34,9 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
 
     private BumpArea bumpArea = new BumpArea();
 
+    /**
+     *
+     */
     public DefaultAlphaLabelPanel(){
 
         setOpaque(false);
@@ -68,10 +71,18 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         return content;
     }
 
+    /**
+     *
+     * @return
+     */
     public BumpArea getBumpArea(){
         return bumpArea;
     }
 
+    /**
+     *
+     * @param txt
+     */
     public void setText(final String txt){
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -87,6 +98,9 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
             }
         });
     }
+    /**
+     *
+     */
     protected void startTimer(){
 
         if(closeTimer.isRunning()){
@@ -98,6 +112,10 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
             animator.cancel();
         }
     }
+    /**
+     *
+     * @param fraction
+     */
     protected void initAnimator(float fraction){
         if(fraction == -1){
             fraction = getContent().getAlpha();
@@ -165,8 +183,15 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         return contentText;
     }
 
+    /**
+     *
+     */
     protected class AnimatorBehaviour implements TimingTarget{
 
+        /**
+         *
+         * @param arg0
+         */
         @Override
         public void timingEvent(float arg0) {
             if(!getContent().setAlpha(arg0)){
@@ -180,14 +205,26 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
                 });
             }
         }
+        /**
+         *
+         */
         @Override
         public void begin() {}
+        /**
+         *
+         */
         @Override
         public void end() {}
+        /**
+         *
+         */
         @Override
         public void repeat() {}
     }
 
+    /**
+     *
+     */
     protected class CloseActionTimer implements ActionListener{
 
         @Override

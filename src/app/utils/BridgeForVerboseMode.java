@@ -29,11 +29,18 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
     public static final Console console =
                         new Console();
 
+    /**
+     *
+     */
     public BridgeForVerboseMode(){
         if(MainConfiguration.getMode())
             addComponentsWithOutputStream(console);
     }
     
+    /**
+     *
+     * @param text
+     */
     @Override
     public void outputVerboseStream(String text){	
         for (OutputVerboseStream ucomp : updateComponents) {            
@@ -49,6 +56,10 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
             return updateComponents.remove(l);
         }return false;
     }
+    /**
+     *
+     * @param text
+     */
     @Override
     public void outputErrorVerboseStream(String text) {
         for (OutputVerboseStream ucomp : updateComponents) {            
@@ -56,21 +67,37 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
         }
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public PrintWriter getOutputWriter() {
         return out;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public PrintWriter getErrOutputWriter() {
         return err;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public PrintStream getOutputStream() {
         return sout;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public PrintStream getErrOutputStream() {
         return serr;

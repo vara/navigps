@@ -22,31 +22,73 @@ public class DoubleOvalBorder extends OvalBorder{
     private Color colorForInnerBorder = new Color(90, 100, 190, 255);
     private int thickness=0;
 
+    /**
+     *
+     * @param arcW
+     * @param arcH
+     */
     public DoubleOvalBorder(int arcW, int arcH) {
         super(arcW, arcH);
         innerBorder.setRound(arcW, arcH);
     }
 
+    /**
+     *
+     * @param arcw1
+     * @param arch1
+     * @param topColor1
+     * @param arcw2
+     * @param arch2
+     * @param topColor2
+     */
     public DoubleOvalBorder(int arcw1, int arch1, Color topColor1,int arcw2, int arch2, Color topColor2) {
        super(arcw1, arch1, topColor1);
        innerBorder.setRound(arcw2, arch2);
        colorForInnerBorder = topColor2;       
     }
 
+    /**
+     *
+     * @param arcw1
+     * @param arch1
+     * @param topColor1
+     * @param arcw2
+     * @param arch2
+     * @param topColor2
+     * @param tick
+     */
     public DoubleOvalBorder(int arcw1, int arch1, Color topColor1,int arcw2, int arch2, Color topColor2,int tick) {
        this(arcw1, arch1, topColor1, arcw2, arch2, topColor2);
        thickness=tick;
     }
 
+    /**
+     *
+     * @param c
+     * @return
+     */
     @Override
     public Insets getBorderInsets(Component c) {
         return new Insets(getInsetsInner().top+getInsetsOuter().top,getInsetsInner().left+getInsetsOuter().left,
                 getInsetsInner().bottom+getInsetsOuter().bottom, getInsetsInner().right+getInsetsOuter().right);
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public boolean isBorderOpaque() { return true; }
 
+    /**
+     *
+     * @param c
+     * @param g
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     */
     @Override
     public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
         super.paintBorder(c, g, x, y, w, h);
@@ -57,6 +99,17 @@ public class DoubleOvalBorder extends OvalBorder{
                 (int)tmpInnerBorder.getWidth(), (int)tmpInnerBorder.getHeight());
      }
     
+    /**
+     *
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     * @param arcx
+     * @param arcy
+     * @param insetsInner
+     * @return
+     */
     public static RoundRectangle2D.Double createInnerShape(double x, double y, double w, double h,
             double arcx,double arcy,Insets insetsInner){
 
@@ -145,7 +198,7 @@ public class DoubleOvalBorder extends OvalBorder{
     }
 
     /**
-     * @param roundInnerW the roundInnerX to set
+     * @param recW
      */
     public void setRoundInnerW(int recW) {
         innerBorder.setRecW(recW);
@@ -159,7 +212,7 @@ public class DoubleOvalBorder extends OvalBorder{
     }
 
     /**
-     * @param roundInnerY the roundInnerY to set
+     * @param arcH
      */
     public void setRoundInnerH(double arcH) {
         innerBorder.setRecH(arcH);

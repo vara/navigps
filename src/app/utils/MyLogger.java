@@ -17,9 +17,15 @@ import java.util.logging.SimpleFormatter;
  */
 public class MyLogger{
 
+    /**
+     *
+     */
     public static Logger log = Logger.getLogger("navigps");
     private FileHandler fh;
     
+    /**
+     *
+     */
     public MyLogger(){
 	
 	try {

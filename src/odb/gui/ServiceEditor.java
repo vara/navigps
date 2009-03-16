@@ -23,7 +23,10 @@ public class ServiceEditor extends javax.swing.JDialog {
     private ODB odb = null;
     private ServiceCore sc;
 
-    /** Creates new form ServiceFactory */
+    /** Creates new form ServiceFactory
+     * @param parent
+     * @param modal
+     */
     public ServiceEditor(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

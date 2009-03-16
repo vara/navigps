@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.gui.searchServices;
 
 import app.gui.searchServices.swing.SearchServicesPanel;
@@ -10,7 +6,6 @@ import app.gui.detailspanel.AlphaJPanel;
 import app.gui.detailspanel.RoundWindow;
 import app.gui.detailspanel.RoundWindowUtils;
 import app.gui.svgComponents.Canvas;
-import app.gui.svgComponents.PaintingTransformIterface;
 import app.gui.svgComponents.SVGCanvasLayers;
 import app.utils.NaviPoint;
 import app.utils.Utils;
@@ -23,12 +18,11 @@ import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
-import bridge.ODBridge;
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.gvt.JGVTComponentListener;
@@ -52,17 +46,16 @@ public class SearchServices extends AlphaJPanel{
 
     private DocumentStateChangedListener svgViewListener = new DocumentStateChangedListener();
     private boolean enabled = false;
-    private ODBridge odbConnector = null;
 
     private RoundWindow roundWindowInstace;
     
     private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
-    //private Rectangle visibleRec = new Rectangle(0, 0, 0, 0);
-    //private boolean needRepaint = false;
+    private Rectangle visibleRec = new Rectangle(0, 0, 0, 0);
+    private boolean needRepaint = false;
     private SSMouseEvents me = new SSMouseEvents();
     //private AreaOverLay paintArea = new AreaOverLay();
 
-    private SynchronizePaintingTransform synch = new SynchronizePaintingTransform();
+//    private SynchronizePaintingTransform synch = new SynchronizePaintingTransform();
 
     PropertyChangeListener removeContent = new PropertyChangeListener(){
 
@@ -83,6 +76,10 @@ public class SearchServices extends AlphaJPanel{
         }
     };
 
+    /**
+     *
+     * @param canvas
+     */
     public SearchServices(Canvas canvas) {
         svgCanvas = canvas;
         setOpaque(false);
@@ -108,6 +105,9 @@ public class SearchServices extends AlphaJPanel{
         System.out.println(getClass().getCanonicalName()+" [install components]");
     }
 
+    /**
+     *
+     */
     public void uninstall(){
 
         //svgCanvas.remove(synch);
@@ -124,6 +124,10 @@ public class SearchServices extends AlphaJPanel{
         System.out.println(getClass().getCanonicalName()+" [uninstall components]");
     }
 
+    /**
+     *
+     * @param rw
+     */
     protected void installRoundWindow(RoundWindow rw) {
 
         if (roundWindowInstace == null || !roundWindowInstace.equals(rw)) {
@@ -167,14 +171,14 @@ public class SearchServices extends AlphaJPanel{
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEnabledSearchServices() {
         return enabled;
     }
-
-    public void initODBConnector(ODBridge odbb) {
-        odbConnector = odbb;
-    }
-
+    
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);                
@@ -191,6 +195,13 @@ public class SearchServices extends AlphaJPanel{
         }
     }    
 
+    /**
+     *
+     * @param g2
+     * @param radius
+     * @param center
+     * @param currPos
+     */
     protected static void paintCircle(Graphics2D g2, double radius, NaviPoint center, NaviPoint currPos) {
 
         float dash[] = {10.0f};
@@ -217,15 +228,28 @@ public class SearchServices extends AlphaJPanel{
         g2.setStroke(bsLine);
     }
 
+    /**
+     *
+     * @param p
+     */
     public void setCenterPoint(NaviPoint p){
         setCenterPoint(p.getX(), p.getY());
     }
 
+    /**
+     *
+     * @param p
+     */
     public void setCurrentPosition(NaviPoint p) {
         setCurrentPosition(p.getX(), p.getY());
     }
 
-    public void setCenterPoint(float x, float y) {        
+    /**
+     *
+     * @param x
+     * @param y
+     */
+    public void setCenterPoint(float x, float y) {
         paintCenterPoint.setLocation(x, y);
         SVGDocument doc = svgCanvas.getSVGDocument();
         if(doc!=null){
@@ -236,15 +260,28 @@ public class SearchServices extends AlphaJPanel{
         guiForSearchServ.setCenterPoint(getCenterPoint());
     }
 
+    /**
+     *
+     * @param r
+     */
     public void setRadius(double r) {
         radius = r;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getRadius() {
         return radius;
     }
 
-    public void setCurrentPosition(float x, float y) {        
+    /**
+     *
+     * @param x
+     * @param y
+     */
+    public void setCurrentPosition(float x, float y) {
         paintCurrentPos.setLocation(x,y);
         SVGDocument doc = svgCanvas.getSVGDocument();
         if(doc!=null){
@@ -262,7 +299,10 @@ public class SearchServices extends AlphaJPanel{
         guiForSearchServ.setCurrentPos(getCurrentPosition());        
     }
 
-    public void updatePoint(){        
+    /**
+     *
+     */
+    public void updatePoint(){
         SVGDocument doc = svgCanvas.getSVGDocument();
         if(doc!=null){
             NaviPoint [] tabPoints = {centerPoint,currentPos};
@@ -276,10 +316,18 @@ public class SearchServices extends AlphaJPanel{
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public NaviPoint getCenterPoint() {
         return centerPoint;
     }
 
+    /**
+     *
+     * @return
+     */
     public NaviPoint getCurrentPosition() {
         return currentPos;
     }
@@ -311,9 +359,9 @@ public class SearchServices extends AlphaJPanel{
                 setCurrentPosition(e.getX(),e.getY());
                 /*
                 int gap = 10;
-                int x = (int)(getCenterPoint().getX()-getRadius()-gap);
-                int y = (int)(getCenterPoint().getY()-getRadius()-gap);
-                int w = (int)(getRadius()*2+gap*2);
+                int x = (int)(paintCenterPoint.getX()-paintRadius-gap);
+                int y = (int)(paintCenterPoint.getY()-paintRadius-gap);
+                int w = (int)((paintRadius+gap)*2);
                 int h = w;
 
                 if(x<0){ w+=x; x=0; }
@@ -325,10 +373,11 @@ public class SearchServices extends AlphaJPanel{
                 }
                 //System.out.println("Search Services : Visible Rect. "+visibleRec);
                 visibleRec = new Rectangle(x,y,w,h);
-                */
+                
                 //svgViewListener.resetTransform();
                 //svgViewListener.updatePos();
-                //repaint(visibleRec);                                
+                repaint(visibleRec);
+                */
                 repaint();
             }
         }
@@ -381,7 +430,7 @@ public class SearchServices extends AlphaJPanel{
             updatePoint();
         }
     }//DocumentStateChangedListener
-
+/*
     private class SynchronizePaintingTransform extends JComponent
         implements PaintingTransformIterface{
 
@@ -397,4 +446,5 @@ public class SearchServices extends AlphaJPanel{
         }
 
     }
+ */
 }

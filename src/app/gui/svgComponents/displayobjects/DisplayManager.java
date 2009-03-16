@@ -31,9 +31,16 @@ public class DisplayManager extends AbstractDisplayManager{
     private Canvas can;
 
 
+    /**
+     *
+     */
     public static final String SERVICES_NAME = "GroupServices";
 
-    public DisplayManager(Canvas c) {        
+    /**
+     *
+     * @param c
+     */
+    public DisplayManager(Canvas c) {
         can = c;
     }
 
@@ -61,6 +68,10 @@ public class DisplayManager extends AbstractDisplayManager{
             gServ.appendChild(textGraph);
         }
 	}
+    /**
+     *
+     * @return
+     */
     public Element getGroupServices(){
         Element gServ = null;
         if(doc!=null){
@@ -84,6 +95,9 @@ public class DisplayManager extends AbstractDisplayManager{
         return servGroup;
     }
 
+    /**
+     *
+     */
     public void removeLastServices(){
         if(checkDisplaManager()){
             updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
@@ -110,10 +124,19 @@ public class DisplayManager extends AbstractDisplayManager{
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public SVGDocumentLoaderListener getRenderingTreeListener(){
         return new LoaderTreeListener();
     }
 
+    /**
+     *
+     * @param object
+     * @param point
+     */
     @Override
     public void putObject(final Object object, final SVGOMPoint point) {
         if(checkDisplaManager()){
@@ -129,6 +152,10 @@ public class DisplayManager extends AbstractDisplayManager{
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean checkDisplaManager(){
         if(updateManager==null){
             updateManager = can.getUpdateManager();
@@ -136,6 +163,10 @@ public class DisplayManager extends AbstractDisplayManager{
         return updateManager!=null;
     }
 
+    /**
+     *
+     * @param object
+     */
     public void putObject(final Vector<Element> object) {
         if(checkDisplaManager()){
             updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
@@ -149,12 +180,23 @@ public class DisplayManager extends AbstractDisplayManager{
         }
     }
 
+    /**
+     *
+     */
     protected class LoaderTreeListener implements SVGDocumentLoaderListener{
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
             updateManager = null;
@@ -162,48 +204,87 @@ public class DisplayManager extends AbstractDisplayManager{
             putObject("Test !!!", new SVGOMPoint(520, 400));
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
         }
     }
 
+    /**
+     *
+     */
     protected class UpdateManagerInfoListener implements UpdateManagerListener{
 
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void managerStarted(UpdateManagerEvent e) {
             System.err.println("managerStarted ");
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void managerSuspended(UpdateManagerEvent e) {
             System.err.println("managerSuspend ");
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void managerResumed(UpdateManagerEvent e) {
             System.err.println("managerResumed ");
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void managerStopped(UpdateManagerEvent e) {
             System.err.println("managerStoped ");
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void updateStarted(UpdateManagerEvent e) {
             System.err.println("updateStarted ");
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void updateCompleted(UpdateManagerEvent e) {
             System.err.println("updateCompleted ");
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void updateFailed(UpdateManagerEvent e) {
             System.err.println("updateFailed ");

@@ -16,6 +16,10 @@ public class VectorPositionForArgumentsStartup {
     private Vector<String> vec = new Vector<String>();
     private int counter=0;
     
+    /**
+     *
+     * @param arg
+     */
     public VectorPositionForArgumentsStartup(String [] arg){
 	
         for (String string : arg) {
@@ -32,11 +36,21 @@ public class VectorPositionForArgumentsStartup {
         return ret;
     }
     
+    /**
+     *
+     * @return
+     * @throws java.lang.IndexOutOfBoundsException
+     */
     public String getParameter()throws IndexOutOfBoundsException{
         if(counter<vec.size())
             return vec.elementAt(counter);
         throw new IndexOutOfBoundsException("End list of parameters");
     }
+    /**
+     *
+     * @return
+     * @throws java.lang.IndexOutOfBoundsException
+     */
     public String getNextParameter()throws IndexOutOfBoundsException{
         try {
             String ret = getParameter();
@@ -48,10 +62,19 @@ public class VectorPositionForArgumentsStartup {
         }
     }
     
+    /**
+     *
+     * @return
+     */
     public boolean isNextParameter(){
         return getCounter()<vec.size();
     }
     
+    /**
+     *
+     * @return
+     * @throws app.LackOfNextItemException
+     */
     public String getPreviewParameter()throws LackOfNextItemException{
         try{
 
@@ -69,9 +92,17 @@ public class VectorPositionForArgumentsStartup {
     private void decrementCounter(){
         counter--;
     }
+    /**
+     *
+     * @return
+     */
     public final int getCounter(){
         return counter;
     }
+    /**
+     *
+     * @return
+     */
     public int getContentSize(){
         return vec.size();
     }

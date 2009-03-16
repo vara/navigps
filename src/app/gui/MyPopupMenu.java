@@ -18,11 +18,18 @@ import javax.swing.KeyStroke;
  */
 public class MyPopupMenu extends JPopupMenu{
     
+    /**
+     *
+     */
     public MyPopupMenu()
     {
         setLightWeightPopupEnabled(true);
         setAlignmentX(100);
     }
+    /**
+     *
+     * @param item
+     */
     public void addToPopup(JMenuItem [] item)
     {
         if(item.length>0){
@@ -45,7 +52,16 @@ public class MyPopupMenu extends JPopupMenu{
         //g2.fill(rec1);
     }
     
-    public static JMenuItem menuItem(String str, Icon icon, int mnemo, String skrot, ActionListener al) 
+    /**
+     *
+     * @param str
+     * @param icon
+     * @param mnemo
+     * @param skrot
+     * @param al
+     * @return
+     */
+    public static JMenuItem menuItem(String str, Icon icon, int mnemo, String skrot, ActionListener al)
     {
         JMenuItem mi = new JMenuItem(str, icon);
         mi.setMnemonic(mnemo);

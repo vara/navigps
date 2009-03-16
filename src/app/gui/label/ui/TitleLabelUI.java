@@ -34,12 +34,30 @@ import sun.swing.SwingUtilities2;
  */
 public class TitleLabelUI extends BasicLabelUI{
 
+    /**
+     *
+     */
     public static final int CENTER_HORIZONTAL = 0;
+    /**
+     *
+     */
     public static final int LEFT = 1;
+    /**
+     *
+     */
     public static final int RIGHT = 2;
 
+    /**
+     *
+     */
     public static final int TOP = 256;
+    /**
+     *
+     */
     public static final int CENTER_VERTICAL = 512;
+    /**
+     *
+     */
     public static final int BOTTOM = 1024;
 
     private int textPosition = 0;
@@ -55,12 +73,24 @@ public class TitleLabelUI extends BasicLabelUI{
     private int verticalCalibrated = 0;
     private int horizontalCalibrated = 0;
 
+    /**
+     *
+     */
     protected static TitleLabelUI titleLabelUI = new TitleLabelUI();
 
+    /**
+     *
+     * @param position
+     */
     public TitleLabelUI(int position){
         this(position,false);
     }
 
+    /**
+     *
+     * @param position
+     * @param shadow
+     */
     public TitleLabelUI(int position,boolean shadow){
         setTextLayout(position);
         setShadow(shadow);
@@ -68,10 +98,17 @@ public class TitleLabelUI extends BasicLabelUI{
     /* Default Layout is CENTER_VERTICAL and CENTER_HORIZONTAL
      * 
      */
+    /**
+     *
+     */
     public TitleLabelUI(){
         setTextLayout(CENTER_VERTICAL|CENTER_HORIZONTAL);
     }
 
+    /**
+     *
+     * @param c
+     */
     @Override
     protected void installDefaults(JLabel c) {
         super.installDefaults(c);
@@ -80,6 +117,11 @@ public class TitleLabelUI extends BasicLabelUI{
     public void propertyChange(PropertyChangeEvent e){
         super.propertyChange(e);
     }
+    /**
+     *
+     * @param c
+     * @return
+     */
     public static ComponentUI createUI(JComponent c) {
         return titleLabelUI;
     }
@@ -163,6 +205,14 @@ public class TitleLabelUI extends BasicLabelUI{
         }
     }
 
+    /**
+     *
+     * @param l
+     * @param g
+     * @param s
+     * @param textX
+     * @param textY
+     */
     public void drawShadow(JLabel l, Graphics g, String s, int textX, int textY){
         Color tmpCol = g.getColor();
         g.setColor(getColorShadow());
@@ -171,6 +221,10 @@ public class TitleLabelUI extends BasicLabelUI{
         g.setColor(tmpCol);
     }
 
+    /**
+     *
+     * @param l
+     */
     public void showRecs(JLabel l){
         String retStr ="paintViewR "+paintViewR
         +"\npaintIconR "+paintIconR
@@ -182,6 +236,14 @@ public class TitleLabelUI extends BasicLabelUI{
         System.out.println(retStr);
     }
 
+    /**
+     *
+     * @param label
+     * @param fm
+     * @param width
+     * @param height
+     * @return
+     */
     protected String layout(JLabel label, FontMetrics fm,
                           int width, int height) {
         Insets insets = label.getInsets(paintViewInsets);
@@ -214,6 +276,14 @@ public class TitleLabelUI extends BasicLabelUI{
         this.shadow = shadow;
     }
 
+    /**
+     *
+     * @param f
+     * @param mode
+     * @param text
+     * @param frc
+     * @return
+     */
     public Point findPositionForText(Font f,int mode,String text,FontRenderContext frc){
 
         TextLayout textTl = new TextLayout(text,f, frc);

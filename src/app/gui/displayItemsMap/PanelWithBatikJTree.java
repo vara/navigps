@@ -55,6 +55,9 @@ public class PanelWithBatikJTree extends JScrollPane{
     private DOMDocumentTree tree;    
 
 
+    /**
+     *
+     */
     public final DOMTreeSelectionListener treeSelectionListener = new DOMTreeSelectionListener();
     private final GVTTreeListener listener = new GVTTreeListener();
 
@@ -67,6 +70,9 @@ public class PanelWithBatikJTree extends JScrollPane{
         init();
     }
 
+    /**
+     *
+     */
     public void reloadTree(){
         getGVTTreeListener().reload();
     }
@@ -109,6 +115,10 @@ public class PanelWithBatikJTree extends JScrollPane{
         });
     }
 
+    /**
+     *
+     * @param doc
+     */
     public void createModelTree(SVGDocument doc){
         long startTime = System.nanoTime();
         System.out.println("----Create content window properties----");
@@ -129,6 +139,10 @@ public class PanelWithBatikJTree extends JScrollPane{
         System.err.println("Time : "+time+" milisec.");
     }
 
+    /**
+     *
+     * @return
+     */
     public GVTTreeListener getGVTTreeListener(){
         return listener;
     }
@@ -217,6 +231,12 @@ public class PanelWithBatikJTree extends JScrollPane{
         });
     }
 
+    /**
+     *
+     * @param node
+     * @param showWhitespace
+     * @return
+     */
     protected MutableTreeNode createTree(Node node,boolean showWhitespace) {
         DefaultMutableTreeNode result;
         result = new DefaultMutableTreeNode(new NodeInfo(node));
@@ -261,11 +281,15 @@ public class PanelWithBatikJTree extends JScrollPane{
         return result;
     }
 
+    /**
+     *
+     */
     protected class DOMTreeSelectionListener implements TreeSelectionListener {
         //protected CSSStyleDeclaration style;
         //protected ViewCSS viewCSS;
         /**
          * Called when the selection changes.
+         * @param ev
          */
         @Override
         public void valueChanged(TreeSelectionEvent ev) {
@@ -300,6 +324,11 @@ public class PanelWithBatikJTree extends JScrollPane{
             }
         }
 
+        /**
+         *
+         * @param doc
+         * @return
+         */
         protected String createDocumentText(Document doc) {
             StringBuffer sb = new StringBuffer();
             sb.append("Nodes: ");
@@ -307,6 +336,11 @@ public class PanelWithBatikJTree extends JScrollPane{
             return sb.toString();
         }
 
+        /**
+         *
+         * @param node
+         * @return
+         */
         protected int nodeCount(Node node) {
             int result = 1;
             for (Node n = node.getFirstChild();
@@ -345,11 +379,26 @@ public class PanelWithBatikJTree extends JScrollPane{
      */
     protected class NodeRenderer extends DefaultTreeCellRenderer {
 
+        /**
+         *
+         */
         protected ImageIcon elementIcon;
+        /**
+         *
+         */
         protected ImageIcon commentIcon;
+        /**
+         *
+         */
         protected ImageIcon piIcon;
+        /**
+         *
+         */
         protected ImageIcon textIcon;
 
+        /**
+         *
+         */
         public NodeRenderer() {
             setBackgroundNonSelectionColor(new Color(0,0,0,0));
             String folder = "batik/treerenderer/";
@@ -363,6 +412,13 @@ public class PanelWithBatikJTree extends JScrollPane{
 
         /**
          * Sets the value of the current tree cell.
+         * @param tree 
+         * @param value 
+         * @param expanded
+         * @param sel
+         * @param hasFocus
+         * @param leaf
+         * @param row
          */
         @Override
         public Component getTreeCellRendererComponent(JTree tree,
@@ -394,6 +450,7 @@ public class PanelWithBatikJTree extends JScrollPane{
 
         /**
          * Returns the DOM type of the given object.
+         * @param value
          * @return the type or -1.
          */
         protected short getNodeType(Object value) {
@@ -417,6 +474,7 @@ public class PanelWithBatikJTree extends JScrollPane{
 
         /**
          * Creates a new NodeInfo object.
+         * @param n
          */
         public NodeInfo(Node n) {
             node = n;
@@ -424,6 +482,7 @@ public class PanelWithBatikJTree extends JScrollPane{
 
         /**
          * Returns the DOM Node associated with this node info.
+         * @return
          */
         public Node getNode() {
             return node;
@@ -450,6 +509,10 @@ public class PanelWithBatikJTree extends JScrollPane{
      */
     protected static class ShadowNodeInfo extends NodeInfo {
 
+        /**
+         *
+         * @param n
+         */
         public ShadowNodeInfo(Node n) {
             super(n);
         }
@@ -466,6 +529,10 @@ public class PanelWithBatikJTree extends JScrollPane{
      */
     protected static class ContentNodeInfo extends NodeInfo {
 
+        /**
+         *
+         * @param n
+         */
         public ContentNodeInfo(Node n) {
             super(n);
         }

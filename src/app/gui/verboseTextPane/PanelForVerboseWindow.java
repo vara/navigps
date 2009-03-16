@@ -22,6 +22,10 @@ public class PanelForVerboseWindow extends JPanel{
 
     private JTextPaneForVerboseInfo verbosePane;
 
+    /**
+     *
+     * @param verboseStream
+     */
     public PanelForVerboseWindow(BridgeForVerboseMode verboseStream){
         setLayout(new BorderLayout());
         verbosePane = new JTextPaneForVerboseInfo();
@@ -32,8 +36,14 @@ public class PanelForVerboseWindow extends JPanel{
         add(verbosePane,BorderLayout.CENTER);
     }
 
+    /**
+     *
+     */
     protected class PanelMenu extends JPanel{
         private JMenuBar bar = new JMenuBar();
+        /**
+         *
+         */
         public PanelMenu(){
             setLayout(new GridLayout());
             add(bar);

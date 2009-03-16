@@ -16,8 +16,17 @@ public class MainConfiguration {
 
     private static boolean modeVerbose = false;
     private static boolean modeVerboseGui = false;
+    /**
+     *
+     */
     public static final String OS_WINDOWS = "WINDOWS";
+    /**
+     *
+     */
     public static final String OS_LINUX = "LINUX";
+    /**
+     *
+     */
     public static final String OS_OTHER = "OTHER";
     
     private static String pathToFile = null;
@@ -25,14 +34,25 @@ public class MainConfiguration {
     private static boolean showDocumentProperties = false;
     
     
+    /**
+     *
+     */
     public MainConfiguration()
     {}
 
+    /**
+     *
+     * @return
+     */
     public static Dimension getScreenSize()
     {
 	return Toolkit.getDefaultToolkit().getScreenSize();
     }
     
+    /**
+     *
+     * @return
+     */
     public static String getOSName(){
         String osname = System.getProperty("os.name");
         if (osname.toUpperCase().indexOf(MainConfiguration.OS_WINDOWS) != -1) {
@@ -43,41 +63,81 @@ public class MainConfiguration {
             return MainConfiguration.OS_OTHER;
         }
     
-    public static void setMode(boolean verbose){	
+    /**
+     *
+     * @param verbose
+     */
+    public static void setMode(boolean verbose){
         modeVerbose = verbose;
     }
     
+    /**
+     *
+     * @return
+     */
     public static synchronized boolean getMode(){
         return modeVerbose;
     }
     
+    /**
+     *
+     * @return
+     */
     public static boolean isModeVerboseGui() {
         return modeVerboseGui;
     }
 
+    /**
+     *
+     * @param aModeVerboseGui
+     */
     public static void setModeVerboseGui(boolean aModeVerboseGui) {
         modeVerboseGui = aModeVerboseGui;
     }
     
+    /**
+     *
+     * @param pathToFile
+     */
     public static void setPathChartToFile(String pathToFile) {
         MainConfiguration.pathToFile = pathToFile;
     }
 
+    /**
+     *
+     * @return
+     */
     public static String getPathToConfigurationFile() {
         return pathToConfigurationFile;
     }
+    /**
+     *
+     * @return
+     */
     public static String getPathToChartFile() {
         return pathToFile;
     }
 
+    /**
+     *
+     * @param pathToConfigurationFile
+     */
     public static void setPathToConfigurationFile(String pathToConfigurationFile) {
         MainConfiguration.pathToConfigurationFile = pathToConfigurationFile;
     }
 
+    /**
+     *
+     * @return
+     */
     public static boolean isShowDocumentProperties() {
         return showDocumentProperties;
     }
 
+    /**
+     *
+     * @param showDocumentProperties
+     */
     public static void setShowDocumentProperties(boolean showDocumentProperties) {
         MainConfiguration.showDocumentProperties = showDocumentProperties;
     }

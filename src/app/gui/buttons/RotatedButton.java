@@ -22,6 +22,12 @@ public class RotatedButton extends RoundButton{
         private XButton template;
         private boolean clockwise;
         
+        /**
+         *
+         * @param text
+         * @param clockwise
+         * @param size
+         */
         public RotatedButton(String text, boolean clockwise,Dimension size) {
             
             super(text);
@@ -31,10 +37,21 @@ public class RotatedButton extends RoundButton{
             setPreferredSize(size);
             //setLocation(size.width-width,0);
         }       
+        /**
+         *
+         * @param text
+         * @param clockwise
+         * @param size
+         * @param round
+         */
         public RotatedButton(String text, boolean clockwise,Dimension size,double round) {
             this(text, clockwise, size);
             setRound(round, round);
         }
+        /**
+         *
+         * @param g
+         */
         @Override
         public void paintComponent(Graphics g) {
             super.paintComponent(g);

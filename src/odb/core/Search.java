@@ -19,6 +19,10 @@ public class Search implements ODBridge {
     private float wspX;
     private float wspY;
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Vector<String> getCategories() {
         odb = Constants.getDbConnection();
@@ -37,6 +41,11 @@ public class Search implements ODBridge {
         return v;
     }
 
+    /**
+     *
+     * @param category
+     * @return
+     */
     @Override
     public Vector<String> getSubcategories(String category) {
         odb = Constants.getDbConnection();
@@ -58,6 +67,11 @@ public class Search implements ODBridge {
         return v;
     }
 
+    /**
+     *
+     * @param category
+     * @return
+     */
     @Override
     public Vector<String> getSubcategories(Vector<String> category) {
         Vector<String> v = new Vector<String>();
@@ -70,6 +84,14 @@ public class Search implements ODBridge {
         return v;
     }
 
+    /**
+     *
+     * @param category
+     * @param x
+     * @param y
+     * @param radius
+     * @return
+     */
     @Override
     public Vector<ServiceCore> searchCategoryRadius(Vector category, double x, double y, double radius) {
         Vector v = new Vector();

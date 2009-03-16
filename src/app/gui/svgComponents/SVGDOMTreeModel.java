@@ -20,8 +20,15 @@ import org.w3c.dom.NodeList;
 public class SVGDOMTreeModel implements TreeModel{
 
     private Document doc;
+    /**
+     *
+     */
     protected EventListenerList listenerList = new EventListenerList();
 
+    /**
+     *
+     * @param d
+     */
     public SVGDOMTreeModel(Document d){
         doc =d;
     }

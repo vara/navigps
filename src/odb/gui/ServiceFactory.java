@@ -24,7 +24,10 @@ public class ServiceFactory extends javax.swing.JDialog {
 
     private ODB odb = null;
 
-    /** Creates new form ServiceFactory */
+    /** Creates new form ServiceFactory
+     * @param parent
+     * @param modal
+     */
     public ServiceFactory(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         initComponents();

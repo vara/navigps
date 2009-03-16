@@ -23,12 +23,21 @@ public class LineScrollBarUI extends MetalScrollBarUI {
     private Color darkShadowColor = new Color(100,100,100,200);
     private Color shadowColor = new Color(200,200,200,200);
     private Color highlightColor = new Color(200,255,200,200);
+    /**
+     *
+     */
     @Override
     protected void installDefaults() {
         super.installDefaults();
         scrollBarWidth = 13;
     }
 
+    /**
+     *
+     * @param g
+     * @param c
+     * @param trackBounds
+     */
     @Override
     protected void paintTrack(Graphics g, JComponent c, Rectangle trackBounds) {
         //super.paintTrack(g, c, trackBounds);

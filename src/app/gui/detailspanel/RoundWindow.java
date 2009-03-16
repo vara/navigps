@@ -65,6 +65,9 @@ public class RoundWindow extends RoundJPanel
     private Insets innerGap = new Insets(7,7,7,7);
     private int decorateAndContentGap = 5;
 
+    /**
+     *
+     */
     public RoundWindow(){
         super(20,20);
         setSize(defaultSize);
@@ -94,14 +97,25 @@ public class RoundWindow extends RoundJPanel
         super.setEnabled(false);
     }
 
-    public void pack(){        
+    /**
+     *
+     */
+    public void pack(){
         validate();
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isEmpty(){
         return !(getRoundWindowRootPane().getContentPane().getComponents().length>0);
     }
     
+    /**
+     *
+     * @return
+     */
     public RoundRectangle2D getWindowShape(){
         Point.Double corners = getRoundCorner();
         return new RoundRectangle2D.Double(
@@ -125,21 +139,36 @@ public class RoundWindow extends RoundJPanel
         return rootPane.getContentPane();
     }
 
+    /**
+     *
+     */
     public void clearWindow(){
         setIcon(null);
         setTitle("");
         getContentPane().removeAll();
     }
 
+    /**
+     *
+     * @param icon
+     */
     public void setIcon(Icon icon){
         getDecoratePanel().getContent().setIcon(icon);
     }
 
+    /**
+     *
+     * @param str
+     */
     public void setTitle(String str){
 
         getDecoratePanel().setTitle(str);
     }
 
+    /**
+     *
+     * @param aFlag
+     */
     @Override
     public void setEnabled(final boolean aFlag) {
         super.setEnabled(aFlag);
@@ -151,6 +180,10 @@ public class RoundWindow extends RoundJPanel
         });        
     }
 
+    /**
+     *
+     * @param val
+     */
     public void displayPanel(boolean val){
         
         float frac = .0f;
@@ -167,6 +200,9 @@ public class RoundWindow extends RoundJPanel
         }
         animator.start();
     }
+    /**
+     *
+     */
     public void updateMyUI(){
         Container parent = getParent();
         if(parent == null)
@@ -179,7 +215,14 @@ public class RoundWindow extends RoundJPanel
         //getVerboseStream().outputVerboseStream(getClass().getSimpleName()+" UpdateMyUI\n Parent size ["+width+","+height+"]" +
         //        "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");
     }
-     public void updateMyUI(final int x,final int y,final int width,final int height){
+    /**
+     *
+     * @param x
+     * @param y
+     * @param width
+     * @param height
+     */
+    public void updateMyUI(final int x,final int y,final int width,final int height){
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -195,6 +238,10 @@ public class RoundWindow extends RoundJPanel
     }
     
 
+    /**
+     *
+     * @param g
+     */
     @Override
     public void paintComponent(Graphics g){
         if(isVisible() && getAlpha()>0){
@@ -225,6 +272,10 @@ public class RoundWindow extends RoundJPanel
         }        
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     public Insets getInsets() {
         Insets in = super.getInsets();
@@ -306,7 +357,7 @@ public class RoundWindow extends RoundJPanel
     }
 
     /**
-     * @param decoratePanel the decoratePanel to set
+     * @param decorated
      */
     public void setDecorateWindow(boolean decorated) {
         if(decorated){
@@ -327,6 +378,11 @@ public class RoundWindow extends RoundJPanel
         return dynamicRevalidate;
     }
 
+    /**
+     *
+     * @param alphaBorder
+     * @return
+     */
     public boolean setAlphaBorder(float alphaBorder){
         Border bord = getBorder();
         if(bord instanceof AlphaBorder){
@@ -335,6 +391,10 @@ public class RoundWindow extends RoundJPanel
         return false;
     }
 
+    /**
+     *
+     * @param alpha
+     */
     public void setAlphaToAllRootWindow(float alpha){
         setAlphaBorder(alpha);
         setAlpha(alpha);
@@ -405,6 +465,11 @@ public class RoundWindow extends RoundJPanel
             getRoundWindowRootPane().revalidate();
     }
 
+    /**
+     *
+     * @param obj
+     * @return
+     */
     @Override
     public boolean equals(Object obj) {
         boolean retVal = false;

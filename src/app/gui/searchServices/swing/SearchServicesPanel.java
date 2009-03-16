@@ -233,7 +233,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             .addGroup(jPanel6Layout.createSequentialGroup()
                 .addContainerGap()
                 .addComponent(jLabel6)
-                .addContainerGap(94, Short.MAX_VALUE))
+                .addContainerGap(76, Short.MAX_VALUE))
         );
         jPanel6Layout.setVerticalGroup(
             jPanel6Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
@@ -245,14 +245,15 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jPanel5Layout.setHorizontalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addComponent(jPanel6, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-            .addComponent(panelForJTree, javax.swing.GroupLayout.Alignment.TRAILING, javax.swing.GroupLayout.DEFAULT_SIZE, 156, Short.MAX_VALUE)
+            .addComponent(panelForJTree, javax.swing.GroupLayout.DEFAULT_SIZE, 138, Short.MAX_VALUE)
         );
         jPanel5Layout.setVerticalGroup(
             jPanel5Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel5Layout.createSequentialGroup()
                 .addComponent(jPanel6, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                .addComponent(panelForJTree, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE))
+                .addComponent(panelForJTree, javax.swing.GroupLayout.PREFERRED_SIZE, 197, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addContainerGap())
         );
 
         jPanel3.setOpaque(false);
@@ -261,7 +262,6 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jRadioButton1.setText("Remove Last search");
         jRadioButton1.setContentAreaFilled(false);
         jRadioButton1.setFocusPainted(false);
-        jRadioButton1.setOpaque(false);
 
         javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
         jPanel3.setLayout(jPanel3Layout);
@@ -269,14 +269,13 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
                 .addComponent(jRadioButton1)
-                .addContainerGap(27, Short.MAX_VALUE))
+                .addContainerGap(9, Short.MAX_VALUE))
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
             .addGroup(jPanel3Layout.createSequentialGroup()
-                .addGap(20, 20, 20)
-                .addComponent(jRadioButton1)
-                .addContainerGap(25, Short.MAX_VALUE))
+                .addContainerGap(20, Short.MAX_VALUE)
+                .addComponent(jRadioButton1))
         );
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -300,14 +299,18 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                     .addGroup(jPanel2Layout.createSequentialGroup()
                         .addComponent(jPanel5, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE)
                         .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
-                        .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                        .addComponent(jPanel3, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
                     .addComponent(jPanel4, javax.swing.GroupLayout.PREFERRED_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.PREFERRED_SIZE))
-                .addGap(63, 63, 63))
+                .addContainerGap(javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
         );
 
         add(jPanel2);
     }// </editor-fold>//GEN-END:initComponents
 
+    /**
+     *
+     * @param al
+     */
     public void addActionForSearchButton(ActionListener al) {
         jButton1.addActionListener(al);
     }
@@ -398,20 +401,35 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         setCurrentPos(new NaviPoint(0, 0));
     }
 
+    /**
+     *
+     */
     public void reloadCategory(){
         setServices(new Search().getCategories());
         MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Category Tree reload");
     }
 
+    /**
+     *
+     * @param val
+     */
     public void setRadius(double val) {
         gRadius.setValue(new Double(val));
     }
 
+    /**
+     *
+     * @param val
+     */
     public void setCenterPoint(NaviPoint val) {
         gCenterX.setValue(new Float(val.getX()));
         gCenterY.setValue(new Float(val.getY()));
     }
 
+    /**
+     *
+     * @param val
+     */
     public void setCurrentPos(NaviPoint val) {
         gCurrentX.setValue(new Float(val.getX()));
         gCurrentY.setValue(new Float(val.getY()));
@@ -419,6 +437,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     /*
      * This method implies that jtree model contais String objects
+     */
+    /**
+     *
+     * @return
      */
     public Vector<String> getSelectedServices() {
         Vector<String> val = new Vector<String>(10, 10);
@@ -447,6 +469,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         return val;
     }
 
+    /**
+     *
+     * @param value
+     */
     public void setServices(Vector<String> value) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Services");
         DynamicUtilTreeNode.createChildren(root, value);

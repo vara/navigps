@@ -26,11 +26,19 @@ import sun.swing.SwingUtilities2;
 public class MyButtonUI extends MetalButtonUI{
 
 
+    /**
+     *
+     * @param b
+     */
     @Override
     public void installDefaults(AbstractButton b) {
         super.installDefaults(b);
     }
 
+    /**
+     *
+     * @param b
+     */
     @Override
     public void uninstallDefaults(AbstractButton b) {
 	super.uninstallDefaults(b);
@@ -39,6 +47,11 @@ public class MyButtonUI extends MetalButtonUI{
     // ********************************
     //         Create Listeners
     // ********************************
+    /**
+     *
+     * @param b
+     * @return
+     */
     @Override
     protected BasicButtonListener createButtonListener(AbstractButton b) {
         return new MyBasicButtonListener(b);
@@ -48,12 +61,20 @@ public class MyButtonUI extends MetalButtonUI{
     // ********************************
     //         Default Accessors
     // ********************************
+    /**
+     *
+     * @return
+     */
     @Override
     protected Color getSelectColor() {
         selectColor = UIManager.getColor(getPropertyPrefix() + "select");
 	return selectColor;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     protected Color getDisabledTextColor() {
         disabledTextColor = UIManager.getColor(getPropertyPrefix() +
@@ -61,6 +82,10 @@ public class MyButtonUI extends MetalButtonUI{
 	return disabledTextColor;
     }
 
+    /**
+     *
+     * @return
+     */
     @Override
     protected Color getFocusColor() {
         focusColor = UIManager.getColor(getPropertyPrefix() + "focus");
@@ -97,6 +122,11 @@ public class MyButtonUI extends MetalButtonUI{
         super.update(g, c);
     }
 
+    /**
+     *
+     * @param g
+     * @param b
+     */
     @Override
     protected void paintButtonPressed(Graphics g, AbstractButton b) {
         System.out.println("paintButtonPressed");
@@ -107,6 +137,14 @@ public class MyButtonUI extends MetalButtonUI{
 	}
     }
 
+    /**
+     *
+     * @param g
+     * @param b
+     * @param viewRect
+     * @param textRect
+     * @param iconRect
+     */
     @Override
     protected void paintFocus(Graphics g, AbstractButton b,
 			      Rectangle viewRect, Rectangle textRect, Rectangle iconRect){

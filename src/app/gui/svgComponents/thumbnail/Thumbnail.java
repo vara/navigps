@@ -66,13 +66,35 @@ import org.w3c.dom.svg.SVGSVGElement;
  */
 public class Thumbnail extends AlphaJPanel {
   
+    /**
+     *
+     */
     protected Canvas svgCanvas;
+    /**
+     *
+     */
     protected JGVTComponent svgThumbnailCanvas;
+    /**
+     *
+     */
     protected boolean documentChanged;
+    /**
+     *
+     */
     protected AreaOfInterestOverlay overlay;
+    /**
+     *
+     */
     protected AreaOfInterestListener aoiListener;
+    /**
+     *
+     */
     protected boolean interactionEnabled = false;
 
+    /**
+     *
+     * @param svgCanvas
+     */
     public Thumbnail(Canvas svgCanvas) {
 
         super(new BorderLayout());
@@ -103,6 +125,10 @@ public class Thumbnail extends AlphaJPanel {
         super.paintComponent(g);
     }
 
+    /**
+     *
+     * @param b
+     */
     public void setInteractionEnabled(boolean b) {
 
         if (b == interactionEnabled) return;
@@ -116,6 +142,10 @@ public class Thumbnail extends AlphaJPanel {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean getInteractionEnabled() {
         return interactionEnabled;
     }
@@ -128,6 +158,11 @@ public class Thumbnail extends AlphaJPanel {
         updateThumbnailRenderingTransform();
     }
 
+    /**
+     *
+     * @param gn
+     * @return
+     */
     protected CanvasGraphicsNode getCanvasGraphicsNode(GraphicsNode gn) {
         if (!(gn instanceof CompositeGraphicsNode))
             return null;
@@ -251,6 +286,10 @@ public class Thumbnail extends AlphaJPanel {
      */
     protected class ThumbnailDocumentListener extends SVGDocumentLoaderAdapter {
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
             documentChanged = true;
@@ -262,7 +301,16 @@ public class Thumbnail extends AlphaJPanel {
      */
     protected class AreaOfInterestListener extends MouseInputAdapter {
 
+        /**
+         *
+         */
+        /**
+         *
+         */
         protected int sx, sy;
+        /**
+         *
+         */
         protected boolean in;
 
         @Override
@@ -314,6 +362,10 @@ public class Thumbnail extends AlphaJPanel {
      */
     protected class ThumbnailGVTListener extends GVTTreeRendererAdapter {
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
             if (documentChanged) {
@@ -325,6 +377,10 @@ public class Thumbnail extends AlphaJPanel {
             }
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void gvtRenderingCancelled(GVTTreeRendererEvent e) {
             if (documentChanged) {
@@ -333,6 +389,10 @@ public class Thumbnail extends AlphaJPanel {
             }
         }
 
+        /**
+         *
+         * @param e
+         */
         @Override
         public void gvtRenderingFailed(GVTTreeRendererEvent e) {
             if (documentChanged) {
@@ -370,8 +430,15 @@ public class Thumbnail extends AlphaJPanel {
      *at pan iterator
      */
 
+    /**
+     *
+     */
     protected class PaintingTransformListener implements PaintingTransformIterface{
 
+        /**
+         *
+         * @param pt
+         */
         @Override
         public void setPaintingTransform(AffineTransform pt) {
             updateThumbnailRenderingTransform();
@@ -382,27 +449,57 @@ public class Thumbnail extends AlphaJPanel {
      */
     protected class AreaOfInterestOverlay implements Overlay {
 
+        /**
+         *
+         */
         protected Shape s;
+        /**
+         *
+         */
         protected AffineTransform at;
+        /**
+         *
+         */
         protected AffineTransform paintingTransform = new AffineTransform();
 
+        /**
+         *
+         * @param x
+         * @param y
+         * @return
+         */
         public boolean contains(int x, int y) {
             System.out.println("s bounds "+s.getBounds());
             return (s != null) ? s.contains(x, y) : false;
         }
 
+        /**
+         *
+         * @return
+         */
         public AffineTransform getOverlayTransform() {
             return at;
         }
 
+        /**
+         *
+         * @param rt
+         */
         public void setPaintingTransform(AffineTransform rt) {
             this.paintingTransform = rt;
         }
 
+        /**
+         *
+         * @return
+         */
         public AffineTransform getPaintingTransform() {
             return paintingTransform;
         }
 
+        /**
+         *
+         */
         public void synchronizeAreaOfInterest() {
             paintingTransform = new AffineTransform();
             Dimension dim = svgCanvas.getSize();
@@ -431,6 +528,10 @@ public class Thumbnail extends AlphaJPanel {
         }
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isDisplay(){
         return getAlpha()!=0.0f;
     }

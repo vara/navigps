@@ -61,8 +61,14 @@ public class MyTextPane extends JTextPane{
 
     private boolean autoRoll = true;
 
+    /**
+     *
+     */
     public static final Font DEFAULT_FONT = new Font("monospaced",Font.PLAIN,12);
 
+    /**
+     *
+     */
     public MyTextPane(){
 
         setFont(DEFAULT_FONT);
@@ -119,6 +125,10 @@ public class MyTextPane extends JTextPane{
         super.paint(g2);
     }
 
+    /**
+     *
+     * @return
+     */
     public DocumentStatus getDocumentStatus(){
         return pipe;
     }
@@ -158,6 +168,11 @@ public class MyTextPane extends JTextPane{
         this.errorAtributes = errorAtributes;
     }
 
+    /**
+     *
+     * @param str
+     * @param attr
+     */
     public synchronized void addEndText(String str,SimpleAttributeSet attr){
         try {
             ((StyledDocument)getDocument()).insertString(getDocument().getLength(), str, attr);            
@@ -173,6 +188,11 @@ public class MyTextPane extends JTextPane{
                     "addEndTextnl(String str)","str \""+str+"\"",ex);
         }
     }
+    /**
+     *
+     * @param str
+     * @param attr
+     */
     public synchronized void addEndTextnl(String str,SimpleAttributeSet attr){
         addEndText(str+"\n", attr);
     }
@@ -191,10 +211,20 @@ public class MyTextPane extends JTextPane{
         this.autoRoll = autoScroll;
     }
 
+    /**
+     *
+     */
     protected class DocumentStatus extends OutputVerboseStreamAdapter{
+        /**
+         *
+         */
         public DocumentStatus(){
             //setTimeEnabled(true);
         }
+        /**
+         *
+         * @param text
+         */
         @Override
         public void outputVerboseStream(String text){
             SimpleAttributeSet attr = new SimpleAttributeSet(getDefaultAttributes());
@@ -203,6 +233,10 @@ public class MyTextPane extends JTextPane{
             }
             addEndTextnl(text,attr);
         }
+        /**
+         *
+         * @param text
+         */
         @Override
         public void outputErrorVerboseStream(String text) {
             SimpleAttributeSet attr = new SimpleAttributeSet(getErrorAtributes());
@@ -218,6 +252,9 @@ public class MyTextPane extends JTextPane{
         }
     }
 
+    /**
+     *
+     */
     protected class MyDocumentListener implements DocumentListener {
 
         @Override
@@ -245,8 +282,18 @@ public class MyTextPane extends JTextPane{
         }
     }
 
+    /**
+     *
+     */
     public class ClearAllAction extends AbstractAction{
 
+        /**
+         *
+         * @param text
+         * @param icon
+         * @param desc
+         * @param mnemonic
+         */
         public ClearAllAction(String text, ImageIcon icon,
                            String desc, Integer mnemonic){
             super(text);
@@ -265,11 +312,27 @@ public class MyTextPane extends JTextPane{
         }
     }
 
+    /**
+     *
+     */
     public class ShowTimeAction extends AbstractAction{
 
+        /**
+         *
+         */
         public static final String SHOW_TIME = "Show Time";
+        /**
+         *
+         */
         public static final String HIDE_TIME = "Hide Time";
 
+        /**
+         *
+         * @param text
+         * @param icon
+         * @param desc
+         * @param mnemonic
+         */
         public ShowTimeAction(String text, ImageIcon icon,
                            String desc, Integer mnemonic){
             super(text);
@@ -294,6 +357,9 @@ public class MyTextPane extends JTextPane{
         }
     }
 
+    /**
+     *
+     */
     protected class MouseForVerboseTextPane extends MouseAdapter{
         @Override
         public void mouseClicked(MouseEvent e){

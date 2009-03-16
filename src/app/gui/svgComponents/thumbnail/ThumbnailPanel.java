@@ -23,6 +23,10 @@ public class ThumbnailPanel extends RoundJPanel{
     private int animationDuration = 10000;
     private Thumbnail thumbnail;
 
+    /**
+     *
+     * @param tn
+     */
     public ThumbnailPanel(Thumbnail tn){
         super(10,10);
         setLayout(new BorderLayout());
@@ -35,6 +39,10 @@ public class ThumbnailPanel extends RoundJPanel{
                 RepeatBehavior.LOOP,new AnimatorBehaviour());
         add(thumbnail,BorderLayout.CENTER);
     }
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -50,18 +58,31 @@ public class ThumbnailPanel extends RoundJPanel{
         }
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintBorder(Graphics g) {
         if(getAlpha()>0)
             super.paintBorder(g);
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintChildren(Graphics g) {
         if(getAlpha()>0)
             super.paintChildren(g);
     }
 
+    /**
+     *
+     * @param fraction
+     * @param direct
+     */
     protected void initAnimator(float fraction,Direction direct){
         System.err.println("Init animator <Thumbnail panel>");
         if(fraction == -1){
@@ -71,6 +92,10 @@ public class ThumbnailPanel extends RoundJPanel{
         animator.setStartDirection(direct);
         animator.start();
     }
+    /**
+     *
+     * @param disp
+     */
     public void displayThumbnail(boolean disp){
         if(disp){
             if(!thumbnail.isDisplay())
@@ -87,8 +112,15 @@ public class ThumbnailPanel extends RoundJPanel{
     public Thumbnail getThumbnail() {
         return thumbnail;
     }
+    /**
+     *
+     */
     protected class AnimatorBehaviour implements TimingTarget{
 
+        /**
+         *
+         * @param arg0
+         */
         @Override
         public void timingEvent(float arg0) {
             if(setAlpha(arg0)){
@@ -106,16 +138,25 @@ public class ThumbnailPanel extends RoundJPanel{
                 });
             }
         }
+        /**
+         *
+         */
         @Override
         public void begin() {
             //System.out.println("Thumbnail alpha "+getAlpha()+" upper alpha "+getUpperThresholdAlpha());
             getThumbnail().setInteractionEnabled(!thumbnail.isDisplay());
         }
+        /**
+         *
+         */
         @Override
         public void end() {
             //System.out.println("Thumbnail end -> alpha "+getAlpha()+" upper alpha "+getUpperThresholdAlpha());
             
         }
+        /**
+         *
+         */
         @Override
         public void repeat() {}
     }

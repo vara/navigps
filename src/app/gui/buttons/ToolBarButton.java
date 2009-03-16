@@ -40,6 +40,11 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
 
     private float roundCorner = 12.0f;
 
+    /**
+     *
+     * @param a
+     * @param i
+     */
     public ToolBarButton(Action a,ImageIcon i){
 	
         super(a);
@@ -139,10 +144,18 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
         setMouseOnButton(false);
     }
 
+    /**
+     *
+     * @return
+     */
     protected boolean isMouseOnButton() {
         return mouseOnButton;
     }
 
+    /**
+     *
+     * @param mouseOnButton
+     */
     protected void setMouseOnButton(boolean mouseOnButton) {
         this.mouseOnButton = mouseOnButton;
     }
