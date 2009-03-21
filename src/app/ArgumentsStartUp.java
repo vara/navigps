@@ -21,7 +21,7 @@ public class ArgumentsStartUp {
     
     private boolean isArguments = false;
     private boolean exitProgram = false;
-    private String infoParameters = "\n\t-v  \t(version) print version application" +
+    private static final String INFO_PARAMETERS = "\n\t-v  \t(version) print version application" +
                     "\n\t-V  \t(verbose mode) result return by function only on console" +
 				    "\n\t-Vg \t(verbose mode) like -v + create window in gui with the same result on console" +
 				    "\n\t-sp \t(Show properties) create window in app with properties chart file" +
@@ -43,7 +43,7 @@ public class ArgumentsStartUp {
                 checkParameters(arg);                
                 MyLogger.log.log(Level.FINE,"Validate arguments status OK !");
             } catch (Exception ex) {
-                MyLogger.log.log(Level.WARNING,ex.getMessage());
+                //MyLogger.log.log(Level.INFO,ex.getMessage());
                 helpInformation(ex.getMessage());
             }
         }else{
@@ -153,9 +153,11 @@ public class ArgumentsStartUp {
                 break;
             case 'h':
 
-                System.out.println(Version.getVersion());
+                System.out.println("Version : "+Version.getVersion());
                 setExitProgram(true);
+                //helpInformation(getHelpInformation());
                 throw new Exception(getHelpInformation());
+                //break;
             case 'w'+'s':
                                 
                 {//sWidth or sHeight == null This situation will probably never take place. I hope ! ;D
@@ -186,9 +188,10 @@ public class ArgumentsStartUp {
                 }                          
                 break;
             case 'v':
-                System.out.println(Version.getVersion());
+                //System.out.println("Version : "+Version.getVersion());
                 setExitProgram(true);
-                break;
+                throw new Exception("Version : "+Version.getVersion());
+                //break;
             case 'f'+'s':
                 GUIConfiguration.setModeScreen(GUIConfiguration.FULL_SCREEN);
                 break;
@@ -203,7 +206,7 @@ public class ArgumentsStartUp {
      * @return
      */
     public String getHelpInformation(){
-        return infoParameters;
+        return INFO_PARAMETERS;
     }
     
     /**
