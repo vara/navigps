@@ -1,6 +1,5 @@
 package app.gui.detailspanel;
 
-import app.gui.MainWindowIWD;
 import app.gui.label.ui.TitleLabelUI;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -12,7 +11,6 @@ import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
 import javax.swing.JButton;
 import javax.swing.JLabel;
-import javax.swing.border.LineBorder;
 
 /**
  *

@@ -110,7 +110,7 @@ public class DisplayManager extends AbstractDisplayManager{
 
                             for (int i = 0; i < nl.getLength(); i++) {
                                 Node child =nl.item(i);
-                                System.out.println("node value : "+child.getNodeValue());
+                                //System.out.println("node value : "+child.getNodeValue());
                                 gTekst.removeChild(child);
 
                             }

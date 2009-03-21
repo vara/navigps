@@ -860,31 +860,33 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         public void actionPerformed(ActionEvent e) {
 
             SVGDocument doc = getSVGCanvas().getSVGDocument();
-            SVGSVGElement el = doc.getRootElement();
-            String viewBoxStr = el.getAttributeNS(null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
-            float[] rect = ViewBox.parseViewBoxAttribute(el, viewBoxStr, null);
-            Rectangle2D rect2d = new Rectangle2D.Float(rect[0], rect[1], rect[2], rect[3]);
-            GraphicsNode gn = getSVGCanvas().getGraphicsNode();
-            Rectangle2D bounds = gn.getBounds();
+            if(doc!=null){
+                SVGSVGElement el = doc.getRootElement();
+                String viewBoxStr = el.getAttributeNS(null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
+                float[] rect = ViewBox.parseViewBoxAttribute(el, viewBoxStr, null);
+                Rectangle2D rect2d = new Rectangle2D.Float(rect[0], rect[1], rect[2], rect[3]);
+                GraphicsNode gn = getSVGCanvas().getGraphicsNode();
+                Rectangle2D bounds = gn.getBounds();
 
-            CanvasGraphicsNode cgn = getSVGCanvas().getCanvasGraphicsNode();
-            getVerboseStream().outputVerboseStream("-------- Transform SVG Document --------");
-            getVerboseStream().outputVerboseStream("\t" + getClass().getName() + "");
-            getVerboseStream().outputVerboseStream("ViewingTransform\t" + getSVGCanvas().getViewingTransform());
-            getVerboseStream().outputVerboseStream("ViewBoxTransform\t" + getSVGCanvas().getViewBoxTransform());
-            getVerboseStream().outputVerboseStream("RenderingTransform\t" + getSVGCanvas().getRenderingTransform());
-            getVerboseStream().outputVerboseStream("PaintingTransform\t" + getSVGCanvas().getPaintingTransform());
-            getVerboseStream().outputVerboseStream("InitialTransform\t" + getSVGCanvas().getInitialTransform());
-            getVerboseStream().outputVerboseStream("Visible Rect\t" + getSVGCanvas().getVisibleRect());
-            getVerboseStream().outputVerboseStream("ViewBox Rect\t" + rect2d + "\t" + bounds);
-            getVerboseStream().outputVerboseStream("-------- Transform Graphics Nood -------");
-            getVerboseStream().outputVerboseStream("PositionTransform\t" + cgn.getPositionTransform());
-            getVerboseStream().outputVerboseStream("ViewingTransform\t" + cgn.getViewingTransform());
-            getVerboseStream().outputVerboseStream("GlobalTransform\t" + cgn.getGlobalTransform());
-            getVerboseStream().outputVerboseStream("InverseTransform\t" + cgn.getInverseTransform());
-            getVerboseStream().outputVerboseStream("Transform\t" + cgn.getTransform());
-            getVerboseStream().outputVerboseStream("----------------------------------------");
-
+                CanvasGraphicsNode cgn = getSVGCanvas().getCanvasGraphicsNode();
+                String msg = "-------- Transforms SVG Document --------\n"+
+                    "\t" + getClass().getName() + "\n"+
+                    "ViewingTransform\t" + getSVGCanvas().getViewingTransform()+"\n"+
+                    "ViewBoxTransform\t" + getSVGCanvas().getViewBoxTransform()+"\n"+
+                    "RenderingTransform\t" + getSVGCanvas().getRenderingTransform()+"\n"+
+                    "PaintingTransform\t" + getSVGCanvas().getPaintingTransform()+"\n"+
+                    "InitialTransform\t" + getSVGCanvas().getInitialTransform()+"\n"+
+                    "Visible Rect\t" + getSVGCanvas().getVisibleRect()+"\n"+
+                    "ViewBox Rect\t" + rect2d + "\t" + bounds+"\n"+
+                    "-------- Transform Graphics Nood -------"+"\n"+
+                    "PositionTransform\t" + cgn.getPositionTransform()+"\n"+
+                    "ViewingTransform\t" + cgn.getViewingTransform()+"\n"+
+                    "GlobalTransform\t" + cgn.getGlobalTransform()+"\n"+
+                    "InverseTransform\t" + cgn.getInverseTransform()+"\n"+
+                    "Transform\t" + cgn.getTransform()+"\n"+
+                    "----------------------------------------";
+                getVerboseStream().outputVerboseStream(msg);
+            }
         }
     }
 

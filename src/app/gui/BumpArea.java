@@ -49,7 +49,6 @@ public class BumpArea extends AlphaJPanel{
         int height = getHeight()-ins.bottom;
         int x = ins.left;
         int y = ins.top;
-        System.err.println("insets "+ins);
         g2.setStroke(dashed);
         for (int i = x; i <=width; i++) {
             int offset = i % (gap+1);
