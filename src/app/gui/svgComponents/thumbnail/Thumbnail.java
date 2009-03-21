@@ -245,9 +245,9 @@ public class Thumbnail extends AlphaJPanel {
 
             if(getAlpha()!=0){
                 if (image != null ) {
-                    if(bi == null){
-                        System.err.println("GraphicsUtilities.toCompatibleImage");
+                    if(bi == null){                        
                         bi = GraphicsUtilities.toCompatibleImage(image);
+                        System.err.println(getClass().getCanonicalName()+" created new buffer image -> GraphicsUtilities.toCompatibleImage(image)");
                     }
                     if (paintingTransform != null) {
                         g2d.transform(paintingTransform);
@@ -318,7 +318,7 @@ public class Thumbnail extends AlphaJPanel {
             sx = evt.getX();
             sy = evt.getY();
             in = overlay.contains(sx, sy);
-            System.out.println("in "+in+" sx "+sx+" sy "+sy);
+            System.out.println(getClass().getCanonicalName()+" [in "+in+" sx "+sx+" sy "+sy+"]");
             overlay.setPaintingTransform(new AffineTransform());
         }
 
@@ -452,7 +452,7 @@ public class Thumbnail extends AlphaJPanel {
         /**
          *
          */
-        protected Shape s;
+        protected Shape s = new Rectangle2D.Float(0,0,0,0);
         /**
          *
          */
@@ -469,7 +469,7 @@ public class Thumbnail extends AlphaJPanel {
          * @return
          */
         public boolean contains(int x, int y) {
-            System.out.println("s bounds "+s.getBounds());
+            System.out.println(getClass().getCanonicalName()+" [bounds "+s.getBounds()+"]");
             return (s != null) ? s.contains(x, y) : false;
         }
 
