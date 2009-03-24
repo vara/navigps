@@ -19,6 +19,10 @@ import javax.swing.JScrollBar;
  */
 public class SVGLayerScrollPane extends SVGScrollPane{
 
+    /**
+     *
+     * @param svgCanvasL
+     */
     public SVGLayerScrollPane(SVGCanvasLayers svgCanvasL){
         
         this.canvas = svgCanvasL.getSvgCanvas();
@@ -66,6 +70,10 @@ public class SVGLayerScrollPane extends SVGScrollPane{
         canvas.addUpdateManagerListener  (xlistener);
     }
 
+    /**
+     *
+     * @param scale
+     */
     @Override
     public void scaleChange(float scale) {
         super.scaleChange(scale);

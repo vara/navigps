@@ -15,10 +15,18 @@ public class OpacityButton extends AbstractOpacityJButton{
 
     private BufferedImage buttonImage = null;
 
+    /**
+     *
+     * @param label
+     */
     public OpacityButton(String label) {
         super(label);
         setOpaque(false);        
     }
+    /**
+     *
+     * @param a
+     */
     public OpacityButton(Action a) {
         super(a);
         setOpaque(false);

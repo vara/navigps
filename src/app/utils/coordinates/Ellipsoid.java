@@ -43,6 +43,12 @@ public class Ellipsoid implements EllipsedMethods{
      */
     private double e2;
     
+    /**
+     *
+     * @param name
+     * @param a
+     * @param b
+     */
     public Ellipsoid(String name,double a,double b)  {
 	this.name = name;
 	this.a = a;
@@ -70,38 +76,74 @@ public class Ellipsoid implements EllipsedMethods{
 	*/
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
 	return name;
     }
     
+    /**
+     *
+     * @return
+     */
     public double getInvF() {
 	return 1/getPinFlatteningElipsoidy();
     }
 
+    /**
+     *
+     * @return
+     */
     public double getSemiMinorAxis() {
 	return b;
     }
     
+    /**
+     *
+     * @return
+     */
     public double getSemiMajorAxis() {
 	return a;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getPinFlatteningElipsoidy() {
 	return f;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getFirstEccentricity() {
 	return e1;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getSecondEccentricity() {
 	return e2;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getSquareFirstEccentricity() {
 	return ( (getPinFlatteningElipsoidy()*2) - Math.pow(getPinFlatteningElipsoidy(),2) );
     }
 
+    /**
+     *
+     * @return
+     */
     public double getSquareSecondEccentricity() {
 	return ( Math.pow(getSecondEccentricity(),2) / (1-Math.pow(getSecondEccentricity(),2)) );
     }

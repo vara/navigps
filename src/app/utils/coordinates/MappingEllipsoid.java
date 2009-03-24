@@ -13,12 +13,21 @@ import java.awt.Point;
  */
 public class MappingEllipsoid {
     
+    /**
+     *
+     */
     public final static double DEGREE = 1.74532925199e-2;
+    /**
+     *
+     */
     public final static double R0 = 6367449.145771;
     public final static Ellipsoid [] ellipsoids = new Ellipsoid[]{
 				    new Ellipsoid("WGS-84",6378137.0,6356752.3142)    
 				};
     
+    /**
+     *
+     */
     public MappingEllipsoid(){
     }
     protected static PointXY mappingLagrange(double b,double l){

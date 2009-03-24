@@ -26,37 +26,68 @@ public class SVGBridgeComponents implements StatusChangedListener,
     
     private File svgFile= null;
     
+    /**
+     *
+     */
     public SVGBridgeComponents(){}
     
+    /**
+     *
+     * @return
+     */
     public boolean isRendering() {
         return rederingStatus;
     }
     
+    /**
+     *
+     * @param rederingStatus
+     */
     protected void setRederingStatus(boolean rederingStatus) {
         this.rederingStatus = rederingStatus;
     }
     
+    /**
+     *
+     * @param path
+     */
     public void setSvgFileObject(File path){
         svgFile = path;
     }
     
+    /**
+     *
+     * @return
+     */
     public final String getAbsoluteFilePath(){
         if(svgFile != null)
             return svgFile.getName();
         return "";
     }
     
+    /**
+     *
+     * @param l
+     */
     public void addUpdateComponentslisteners(UpdateComponentsWhenChangedDoc l){
 	
         if(l!=null)
             updateComponets.add(l);
     }
     
+    /**
+     *
+     * @param l
+     */
     public void addStatusChangedlistener(StatusChangedListener l){
         if(l!=null)
              statusChanged.add(l);
     }
 
+    /**
+     *
+     * @param str
+     */
     @Override
     synchronized public void currentStatusChanged(String str) {
         for (StatusChangedListener ucomp : statusChanged) {
@@ -65,6 +96,9 @@ public class SVGBridgeComponents implements StatusChangedListener,
         //System.out.println(str);
     }
 
+    /**
+     *
+     */
     @Override
     public void documentPrepareToModification() {
         Thread t = new Thread(new Runnable() {
@@ -77,6 +111,9 @@ public class SVGBridgeComponents implements StatusChangedListener,
         t.start();
     }
 
+    /**
+     *
+     */
     @Override
     public void documentClosed() {
         Thread t = new Thread(new Runnable() {

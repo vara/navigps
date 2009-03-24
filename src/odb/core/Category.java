@@ -3,6 +3,10 @@ package odb.core;
 import config.DataBaseConfig;
 import java.util.Vector;
 
+/**
+ *
+ * @author ACME
+ */
 public class Category {
     
     private String name;
@@ -10,24 +14,44 @@ public class Category {
     private String icoPath;
     private String defaultIconExtension = ".png";
     
+    /**
+     *
+     * @param name
+     */
     public Category(String name) {
         this.name = name;
         subcategories = null;
         this.icoPath = DataBaseConfig.getIconPath()+name+defaultIconExtension;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getName() {
         return name;
     }
 
+    /**
+     *
+     * @param name
+     */
     public void setName(String name) {
         this.name = name;
     }
 
+    /**
+     *
+     * @return
+     */
     public Vector getSubcategories() {
         return subcategories;
     }
 
+    /**
+     *
+     * @param subcategories
+     */
     public void setSubcategories(Vector subcategories) {
         this.subcategories = subcategories;
     }

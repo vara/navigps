@@ -11,14 +11,26 @@ public abstract class RoundBorder extends AlphaBorder{
     private double recw=0;
     private double rech=0;
     
+    /**
+     *
+     */
     public RoundBorder(){
     }
 
+    /**
+     *
+     * @param recw
+     * @param rech
+     */
     public RoundBorder(double recw, double rech) {
          this.recw=recw;
          this.rech=rech;
     }
 
+    /**
+     *
+     * @param ins
+     */
     public abstract void setBorderInsets(Insets ins);
 
     /**
@@ -49,6 +61,11 @@ public abstract class RoundBorder extends AlphaBorder{
         this.rech = rech;
     }
 
+    /**
+     *
+     * @param recw
+     * @param rech
+     */
     public void setRound(double recw, double rech){
         setRecH(rech);
         setRecW(recw);

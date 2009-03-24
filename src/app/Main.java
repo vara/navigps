@@ -2,10 +2,8 @@ package app;
 
 import app.gui.MainWindowIWD;
 import app.utils.MyLogger;
-import config.DataBaseConfig;
 import java.util.logging.Level;
 import javax.swing.SwingUtilities;
-import odb.utils.Constants;
 
 /**
  *
@@ -14,13 +12,20 @@ import odb.utils.Constants;
 public class Main {
     
     public final MyLogger logger = new MyLogger();
-
+    /**
+     *
+     * @param args
+     */
     public Main(String [] args){
 
         MyLogger.log.log(Level.FINE,"Start main application");
         new ArgumentsStartUp(args);
     }
     
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args) {
         args = new String[]{"-Vg","-sp","-V","-f","./resources/maps/MapWorld.svg","-ws","800","600"};
         //System.setProperty("sun.java2d.noddraw", "true");
@@ -29,6 +34,10 @@ public class Main {
         Main.initGui(app);
     }
 
+    /**
+     *
+     * @param m
+     */
     public static void initGui(final Main m){
         SwingUtilities.invokeLater(new Runnable() {
             @Override
@@ -38,7 +47,10 @@ public class Main {
         });
     }
     
-    public void reload(){		 
+    /**
+     *
+     */
+    public void reload(){
         initGui(this);
     }
 }

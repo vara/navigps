@@ -45,7 +45,10 @@ public class DatabaseManager extends javax.swing.JDialog {
     private JMenuItem removeMenu;
     private JMenu newMenu;
 
-    /** Creates new form Manager */
+    /** Creates new form Manager
+     * @param parent
+     * @param modal
+     */
     public DatabaseManager(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         setLocationRelativeTo(parent);
@@ -467,10 +470,21 @@ public class DatabaseManager extends javax.swing.JDialog {
         popup.add(removeMenu);
     }
 
+    /**
+     *
+     * @param name
+     * @return
+     */
     public static ImageIcon getIcon(String name) {
         return getIcon(name, "png");
     }
 
+    /**
+     *
+     * @param name
+     * @param ext
+     * @return
+     */
     public static ImageIcon getIcon(String name, String ext) {
         String imgLocation = DataBaseConfig.getIconPath() + name + "." + ext;
         URL imageURL = DatabaseManager.class.getResource(imgLocation);
@@ -520,6 +534,9 @@ public class DatabaseManager extends javax.swing.JDialog {
         }
     }
 
+    /**
+     *
+     */
     public void initServicesTable() {
         odb = Constants.getDbConnection();
         Vector v = null;

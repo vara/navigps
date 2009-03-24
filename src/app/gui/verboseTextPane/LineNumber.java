@@ -10,8 +10,15 @@ import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
 import javax.swing.*;
 
+/**
+ *
+ * @author wara
+ */
 public class LineNumber extends JComponent{
 
+    /**
+     *
+     */
     public final static String CHANGE_VISIBLE_LINE_NUMBER = "linenumber.visibleline";
 
     private float limitColorFontAlpha = 0.8f;
@@ -41,7 +48,11 @@ public class LineNumber extends JComponent{
     private boolean showNumber = true;
     private ShowLineNumberAction showNum = new ShowLineNumberAction();
 
-	public LineNumber(JComponent component){
+    /**
+     *
+     * @param component
+     */
+    public LineNumber(JComponent component){
 
 		if (component == null){
 			setFont(DEFAULT_FONT);
@@ -60,7 +71,9 @@ public class LineNumber extends JComponent{
 
 	/**
 	 *  Calculate the width needed to display the maximum line number
-	 */
+     *
+     * @param lines
+     */
 	public void setPreferredWidth(int lines)
 	{
 		int digits = String.valueOf(lines).length();        
@@ -89,7 +102,9 @@ public class LineNumber extends JComponent{
 	/**
 	 *  The line height defaults to the line height of the font for this
 	 *  component.
-	 */
+     *
+     * @return
+     */
 	public int getLineHeight(){
 		if (lineHeight == 0)
 			return componentFontHeight;
@@ -101,13 +116,19 @@ public class LineNumber extends JComponent{
 	 *  Override the default line height with a positive value.
 	 *  For example, when you want line numbers for a JTable you could
 	 *  use the JTable row height.
-	 */
+     *
+     * @param lineHeight
+     */
 	public void setLineHeight(int lineHeight){
 		if (lineHeight > 0)
 			this.lineHeight = lineHeight;
 	}
 
-	public int getStartOffset(){
+    /**
+     *
+     * @return
+     */
+    public int getStartOffset(){
 		return component.getInsets().top + componentFontAscent;
 	}
 
@@ -152,6 +173,10 @@ public class LineNumber extends JComponent{
         }
 	}
 
+    /**
+     *
+     * @param alpha
+     */
     public void setColorFontAlpha(float alpha){
         colorFontAlpha = alpha<0.0f ? 0.0f : (alpha>1.0f ? 1.0f:getLimitColorFontAlpha());
         //System.out.println("ColorAlpha "+colorFontAlpha);
@@ -256,6 +281,10 @@ public class LineNumber extends JComponent{
 
     }
 
+    /**
+     *
+     * @param args
+     */
     public static void main(String[] args){
 		JFrame frame = new JFrame("LineNumberDemo");
 		frame.setDefaultCloseOperation( JFrame.EXIT_ON_CLOSE );

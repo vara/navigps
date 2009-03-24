@@ -14,11 +14,28 @@ import java.awt.Graphics;
  */
 public class EmptyOvalBorder extends OvalBorder{
 
+    /**
+     *
+     */
     public EmptyOvalBorder(){
     }
+    /**
+     *
+     * @param recW
+     * @param recH
+     */
     public EmptyOvalBorder(double recW,double recH){
         super(recH, recH);
     }
+    /**
+     *
+     * @param c
+     * @param g
+     * @param x
+     * @param y
+     * @param w
+     * @param h
+     */
     @Override
      public void paintBorder(Component c, Graphics g, int x, int y, int w, int h) {
         

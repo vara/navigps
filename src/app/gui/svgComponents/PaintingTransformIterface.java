@@ -13,5 +13,9 @@ import java.awt.geom.AffineTransform;
  */
 public interface PaintingTransformIterface {
 
+    /**
+     *
+     * @param pt
+     */
     void setPaintingTransform(AffineTransform pt);
 }

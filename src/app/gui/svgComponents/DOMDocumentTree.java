@@ -301,6 +301,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
 
         /**
          * Constructor.
+         * @param tree
          */
         public TreeDropTargetListener(DOMDocumentTree tree) {
             addOnAutoscrollListener(tree);
@@ -682,6 +683,10 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
          */
         protected TransferData data;
 
+        /**
+         *
+         * @param data
+         */
         public TransferableTreeNode(TransferData data) {
             this.data = data;
         }
@@ -759,6 +764,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
         /**
          * Gets the concatenated string representation of the nodes in the node
          * list. (To support string data flavor)
+         * @return
          */
         public String getNodesAsXML() {
             String toReturn = "";
@@ -833,6 +839,10 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
      */
     public static class DOMDocumentTreeEvent extends EventObject {
 
+        /**
+         *
+         * @param source
+         */
         public DOMDocumentTreeEvent(Object source) {
             super(source);
         }
@@ -942,6 +952,7 @@ public class DOMDocumentTree extends JTree implements Autoscroll {
         /**
          * @param parent
          *            Parent node
+         * @param sibling
          * @param children
          *            Nodes to be appended
          */

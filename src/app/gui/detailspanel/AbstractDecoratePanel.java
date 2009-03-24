@@ -13,8 +13,24 @@ import javax.swing.JLabel;
  */
 public abstract class AbstractDecoratePanel extends AlphaJPanel{
 
+    /**
+     *
+     * @param text
+     */
     abstract public void setTitle(String text);
+    /**
+     *
+     * @return
+     */
     abstract public String getTitle();
+    /**
+     *
+     * @return
+     */
     abstract public JLabel getContent();
+    /**
+     *
+     * @param lab
+     */
     abstract public void setContent(JLabel lab);
 }

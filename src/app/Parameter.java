@@ -16,16 +16,33 @@ public class Parameter {
     private String param;
     private Vector <String> value = new Vector<String>(3,1);
         
+    /**
+     *
+     * @param p
+     * @param val
+     */
     public Parameter(String p,String val){
         param = p;
         value.add(val);
     }
+    /**
+     *
+     * @param p
+     */
     public Parameter(String p){
         param = p;
     }
+    /**
+     *
+     * @return
+     */
     public String getParam() {
         return param;
     }
+    /**
+     *
+     * @return
+     */
     public char getCharParam(){
         char [] charArr = param.toCharArray();
         char sumChar=0;
@@ -34,10 +51,19 @@ public class Parameter {
         }
         return sumChar;
     }
+    /**
+     *
+     * @param param
+     */
     public void setParam(String param) {
         this.param = param;
     }
 
+    /**
+     *
+     * @param index
+     * @return
+     */
     public String getValue(int index){
 
         try{
@@ -47,9 +73,17 @@ public class Parameter {
         }
     }
 
+    /**
+     *
+     * @param value
+     */
     public void addValue(String value) {
         this.value.add(value);
     }
+    /**
+     *
+     * @return
+     */
     public Vector<String> getVecValue(){
         return value;
     }

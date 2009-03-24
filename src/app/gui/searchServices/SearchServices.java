@@ -1,7 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
 package app.gui.searchServices;
 
 import app.gui.searchServices.swing.SearchServicesPanel;
@@ -10,7 +6,6 @@ import app.gui.detailspanel.AlphaJPanel;
 import app.gui.detailspanel.RoundWindow;
 import app.gui.detailspanel.RoundWindowUtils;
 import app.gui.svgComponents.Canvas;
-import app.gui.svgComponents.PaintingTransformIterface;
 import app.gui.svgComponents.SVGCanvasLayers;
 import app.utils.NaviPoint;
 import app.utils.Utils;
@@ -23,12 +18,10 @@ import java.awt.RenderingHints;
 import java.awt.event.ComponentEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
-import bridge.ODBridge;
 import java.awt.BorderLayout;
 import java.awt.geom.AffineTransform;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
-import javax.swing.JComponent;
 import javax.swing.event.MouseInputAdapter;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.gvt.JGVTComponentListener;
@@ -52,17 +45,11 @@ public class SearchServices extends AlphaJPanel{
 
     private DocumentStateChangedListener svgViewListener = new DocumentStateChangedListener();
     private boolean enabled = false;
-    private ODBridge odbConnector = null;
 
     private RoundWindow roundWindowInstace;
     
     private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
-    //private Rectangle visibleRec = new Rectangle(0, 0, 0, 0);
-    //private boolean needRepaint = false;
     private SSMouseEvents me = new SSMouseEvents();
-    //private AreaOverLay paintArea = new AreaOverLay();
-
-    private SynchronizePaintingTransform synch = new SynchronizePaintingTransform();
 
     PropertyChangeListener removeContent = new PropertyChangeListener(){
 
@@ -110,7 +97,6 @@ public class SearchServices extends AlphaJPanel{
 
     public void uninstall(){
 
-        //svgCanvas.remove(synch);
         svgCanvas.removeMouseMotionListener(me);
         svgCanvas.removeMouseListener(me);
         svgCanvas.removeJGVTComponentListener(svgViewListener);
@@ -170,11 +156,7 @@ public class SearchServices extends AlphaJPanel{
     public boolean isEnabledSearchServices() {
         return enabled;
     }
-
-    public void initODBConnector(ODBridge odbb) {
-        odbConnector = odbb;
-    }
-
+    
     @Override
     public void paintComponent(Graphics g) {
         super.paintComponent(g);                
@@ -191,7 +173,7 @@ public class SearchServices extends AlphaJPanel{
         }
     }    
 
-    protected static void paintCircle(Graphics2D g2, double radius, NaviPoint center, NaviPoint currPos) {
+    protected void paintCircle(Graphics2D g2, double radius, NaviPoint center, NaviPoint currPos) {
 
         float dash[] = {10.0f};
         float widthStroke = 1.0f;
@@ -225,7 +207,7 @@ public class SearchServices extends AlphaJPanel{
         setCurrentPosition(p.getX(), p.getY());
     }
 
-    public void setCenterPoint(float x, float y) {        
+    public void setCenterPoint(float x, float y) {
         paintCenterPoint.setLocation(x, y);
         SVGDocument doc = svgCanvas.getSVGDocument();
         if(doc!=null){
@@ -244,7 +226,7 @@ public class SearchServices extends AlphaJPanel{
         return radius;
     }
 
-    public void setCurrentPosition(float x, float y) {        
+    public void setCurrentPosition(float x, float y) {
         paintCurrentPos.setLocation(x,y);
         SVGDocument doc = svgCanvas.getSVGDocument();
         if(doc!=null){
@@ -262,7 +244,10 @@ public class SearchServices extends AlphaJPanel{
         guiForSearchServ.setCurrentPos(getCurrentPosition());        
     }
 
-    public void updatePoint(){        
+    /**
+     *
+     */
+    public void updatePoint(){
         SVGDocument doc = svgCanvas.getSVGDocument();
         if(doc!=null){
             NaviPoint [] tabPoints = {centerPoint,currentPos};
@@ -284,10 +269,6 @@ public class SearchServices extends AlphaJPanel{
         return currentPos;
     }
 
-    /*
-    *     Mouse listener for search services
-    */
-
     private class SSMouseEvents extends MouseInputAdapter{
         
         private boolean dragged;
@@ -298,7 +279,6 @@ public class SearchServices extends AlphaJPanel{
             if (e.getButton() == MouseEvent.BUTTON1 && !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && isEnabledSearchServices()) {
                 
                 startPoint.setLocation(e.getX(), e.getY());
-                //needRepaint = true;
                 setDragged(true);                
             }
         }
@@ -309,26 +289,6 @@ public class SearchServices extends AlphaJPanel{
             if (isEnabledSearchServices() && isDragged()) {
                 setCenterPoint(startPoint);                
                 setCurrentPosition(e.getX(),e.getY());
-                /*
-                int gap = 10;
-                int x = (int)(getCenterPoint().getX()-getRadius()-gap);
-                int y = (int)(getCenterPoint().getY()-getRadius()-gap);
-                int w = (int)(getRadius()*2+gap*2);
-                int h = w;
-
-                if(x<0){ w+=x; x=0; }
-                if(y<0){ h+=y; y=0; }
-
-                if(visibleRec.getWidth()>w || visibleRec.getHeight()>h || needRepaint){
-                    repaint(visibleRec);
-                    needRepaint = false;
-                }
-                //System.out.println("Search Services : Visible Rect. "+visibleRec);
-                visibleRec = new Rectangle(x,y,w,h);
-                */
-                //svgViewListener.resetTransform();
-                //svgViewListener.updatePos();
-                //repaint(visibleRec);                                
                 repaint();
             }
         }
@@ -337,64 +297,21 @@ public class SearchServices extends AlphaJPanel{
         public void mouseReleased(MouseEvent e) {
             setDragged(false);
         }
-        
-        /**
-         * @return the dragged
-         */
+
         private boolean isDragged() {
             return dragged;
         }
-        
-        /**
-         * @param dragged the dragged to set
-         */
+
         private void setDragged(boolean dragged) {
             this.dragged = dragged;
         }
     }
 
-    /*
-     *  Test for OverLay's list (not worked properly)
-     *
-    private class AreaOverLay implements Overlay{
-
-        @Override
-        public void paint(Graphics g) {
-            Graphics2D g2 = (Graphics2D) g.create();            
-
-            Shape shape = getPaintingShape();
-            NaviPoint centPoint = getCenterPoint();
-            g2.translate(centPoint.getX(), centPoint.getY());
-            g2.draw(shape);
-            g2.translate(-centPoint.getX(), -centPoint.getY());
-
-            g2.dispose();
-       }
-
-    }
-    */
     private class DocumentStateChangedListener implements JGVTComponentListener{
-        //JGVTComponentListener
         @Override
         public void componentTransformChanged(ComponentEvent event) {
             System.err.println("***<SearchServicesListener> svgCanvas transform changed ***");
             updatePoint();
         }
-    }//DocumentStateChangedListener
-
-    private class SynchronizePaintingTransform extends JComponent
-        implements PaintingTransformIterface{
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            super.paintComponent(g);
-            SearchServices.this.paintComponent(g);
-        }
-
-        @Override
-        public void setPaintingTransform(AffineTransform pt) {
-
-        }
-
     }
 }

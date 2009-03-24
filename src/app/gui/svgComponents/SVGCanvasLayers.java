@@ -25,8 +25,17 @@ import javax.swing.OverlayLayout;
  */
 public class SVGCanvasLayers extends JLayeredPane{
 
+    /**
+     *
+     */
     public static final String SVG_CANVAS_CHANGED = "svgcanvas.changed";
+    /**
+     *
+     */
     public static final Integer SEARCH_SERVICES_LAYER = new Integer(JLayeredPane.FRAME_CONTENT_LAYER+100);
+    /**
+     *
+     */
     public static final Integer THUMBNAIL_LAYER = new Integer(JLayeredPane.DEFAULT_LAYER+10);
 
     private Canvas svgCanvas;
@@ -35,6 +44,9 @@ public class SVGCanvasLayers extends JLayeredPane{
     private AlphaJPanel modalContainer;
     private AlphaJPanel thumbnailContainer;
 
+    /**
+     *
+     */
     public SVGCanvasLayers(){
 
         setLayout(new OverlayLayout(this));

@@ -18,6 +18,13 @@ import java.awt.Shape;
  */
 public class BorderEfects {
 
+    /**
+     *
+     * @param g2
+     * @param shadowWidth
+     * @param clipShape
+     * @param col
+     */
     public static  void paintBorderShadow(Graphics2D g2, int shadowWidth,Shape clipShape,Color [] col) {
         int sw = shadowWidth*2;
         for (int i=sw; i >= 2; i-=1) {
@@ -29,6 +36,14 @@ public class BorderEfects {
             g2.draw(clipShape);
         }
     }
+    /**
+     *
+     * @param c1
+     * @param pct1
+     * @param c2
+     * @param pct2
+     * @return
+     */
     public static Color getMixedColor(Color c1, float pct1, Color c2, float pct2) {
         float[] clr1 = c1.getComponents(null);
         float[] clr2 = c2.getComponents(null);        
@@ -46,6 +61,13 @@ public class BorderEfects {
      *      col[1] clrGlowOuterHi
      *      col[2] clrGlowInnerLo
      *      col[3] clrGlowOuterLo
+     */
+    /**
+     *
+     * @param g2
+     * @param glowWidth
+     * @param clipShape
+     * @param col
      */
     public static void paintBorderGlow(Graphics2D g2, int glowWidth,Shape clipShape,Color[] col) {
 

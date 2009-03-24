@@ -9,33 +9,65 @@ import javax.swing.tree.TreeNode;
 import javax.swing.tree.TreePath;
 import javax.swing.tree.TreeSelectionModel;
 
+/**
+ *
+ * @author wara
+ */
 public class JCheckBoxTree extends JTree{
     Vector checkedPaths = new Vector();
     JCheckBoxTreeRenderer checkBoxCellRenderer;
 
+    /**
+     *
+     * @param value
+     */
     public JCheckBoxTree(Object[] value) {
         super(value);
     }
 
+    /**
+     *
+     * @param value
+     */
     public JCheckBoxTree(Vector<?> value){
         super(value);
     }
 
+    /**
+     *
+     * @param value
+     */
     public JCheckBoxTree(Hashtable<?,?> value){
         super(value);
     }
 
+    /**
+     *
+     * @param root
+     */
     public JCheckBoxTree(TreeNode root){
         super(root);
     }
 
+    /**
+     *
+     * @param root
+     * @param asksAllowsChildren
+     */
     public JCheckBoxTree(TreeNode root, boolean asksAllowsChildren){
         super(root, asksAllowsChildren);
     }
+    /**
+     *
+     * @param newModel
+     */
     public JCheckBoxTree(TreeModel newModel){
         super(newModel);
     }
 
+    /**
+     *
+     */
     public JCheckBoxTree() {
         super();
         init();
@@ -48,6 +80,10 @@ public class JCheckBoxTree extends JTree{
         addMouseListener(new JCheckBoxTreeMouseListener(this));
     }
 
+    /**
+     *
+     * @param path
+     */
     public void setChecked(TreePath path) {
         if(checkedPaths.contains(path)) {
             checkedPaths.remove(path);
@@ -96,6 +132,11 @@ public class JCheckBoxTree extends JTree{
         }
     }
 
+    /**
+     *
+     * @param path
+     * @return
+     */
     public boolean isAnyChildChecked(TreePath path) {
         if ((path != null) && (checkedPaths != null)) {
             for(int i=0; i < checkedPaths.size(); i++) {
@@ -151,6 +192,11 @@ public class JCheckBoxTree extends JTree{
         }
     }
 
+    /**
+     *
+     * @param path
+     * @return
+     */
     public boolean isChecked(TreePath path) {
         return (checkedPaths.contains(path));
     }

@@ -26,12 +26,19 @@ public class BumpArea extends AlphaJPanel{
                                       BasicStroke.CAP_BUTT,
                                       BasicStroke.JOIN_BEVEL,
                                       1.0f, dash1, 0.0f);
+    /**
+     *
+     */
     public BumpArea(){
         setOpaque(false);
         setAlpha(0.6f);
         //setBorder(new EmptyBorder(4,4,4,4));
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
@@ -42,7 +49,6 @@ public class BumpArea extends AlphaJPanel{
         int height = getHeight()-ins.bottom;
         int x = ins.left;
         int y = ins.top;
-        System.err.println("insets "+ins);
         g2.setStroke(dashed);
         for (int i = x; i <=width; i++) {
             int offset = i % (gap+1);

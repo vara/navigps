@@ -41,15 +41,39 @@ import javax.swing.border.Border;
  */
 public class MemoryGui extends JComponent implements Runnable,
 						     MouseListener{
+    /**
+     *
+     */
     public static final int B =  1;
+    /**
+     *
+     */
     public static final int KB = 1024;
+    /**
+     *
+     */
     public static final int MB = 1024*1024;
+    /**
+     *
+     */
     public static final int GB = 1024*1024*1024;
     
+    /**
+     *
+     */
     protected static final int STARTED=0;
+    /**
+     *
+     */
     protected static final int STOPED=1;
+    /**
+     *
+     */
     protected static final int PAUSED=2;
-    protected static final int RESUMED=3;    
+    /**
+     *
+     */
+    protected static final int RESUMED=3;
     
     private int mul = MemoryGui.MB;
     private String unitName = "MB";    
@@ -197,6 +221,9 @@ public class MemoryGui extends JComponent implements Runnable,
         }
     }
     
+    /**
+     *
+     */
     public void stop(){
 	
         if(isLoopThread()){
@@ -208,7 +235,10 @@ public class MemoryGui extends JComponent implements Runnable,
         }
     }
     
-    public void start(){	
+    /**
+     *
+     */
+    public void start(){
         if(!isLoopThread()){
 
             if( getVerboseStream()!=null)
@@ -222,13 +252,20 @@ public class MemoryGui extends JComponent implements Runnable,
         }
     }
         
-    public void pause(){	
+    /**
+     *
+     */
+    public void pause(){
         setLoopThread(false);
         if( getVerboseStream()!=null)
             getVerboseStream().outputVerboseStream("Memory Monitor paused");
         setStatusMonitor(MemoryGui.PAUSED);
     }
     
+    /**
+     *
+     * @param mode
+     */
     protected void setStatusMonitor(int mode){
 	
         switch(mode){
@@ -250,66 +287,130 @@ public class MemoryGui extends JComponent implements Runnable,
         }
     }
     
-    public int getWPaint() { 
+    /**
+     *
+     * @return
+     */
+    public int getWPaint() {
         return wPaint;
     }
 
+    /**
+     *
+     * @param wPaint
+     */
     public void setWPaint(int wPaint) {
         this.wPaint = wPaint;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getHPaint() {
         return hpaint;
     }
 
+    /**
+     *
+     * @param hpaint
+     */
     public void setHpaint(int hpaint) {
         this.hpaint = hpaint;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getFreeMem() {
         return freeMem;
     }
 
+    /**
+     *
+     * @param freeMem
+     */
     protected void setFreeMem(long freeMem) {
         this.freeMem = freeMem;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getTotalMem() {
         return totalMem;
     }
 
+    /**
+     *
+     * @param totalMem
+     */
     protected void setTotalMem(long totalMem) {
         this.totalMem = totalMem;
     }
 
+    /**
+     *
+     * @return
+     */
     public long getMaxMem() {
         return maxMem;
     }
 
+    /**
+     *
+     * @param maxMem
+     */
     protected void setMaxMem(long maxMem) {
         this.maxMem = maxMem;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getRefresh() {
         return refresh;
     }
 
+    /**
+     *
+     * @param refresh
+     */
     public void setRefresh(int refresh) {
         this.refresh = refresh;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isLoopThread() {
         return loopThread;
     }
 
+    /**
+     *
+     * @param repaintThread
+     */
     protected void setLoopThread(boolean repaintThread) {
         this.loopThread = repaintThread;
     }
 
+    /**
+     *
+     * @return
+     */
     public int getMul() {
         return mul;
     }
 
+    /**
+     *
+     * @param mul
+     */
     public void setMul(int mul) {
         if(mul<MemoryGui.KB)
             setUnitName("B");
@@ -322,50 +423,98 @@ public class MemoryGui extends JComponent implements Runnable,
         this.mul = mul;
     }
 
+    /**
+     *
+     * @return
+     */
     public String getUnitName() {
         return unitName;
     }
 
+    /**
+     *
+     * @param unitName
+     */
     protected void setUnitName(String unitName) {
         this.unitName = unitName;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isShowText() {
         return showText;
     }
 
+    /**
+     *
+     * @param showText
+     */
     public void setShowText(boolean showText) {
         this.showText = showText;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isShowShadow() {
         return showShadow;
     }
 
+    /**
+     *
+     * @param showShadow
+     */
     public void setShowShadow(boolean showShadow) {
         this.showShadow = showShadow;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isMonitorStoped() {
         return monitorStoped;
     }
 
+    /**
+     *
+     * @param monitorStoped
+     */
     protected void setMonitorStoped(boolean monitorStoped) {
         this.monitorStoped = monitorStoped;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isMonitorStared() {
         return monitorStared;
     }
 
+    /**
+     *
+     * @param monitorStared
+     */
     protected void setMonitorStared(boolean monitorStared) {
         this.monitorStared = monitorStared;
     }
 
+    /**
+     *
+     * @return
+     */
     public boolean isMonitorPaused() {
         return monitorPaused;
     }
 
+    /**
+     *
+     * @param monitorpaused
+     */
     protected void setMonitorPaused(boolean monitorpaused) {
         this.monitorPaused = monitorpaused;
     }
@@ -412,6 +561,9 @@ public class MemoryGui extends JComponent implements Runnable,
         this.textFont = textFont;
     }
 
+    /**
+     *
+     */
     protected class GridClass {
 
         private int width = 15;
@@ -419,35 +571,73 @@ public class MemoryGui extends JComponent implements Runnable,
         private Color color = new Color(240,240,240,150);
         private boolean showGrid = true;
 
+        /**
+         *
+         * @return
+         */
         public int getWidthGridCell() {
             return width;
         }
 
+        /**
+         *
+         * @param width
+         */
         public void setWidthGridCell(int width) {
             this.width = width;
         }
 
+        /**
+         *
+         * @return
+         */
         public int getHeightGridCell() {
             return height;
         }
 
+        /**
+         *
+         * @param height
+         */
         public void setHeightGridCell(int height) {
             this.height = height;
         }
+        /**
+         *
+         * @param r
+         * @param g
+         * @param b
+         */
         public void setGridColor(int r,int g,int b){
             color = new Color(r,g,b,color.getAlpha());
         }
+        /**
+         *
+         * @param a
+         */
         public void setGridAlpha(int a){
             color = new Color(color.getRed(),color.getGreen(),color.getBlue(),a);
         }
+        /**
+         *
+         * @return
+         */
         public Color getGridColor(){
             return color;
         }
 
+        /**
+         *
+         * @return
+         */
         public boolean isShowGrid() {
             return showGrid;
         }
 
+        /**
+         *
+         * @param showGrid
+         */
         public void setShowGrid(boolean showGrid) {
             this.showGrid = showGrid;
             if( getVerboseStream()!=null)
@@ -455,20 +645,33 @@ public class MemoryGui extends JComponent implements Runnable,
         }
     }
     
+    /**
+     *
+     */
     protected class Chart {
 	
         private int [] bitMap = new int [getWPaint()];
 
+        /**
+         *
+         */
         public Chart(){
             //initial table
             resetBitmap();
         }
 
+        /**
+         *
+         */
         public void resetBitmap(){
             for (int i = 0; i < bitMap.length; i++)
                 bitMap[i] = 0;
         }
 
+        /**
+         *
+         * @param y
+         */
         public void updatePoint(int y){
             bitMap[0]=y;
             rollValuesInTable();
@@ -479,6 +682,10 @@ public class MemoryGui extends JComponent implements Runnable,
                 bitMap[i+1]=bitMap[i];
         }
 
+        /**
+         *
+         * @return
+         */
         public Shape transformToShape(){
             GeneralPath genPath = new GeneralPath();
             genPath.moveTo(0,0);//start point

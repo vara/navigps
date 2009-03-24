@@ -15,42 +15,82 @@ import org.w3c.dom.svg.SVGPoint;
  */
 public class NaviPoint extends SVGOMPoint{
 
+    /**
+     *
+     * @param x
+     * @param y
+     */
     public NaviPoint(float x, float y){
         super(x, y);
     }
     
+    /**
+     *
+     * @param p
+     */
     public NaviPoint(SVGPoint p){
         super(p.getX(),p.getY());
     }
 
+    /**
+     *
+     * @param x
+     * @param y
+     */
     public void setLocation(float x, float y) {
 	    this.x = x;
 	    this.y = y;
 	}
     
+    /**
+     *
+     * @param p
+     */
     public void setLocation(SVGPoint p) {
 	    this.x = p.getX();
 	    this.y = p.getY();
 	}
 
+    /**
+     *
+     * @param pt
+     * @return
+     */
     public double distance(NaviPoint pt) {
         float px = pt.getX() - this.getX();
         float py = pt.getY() - this.getY();
         return Math.sqrt(px * px + py * py);
     }
 
+    /**
+     *
+     * @param px
+     * @param py
+     * @return
+     */
     public double distance(float px, float py) {
         px -= getX();
         py -= getY();
         return Math.sqrt(px * px + py * py);
     }
 
+    /**
+     *
+     * @param px
+     * @param py
+     * @return
+     */
     public double distanceSq(float px, float py) {
         px -= getX();
         py -= getY();
         return (px * px + py * py);
     }
 
+    /**
+     *
+     * @param pt
+     * @return
+     */
     public double distanceSq(NaviPoint pt) {
         float px = pt.getX() - this.getX();
         float py = pt.getY() - this.getY();

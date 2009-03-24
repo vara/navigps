@@ -6,6 +6,7 @@ public interface DOMDocumentTreeController {
 
     /**
      * Returns whether the DOMDocumentTree supports drag-and-drop.
+     * @return
      */
     boolean isDNDSupported();
 }

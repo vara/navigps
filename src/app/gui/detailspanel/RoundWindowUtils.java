@@ -9,6 +9,11 @@ import java.awt.Container;
  */
 public class RoundWindowUtils {
 
+    /**
+     *
+     * @param container
+     * @return
+     */
     public static Container getRoundWindowFromContainer(Container container){
         SearchRoundWindow.search(container);
         return SearchRoundWindow.getRoundWindow();

@@ -8,10 +8,24 @@ import java.lang.reflect.Method;
  */
 public class InvokeUtils{
 
+    /**
+     *
+     * @param baseClass
+     * @param methodName
+     * @return
+     */
     public static ReturnValue invokeWithTime(Object baseClass,String methodName){
         return invokeWithTime(baseClass, methodName, null,null);
     }
 
+    /**
+     *
+     * @param baseClass
+     * @param methodName
+     * @param paramsType
+     * @param params
+     * @return
+     */
     public static ReturnValue invokeWithTime(Object baseClass,String methodName,
                                         Class[] paramsType,Object[] params){
         try {
@@ -29,17 +43,31 @@ public class InvokeUtils{
         }
     }
 
+    /**
+     *
+     */
     public static class ReturnValue{
 
         private Object ret;
         private double timeNano;
         private Exception message;
 
+        /**
+         *
+         * @param obj
+         * @param time
+         * @param e
+         */
         public ReturnValue(Object obj,double time,Exception e){
             ret = obj;
             timeNano = time;
             message = e;
         }
+        /**
+         *
+         * @param obj
+         * @param time
+         */
         public ReturnValue(Object obj,double time){
             this(obj, time, null);
         }

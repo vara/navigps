@@ -30,13 +30,23 @@ import sun.swing.ImageIconUIResource;
 
    public class MetalUtils {
 
+       /**
+        *
+        * @param g
+        * @param r
+        */
        public static void drawFlush3DBorder(Graphics g, Rectangle r) {
            drawFlush3DBorder(g, r.x, r.y, r.width, r.height);
        }
 
        /**
          * This draws the "Flush 3D Border" which is used throughout the Metal L&F
-         */
+        * @param g
+        * @param x
+        * @param y
+        * @param w
+        * @param h
+        */
        public static void drawFlush3DBorder(Graphics g, int x, int y, int w, int h) {
            g.translate( x, y);
            g.setColor( MetalLookAndFeel.getControlDarkShadow() );
@@ -52,11 +62,21 @@ import sun.swing.ImageIconUIResource;
        /**
          * This draws a variant "Flush 3D Border"
          * It is used for things like pressed buttons.
-         */
+        * @param g 
+        * @param r
+        */
        public static void drawPressed3DBorder(Graphics g, Rectangle r) {
            drawPressed3DBorder( g, r.x, r.y, r.width, r.height );
        }
 
+       /**
+        *
+        * @param g
+        * @param x
+        * @param y
+        * @param w
+        * @param h
+        */
        public static void drawDisabledBorder(Graphics g, int x, int y, int w, int h) {
            g.translate( x, y);
            g.setColor( MetalLookAndFeel.getControlShadow() );
@@ -67,7 +87,12 @@ import sun.swing.ImageIconUIResource;
        /**
          * This draws a variant "Flush 3D Border"
          * It is used for things like pressed buttons.
-         */
+        * @param g 
+        * @param w
+        * @param x
+        * @param h
+        * @param y
+        */
        public static void drawPressed3DBorder(Graphics g, int x, int y, int w, int h) {
            g.translate( x, y);
 
@@ -83,7 +108,9 @@ import sun.swing.ImageIconUIResource;
          * This draws a variant "Flush 3D Border"
          * It is used for things like active toggle buttons.
          * This is used rarely.
-         */
+        * @param g
+        * @param r
+        */
        public static void drawDark3DBorder(Graphics g, Rectangle r) {
            drawDark3DBorder(g, r.x, r.y, r.width, r.height);
        }
@@ -92,7 +119,12 @@ import sun.swing.ImageIconUIResource;
          * This draws a variant "Flush 3D Border"
          * It is used for things like active toggle buttons.
          * This is used rarely.
-         */
+        * @param g 
+        * @param y
+        * @param x
+        * @param h
+        * @param w
+        */
        public static void drawDark3DBorder(Graphics g, int x, int y, int w, int h) {
            g.translate( x, y);
 
@@ -107,6 +139,15 @@ import sun.swing.ImageIconUIResource;
            g.translate( -x, -y);
        }
 
+       /**
+        *
+        * @param g
+        * @param x
+        * @param y
+        * @param w
+        * @param h
+        * @param active
+        */
        public static void drawButtonBorder(Graphics g, int x, int y, int w, int h, boolean active) {
            if (active) {
                drawActiveButtonBorder(g, x, y, w, h);
@@ -115,6 +156,14 @@ import sun.swing.ImageIconUIResource;
            }
        }
 
+       /**
+        *
+        * @param g
+        * @param x
+        * @param y
+        * @param w
+        * @param h
+        */
        public static void drawActiveButtonBorder(Graphics g, int x, int y, int w, int h) {
            drawFlush3DBorder(g, x, y, w, h);
            g.setColor( MetalLookAndFeel.getPrimaryControl() );
@@ -125,6 +174,15 @@ import sun.swing.ImageIconUIResource;
            g.drawLine( w-2, y+2, w-2, h-2 );
        }
 
+       /**
+        *
+        * @param g
+        * @param x
+        * @param y
+        * @param w
+        * @param h
+        * @param active
+        */
        public static void drawDefaultButtonBorder(Graphics g, int x, int y, int w, int h, boolean active) {
            drawButtonBorder(g, x+1, y+1, w-1, h-1, active);
            g.translate(x, y);
@@ -135,6 +193,14 @@ import sun.swing.ImageIconUIResource;
            g.translate(-x, -y);
        }
 
+       /**
+        *
+        * @param g
+        * @param x
+        * @param y
+        * @param w
+        * @param h
+        */
        public static void drawDefaultButtonPressedBorder(Graphics g, int x, int y, int w, int h) {
            drawPressed3DBorder(g, x + 1, y + 1, w - 1, h - 1);
            g.translate(x, y);
@@ -152,10 +218,21 @@ import sun.swing.ImageIconUIResource;
         * Convenience function for determining ComponentOrientation.  Helps us
         * avoid having Munge directives throughout the code.
         */
+       /**
+        *
+        * @param c
+        * @return
+        */
        public static boolean isLeftToRight( Component c ) {
            return c.getComponentOrientation().isLeftToRight();
        }
 
+       /**
+        *
+        * @param key
+        * @param defaultValue
+        * @return
+        */
        public static int getInt(Object key, int defaultValue) {
            Object value = UIManager.get(key);
 
@@ -368,17 +445,29 @@ import sun.swing.ImageIconUIResource;
 
        /**
         * Returns true if the specified widget is in a toolbar.
+        * @param c 
+        * @return
         */
        public static boolean isToolBarButton(JComponent c) {
            return (c.getParent() instanceof JToolBar);
        }
 
+       /**
+        *
+        * @param i
+        * @return
+        */
        public static Icon getOceanToolBarIcon(Image i) {
            ImageProducer prod = new FilteredImageSource(i.getSource(),
                                 new OceanToolBarImageFilter());
            return new ImageIconUIResource(Toolkit.getDefaultToolkit().createImage(prod));
        }
 
+       /**
+        *
+        * @param image
+        * @return
+        */
        public static Icon getOceanDisabledButtonIcon(Image image) {
            Object[] range = (Object[])UIManager.get("Button.disabledGrayRange");
            int min = 180;

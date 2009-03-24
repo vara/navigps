@@ -19,10 +19,17 @@ public abstract class AbstractOpacityJButton extends JButton implements AlphaInt
     private float upperThresholdAlpha = 1f;
     private float alpha = 1f;
 
+    /**
+     *
+     */
     public AbstractOpacityJButton(){
         super(null,null);
     }
 
+    /**
+     *
+     * @param icon
+     */
     public AbstractOpacityJButton(Icon icon) {
         this(null, icon);
     }
@@ -83,6 +90,7 @@ public abstract class AbstractOpacityJButton extends JButton implements AlphaInt
 
     /**
      * @param alpha the alpha to set
+     * @return
      */
     @Override
     public boolean setAlpha(float alpha) {

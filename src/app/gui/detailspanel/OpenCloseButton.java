@@ -25,9 +25,22 @@ public class OpenCloseButton extends RotatedButton implements ActionListener,Tim
     private Animator animator;
     private int animationDuration = 2000;
 
+    /**
+     *
+     * @param text
+     * @param clockwise
+     * @param size
+     */
     public OpenCloseButton(String text,boolean clockwise,Dimension size){
         this(text, clockwise, size, 0);
     }
+    /**
+     *
+     * @param text
+     * @param clockwise
+     * @param size
+     * @param round
+     */
     public OpenCloseButton(String text,boolean clockwise,Dimension size,double round){
         super(text,true,size,round);
         animator = new Animator(animationDuration, Animator.INFINITE,
@@ -36,18 +49,31 @@ public class OpenCloseButton extends RotatedButton implements ActionListener,Tim
         animator.setStartDirection(Direction.BACKWARD);
         addActionListener(this);
     }
+    /**
+     *
+     * @param arg0
+     */
     @Override
     public void timingEvent(float arg0) {
         setAlpha(arg0);
         repaint();
     }
 
+    /**
+     *
+     */
     @Override
     public void begin() {}
 
+    /**
+     *
+     */
     @Override
     public void end() {}
 
+    /**
+     *
+     */
     @Override
     public void repeat() {}
 

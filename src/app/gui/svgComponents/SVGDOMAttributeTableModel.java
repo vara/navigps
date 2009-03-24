@@ -16,6 +16,10 @@ public class SVGDOMAttributeTableModel extends AbstractTableModel{
 
     private NamedNodeMap map;
     
+    /**
+     *
+     * @param map
+     */
     public SVGDOMAttributeTableModel(NamedNodeMap map){
         this.map = map;
     }

@@ -18,7 +18,12 @@ public class MyFileFilter extends FileFilter{
 	String []lesSuffixes;
 	String  laDescription;
 	
-	public MyFileFilter(String []lesSuffixes, String laDescription){		
+    /**
+     *
+     * @param lesSuffixes
+     * @param laDescription
+     */
+    public MyFileFilter(String []lesSuffixes, String laDescription){
 		this.lesSuffixes = lesSuffixes;
 		this.laDescription = laDescription;
 	}

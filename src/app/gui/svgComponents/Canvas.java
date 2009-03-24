@@ -81,6 +81,9 @@ public class Canvas extends JSVGCanvas{
         }
     };
 
+    /**
+     *
+     */
     public Canvas(){
 		super(null,false,false);
         setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
@@ -118,6 +121,10 @@ public class Canvas extends JSVGCanvas{
         return dm;
     }
 
+    /**
+     *
+     * @param pt
+     */
     public void addPaintingTranformListener(PaintingTransformIterface pt){
         paintingTranformListener.add(pt);
     }
@@ -143,6 +150,10 @@ public class Canvas extends JSVGCanvas{
         return true;
     }
     
+    /**
+     *
+     * @param val
+     */
     public void setRequestFocusOnWindow(boolean val){
         if(val){
             addMouseListener(requestFocus);
@@ -155,15 +166,27 @@ public class Canvas extends JSVGCanvas{
         return search;
     }
 
-    public boolean isDocumentSet(){ 
+    /**
+     *
+     * @return
+     */
+    public boolean isDocumentSet(){
         return (getSVGDocument() != null);
     }
     
+    /**
+     *
+     * @param zoomIn
+     */
     public void zoomFromCenterDocumnet(boolean zoomIn){
         mouseIteraction.zoomFromCenterDocumnet(zoomIn);
         mouseIteraction.setMode(MouseGestures.ZOOM_ACTION);
     }
 
+    /**
+     *
+     * @param setZoom
+     */
     public void zoomFromMouseCoordinationEnable(boolean setZoom){
 
         if(setZoom){
@@ -290,7 +313,14 @@ public class Canvas extends JSVGCanvas{
         }
     }//class MouseGestures
 
+    /**
+     *
+     */
     protected class ThumbnailAction extends AbstractAction{
+        /**
+         *
+         * @param mnemonic
+         */
         public ThumbnailAction(Integer mnemonic) {
             super();
 

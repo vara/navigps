@@ -18,23 +18,44 @@ public class PointXY {
     private double longitude;
      
     
+    /**
+     *
+     * @param coordX
+     * @param coordY
+     */
     public PointXY(double coordX,double coordY){
 	latitude = coordX;
 	longitude = coordY;
     }       
     
+    /**
+     *
+     * @return
+     */
     public double getLatitude() {
 	return latitude;
     }
 
+    /**
+     *
+     * @param latitude
+     */
     public void setLatitude(double latitude) {
 	this.latitude = latitude;
     }
 
+    /**
+     *
+     * @return
+     */
     public double getLongitude() {
 	return longitude;
     }
 
+    /**
+     *
+     * @param longitude
+     */
     public void setLongitude(double longitude) {
 	this.longitude = longitude;
     }
@@ -44,43 +65,93 @@ public class PointXY {
 	return "Latitude : "+getLatitude()+" Longitude : "+getLongitude();
     }
     
+    /**
+     *
+     */
     public static class Conversion{
 	
-	public static double convertDMSToDecimalDegree(int deg,int min,double sec){
+        /**
+         *
+         * @param deg
+         * @param min
+         * @param sec
+         * @return
+         */
+        public static double convertDMSToDecimalDegree(int deg,int min,double sec){
 	    return ( ((min*60)+sec)/3600 )+deg;
 	}
 
-	public static PointXY convertDMSToDecimalDegree(int deg,int min,double sec,
+    /**
+     *
+     * @param deg
+     * @param min
+     * @param sec
+     * @param deg2
+     * @param min2
+     * @param sec2
+     * @return
+     */
+    public static PointXY convertDMSToDecimalDegree(int deg,int min,double sec,
 							int deg2,int min2,double sec2){
 
 	    return new PointXY(PointXY.Conversion.convertDMSToDecimalDegree(deg,min,sec),
 			       PointXY.Conversion.convertDMSToDecimalDegree(deg2,min2,sec2));
 	}
 
-	public static String convertDecimalDegreeToDMS(double ddms){
+    /**
+     *
+     * @param ddms
+     * @return
+     */
+    public static String convertDecimalDegreeToDMS(double ddms){
 	    int degree = (int)ddms;	
 	    double tmpmin = (ddms - (int)ddms)*60;
 	    double sec = (tmpmin-(int)(tmpmin))*60;
 	    return degree+","+(int)(tmpmin)+","+sec;
 	}
 
-	public static String convertDecimalDegreeToDMS(double ddmsLat,double ddmsLon){
+    /**
+     *
+     * @param ddmsLat
+     * @param ddmsLon
+     * @return
+     */
+    public static String convertDecimalDegreeToDMS(double ddmsLat,double ddmsLon){
 
 	    return "latitude: "+PointXY.Conversion.convertDecimalDegreeToDMS(ddmsLat)+" ; "+
 		   "longitude: "+PointXY.Conversion.convertDecimalDegreeToDMS(ddmsLon);
 	}
 
-	public static double convertNmeaDMSToToDecimalDegree(double ddms){
+    /**
+     *
+     * @param ddms
+     * @return
+     */
+    public static double convertNmeaDMSToToDecimalDegree(double ddms){
 	    int deg = (int)ddms/100;
 	    return deg + ( ddms-(deg*100) )/60;	
 	}
 
-	public static PointXY convertNmeaDMSToToDecimalDegree(double ddmsLat,double ddmsLon){
+    /**
+     *
+     * @param ddmsLat
+     * @param ddmsLon
+     * @return
+     */
+    public static PointXY convertNmeaDMSToToDecimalDegree(double ddmsLat,double ddmsLon){
 	    return new PointXY(PointXY.Conversion.convertNmeaDMSToToDecimalDegree(ddmsLat),
 			       PointXY.Conversion.convertNmeaDMSToToDecimalDegree(ddmsLon));
 	}
 	
-	public static PointXY convertNmeaDMSToToDecimalDegree(double ddmsLat,char orientLat,
+    /**
+     *
+     * @param ddmsLat
+     * @param orientLat
+     * @param ddmsLon
+     * @param orientLon
+     * @return
+     */
+    public static PointXY convertNmeaDMSToToDecimalDegree(double ddmsLat,char orientLat,
 							      double ddmsLon,char orientLon){
 	    return new PointXY(PointXY.Conversion.convertNmeaDMSToToDecimalDegree(ddmsLat)*PointXY.Conversion.checkOrientation(orientLat),
 			       PointXY.Conversion.convertNmeaDMSToToDecimalDegree(ddmsLon)*PointXY.Conversion.checkOrientation(orientLon));

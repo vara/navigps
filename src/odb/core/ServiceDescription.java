@@ -1,5 +1,9 @@
 package odb.core;
 
+/**
+ *
+ * @author ACME
+ */
 public class ServiceDescription {
 
     private String serviceNumber;

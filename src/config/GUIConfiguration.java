@@ -18,11 +18,20 @@ public class GUIConfiguration {
     
     private static Dimension defaultWindowSize = Toolkit.getDefaultToolkit().getScreenSize();
 
+    /**
+     *
+     */
     public static final byte FULL_SCREEN = 0;
+    /**
+     *
+     */
     public static final byte FRAME_SCREEN = 1;
 
     private static byte modeScreen = FRAME_SCREEN;
 
+    /**
+     *
+     */
     public GUIConfiguration(){
     }
 
@@ -47,7 +56,7 @@ public class GUIConfiguration {
     }
 
     /**
-     * @param windowSize the windowSize to set
+     * @param winSize
      */
     public static void setWindowSize(Dimension winSize) {        
         if(winSize.getWidth()!=0 && winSize.getHeight()!=0){
@@ -65,6 +74,10 @@ public class GUIConfiguration {
                 (int)getWindowSize().getWidth()+","+(int)getWindowSize().getHeight());
     }
 
+    /**
+     *
+     * @return
+     */
     public static GraphicsDevice getGraphicDevice(){
         return GraphicsEnvironment.getLocalGraphicsEnvironment().getDefaultScreenDevice();
     }

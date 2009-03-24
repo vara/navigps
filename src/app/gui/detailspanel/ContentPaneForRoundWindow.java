@@ -24,9 +24,16 @@ public class ContentPaneForRoundWindow extends RoundJPanel implements AlphaInter
     private Color [] colorBorderEfect = {new Color(200,200,255,200),
                                          new Color(255,255,255,100)};
 
+    /**
+     *
+     */
     public ContentPaneForRoundWindow() {
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintComponent(Graphics g) {        
         if(getAlpha()>0){
@@ -52,6 +59,10 @@ public class ContentPaneForRoundWindow extends RoundJPanel implements AlphaInter
         }
     }
 
+    /**
+     *
+     * @param g
+     */
     @Override
     public void paintChildren(Graphics g){        
         if(getAlpha()>0){            
@@ -59,6 +70,10 @@ public class ContentPaneForRoundWindow extends RoundJPanel implements AlphaInter
         }
     }    
 
+    /**
+     *
+     * @param g
+     */
     @Override
     protected void paintBorder(Graphics g) {
         getRoundBorder().setAlpha(getAlpha());

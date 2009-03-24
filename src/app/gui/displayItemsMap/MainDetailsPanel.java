@@ -22,6 +22,9 @@ public class MainDetailsPanel extends JSplitPane{
     private JPanel upperContent = new JPanel(new BorderLayout(20, 20));
     private JPanel lowerContent = new JPanel(new BorderLayout(20, 20));
 
+    /**
+     *
+     */
     public MainDetailsPanel(){
         super(JSplitPane.VERTICAL_SPLIT, true);
         setBorder(null);
@@ -42,10 +45,18 @@ public class MainDetailsPanel extends JSplitPane{
         setResizeWeight(0.7D);
     }
 
+    /**
+     *
+     * @param comp
+     */
     public void addToUpperContent(Component comp){
         upperContent.add(comp);
     }
 
+    /**
+     *
+     * @param comp
+     */
     public void addToLowerContent(Component comp){
         lowerContent.add(comp);
     }

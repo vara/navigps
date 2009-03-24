@@ -11,9 +11,16 @@ package app;
  */
 public class LackOfNextItemException extends Exception{
 
+    /**
+     *
+     */
     public LackOfNextItemException(){
 	super();
     }
+    /**
+     *
+     * @param s
+     */
     public LackOfNextItemException(String s){
 	super(s);
     }

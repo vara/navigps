@@ -21,7 +21,7 @@ public class ArgumentsStartUp {
     
     private boolean isArguments = false;
     private boolean exitProgram = false;
-    private String infoParameters = "\n\t-v  \t(version) print version application" +
+    private static final String INFO_PARAMETERS = "\n\t-v  \t(version) print version application" +
                     "\n\t-V  \t(verbose mode) result return by function only on console" +
 				    "\n\t-Vg \t(verbose mode) like -v + create window in gui with the same result on console" +
 				    "\n\t-sp \t(Show properties) create window in app with properties chart file" +
@@ -33,13 +33,17 @@ public class ArgumentsStartUp {
                     "\n\t-fs  \t(Display root window in full screen mode)"+
 				    "\n\t-h  \t(Show this text)";
     
-    public ArgumentsStartUp(String [] arg){	
+    /**
+     *
+     * @param arg
+     */
+    public ArgumentsStartUp(String [] arg){
         if(arg.length>0){
             try {
                 checkParameters(arg);                
                 MyLogger.log.log(Level.FINE,"Validate arguments status OK !");
             } catch (Exception ex) {
-                MyLogger.log.log(Level.WARNING,ex.getMessage());
+                //MyLogger.log.log(Level.INFO,ex.getMessage());
                 helpInformation(ex.getMessage());
             }
         }else{
@@ -121,6 +125,11 @@ public class ArgumentsStartUp {
         }//while        
     }
     
+    /**
+     *
+     * @param p
+     * @throws java.lang.Exception
+     */
     public void orderCommands(Parameter p) throws Exception{
 	
         switch(p.getCharParam()){
@@ -144,9 +153,11 @@ public class ArgumentsStartUp {
                 break;
             case 'h':
 
-                System.out.println(Version.getVersion());
+                System.out.println("Version : "+Version.getVersion());
                 setExitProgram(true);
+                //helpInformation(getHelpInformation());
                 throw new Exception(getHelpInformation());
+                //break;
             case 'w'+'s':
                                 
                 {//sWidth or sHeight == null This situation will probably never take place. I hope ! ;D
@@ -177,9 +188,10 @@ public class ArgumentsStartUp {
                 }                          
                 break;
             case 'v':
-                System.out.println(Version.getVersion());
+                //System.out.println("Version : "+Version.getVersion());
                 setExitProgram(true);
-                break;
+                throw new Exception("Version : "+Version.getVersion());
+                //break;
             case 'f'+'s':
                 GUIConfiguration.setModeScreen(GUIConfiguration.FULL_SCREEN);
                 break;
@@ -189,18 +201,34 @@ public class ArgumentsStartUp {
         }
     }
     
+    /**
+     *
+     * @return
+     */
     public String getHelpInformation(){
-        return infoParameters;
+        return INFO_PARAMETERS;
     }
     
+    /**
+     *
+     * @return
+     */
     public boolean isArguments(){
         return isArguments;
     }
     
+    /**
+     *
+     * @param val
+     */
     public void setExitProgram(boolean val){
         exitProgram = val;
     }
     
+    /**
+     *
+     * @return
+     */
     public boolean exitProgram(){
         return exitProgram;
     }
@@ -209,14 +237,24 @@ public class ArgumentsStartUp {
         isArguments = true;
     }
 
+    /**
+     *
+     * @param text
+     */
     protected void helpInformation(String text){
         System.out.println(""+text);        
     }
 
+    /**
+     *
+     */
     public class ValidateParameter {
 
         private HashMap <String,Integer> map = new HashMap<String,Integer>();
 
+        /**
+         *
+         */
         public ValidateParameter(){
 
             map.put("Vg",0);
@@ -229,6 +267,11 @@ public class ArgumentsStartUp {
             map.put("v",0);
             map.put("fs",0);
         }
+        /**
+         *
+         * @param val
+         * @return
+         */
         public Integer getInformationOnParameter(String val){
             return map.get(val);
         }
