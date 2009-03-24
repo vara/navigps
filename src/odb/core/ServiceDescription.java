@@ -2,7 +2,7 @@ package odb.core;
 
 /**
  *
- * @author wara
+ * @author ACME
  */
 public class ServiceDescription {
 

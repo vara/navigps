@@ -2,7 +2,7 @@ package odb.core;
 
 /**
  *
- * @author praise
+ * @author ACME
  */
 public class Subcategory {
     

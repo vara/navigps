@@ -5,7 +5,7 @@ import odb.core.ServiceCore;
 
 /**
  *
- * @author wara
+ * @author ACME
  */
 public interface ODBridge {
     /**

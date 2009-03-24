@@ -11,7 +11,7 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 import java.lang.Math;
 /**
  *
- * @author praise
+ * @author ACME
  */
 public class Search implements ODBridge {
 

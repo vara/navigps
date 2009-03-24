@@ -5,7 +5,7 @@ import java.util.Vector;
 
 /**
  *
- * @author wara
+ * @author ACME
  */
 public class Category {
     

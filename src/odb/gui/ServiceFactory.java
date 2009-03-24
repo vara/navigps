@@ -18,7 +18,7 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
  *
- * @author praise
+ * @author ACME
  */
 public class ServiceFactory extends javax.swing.JDialog {
 
