@@ -8,15 +8,12 @@ package app.gui.svgComponents.displayobjects;
 import app.gui.svgComponents.Canvas;
 import java.util.Vector;
 import org.apache.batik.bridge.UpdateManager;
-import org.apache.batik.bridge.UpdateManagerEvent;
-import org.apache.batik.bridge.UpdateManagerListener;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
 import org.w3c.dom.Text;
 import org.w3c.dom.svg.SVGDocument;
 
@@ -24,16 +21,17 @@ import org.w3c.dom.svg.SVGDocument;
  *
  * @author vara
  */
-public class DisplayManager extends AbstractDisplayManager{
+public class XMLDOMDisplayManager extends AbstractDisplayManager{
+    
+    private UpdateManager updateManager;
 
     private SVGDocument doc;
-    private UpdateManager updateManager;
-    private Canvas can;
 
     public static final String SERVICES_NAME = "GroupServices";
 
-    public DisplayManager(Canvas c) {
-        can = c;
+    public XMLDOMDisplayManager(Canvas c) {
+        super(c);
+        c.addSVGDocumentLoaderListener(getRenderingTreeListener());
     }
 
     private void putElement(Element e){
@@ -87,9 +85,8 @@ public class DisplayManager extends AbstractDisplayManager{
         return servGroup;
     }
 
-    /**
-     *
-     */
+    
+    @Override
     public void removeLastServices(){
         if(checkDisplaManager()){
             updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
@@ -97,17 +94,10 @@ public class DisplayManager extends AbstractDisplayManager{
                 public void run(){
                     if(doc!=null){
                         Element gTekst = doc.getElementById(SERVICES_NAME);
-                        if(gTekst!=null){
-                            /*NodeList nl = gTekst.getChildNodes();
-                            for (int i = 0; i < nl.getLength(); i++) {
-                                Node child =nl.item(i);
-                                System.out.println("node: name : "+child.getLocalName()+" value : "+child.getNodeValue());
-                                System.out.println("node value : "+child.getNodeValue());
-                                gTekst.removeChild(child);
-                            }
-                            System.err.println("Removed "+nl.getLength()+" last services");
-                             */
-                            doc.getRootElement().removeChild(gTekst);
+                        if(gTekst!=null){                            
+                            Node nl = doc.getRootElement().removeChild(gTekst);
+                            System.err.println("Removed "+nl.getChildNodes().getLength()+" last services");
+          
                         }else{
                             System.err.println("Group "+SERVICES_NAME+" does not exist !");
                         }
@@ -178,9 +168,7 @@ public class DisplayManager extends AbstractDisplayManager{
 
         @Override
         public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
-            updateManager = null;
             doc = e.getSVGDocument();
-            putObject("Test !!!", new SVGOMPoint(520, 400));
         }
         @Override
         public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
@@ -188,44 +176,6 @@ public class DisplayManager extends AbstractDisplayManager{
 
         @Override
         public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
-        }
-    }
-
-    protected class UpdateManagerInfoListener implements UpdateManagerListener{
-
-        @Override
-        public void managerStarted(UpdateManagerEvent e) {
-            System.err.println("managerStarted ");
-        }
-
-        @Override
-        public void managerSuspended(UpdateManagerEvent e) {
-            System.err.println("managerSuspend ");
-        }
-
-        @Override
-        public void managerResumed(UpdateManagerEvent e) {
-            System.err.println("managerResumed ");
-        }
-
-        @Override
-        public void managerStopped(UpdateManagerEvent e) {
-            System.err.println("managerStoped ");
-        }
-
-        @Override
-        public void updateStarted(UpdateManagerEvent e) {
-            System.err.println("updateStarted ");
-        }
-
-        @Override
-        public void updateCompleted(UpdateManagerEvent e) {
-            System.err.println("updateCompleted ");
-        }
-
-        @Override
-        public void updateFailed(UpdateManagerEvent e) {
-            System.err.println("updateFailed ");
         }
     }
 }
