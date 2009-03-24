@@ -271,8 +271,8 @@ public class ServiceEditor extends javax.swing.JDialog {
 
         odb.store(sc);
         odb.commit();
-        Constants.getManagerWindow().initServicesTable();
-        ServiceEditor.this.dispose();
+        Constants.getManagerWindow().reloadServicesTable();
+        this.dispose();
         /*
          * FIXME double edit window after 1st edit
          */
@@ -341,7 +341,7 @@ public class ServiceEditor extends javax.swing.JDialog {
     private void fillSubcategoryCombo() {
         odb = Constants.getDbConnection();
         Vector v = new Vector();
-
+        v.add("");//empty subcategory
         IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
         Objects cat = odb.getObjects(query);
         Category c = (Category) cat.getFirst();

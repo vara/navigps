@@ -6,6 +6,7 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
+import java.util.LinkedList;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -45,6 +46,10 @@ public class DatabaseManager extends javax.swing.JDialog {
     private JMenuItem removeMenu;
     private JMenu newMenu;
 
+    public final static String CATEGORY_ADDED = "cat.added";
+    public final static String CATEGORY_RENAMED = "cat.renamed";
+    public final static String CATEGORY_REMOVED = "cat.removed";
+
     /** Creates new form Manager
      * @param parent
      * @param modal
@@ -56,6 +61,71 @@ public class DatabaseManager extends javax.swing.JDialog {
         refreshTree();
         loadTreePopup();
         initServicesTable();
+
+        initMyComponents();
+    }
+
+
+    private void initMyComponents() {
+
+        jTable1.addMouseListener(new MouseAdapter() {
+
+            @Override
+            public void mouseClicked(MouseEvent e) {
+                if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
+                    IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 3))).add(Where.equal("y", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 4))));
+                    Objects cats = odb.getObjects(query);
+                    if (cats != null && !cats.isEmpty()) {
+                        ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
+                        ServiceCore sc = sa.getServiceCore();
+                        ServiceEditor se = new ServiceEditor(null, true, sc);
+                        se.setVisible(true);
+                    } else {
+                        System.out.println("cell selection error!");
+                    }
+                }
+            }
+        });
+    }
+
+    public void reloadServicesTable() {
+
+        Vector v = new Vector();
+
+        if (odb != null) {
+            Objects services = odb.getObjects(ServiceCore.class);
+            Object[] columns = {"Name", "Category", "Subcategory", "X", "Y"};
+
+            DefaultTableModel model = new DefaultTableModel() {
+
+                @Override
+                public boolean isCellEditable(int row, int column) {
+                    return false;
+                }
+            };
+            model.setColumnIdentifiers(columns);
+            if (!services.isEmpty()) {
+                while (services.hasNext()) {
+                    v = new Vector();
+                    ServiceCore sc = (ServiceCore) services.next();
+                    v.add(sc.getServiceDescription().getServiceName());
+                    v.add(sc.getServiceDescription().getCategory().getName());
+                    if (sc.getServiceDescription().getServiceSubCategory() == null) {
+                        v.add("empty");
+                    } else {
+                        v.add(sc.getServiceDescription().getServiceSubCategory().getName());
+                    }
+                    v.add(sc.getServiceAttributes().getX());
+                    v.add(sc.getServiceAttributes().getY());
+                    model.addRow(v);
+                }
+                jTable1.setModel(model);
+            } else {
+                jTable1.setModel(model);
+            }
+        } else {
+            System.err.println("DataBase not init !!!");
+        }
     }
 
     private void addNewService() {
@@ -257,6 +327,12 @@ public class DatabaseManager extends javax.swing.JDialog {
     private javax.swing.JTree jTree1;
     // End of variables declaration//GEN-END:variables
 
+    private void addCategory(String category) {
+        odb.store(new Category(category));
+        odb.commit();
+        refreshTree();
+    }
+
     private void loadTreePopup() {
         popup = new JPopupMenu();
         newMenu = new JMenu("New");
@@ -264,39 +340,37 @@ public class DatabaseManager extends javax.swing.JDialog {
         categoryMenu = new JMenuItem("Category");
         categoryMenu.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
 
                 ODB odb = Constants.getDbConnection();
-                boolean FL_D = false;
-                String newCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new category name", "new category");
 
-                if (newCat == null) {
-                    //cancel
-                } else if (newCat.equals("")) {
-                    JOptionPane.showMessageDialog(DatabaseManager.this, "You have to input name!", "Warning", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    Objects categories = odb.getObjects(Category.class);
-                    Category category = null;
-                    if (!categories.isEmpty()) {
-                        while (categories.hasNext()) {
-                            category = (Category) categories.next();
-                            if (category.getName().equalsIgnoreCase(newCat)) {
-                                JOptionPane.showMessageDialog(null, "Category already exists! Change new category name.", "Warning", JOptionPane.ERROR_MESSAGE);
-                                FL_D = true;
-                                break;
+                if (odb != null) {
+                    String newCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new category name", "new category");
+                    if (newCat != null && !newCat.equals("")) {
+                        Objects categories = odb.getObjects(Category.class);
+                        if (!categories.isEmpty()) {
+                            //check duplicate name
+                            while (categories.hasNext()) {
+                                Category category = (Category) categories.next();
+                                if (category.getName().equalsIgnoreCase(newCat)) {
+                                    JOptionPane.showMessageDialog(null, "Category already exists! Change new category name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                                    return;
+                                }
                             }
-                        }
-                        if (!FL_D) {
-                            odb.store(new Category(newCat));
-                            odb.commit();
-                            initServicesTable();
+                            //no duplicate name
+                            addCategory(newCat);
+
+                        } else {
+                            //if no cat present
+                            addCategory(newCat);
                         }
                     } else {
-                        odb.store(new Category(newCat));
-                        odb.commit();
-                        initServicesTable();
+                        System.out.println("no name input");
                     }
-                    refreshTree();
+
+                } else {
+                    System.out.println("no db initialized");
                 }
             }
         });
@@ -304,6 +378,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         subcategoryMenu = new JMenuItem("Subcategory");
         subcategoryMenu.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (jTree1.isSelectionEmpty()) {
                     JOptionPane.showMessageDialog(DatabaseManager.this, "No category selected!", "Error!", JOptionPane.ERROR_MESSAGE);
@@ -368,6 +443,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         removeMenu = new JMenuItem("Remove");
         removeMenu.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 if (jTree1.isSelectionEmpty()) {
                     JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
@@ -394,6 +470,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         editMenu = new JMenuItem("Edit");
         editMenu.addActionListener(new ActionListener() {
 
+            @Override
             public void actionPerformed(ActionEvent e) {
                 boolean FL_D = false;
                 boolean FL_DD = false;
@@ -540,87 +617,58 @@ public class DatabaseManager extends javax.swing.JDialog {
     public void initServicesTable() {
         odb = Constants.getDbConnection();
         Vector v = null;
-        Vector vc = new Vector();
 
         jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         jTable1.setToolTipText("Double click to edit!");
         jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
 
+            @Override
             public void valueChanged(ListSelectionEvent e) {
                 jTextArea1.setText("");
-                if(odb != null) {
-                    IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and()
-                                .add(Where.equal("x", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 3)))
-                                .add(Where.equal("y", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 4))));
+                if (odb != null) {
+                    int selectedRow = jTable1.getSelectedRow();
+                    System.out.println("Selected row " + selectedRow);
+                    if (selectedRow != -1) {
+                        Float sx = (Float) jTable1.getModel().getValueAt(selectedRow, 3);
+                        Float sy = (Float) jTable1.getModel().getValueAt(selectedRow, 4);
+                        System.out.println("SX " + sx + " sy " + sy);
+
+                        IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", sx)).add(Where.equal("y", sy)));
+
                         Objects cats = odb.getObjects(query);
-                        if(!cats.isEmpty()) {
-                                ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
-                                ServiceDescription sd = sa.getServiceCore().getServiceDescription();
-                                jTextArea1.setText("Attributes:\nService at x: "+sa.getX()+" y: "+sa.getY()+"\nDescription:\nName: "+sd.getServiceName()+"\nStreet: "+sd.getServiceStreet()+"\nNumber: "+sd.getServiceNumber()+"\nCategory: "+sd.getCategory().getName()+"\nSubcategory: "+sd.getServiceSubCategory().getName()+"\nAdditional: "+sd.getAdditionaInfo());
+                        if (cats != null && !cats.isEmpty()) {
+                            ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
+                            ServiceDescription sd = sa.getServiceCore().getServiceDescription();
+
+                            Subcategory subCat = sd.getServiceSubCategory();
+                            String sSubCat = "no subcategory";
+                            if (subCat != null) {
+                                sSubCat = subCat.getName();
+                            }
+                            /*
+                             *  FIXME null pointer exception !!!!!!!!!!!!
+                             */
+                            jTextArea1.setText("Attributes:\nService at x: " + sa.getX() +
+                                    " y: " + sa.getY() +
+                                    "\nDescription:\nName: " + sd.getServiceName() +
+                                    "\nStreet: " + sd.getServiceStreet() +
+                                    "\nNumber: " + sd.getServiceNumber() +
+                                    "\nCategory: " + sd.getCategory().getName() +
+                                    "\nSubcategory: " + sSubCat +
+                                    "\nAdditional: " + sd.getAdditionaInfo());
                         } else {
                             System.out.println("empty selection");
                         }
+                    } else {
+                        System.err.println(this.getClass().getCanonicalName() + " valueChanged -> selected row is -1 !!!");
+                    }
+
                 } else {
                     System.out.println("db not initialized!");
                 }
             }
         });
 
-        if (odb != null) {
-            Objects services = odb.getObjects(ServiceCore.class);
-            Object[] columns = {"Name", "Category", "Subcategory", "X", "Y"};
-
-            DefaultTableModel model = new DefaultTableModel() {
-
-                @Override
-                public boolean isCellEditable(int row, int column) {
-                    return false;
-                }
-            };
-            model.setColumnIdentifiers(columns);
-            if (!services.isEmpty()) {
-                while (services.hasNext()) {
-                    v = new Vector();
-                    ServiceCore sc = (ServiceCore) services.next();
-                    v.add(sc.getServiceDescription().getServiceName());
-                    v.add(sc.getServiceDescription().getCategory().getName());
-                    if (sc.getServiceDescription().getServiceSubCategory() == null) {
-                        v.add("empty");
-                    } else {
-                        v.add(sc.getServiceDescription().getServiceSubCategory().getName());
-                    }
-                    v.add(sc.getServiceAttributes().getX());
-                    v.add(sc.getServiceAttributes().getY());
-                    model.addRow(v);
-                }
-                jTable1.setModel(model);
-            } else {
-                jTable1.setModel(model);
-            }
-
-            jTable1.addMouseListener(new MouseAdapter() {
-
-                @Override
-                public void mouseClicked(MouseEvent e) {
-                    if (e.getClickCount() == 2) {
-                        IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and()
-                                .add(Where.equal("x", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 3)))
-                                .add(Where.equal("y", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 4))));
-                        Objects cats = odb.getObjects(query);
-                        if(!cats.isEmpty()) {
-                            ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
-                            ServiceCore sc = sa.getServiceCore();
-                            ServiceEditor se = new ServiceEditor(null,true,sc);
-                            se.setVisible(true);
-                        } else {
-                            System.out.println("cell selection error!");
-                        }
-                    }
-                }
-            });
-
-        } else {
-            System.out.println("DB not initialized");
-        }
+        reloadServicesTable();
     }
 }
