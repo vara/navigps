@@ -2,7 +2,9 @@ package app.gui.svgComponents;
 
 import app.gui.MainWindowIWD;
 import app.gui.searchServices.SearchServices;
-import app.gui.svgComponents.displayobjects.DisplayManager;
+import app.gui.svgComponents.displayobjects.AbstractDisplayManager;
+import app.gui.svgComponents.displayobjects.ComponentDisplayManager;
+import app.gui.svgComponents.displayobjects.XMLDOMDisplayManager;
 import config.SVGConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
@@ -19,7 +21,12 @@ import java.awt.geom.Point2D;
 import java.util.LinkedList;
 import javax.swing.AbstractAction;
 import javax.swing.KeyStroke;
+import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.JSVGCanvas;
+import org.w3c.dom.Node;
+import org.w3c.dom.svg.SVGLocatable;
+import org.w3c.dom.svg.SVGMatrix;
+import org.w3c.dom.svg.SVGPoint;
 
 /**
  *
@@ -66,12 +73,12 @@ public class Canvas extends JSVGCanvas{
     //private SVGUserAgentGUIAdapter agent;
 
     private SearchServices search;
-    private DisplayManager dm;
+    private AbstractDisplayManager dm;
 
     private boolean isFocus = false;
 
-    private LinkedList<PaintingTransformIterface> paintingTranformListener =
-            new LinkedList<PaintingTransformIterface>();
+    private LinkedList<TransformAdapter> tranformListener =
+            new LinkedList<TransformAdapter>();
 
     MouseListener requestFocus = new MouseAdapter() {
         @Override
@@ -80,14 +87,11 @@ public class Canvas extends JSVGCanvas{
                 requestFocusInWindow();             
         }
     };
-
-    /**
-     *
-     */
+    
     public Canvas(){
 		super(null,false,false);
-        setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
-        //setDocumentState(Canvas.ALWAYS_STATIC);
+        //setDocumentState(JSVGCanvas.ALWAYS_DYNAMIC);
+        setDocumentState(Canvas.ALWAYS_STATIC);
         setDoubleBuffered(true);
         //setDoubleBufferedRendering(true);
 
@@ -96,8 +100,9 @@ public class Canvas extends JSVGCanvas{
         search = new SearchServices(this);
         //add(search,BorderLayout.CENTER);
         
-        dm = new DisplayManager(this);
-        addSVGDocumentLoaderListener(dm.getRenderingTreeListener());
+        //dm = new XMLDOMDisplayManager(this);
+        dm = new ComponentDisplayManager(this);
+        
 
         //setEnableZoomInteractor(false);
         //setEnableImageZoomInteractor(false);
@@ -115,9 +120,10 @@ public class Canvas extends JSVGCanvas{
                 isFocus = false;
             }
         });
+
     }
 
-    public DisplayManager getDisplayManager(){
+    public AbstractDisplayManager getDisplayManager(){
         return dm;
     }
 
@@ -125,31 +131,84 @@ public class Canvas extends JSVGCanvas{
      *
      * @param pt
      */
-    public void addPaintingTranformListener(PaintingTransformIterface pt){
-        paintingTranformListener.add(pt);
+    public void addTranformListener(TransformAdapter ta){
+        tranformListener.add(ta);
     }
 
     @Override
-    public void setPaintingTransform(AffineTransform at) {
-        /*
-        new Thread(new Runnable() {
+    public void setPaintingTransform(AffineTransform at) {        
+        super.setPaintingTransform(at);
+        if(at!=null){
+            final AffineTransform tmpAt = new AffineTransform(at);
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (Object o : tranformListener) {
+                        ((PaintingTransformIterface)o).setPaintingTransform(tmpAt);
+                    }
+                }
+            }).start();
+        }
+    }
 
+    @Override
+    public void setRenderingTransform(AffineTransform at) {
+        final AffineTransform tmpAt = new AffineTransform(at);   
+        
+        new Thread(new Runnable() {
             @Override
             public void run() {
-                for (Object o : paintingTranformListener) {
-                    ((PaintingTransformIterface)o).setPaintingTransform(at);
+                for (Object o : tranformListener) {
+                    ((RenderingTransformInterface)o).setRenderingTransform(tmpAt);
                 }
             }
-        }).start();
-        */
-        super.setPaintingTransform(at);        
+        }).start();        
+        
+        super.setRenderingTransform(at);
     }
-    
+
     @Override
     public boolean isFocusable() {
         return true;
     }
-    
+
+    public SVGPoint[] getWindowPoints() {
+        final SVGOMPoint upperLeft = new SVGOMPoint(0, 0);
+        final SVGOMPoint upperRight = new SVGOMPoint(this.getWidth(), 0);
+        final SVGOMPoint lowerLeft = new SVGOMPoint(0, this.getHeight());
+        return new SVGPoint[] {upperLeft, upperRight, lowerLeft};
+    }
+
+    /**
+     * Maps the points of the corners of this JSVGCanvas to SVG document
+     * coordinates.
+     * @return An SVGPoint array of points representing document coordinates.
+     */
+    public SVGPoint[] getDocumentPoints() {
+        if (this.getSVGDocument() != null) {
+            final Node node = this.getSVGDocument().getDocumentElement();
+            SVGMatrix matrix = ((SVGLocatable) node).getScreenCTM();
+            if(matrix!=null){
+                matrix = matrix.inverse();
+
+                SVGPoint[] windowPoints = this.getWindowPoints();
+                final SVGPoint derivedUpperLeft = windowPoints[0].matrixTransform(matrix);
+                final SVGPoint derivedUpperRight = windowPoints[1].matrixTransform(matrix);
+                final SVGPoint derivedLowerLeft = windowPoints[2].matrixTransform(matrix);
+                /*
+                System.out.println("Upper Left: " + windowPoints[0].getX() + ", " + windowPoints[0].getY());
+                System.out.println("Upper Right: " + windowPoints[1].getX() + ", " + windowPoints[1].getY());
+                System.out.println("Lower Left: " + windowPoints[2].getX() + ", " + windowPoints[2].getY());
+                System.out.println("Document Upper Left: " + derivedUpperLeft.getX() + ", " + derivedUpperLeft.getY());
+                System.out.println("Document Upper Right: " + derivedUpperRight.getX() + ", " + derivedUpperRight.getY());
+                System.out.println("Document Lower Left: " + derivedLowerLeft.getX() + ", " + derivedLowerLeft.getY());
+                */
+                return new SVGPoint[] {derivedUpperLeft, derivedUpperRight, derivedLowerLeft};
+            }
+        }
+        return null;
+        
+    }
     /**
      *
      * @param val
@@ -216,7 +275,7 @@ public class Canvas extends JSVGCanvas{
         private byte mode = -1;
 
         @Override
-        public void mouseClicked(MouseEvent evt) {
+        public void mouseClicked(MouseEvent evt) {            
             Point2D p2d = new Point2D.Double(evt.getX(),evt.getY());
             int button = evt.getButton();
             if(button==MouseEvent.BUTTON1){

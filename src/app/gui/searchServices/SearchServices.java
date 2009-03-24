@@ -58,7 +58,7 @@ public class SearchServices extends AlphaJPanel{
             if (evt.getPropertyName().equals(ALPHA_CHANGE)) {
                 float newAlpha = (Float) evt.getNewValue();
                 float oldAlpha = (Float) evt.getOldValue();
-                System.out.println("new Alpa "+newAlpha);
+                //System.out.println("new Alpa "+newAlpha);
                 if (setAlpha(newAlpha)) {
                     repaint();
                 }

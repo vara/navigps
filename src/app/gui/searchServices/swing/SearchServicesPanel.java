@@ -5,10 +5,11 @@
  */
 package app.gui.searchServices.swing;
 
+
 import app.gui.MainWindowIWD;
 import app.gui.MyPopupMenu;
 import app.gui.ScrollBar.ui.LineScrollBarUI;
-import app.gui.svgComponents.displayobjects.DisplayManager;
+import app.gui.svgComponents.displayobjects.AbstractDisplayManager;
 import app.utils.InvokeUtils;
 import app.utils.InvokeUtils.ReturnValue;
 import app.utils.NaviPoint;
@@ -27,17 +28,16 @@ import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
 import javax.swing.tree.TreeModel;
+import odb.core.Category;
 import odb.core.Search;
 import odb.core.ServiceCore;
 import odb.utils.Constants;
-import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.util.SVGConstants;
+import org.neodatis.odb.ODB;
+import org.neodatis.odb.OID;
+import org.neodatis.odb.core.trigger.InsertTrigger;
 import org.w3c.dom.Element;
-import org.w3c.dom.events.Event;
-import org.w3c.dom.events.EventListener;
-import org.w3c.dom.events.EventTarget;
-import org.w3c.dom.svg.SVGElement;
 
 /**
  *
@@ -84,6 +84,17 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         reloadCategory();
 
+        addTriggerToDB();
+    }
+
+    protected boolean addTriggerToDB(){
+
+        ODB odb = Constants.getDbConnection();
+        if(odb != null ){
+            odb.addInsertTrigger(Category.class,new MyTrigger());
+            return true;
+        }
+        return false;
     }
 
     /** This method is called from within the constructor to
@@ -345,7 +356,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                     ReturnValue rv = InvokeUtils.invokeWithTime(
                             new Search(), "searchCategoryRadius", pt, obj);
                     Vector subResult = (Vector) rv.getRet();
-                    DisplayManager dm = MainWindowIWD.getSVGCanvas().getDisplayManager();
+                    AbstractDisplayManager dm = MainWindowIWD.getSVGCanvas().getDisplayManager();
 
                     if(jRadioButton1.isSelected()){
                         dm.removeLastServices();
@@ -354,18 +365,32 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
                     for (int i = 0; i < subResult.size(); i++) {
                         ServiceCore sc = (ServiceCore) subResult.get(i);
+
+                        String groupName = sc.getServiceDescription().getCategory().getName();
+                        String serviceName = sc.getServiceDescription().getServiceName();
+                        String serviceDesc = sc.getServiceDescription().getAdditionaInfo();
+                        String serviceStreet = sc.getServiceDescription().getServiceStreet();
+                        String serviceNumber = sc.getServiceDescription().getServiceNumber();
+
+                        serviceDesc+="<br>Street :<b>"+serviceStreet+" "+serviceNumber+"</b>";
+
                         Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "image");
                         service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
                         service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
-                        service.setAttributeNS(null, "width", "32");
-                        service.setAttributeNS(null, "height", "32");
+                        service.setAttributeNS(null, "width", "28");
+                        service.setAttributeNS(null, "height", "28");
+                        service.setAttributeNS(null, "groupName", groupName);
+                        service.setAttributeNS(null, "serviceName", serviceName);
+                        service.setAttributeNS(null, "serviceDesc", serviceDesc);
+
                         service.setAttributeNS(null, "xmlns:xlink", "http://www.w3.org/1999/xlink");
                         String path = "";
                         try {
-                            path = MainWindowIWD.createNavigationIconPath("/test/cpn","png").toURI().toString();
+                            path = MainWindowIWD.createNavigationIconPath("test/"+groupName,"png").toURI().toString();
                         } catch (URISyntaxException ex) {}
                         service.setAttributeNS(xlinkNS, SVGConstants.XLINK_HREF_QNAME,path);
 
+                        /*
                         EventTarget evT = (EventTarget)service;
                         evT.addEventListener("click", new EventListener() {
 
@@ -378,7 +403,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                                 System.out.println("x: "+xxx+" y: "+yyy+" Element: "+element.getNodeName());
                             }
                         }, false);
-
+                        */
                         serviceElements.add(service);
                     }
                     dm.putObject(serviceElements);
@@ -514,7 +539,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     public void setServices(Vector<String> value) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Services");
         DynamicUtilTreeNode.createChildren(root, value);
-        DefaultTreeModel dtm = new DefaultTreeModel(root, false);
+        DefaultTreeModel dtm = new DefaultTreeModel(root, true);
         jTree1.setModel(dtm);
     }
 
@@ -541,6 +566,21 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             }
         }
 
+    }
+
+    public class MyTrigger extends InsertTrigger {
+
+        @Override
+        public boolean beforeInsert(Object object) {
+            //System.out.println("before inserting " + object);
+            return true;
+        }
+
+        @Override
+        public void afterInsert(Object object, OID oid) {
+            //System.out.println("after insert object with id "+oid+"("+object.getClass().getName()+")");
+            reloadCategory();
+        }
     }
 }
  

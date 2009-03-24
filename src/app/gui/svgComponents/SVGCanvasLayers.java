@@ -15,7 +15,6 @@ import java.awt.Component;
 import java.awt.Container;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
-import javax.swing.JComponent;
 import javax.swing.JLayeredPane;
 import javax.swing.OverlayLayout;
 
@@ -32,6 +31,10 @@ public class SVGCanvasLayers extends JLayeredPane{
     /**
      *
      */
+    public static final Integer DISPLAY_SERVICES_LAYER = new Integer(JLayeredPane.FRAME_CONTENT_LAYER+50);
+    /**
+     *
+     */
     public static final Integer SEARCH_SERVICES_LAYER = new Integer(JLayeredPane.FRAME_CONTENT_LAYER+100);
     /**
      *
@@ -43,6 +46,7 @@ public class SVGCanvasLayers extends JLayeredPane{
     private AlphaJPanel componentContainer;
     private AlphaJPanel modalContainer;
     private AlphaJPanel thumbnailContainer;
+    private AlphaJPanel servicesContainer;
 
     /**
      *
@@ -65,10 +69,13 @@ public class SVGCanvasLayers extends JLayeredPane{
 
         thumbnailContainer = new AlphaJPanel(null);
         getThumbnailContainer().setOpaque(false);
-        
+
+        setServicesContainer(new SynchronizedSVGLayer(getSvgCanvas()));
+
         add(getModalContainer(),MODAL_LAYER);
         add(getComponentContainer(),DEFAULT_LAYER);
-        add(thumbnailContainer, THUMBNAIL_LAYER);
+        add(getThumbnailContainer(), THUMBNAIL_LAYER);
+        add(getServicesContainer(),DISPLAY_SERVICES_LAYER);
 
         createThumbnails();
     }
@@ -159,5 +166,19 @@ public class SVGCanvasLayers extends JLayeredPane{
      */
     public AlphaJPanel getThumbnailContainer() {
         return thumbnailContainer;
+    }
+
+    /**
+     * @return the servicesContainer
+     */
+    public AlphaJPanel getServicesContainer() {
+        return servicesContainer;
+    }
+
+    /**
+     * @param servicesContainer the servicesContainer to set
+     */
+    public void setServicesContainer(AlphaJPanel servicesContainer) {
+        this.servicesContainer = servicesContainer;
     }
 }

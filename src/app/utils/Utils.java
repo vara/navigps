@@ -2,13 +2,16 @@ package app.utils;
 
 import java.awt.Color;
 import java.awt.Font;
+import java.awt.geom.AffineTransform;
+import java.awt.geom.NoninvertibleTransformException;
+import java.awt.geom.Point2D;
 import java.text.NumberFormat;
 import javax.swing.BorderFactory;
 import javax.swing.border.Border;
-import org.apache.batik.dom.svg.SVGOMPoint;
 import org.w3c.dom.Element;
 import org.w3c.dom.svg.SVGLocatable;
 import org.w3c.dom.svg.SVGMatrix;
+import org.w3c.dom.svg.SVGPoint;
 
 /**
  *
@@ -87,7 +90,81 @@ public class Utils {
         }
 	    return dest;
     }
+    
+    public static Point2D[] svgPointToPoint2D(SVGPoint[] points) {
+        final Point2D[] returnPoints = new Point2D.Double[points.length];
+        for (int count = 0; count < points.length; count++) {
+            returnPoints[count] =
+                    new Point2D.Double(points[count].getX(),
+                    points[count].getY());
+        }
+        return returnPoints;
+    }
 
+    /**
+     * Derives the "magic" transform that can transform source points to
+     * destination points.
+     *
+     * @param srcPoints Three points representing the source parallelogram.
+     * @param destPoints Three points representing the destination
+     * parallelogram.
+     * 
+     * Matrix is represent
+     * [m00 m01 m02]
+     * [m10 m11 m12]
+     * [ 0   0   1 ]
+     *
+     * @return A transform as described above.
+     *
+     */
+    public static AffineTransform deriveTransform(
+            Point2D[] srcPoints, Point2D[] destPoints) throws NoninvertibleTransformException {
+        if ((srcPoints == null) || (srcPoints.length != 3)) {
+            throw new IllegalArgumentException(
+                    "Source points must contain three points!");
+        } else if ((destPoints == null) || (destPoints.length != 3)) {
+            throw new IllegalArgumentException(
+                    "Destination points must contain three points!");
+        }
+        AffineTransform returnTransform = null;
+
+        //System.out.println(srcPoints[0]+","+srcPoints[1]+","+srcPoints[2]);
+        final double m00 = srcPoints[1].getX() - srcPoints[0].getX();
+        final double m10 = srcPoints[1].getY() - srcPoints[0].getY();
+        final double m01 = srcPoints[2].getX() - srcPoints[0].getX();
+        final double m11 = srcPoints[2].getY() - srcPoints[0].getY();
+        final double m02 = srcPoints[0].getX();
+        final double m12 = srcPoints[0].getY();
+
+        final double n00 = destPoints[1].getX() - destPoints[0].getX();
+        final double n10 = destPoints[1].getY() - destPoints[0].getY();
+        final double n01 = destPoints[2].getX() - destPoints[0].getX();
+        final double n11 = destPoints[2].getY() - destPoints[0].getY();
+        final double n02 = destPoints[0].getX();
+        final double n12 = destPoints[0].getY();
+
+        // Build the transform based on the source points.
+        final AffineTransform srcTransform =
+                new AffineTransform(
+                new double[] {m00, m10, m01, m11, m02, m12});
+        //System.out.println("src Tran "+srcTransform);
+
+        final AffineTransform destTransform =
+                    new AffineTransform(
+                    new double[] {n00, n10, n01, n11, n02, n12});
+        //System.out.println("destTran "+destTransform);
+       
+        try {
+
+            returnTransform = srcTransform.createInverse();
+            returnTransform.preConcatenate(destTransform);
+
+        } catch (NoninvertibleTransformException e) {
+            MyLogger.log.severe(e.getMessage());
+        }
+        //System.out.println("retTran "+returnTransform);
+        return returnTransform;
+    }
     /**
      *
      * @param val

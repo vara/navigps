@@ -5,6 +5,8 @@
 
 package app.utils;
 
+import java.awt.Point;
+import java.awt.geom.AffineTransform;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPoint;
@@ -104,6 +106,12 @@ public class NaviPoint extends SVGOMPoint{
             return (getX() == p2d.getX()) && (getY() == p2d.getY());
         }
         return super.equals(obj);
+    }
+
+    public NaviPoint matrixTransform(AffineTransform matrix){
+        Point.Float p = new Point.Float(this.x,this.y);
+        matrix.transform(p, p);
+        return new NaviPoint(p.x, p.y);
     }
 
     @Override
