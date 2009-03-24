@@ -5,7 +5,9 @@
 
 package app.gui.svgComponents.displayobjects;
 
+import java.util.Vector;
 import org.apache.batik.dom.svg.SVGOMPoint;
+import org.w3c.dom.Element;
 
 /**
  *
@@ -18,4 +20,5 @@ public abstract class AbstractDisplayManager {
      * @param point
      */
     public abstract void putObject(Object object,SVGOMPoint point);
+    public abstract void putObject(final Vector<Element> object);
 }

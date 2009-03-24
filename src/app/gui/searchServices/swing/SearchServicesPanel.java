@@ -22,6 +22,7 @@ import javax.swing.JMenuItem;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
 import javax.swing.JTree.DynamicUtilTreeNode;
+import javax.swing.SwingUtilities;
 import javax.swing.event.MouseInputAdapter;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeModel;
@@ -436,8 +437,14 @@ public class SearchServicesPanel extends javax.swing.JPanel {
      *
      */
     public void reloadCategory(){
-        setServices(new Search().getCategories());
-        MainWindowIWD.getBridgeInformationPipe().currentStatusChanged("Category Tree reload");
+        SwingUtilities.invokeLater(new Runnable() {
+            @Override
+            public void run() {
+                setServices(new Search().getCategories());
+                MainWindowIWD.getBridgeInformationPipe().
+                        currentStatusChanged("Category Tree reload");
+            }
+        });
     }
 
     /**

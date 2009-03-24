@@ -973,15 +973,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             boolean en = button.getModel().isSelected();
             putValue(AbstractAction.SELECTED_KEY, new Boolean(en));
             SearchServices ss = getSVGCanvas().getSearchServices();
-            ss.setEnabled(en);
+            ss.setEnabledSearchServices(en);
             if(en){
+                int count = canvaslayers.getComponentCountInLayer(SVGCanvasLayers.SEARCH_SERVICES_LAYER);
+                System.err.println("component count on SVGCanvasLayers.SEARCH_SERVICES_LAYER "+count);
                 canvaslayers.add(ss,SVGCanvasLayers.SEARCH_SERVICES_LAYER);
             }
-            /*else{
-                canvaslayers.remove(ss);
-                canvaslayers.repaint();
-            }   
-            */
             String info = "Search services " + (en ? "enabled" : "disabled");
             svgListeners.currentStatusChanged(info);
         }

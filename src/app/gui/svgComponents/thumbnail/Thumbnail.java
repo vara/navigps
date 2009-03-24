@@ -301,16 +301,7 @@ public class Thumbnail extends AlphaJPanel {
      */
     protected class AreaOfInterestListener extends MouseInputAdapter {
 
-        /**
-         *
-         */
-        /**
-         *
-         */
-        protected int sx, sy;
-        /**
-         *
-         */
+        protected int sx, sy;      
         protected boolean in;
 
         @Override

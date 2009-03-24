@@ -41,41 +41,17 @@ import javax.swing.border.Border;
  */
 public class MemoryGui extends JComponent implements Runnable,
 						     MouseListener{
-    /**
-     *
-     */
-    public static final int B =  1;
-    /**
-     *
-     */
-    public static final int KB = 1024;
-    /**
-     *
-     */
-    public static final int MB = 1024*1024;
-    /**
-     *
-     */
-    public static final int GB = 1024*1024*1024;
-    
-    /**
-     *
-     */
+   
+    public static final int B =  1;   
+    public static final int KB = 1024;    
+    public static final int MB = 1024*1024;  
+    public static final int GB = 1024*1024*1024;    
     protected static final int STARTED=0;
-    /**
-     *
-     */
     protected static final int STOPED=1;
-    /**
-     *
-     */
     protected static final int PAUSED=2;
-    /**
-     *
-     */
     protected static final int RESUMED=3;
     
-    private int mul = MemoryGui.MB;
+    private double mul = MemoryGui.MB;
     private String unitName = "MB";    
     private Runtime runtime = Utils.getRuntime();    
     private int wPaint = 100;
@@ -177,7 +153,7 @@ public class MemoryGui extends JComponent implements Runnable,
             Rectangle2D textBounds = getTextFont().getStringBounds(info, frc);
             double maxWidthAreaPaint = getWPaint()-(2.0*getTPaint());
             double scale = maxWidthAreaPaint/textBounds.getWidth();
-            //getVerboseStream().outputErrorVerboseStream("AreaP "+maxWidthAreaPaint+" tb "+textBounds.getWidth()+" Scale "+scale);
+            //getVerboseStream().outputErrorVerboseStream("Painted Area "+maxWidthAreaPaint+" text width "+textBounds.getWidth()+" Scale "+scale);
             if(scale<1.0){                
                 setTextFont(Utils.createFitFont(getTextFont(), scale));
                 getVerboseStream().outputErrorVerboseStream("MemoryGui changed font size "+getTextFont().getSize());
@@ -186,6 +162,9 @@ public class MemoryGui extends JComponent implements Runnable,
             GlyphVector gv = getTextFont().createGlyphVector(frc, info);
             LineMetrics lm = gv.getFont().getLineMetrics(info, frc);
             int x = (int)((maxWidthAreaPaint - textBounds.getWidth())/2);
+            if(x<2){
+                x=2;
+            }
             int y = (int)(lm.getAscent() + (getTPaint()+getHPaint() - (lm.getAscent() + lm.getDescent())) / 2);
             
             if(isShowShadow()){
@@ -204,9 +183,9 @@ public class MemoryGui extends JComponent implements Runnable,
         //int xx = 0;
             while(isLoopThread()){
 
-                freeMem = runtime.freeMemory();
-                totalMem = runtime.totalMemory();
-                maxMem = runtime.maxMemory();
+                setFreeMem(runtime.freeMemory());
+                setTotalMem(runtime.totalMemory());
+                setMaxMem(runtime.maxMemory());
                 double convert = getTotalMem()/getMul();
                 double scale = getHPaint()/convert;
                 chart.updatePoint((int)( ((getTotalMem()-getFreeMem())/getMul()) *scale));
@@ -403,7 +382,7 @@ public class MemoryGui extends JComponent implements Runnable,
      *
      * @return
      */
-    public int getMul() {
+    public double getMul() {
         return mul;
     }
 

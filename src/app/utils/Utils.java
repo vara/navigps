@@ -95,7 +95,7 @@ public class Utils {
      * @param mul
      * @return
      */
-    public static String roundsValue(double val,int fraction,int mul){
+    public static String roundsValue(double val,int fraction,double mul){
         NumberFormat nf = NumberFormat.getInstance();
         nf.setMaximumFractionDigits(fraction);
         return nf.format(val/mul);

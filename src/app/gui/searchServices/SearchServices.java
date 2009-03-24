@@ -58,13 +58,14 @@ public class SearchServices extends AlphaJPanel{
             if (evt.getPropertyName().equals(ALPHA_CHANGE)) {
                 float newAlpha = (Float) evt.getNewValue();
                 float oldAlpha = (Float) evt.getOldValue();
-                //System.out.println("new Alpa "+newAlpha);
+                System.out.println("new Alpa "+newAlpha);
                 if (setAlpha(newAlpha)) {
                     repaint();
                 }
-                if (newAlpha < .01f && oldAlpha>newAlpha) {
-                    enabled = false;
+                if (newAlpha <= .015f && oldAlpha>newAlpha) {
+                    setEnabledSearchServices(false);
                     uninstall();
+                    enabled = false;
                 }
             }
         }
@@ -97,7 +98,7 @@ public class SearchServices extends AlphaJPanel{
 
     public void uninstall(){
 
-        svgCanvas.removeMouseMotionListener(me);
+        removeMouseMotionListener(me);
         svgCanvas.removeMouseListener(me);
         svgCanvas.removeJGVTComponentListener(svgViewListener);
         roundWindowInstace.getContentPane().remove(guiForSearchServ);
@@ -129,15 +130,13 @@ public class SearchServices extends AlphaJPanel{
         roundWindowInstace.setEnabled(true);
     }
 
-    @Override
-    public void setEnabled(boolean val) {
-        //enabled = val;        
-        if (val) {            
+    public void setEnabledSearchServices(boolean val){        
+        if (val) {
             Container parent = svgCanvas.getParent();
             enabled = true;
             if (parent instanceof SVGCanvasLayers) {
                 Container cont = RoundWindowUtils.getRoundWindowFromContainer(parent);
-                if (cont != null) {                                        
+                if (cont != null) {
                     installRoundWindow((RoundWindow) cont);
                     install();
                 }
@@ -151,8 +150,8 @@ public class SearchServices extends AlphaJPanel{
             roundWindowInstace.setEnabled(false);
             //uninstall();
         }
-    }
 
+    }
     public boolean isEnabledSearchServices() {
         return enabled;
     }

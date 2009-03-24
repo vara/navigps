@@ -30,16 +30,8 @@ public class DisplayManager extends AbstractDisplayManager{
     private UpdateManager updateManager;
     private Canvas can;
 
-
-    /**
-     *
-     */
     public static final String SERVICES_NAME = "GroupServices";
 
-    /**
-     *
-     * @param c
-     */
     public DisplayManager(Canvas c) {
         can = c;
     }
@@ -163,10 +155,7 @@ public class DisplayManager extends AbstractDisplayManager{
         return updateManager!=null;
     }
 
-    /**
-     *
-     * @param object
-     */
+    @Override
     public void putObject(final Vector<Element> object) {
         if(checkDisplaManager()){
             updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
@@ -180,111 +169,59 @@ public class DisplayManager extends AbstractDisplayManager{
         }
     }
 
-    /**
-     *
-     */
     protected class LoaderTreeListener implements SVGDocumentLoaderListener{
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {
             updateManager = null;
             doc = e.getSVGDocument();
             putObject("Test !!!", new SVGOMPoint(520, 400));
         }
-
-        /**
-         *
-         * @param e
-         */
         @Override
         public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
         }
     }
 
-    /**
-     *
-     */
     protected class UpdateManagerInfoListener implements UpdateManagerListener{
 
-
-        /**
-         *
-         * @param e
-         */
         @Override
         public void managerStarted(UpdateManagerEvent e) {
             System.err.println("managerStarted ");
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void managerSuspended(UpdateManagerEvent e) {
             System.err.println("managerSuspend ");
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void managerResumed(UpdateManagerEvent e) {
             System.err.println("managerResumed ");
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void managerStopped(UpdateManagerEvent e) {
             System.err.println("managerStoped ");
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void updateStarted(UpdateManagerEvent e) {
             System.err.println("updateStarted ");
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void updateCompleted(UpdateManagerEvent e) {
             System.err.println("updateCompleted ");
         }
 
-        /**
-         *
-         * @param e
-         */
         @Override
         public void updateFailed(UpdateManagerEvent e) {
             System.err.println("updateFailed ");

@@ -305,14 +305,19 @@ public class PanelWithBatikJTree extends JScrollPane{
 
             Object nodeInfo = mtn.getUserObject();            
             if (nodeInfo instanceof NodeInfo) {
-                Node node = ((NodeInfo) nodeInfo).getNode();                
+                final Node node = ((NodeInfo) nodeInfo).getNode();
                 switch (node.getNodeType()) {
                 case Node.DOCUMENT_NODE:
                     attributePanel.getXMLEditorPanel().getNodeXmlArea().setText(
                             createDocumentText((Document) node));
                     break;
-                case Node.ELEMENT_NODE:                  
-                    attributePanel.setPreviewElement((Element) node);
+                case Node.ELEMENT_NODE:
+                    new Thread(new Runnable() {
+                        @Override
+                        public void run() {
+                            attributePanel.setPreviewElement((Element) node);
+                        }
+                    }).start();
                     break;
                 case Node.COMMENT_NODE:
                 case Node.TEXT_NODE:
