@@ -92,15 +92,17 @@ public class DisplayManager extends AbstractDisplayManager{
                     if(doc!=null){
                         Element gTekst = doc.getElementById(SERVICES_NAME);
                         if(gTekst!=null){
-                            NodeList nl = gTekst.getChildNodes();
+                            /*NodeList nl = gTekst.getChildNodes();
 
                             for (int i = 0; i < nl.getLength(); i++) {
                                 Node child =nl.item(i);
-                                System.out.println("node value : "+child.getNodeValue());
+                                System.out.println("node: name : "+child.getLocalName()+" value : "+child.getNodeValue());
                                 gTekst.removeChild(child);
 
                             }
                             System.err.println("Removed "+nl.getLength()+" last services");
+                             */
+                            doc.getRootElement().removeChild(gTekst);
                         }else{
                             System.err.println("Group "+SERVICES_NAME+" does not exist !");
                         }
