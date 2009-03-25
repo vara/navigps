@@ -24,12 +24,11 @@ public class ServicesContainer extends SynchronizedSVGLayer{
 
         AffineTransform at = getTransform();
         if( !(at.equals(new AffineTransform())) ){
-
-            Component [] comps = getComponents();
-            System.out.println(getClass().getCanonicalName()+" updateComponentsCoordinates component count "+comps.length);
+            Component [] comps = getComponents();            
             for (Component c : comps) {
                 ((ObjectService)c).transformCoordinate(at);
             }
+            System.out.println(getClass().getCanonicalName()+" updateComponentsCoordinates component count "+comps.length);
         }
         needUpdate = false;
         //revalidate();

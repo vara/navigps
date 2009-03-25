@@ -196,6 +196,10 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
                         if(parent != null){
                             parent.remove(ObjectService.this);
                             parent.repaint();
+                            String msg = "Removed service \""+ObjectService.this.getServiceName()+"\"";
+                            MainWindowIWD.getBridgeInformationPipe().
+                                    currentStatusChanged(msg);
+                            System.out.println(msg);
                         }
                     }
                 });
@@ -205,8 +209,13 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
                     public void actionPerformed(ActionEvent e) {                        
                         Container parent = ObjectService.getServicesContainer(ObjectService.this);
                         if(parent != null){
+                            int count = parent.getComponentCount();
                             parent.removeAll();
                             parent.repaint();
+                            String msg = "Removed "+count+" services";
+                            MainWindowIWD.getBridgeInformationPipe().
+                                    currentStatusChanged(msg);
+                            System.out.println(msg);
                         }
                     }
                 });
