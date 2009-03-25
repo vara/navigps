@@ -9,13 +9,14 @@ import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGCanvasLayers;
 import app.gui.svgComponents.SynchronizedSVGLayer;
 import app.utils.GraphicsUtilities;
+import app.utils.MyLogger;
 import app.utils.NaviPoint;
 import java.awt.image.BufferedImage;
 import java.io.IOException;
 import java.net.URL;
 import java.util.Vector;
+import java.util.logging.Level;
 import org.apache.batik.dom.svg.SVGOMPoint;
-import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 
 /**
@@ -56,18 +57,19 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
             float fy = Float.parseFloat(y);
             int iw = Integer.parseInt(w);
             NaviPoint np = new NaviPoint(fx, fy);
-
-            System.out.println("href "+href);
+            ObjectService ob = null;
             try {
 
                 BufferedImage bi = GraphicsUtilities.loadCompatibleImage(new URL(href));
                 BufferedImage thumbImg = GraphicsUtilities.createThumbnail(bi, iw);
-                ObjectService ob = new ObjectService(thumbImg, serviceDesc,groupName,serviceName, np);
-                getDisplayLayer().add(ob);
+                ob = new ObjectService(thumbImg, serviceDesc,groupName,serviceName, np);               
 
             } catch (IOException ex) {
-                System.err.println(""+ex);
+                ob = new ObjectService(null, serviceDesc,groupName,serviceName, np);
+                String msg = ex + "[ for group name "+groupName+" ]";
+                MyLogger.log.log(Level.WARNING, msg);
             }
+            getDisplayLayer().add(ob);
         }
         getDisplayLayer().updateComponent();
     }

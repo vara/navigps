@@ -59,7 +59,8 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     public ObjectService(BufferedImage img,String desc,String group,String servicesName,NaviPoint point){
         super(null);
         setOpaque(false);
-        icon = new ImageIcon(img);
+        if(img != null)
+            icon = new ImageIcon(img);
         description = desc;
         category = group;
         this.serviceName = servicesName;
@@ -103,8 +104,11 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     }
 
     @Override
-    protected void paintComponent(Graphics g) {        
-        g.drawImage(getIconinfo().getImage(), iconGap,iconGap, null);
+    protected void paintComponent(Graphics g) {
+        if(getIconinfo() != null)
+            g.drawImage(getIconinfo().getImage(), iconGap,iconGap, null);
+        else
+            g.drawRect(0, 0,getWidth()-1, getHeight()-1);
     }
 
     @Override
@@ -159,9 +163,12 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     }
 
     private void updateObject(){
-
-        int width = getIconinfo().getIconWidth();
-        int height = getIconinfo().getIconHeight();
+        int width = 28;
+        int height = 28;
+        if(getIconinfo() != null){
+            width = getIconinfo().getIconWidth();
+            height = getIconinfo().getIconHeight();
+        }
         int allGap = iconGap*2;
         setBounds((int)getCoordinate().getX(), (int)getCoordinate().getY(), width+allGap, height+ allGap);
 
