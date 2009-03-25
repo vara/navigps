@@ -144,7 +144,7 @@ public class Canvas extends JSVGCanvas{
                 @Override
                 public void run() {
                     for (Object o : tranformListener) {
-                        ((PaintingTransformIterface)o).setPaintingTransform(tmpAt);
+                        ((PaintingTransformIterface)o).setPaintingTransform(tmpAt);                        
                     }
                 }
             }).start();

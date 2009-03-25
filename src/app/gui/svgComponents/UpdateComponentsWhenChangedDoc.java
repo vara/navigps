@@ -1,12 +1,11 @@
 package app.gui.svgComponents;
 
 /**
- *
+ * When document rendering,building etc.
  * @author vara
  */
 
-public interface UpdateComponentsWhenChangedDoc{
-    //when document rendering building etc.       
+public interface UpdateComponentsWhenChangedDoc{          
     /**
      *
      */

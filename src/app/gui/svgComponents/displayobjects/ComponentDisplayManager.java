@@ -69,7 +69,7 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
                 System.err.println(""+ex);
             }
         }
-        getDisplayLayer().updateComponentsCoordinates();
+        getDisplayLayer().updateComponent();
     }
 
     @Override
