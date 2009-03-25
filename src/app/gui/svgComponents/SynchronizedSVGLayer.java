@@ -1,14 +1,12 @@
 package app.gui.svgComponents;
 
 import app.gui.detailspanel.AlphaJPanel;
-import app.gui.svgComponents.displayobjects.ObjectService;
 import app.utils.Utils;
-import java.awt.Component;
 import java.awt.Graphics;
+import java.awt.Graphics2D;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.NoninvertibleTransformException;
 import java.awt.geom.Point2D;
-import javax.swing.SwingUtilities;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.w3c.dom.svg.SVGPoint;
 
@@ -17,14 +15,19 @@ import org.w3c.dom.svg.SVGPoint;
  * @author wara
  */
 
-public class SynchronizedSVGLayer extends AlphaJPanel{
+public abstract class SynchronizedSVGLayer extends AlphaJPanel{
 
-    protected Canvas can;
+    protected Canvas svgCanvas;
     private TransformCanvasListener txListener = new TransformCanvasListener();
+
+    /*
+     * Var. needUpdate seted true when only svg document transform changed
+     */
+    protected boolean needUpdate = false;
 
     public SynchronizedSVGLayer(Canvas can){
         super(null);
-        this.can = can;
+        this.svgCanvas = can;
         setOpaque(false);
         can.addTranformListener(txListener);
     }
@@ -32,9 +35,19 @@ public class SynchronizedSVGLayer extends AlphaJPanel{
     @Override
     protected void paintComponent(Graphics g) {
         super.paintComponent(g);
+        Graphics2D g2 = (Graphics2D)g;
+        AffineTransform pt = svgCanvas.getPaintingTransform();
+        if(pt!=null){
+            AffineTransform orgT = g2.getTransform();
+            orgT.concatenate(pt);
+            g2.setTransform(orgT);
+        }else{
+            if(needUpdate) updateComponent();
+
+        }
     }
 
-    public SVGPoint[] getWindowPoints() {
+    public SVGPoint[] getPointsRelativeToWindow() {
         final SVGOMPoint upperLeft = new SVGOMPoint(0, 0);
         final SVGOMPoint upperRight = new SVGOMPoint(this.getWidth(), 0);
         final SVGOMPoint lowerLeft = new SVGOMPoint(0, this.getHeight());
@@ -44,10 +57,10 @@ public class SynchronizedSVGLayer extends AlphaJPanel{
     public AffineTransform getTransform(){
 
         AffineTransform derivedTransform = new AffineTransform();
-        SVGPoint[] docPoints = can.getDocumentPoints();
+        SVGPoint[] docPoints = svgCanvas.getDocumentPoints();
         if(docPoints != null){
             final Point2D[] src = Utils.svgPointToPoint2D(docPoints);
-            final Point2D[] dest = Utils.svgPointToPoint2D(getWindowPoints());
+            final Point2D[] dest = Utils.svgPointToPoint2D(getPointsRelativeToWindow());
             try {
                 derivedTransform = Utils.deriveTransform(src, dest);
             } catch (NoninvertibleTransformException ex) {}
@@ -55,31 +68,12 @@ public class SynchronizedSVGLayer extends AlphaJPanel{
         return derivedTransform;
     }
 
-    public void updateComponentsCoordinates(){
-
-        AffineTransform at = getTransform();
-        if( !(at.equals(new AffineTransform())) ){
-
-            Component [] comps = getComponents();
-            for (Component c : comps) {
-                ((ObjectService)c).transformCoordinate(at);
-            }
-        }
-    }
+    public abstract void updateComponent();
 
     public class TransformCanvasListener extends TransformAdapter{
         @Override
         public void setRenderingTransform(AffineTransform rt) {
-            SwingUtilities.invokeLater(new Runnable() {
-                @Override
-                public void run() {
-                    updateComponentsCoordinates();
-                }
-            });
-        }
-
-        @Override
-        public void setPaintingTransform(AffineTransform pt) {
+            needUpdate = true;
         }
     }
 }

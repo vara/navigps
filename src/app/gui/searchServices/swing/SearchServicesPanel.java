@@ -17,6 +17,7 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
@@ -386,8 +387,13 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                         service.setAttributeNS(null, "xmlns:xlink", "http://www.w3.org/1999/xlink");
                         String path = "";
                         try {
-                            path = MainWindowIWD.createNavigationIconPath("test/"+groupName,"png").toURI().toString();
-                        } catch (URISyntaxException ex) {}
+                            URL url = MainWindowIWD.createNavigationIconPath("test/"+groupName,"png");
+                            if(url != null){
+                                path = url.toURI().toString();
+                            }
+                        } catch (URISyntaxException ex) {
+
+                        }
                         service.setAttributeNS(xlinkNS, SVGConstants.XLINK_HREF_QNAME,path);
 
                         /*

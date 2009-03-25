@@ -6,17 +6,23 @@
 package app.gui.svgComponents.displayobjects;
 
 import app.gui.MainWindowIWD;
+import app.gui.MyPopupMenu;
 import app.gui.detailspanel.AlphaJPanel;
+import app.gui.svgComponents.ServicesContainer;
 import app.utils.GraphicsUtilities;
 import app.utils.NaviPoint;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.event.MouseInputAdapter;
 import net.java.balloontip.BalloonTip;
 import net.java.balloontip.styles.BalloonTipStyle;
@@ -48,13 +54,13 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
     private ObjectMouseListener ml = new ObjectMouseListener();
 
-
-    String toolTipString;
+    private String toolTipString;    
 
     public ObjectService(BufferedImage img,String desc,String group,String servicesName,NaviPoint point){
         super(null);
         setOpaque(false);
-        icon = new ImageIcon(img);
+        if(img != null)
+            icon = new ImageIcon(img);
         description = desc;
         category = group;
         this.serviceName = servicesName;
@@ -98,8 +104,11 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     }
 
     @Override
-    protected void paintComponent(Graphics g) {        
-        g.drawImage(getIconinfo().getImage(), iconGap,iconGap, null);
+    protected void paintComponent(Graphics g) {
+        if(getIconinfo() != null)
+            g.drawImage(getIconinfo().getImage(), iconGap,iconGap, null);
+        else
+            g.drawRect(0, 0,getWidth()-1, getHeight()-1);
     }
 
     @Override
@@ -154,12 +163,23 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     }
 
     private void updateObject(){
-
-        int width = getIconinfo().getIconWidth();
-        int height = getIconinfo().getIconHeight();
+        int width = 28;
+        int height = 28;
+        if(getIconinfo() != null){
+            width = getIconinfo().getIconWidth();
+            height = getIconinfo().getIconHeight();
+        }
         int allGap = iconGap*2;
         setBounds((int)getCoordinate().getX(), (int)getCoordinate().getY(), width+allGap, height+ allGap);
 
+    }
+
+    private static Container getServicesContainer(JComponent child){
+        Container parent = child.getParent();
+        if(parent instanceof ServicesContainer){
+            return parent;
+        }
+        return null;
     }
 
     private class ObjectMouseListener extends MouseInputAdapter{
@@ -167,6 +187,49 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         public void mouseEntered(MouseEvent e) {
             //System.err.println(ObjectService.this.toString());
             setToolTip(toolTipString);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON3){
+                MyPopupMenu popup = new MyPopupMenu();
+                JMenuItem miRemoveThis= new JMenuItem("Remove this service");
+                JMenuItem miRemoveAll= new JMenuItem("Remove all services");
+                miRemoveThis.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Container parent = ObjectService.getServicesContainer(ObjectService.this);                        
+                        if(parent != null){
+                            parent.remove(ObjectService.this);
+                            parent.repaint();
+                            String msg = "Removed service \""+ObjectService.this.getServiceName()+"\"";
+                            MainWindowIWD.getBridgeInformationPipe().
+                                    currentStatusChanged(msg);
+                            System.out.println(msg);
+                        }
+                    }
+                });
+                miRemoveAll.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {                        
+                        Container parent = ObjectService.getServicesContainer(ObjectService.this);
+                        if(parent != null){
+                            int count = parent.getComponentCount();
+                            parent.removeAll();
+                            parent.repaint();
+                            String msg = "Removed "+count+" services";
+                            MainWindowIWD.getBridgeInformationPipe().
+                                    currentStatusChanged(msg);
+                            System.out.println(msg);
+                        }
+                    }
+                });
+                popup.add(miRemoveThis);
+                popup.add(miRemoveAll);
+                popup.show(ObjectService.this, e.getX(), e.getY());
+            }
         }
     }
 }
