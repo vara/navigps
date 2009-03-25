@@ -47,7 +47,7 @@ public abstract class SynchronizedSVGLayer extends AlphaJPanel{
         }
     }
 
-    public SVGPoint[] getPointsRelativeToWindow() {
+    public SVGPoint[] getPointsRelativeToRootContainer() {
         final SVGOMPoint upperLeft = new SVGOMPoint(0, 0);
         final SVGOMPoint upperRight = new SVGOMPoint(this.getWidth(), 0);
         final SVGOMPoint lowerLeft = new SVGOMPoint(0, this.getHeight());
@@ -60,7 +60,7 @@ public abstract class SynchronizedSVGLayer extends AlphaJPanel{
         SVGPoint[] docPoints = svgCanvas.getDocumentPoints();
         if(docPoints != null){
             final Point2D[] src = Utils.svgPointToPoint2D(docPoints);
-            final Point2D[] dest = Utils.svgPointToPoint2D(getPointsRelativeToWindow());
+            final Point2D[] dest = Utils.svgPointToPoint2D(getPointsRelativeToRootContainer());
             try {
                 derivedTransform = Utils.deriveTransform(src, dest);
             } catch (NoninvertibleTransformException ex) {}
