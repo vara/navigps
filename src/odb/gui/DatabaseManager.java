@@ -6,7 +6,6 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
-import java.util.LinkedList;
 import java.util.Vector;
 import javax.swing.ImageIcon;
 import javax.swing.JMenu;
@@ -38,17 +37,13 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
  */
 public class DatabaseManager extends javax.swing.JDialog {
 
-    private ODB odb = null;
+    private ODB odb = Constants.getDbConnection();
     private JPopupMenu popup;
     private JMenuItem categoryMenu;
     private JMenuItem subcategoryMenu;
     private JMenuItem editMenu;
     private JMenuItem removeMenu;
     private JMenu newMenu;
-
-    public final static String CATEGORY_ADDED = "cat.added";
-    public final static String CATEGORY_RENAMED = "cat.renamed";
-    public final static String CATEGORY_REMOVED = "cat.removed";
 
     /** Creates new form Manager
      * @param parent
@@ -62,12 +57,11 @@ public class DatabaseManager extends javax.swing.JDialog {
         loadTreePopup();
         initServicesTable();
 
-        initMyComponents();
+        initFormListeners();
     }
 
-
-    private void initMyComponents() {
-
+    private void initFormListeners() {
+        //JTABLE mouse adapter
         jTable1.addMouseListener(new MouseAdapter() {
 
             @Override
@@ -86,10 +80,271 @@ public class DatabaseManager extends javax.swing.JDialog {
                 }
             }
         });
+        //POPUP remove menu listener
+        removeMenu.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTree1.isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (jTree1.getSelectionPath().getPath().length == 2) {
+                        System.out.println("Removing category: " + jTree1.getLastSelectedPathComponent().toString());
+                        Object[] options = {"Yes", "No", "Cancel"};
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove category " + jTree1.getLastSelectedPathComponent().toString() + "? Removing category will cause all of its subcategories and services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
+                        if (n == 0) {
+                            IQuery query1 = new CriteriaQuery(ServiceDescription.class, Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects services = odb.getObjects(query1);
+                            //remove services inside category
+                            if (!services.isEmpty() && services != null) {
+                                System.out.println("number of services to be deleted: " + services.size());
+                                while (services.hasNext()) {
+                                    ServiceDescription sd = (ServiceDescription) services.next();
+                                    ServiceCore sc = sd.getServiceCore();
+                                    ServiceAttributes sa = sc.getServiceAttributes();
+                                    odb.delete(sa);
+                                    odb.delete(sd);
+                                    odb.delete(sc);
+                                }
+                                odb.commit();
+                            } else {
+                                System.out.println("No services in category!");
+                            }
+                            //remove subcategories inside category
+                            IQuery query = new CriteriaQuery(Subcategory.class, Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects subcategories = odb.getObjects(query);
+                            if (!subcategories.isEmpty() && subcategories != null) {
+                                System.out.println("number of subcategories to be deleted: " + subcategories.size());
+                                while (subcategories.hasNext()) {
+                                    Subcategory sub = (Subcategory) subcategories.next();
+                                    odb.delete(sub);
+                                }
+                                odb.commit();
+                            } else {
+                                System.out.println("No subcategories in category!");
+                            }
+                            //remove selected category
+                            IQuery query2 = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects cats = odb.getObjects(query2);
+                            if (!cats.isEmpty() && cats != null) {
+                                System.out.println("Categories to be deleted: " + cats.size());
+                                Category category = (Category) cats.getFirst();
+                                odb.delete(category);
+                                odb.commit();
+                            } else {
+                                System.err.println("No category match!");
+                            }
+                            refreshTree();
+                            reloadServicesTable();
+                        }
+                    } else if (jTree1.getSelectionPath().getPath().length == 3) {
+                        System.out.println("Removing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
+                        Object[] options = {"Yes", "No", "Cancel"};
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove subcategory " + jTree1.getLastSelectedPathComponent().toString() + "? Removing subcategory will cause all of its services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
+                        if (n == 0) {
+                            IQuery query1 = new CriteriaQuery(ServiceDescription.class, Where.equal("serviceSubCategory.name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects services = odb.getObjects(query1);
+                            //remove services inside category
+                            if (!services.isEmpty() && services != null) {
+                                System.out.println("number of services to be deleted: " + services.size());
+                                while (services.hasNext()) {
+                                    ServiceDescription sd = (ServiceDescription) services.next();
+                                    ServiceCore sc = sd.getServiceCore();
+                                    ServiceAttributes sa = sc.getServiceAttributes();
+                                    odb.delete(sa);
+                                    odb.delete(sd);
+                                    odb.delete(sc);
+                                }
+                                odb.commit();
+                            } else {
+                                System.out.println("No services in category!");
+                            }
+                            //remove subcategory
+                            IQuery query = new CriteriaQuery(Subcategory.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects subcategories = odb.getObjects(query);
+                            if (!subcategories.isEmpty() && subcategories != null) {
+                                System.out.println("number of subcategories to be deleted: " + subcategories.size());
+                                Subcategory sub = (Subcategory) subcategories.getFirst();
+                                Category catt = sub.getCategory();
+                                catt.removeSubcategory(sub);
+                                odb.delete(sub);
+                                odb.store(catt);
+                                odb.commit();
+                            } else {
+                                System.out.println("No such subcategory!");
+                            }
+                            refreshTree();
+                            reloadServicesTable();
+                        }
+                    }
+                }
+            }
+        });
+
+        //POPUP category menu listener
+        categoryMenu.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (odb != null) {
+                    String newCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new category name", "new category");
+                    if (newCat != null && !newCat.equals("")) {
+                        Objects categories = odb.getObjects(Category.class);
+                        if (!categories.isEmpty()) {
+                            //check duplicate name
+                            while (categories.hasNext()) {
+                                Category category = (Category) categories.next();
+                                if (category.getName().equalsIgnoreCase(newCat)) {
+                                    JOptionPane.showMessageDialog(null, "Category already exists! Change new category name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                                    return;
+                                }
+                            }
+                            //no duplicate name
+                            addCategory(newCat);
+
+                        } else {
+                            //if no cat present
+                            addCategory(newCat);
+                        }
+                    } else {
+                        System.out.println("no name input");
+                    }
+
+                } else {
+                    System.out.println("no db initialized");
+                }
+            }
+        });
+        //POPUP subcategory menu listener
+        subcategoryMenu.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if (jTree1.isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "No category selected!", "Error!", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (jTree1.getSelectionPath().getPath().length == 2) {
+                        boolean FL_DS = false;
+                        String newsubCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new subcategory name:", "new subcategory");
+
+                        if (newsubCat == null) {
+                            //cancel
+                        } else if (newsubCat.equals("")) {
+                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to input name!", "Warning", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects categories = odb.getObjects(query);
+                            Category category = (Category) categories.getFirst();
+
+                            if (category.getSubcategories() == null) {
+                                category.setSubcategories(new Vector());
+                                category.addSubcategory(new Subcategory(category, newsubCat));
+                                odb.store(category);
+                                odb.commit();
+                            } else {
+                                if (category.getSubcategories().isEmpty()) {
+                                    category.addSubcategory(new Subcategory(category, newsubCat));
+                                } else {
+                                    for (Object sub : category.getSubcategories()) {
+                                        Subcategory sc = (Subcategory) sub;
+                                        if (sc.getName().equalsIgnoreCase(newsubCat)) {
+                                            FL_DS = true;
+                                        }
+                                    }
+                                    if (FL_DS) {
+                                        JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                                    } else {
+                                        category.addSubcategory(new Subcategory(category, newsubCat));
+                                        odb.store(category);
+                                        odb.commit();
+                                    }
+                                }
+                            }
+                            refreshTree();
+                        }
+                    } else {
+                        JOptionPane.showMessageDialog(DatabaseManager.this, "Selection is not a category!", "Error!", JOptionPane.ERROR_MESSAGE);
+                    }
+                }
+
+            }
+        });
+        //POPUP edit menu listener
+        editMenu.addActionListener(new ActionListener() {
+
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                boolean FL_D = false;
+                boolean FL_DD = false;
+                if (jTree1.isSelectionEmpty()) {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
+                } else {
+                    if (jTree1.getSelectionPath().getPath().length == 2) {
+                        String newcat = JOptionPane.showInputDialog("Please input new name for the selected category " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
+                        if (newcat == null) {
+//                            cancel
+                        } else if (newcat.equalsIgnoreCase("")) {
+                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid category name!", "Warning", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            Objects categories = odb.getObjects(Category.class);
+                            while (categories.hasNext()) {
+                                Category c = (Category) categories.next();
+                                if (c.getName().equalsIgnoreCase(newcat)) {
+                                    FL_D = true;
+                                    break;
+                                }
+                            }
+                            if (FL_D) {
+                                JOptionPane.showMessageDialog(DatabaseManager.this, "Category already exists! Change category name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                                Objects cats = odb.getObjects(query);
+                                Category cat = (Category) cats.getFirst();
+                                cat.setName(newcat);
+                                odb.store(cat);
+                                odb.commit();
+                                refreshTree();
+                                initServicesTable();
+                            }
+                        }
+
+                    } else if (jTree1.getSelectionPath().getPath().length == 3) {
+                        String newsubcat = JOptionPane.showInputDialog("Please input new name for the selected subcategory " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
+                        if (newsubcat == null) {
+                        } else if (newsubcat.equalsIgnoreCase("")) {
+                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid subcategory name!", "Warning", JOptionPane.ERROR_MESSAGE);
+                        } else {
+                            IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getSelectionPath().getParentPath().getLastPathComponent().toString()));
+                            Objects cats = odb.getObjects(query);
+                            Category c = (Category) cats.getFirst();
+                            for (Object subcategory : c.getSubcategories()) {
+                                Subcategory s = (Subcategory) subcategory;
+                                if (s.getName().equalsIgnoreCase(newsubcat)) {
+                                    FL_DD = true;
+                                }
+                            }
+                            if (FL_DD) {
+                                JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                            } else {
+                                for (Object subcategory : c.getSubcategories()) {
+                                    Subcategory s = (Subcategory) subcategory;
+                                    if (s.getName().equalsIgnoreCase(jTree1.getLastSelectedPathComponent().toString())) {
+                                        s.setName(newsubcat);
+                                        odb.store(c);
+                                        odb.commit();
+                                        break;
+                                    }
+                                }
+                            }
+                            refreshTree();
+                        }
+                    }
+                }
+            }
+        });
     }
 
     public void reloadServicesTable() {
-
         Vector v = new Vector();
 
         if (odb != null) {
@@ -103,6 +358,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                     return false;
                 }
             };
+
             model.setColumnIdentifiers(columns);
             if (!services.isEmpty()) {
                 while (services.hasNext()) {
@@ -124,7 +380,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                 jTable1.setModel(model);
             }
         } else {
-            System.err.println("DataBase not init !!!");
+            System.err.println("DataBase not initialized!");
         }
     }
 
@@ -335,214 +591,18 @@ public class DatabaseManager extends javax.swing.JDialog {
 
     private void loadTreePopup() {
         popup = new JPopupMenu();
+
         newMenu = new JMenu("New");
-
         categoryMenu = new JMenuItem("Category");
-        categoryMenu.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-
-                ODB odb = Constants.getDbConnection();
-
-                if (odb != null) {
-                    String newCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new category name", "new category");
-                    if (newCat != null && !newCat.equals("")) {
-                        Objects categories = odb.getObjects(Category.class);
-                        if (!categories.isEmpty()) {
-                            //check duplicate name
-                            while (categories.hasNext()) {
-                                Category category = (Category) categories.next();
-                                if (category.getName().equalsIgnoreCase(newCat)) {
-                                    JOptionPane.showMessageDialog(null, "Category already exists! Change new category name.", "Warning", JOptionPane.ERROR_MESSAGE);
-                                    return;
-                                }
-                            }
-                            //no duplicate name
-                            addCategory(newCat);
-
-                        } else {
-                            //if no cat present
-                            addCategory(newCat);
-                        }
-                    } else {
-                        System.out.println("no name input");
-                    }
-
-                } else {
-                    System.out.println("no db initialized");
-                }
-            }
-        });
-
         subcategoryMenu = new JMenuItem("Subcategory");
-        subcategoryMenu.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (jTree1.isSelectionEmpty()) {
-                    JOptionPane.showMessageDialog(DatabaseManager.this, "No category selected!", "Error!", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    if (jTree1.getSelectionPath().getPath().length == 2) {
-                        ODB odb = Constants.getDbConnection();
-                        boolean FL_DS = false;
-                        String newsubCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new subcategory name:", "new subcategory");
-
-                        if (newsubCat == null) {
-                            //cancel
-                        } else if (newsubCat.equals("")) {
-                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to input name!", "Warning", JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
-                            Objects categories = odb.getObjects(query);
-                            Category category = (Category) categories.getFirst();
-
-                            if (category.getSubcategories() == null) {
-                                category.setSubcategories(new Vector());
-                                category.addSubcategory(new Subcategory(category, newsubCat));
-                                odb.store(category);
-                                odb.commit();
-                            } else {
-                                if (category.getSubcategories().isEmpty()) {
-                                    category.addSubcategory(new Subcategory(category, newsubCat));
-                                } else {
-                                    for (Object sub : category.getSubcategories()) {
-                                        Subcategory sc = (Subcategory) sub;
-                                        if (sc.getName().equalsIgnoreCase(newsubCat)) {
-                                            FL_DS = true;
-                                        }
-                                    }
-                                    if (FL_DS) {
-                                        JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
-                                    } else {
-                                        category.addSubcategory(new Subcategory(category, newsubCat));
-                                        odb.store(category);
-                                        odb.commit();
-                                    }
-                                }
-                            }
-                            refreshTree();
-                        }
-                    } else {
-                        JOptionPane.showMessageDialog(DatabaseManager.this, "Selection is not a category!", "Error!", JOptionPane.ERROR_MESSAGE);
-                    }
-                }
-
-            }
-        });
+        removeMenu = new JMenuItem("Remove");
+        editMenu = new JMenuItem("Edit");
 
         newMenu.add(categoryMenu);
         newMenu.add(subcategoryMenu);
 
         popup.add(newMenu);
         popup.add(new JPopupMenu.Separator());
-
-        /*
-         * TODO remove category and subcategory
-         */
-        removeMenu = new JMenuItem("Remove");
-        removeMenu.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                if (jTree1.isSelectionEmpty()) {
-                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    if (jTree1.getSelectionPath().getPath().length == 2) {
-                        System.out.println("Removing category: " + jTree1.getLastSelectedPathComponent().toString());
-                        Object[] options = {"Yes", "No", "Cancel"};
-                        int n = JOptionPane.showOptionDialog(rootPane, "Remove category " + jTree1.getLastSelectedPathComponent().toString() + "? Removing category will cause all of its subcategories and services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
-                        if (n == 0) {
-                            System.out.println("remove category");
-                        }
-                    } else if (jTree1.getSelectionPath().getPath().length == 3) {
-                        System.out.println("Removing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
-                        Object[] options = {"Yes", "No", "Cancel"};
-                        int n = JOptionPane.showOptionDialog(rootPane, "Remove subcategory " + jTree1.getLastSelectedPathComponent().toString() + "? Removing subcategory will cause all of its services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
-                        if (n == 0) {
-                            System.out.println("remove subcategory");
-                        }
-                    }
-                }
-            }
-        });
-
-        editMenu = new JMenuItem("Edit");
-        editMenu.addActionListener(new ActionListener() {
-
-            @Override
-            public void actionPerformed(ActionEvent e) {
-                boolean FL_D = false;
-                boolean FL_DD = false;
-                if (jTree1.isSelectionEmpty()) {
-                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
-                } else {
-                    if (jTree1.getSelectionPath().getPath().length == 2) {
-                        String newcat = JOptionPane.showInputDialog("Please input new name for the selected category " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
-                        if (newcat == null) {
-//                            cancel
-                        } else if (newcat.equalsIgnoreCase("")) {
-                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid category name!", "Warning", JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            odb = Constants.getDbConnection();
-                            Objects categories = odb.getObjects(Category.class);
-                            while (categories.hasNext()) {
-                                Category c = (Category) categories.next();
-                                if (c.getName().equalsIgnoreCase(newcat)) {
-                                    FL_D = true;
-                                    break;
-                                }
-                            }
-                            if (FL_D) {
-                                JOptionPane.showMessageDialog(DatabaseManager.this, "Category already exists! Change category name.", "Warning", JOptionPane.ERROR_MESSAGE);
-                            } else {
-                                IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
-                                Objects cats = odb.getObjects(query);
-                                Category cat = (Category) cats.getFirst();
-                                cat.setName(newcat);
-                                odb.store(cat);
-                                odb.commit();
-                                refreshTree();
-                                initServicesTable();
-                            }
-                        }
-
-                    } else if (jTree1.getSelectionPath().getPath().length == 3) {
-                        String newsubcat = JOptionPane.showInputDialog("Please input new name for the selected subcategory " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
-                        if (newsubcat == null) {
-                        } else if (newsubcat.equalsIgnoreCase("")) {
-                            JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid subcategory name!", "Warning", JOptionPane.ERROR_MESSAGE);
-                        } else {
-                            odb = Constants.getDbConnection();
-                            IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getSelectionPath().getParentPath().getLastPathComponent().toString()));
-                            Objects cats = odb.getObjects(query);
-                            Category c = (Category) cats.getFirst();
-                            for (Object subcategory : c.getSubcategories()) {
-                                Subcategory s = (Subcategory) subcategory;
-                                if (s.getName().equalsIgnoreCase(newsubcat)) {
-                                    FL_DD = true;
-                                }
-                            }
-                            if (FL_DD) {
-                                JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
-                            } else {
-                                for (Object subcategory : c.getSubcategories()) {
-                                    Subcategory s = (Subcategory) subcategory;
-                                    if (s.getName().equalsIgnoreCase(jTree1.getLastSelectedPathComponent().toString())) {
-                                        s.setName(newsubcat);
-                                        odb.store(c);
-                                        odb.commit();
-                                        break;
-                                    }
-                                }
-                            }
-                            refreshTree();
-                        }
-                    }
-                }
-            }
-        });
-
         popup.add(editMenu);
         popup.add(removeMenu);
     }
@@ -576,46 +636,55 @@ public class DatabaseManager extends javax.swing.JDialog {
     private void refreshTree() {
         Category category;
         Subcategory subcategory;
+        DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
+
         ImageIcon leafIcon = DatabaseManager.getIcon("22");
         ImageIcon openIcon = DatabaseManager.getIcon("8");
         ImageIcon closedIcon = DatabaseManager.getIcon("5");
 
-        odb = Constants.getDbConnection();
         Objects categories = odb.getObjects(Category.class);
+        if (categories != null) {
+            if (categories.isEmpty()) {
+                System.out.println("jTree model: no categories present");
+                jTree1.setModel(new DefaultTreeModel(root));
+                DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+                model.reload();
 
-        if (categories.isEmpty()) {
-        } else {
-            DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
-            jTree1.setModel(new DefaultTreeModel(root));
-            DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+            } else {
+                jTree1.setModel(new DefaultTreeModel(root));
+                DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
 
-            DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-            renderer.setLeafIcon(leafIcon);
-            renderer.setClosedIcon(closedIcon);
-            renderer.setOpenIcon(openIcon);
-            jTree1.setCellRenderer(renderer);
+                DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+                renderer.setLeafIcon(leafIcon);
+                renderer.setClosedIcon(closedIcon);
+                renderer.setOpenIcon(openIcon);
+                jTree1.setCellRenderer(renderer);
 
-            while (categories.hasNext()) {
-                category = (Category) categories.next();
-                DefaultMutableTreeNode cat = new DefaultMutableTreeNode(category.getName());
-                model.insertNodeInto(cat, root, root.getChildCount());
-                if (category.getSubcategories() != null) {
-                    for (int i = 0; i < category.getSubcategories().size(); i++) {
-                        subcategory = (Subcategory) category.getSubcategories().get(i);
-                        DefaultMutableTreeNode sub = new DefaultMutableTreeNode(subcategory.getName());
-                        model.insertNodeInto(sub, cat, cat.getChildCount());
+                while (categories.hasNext()) {
+                    category = (Category) categories.next();
+                    DefaultMutableTreeNode cat = new DefaultMutableTreeNode(category.getName());
+                    model.insertNodeInto(cat, root, root.getChildCount());
+                    if (category.getSubcategories() != null) {
+                        for (int i = 0; i < category.getSubcategories().size(); i++) {
+                            subcategory = (Subcategory) category.getSubcategories().get(i);
+                            DefaultMutableTreeNode sub = new DefaultMutableTreeNode(subcategory.getName());
+                            model.insertNodeInto(sub, cat, cat.getChildCount());
+                        }
                     }
+                    model.reload();
                 }
+
             }
-            model.reload();
+        } else {
+            System.out.println("Categories is null");
         }
+
     }
 
     /**
      *
      */
     public void initServicesTable() {
-        odb = Constants.getDbConnection();
         Vector v = null;
 
         jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
@@ -668,7 +737,6 @@ public class DatabaseManager extends javax.swing.JDialog {
                 }
             }
         });
-
         reloadServicesTable();
     }
 }
