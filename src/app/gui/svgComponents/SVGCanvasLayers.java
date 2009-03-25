@@ -71,6 +71,7 @@ public class SVGCanvasLayers extends JLayeredPane{
         getThumbnailContainer().setOpaque(false);
 
         setServicesContainer(new SynchronizedSVGLayer(getSvgCanvas()));
+        getServicesContainer().setAlpha(0.6f);
 
         add(getModalContainer(),MODAL_LAYER);
         add(getComponentContainer(),DEFAULT_LAYER);
