@@ -6,17 +6,23 @@
 package app.gui.svgComponents.displayobjects;
 
 import app.gui.MainWindowIWD;
+import app.gui.MyPopupMenu;
 import app.gui.detailspanel.AlphaJPanel;
+import app.gui.svgComponents.ServicesContainer;
 import app.utils.GraphicsUtilities;
 import app.utils.NaviPoint;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
-import java.io.IOException;
 import java.net.URL;
 import javax.swing.ImageIcon;
+import javax.swing.JComponent;
+import javax.swing.JMenuItem;
 import javax.swing.event.MouseInputAdapter;
 import net.java.balloontip.BalloonTip;
 import net.java.balloontip.styles.BalloonTipStyle;
@@ -48,8 +54,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
     private ObjectMouseListener ml = new ObjectMouseListener();
 
-
-    String toolTipString;
+    private String toolTipString;    
 
     public ObjectService(BufferedImage img,String desc,String group,String servicesName,NaviPoint point){
         super(null);
@@ -162,11 +167,53 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
     }
 
+    private static Container getServicesContainer(JComponent child){
+        Container parent = child.getParent();
+        if(parent instanceof ServicesContainer){
+            return parent;
+        }
+        return null;
+    }
+
     private class ObjectMouseListener extends MouseInputAdapter{
         @Override
         public void mouseEntered(MouseEvent e) {
             //System.err.println(ObjectService.this.toString());
             setToolTip(toolTipString);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            if(e.getButton() == MouseEvent.BUTTON3){
+                MyPopupMenu popup = new MyPopupMenu();
+                JMenuItem miRemoveThis= new JMenuItem("Remove this service");
+                JMenuItem miRemoveAll= new JMenuItem("Remove all services");
+                miRemoveThis.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {
+                        Container parent = ObjectService.getServicesContainer(ObjectService.this);                        
+                        if(parent != null){
+                            parent.remove(ObjectService.this);
+                            parent.repaint();
+                        }
+                    }
+                });
+                miRemoveAll.addActionListener(new ActionListener() {
+
+                    @Override
+                    public void actionPerformed(ActionEvent e) {                        
+                        Container parent = ObjectService.getServicesContainer(ObjectService.this);
+                        if(parent != null){
+                            parent.removeAll();
+                            parent.repaint();
+                        }
+                    }
+                });
+                popup.add(miRemoveThis);
+                popup.add(miRemoveAll);
+                popup.show(ObjectService.this, e.getX(), e.getY());
+            }
         }
     }
 }
