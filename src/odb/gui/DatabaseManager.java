@@ -15,6 +15,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
+import javax.swing.event.RowSorterEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -26,24 +27,31 @@ import odb.core.ServiceDescription;
 import odb.core.Subcategory;
 import odb.utils.Constants;
 import org.neodatis.odb.ODB;
+import org.neodatis.odb.OID;
+import org.neodatis.odb.ObjectRepresentation;
 import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
 import org.neodatis.odb.core.query.criteria.Where;
+import org.neodatis.odb.core.trigger.DeleteTrigger;
+import org.neodatis.odb.core.trigger.InsertTrigger;
+import org.neodatis.odb.core.trigger.UpdateTrigger;
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 
 /**
- *
  * @author ACME
  */
 public class DatabaseManager extends javax.swing.JDialog {
 
     private ODB odb = Constants.getDbConnection();
-    private JPopupMenu popup;
+    private JPopupMenu treePopup, tablePopup;
     private JMenuItem categoryMenu;
     private JMenuItem subcategoryMenu;
-    private JMenuItem editMenu;
-    private JMenuItem removeMenu;
+    private JMenuItem editMenu,tableEditMenu;
+    private JMenuItem removeMenu,tableRemoveMenu;
     private JMenu newMenu;
+    private ODBInsertTrigger insertTrigger = new ODBInsertTrigger();
+    private ODBUpdateTrigger updateTrigger = new ODBUpdateTrigger();
+    private ODBDeleteTrigger deleteTrigger = new ODBDeleteTrigger();
 
     /** Creates new form Manager
      * @param parent
@@ -53,21 +61,62 @@ public class DatabaseManager extends javax.swing.JDialog {
         super(parent, modal);
         setLocationRelativeTo(parent);
         initComponents();
-        refreshTree();
+        refreshTreeData();
         loadTreePopup();
+        loadTablePopup();
         initServicesTable();
-
         initFormListeners();
+        initDatabaseTriggers();
+    }
+
+    private void initDatabaseTriggers() {
+        if (odb != null) {
+            odb.addInsertTrigger(Category.class, insertTrigger);
+            odb.addInsertTrigger(Subcategory.class, insertTrigger);
+            odb.addInsertTrigger(ServiceCore.class, insertTrigger);
+
+            odb.addUpdateTrigger(Category.class, updateTrigger);
+            odb.addUpdateTrigger(Subcategory.class, updateTrigger);
+            odb.addUpdateTrigger(ServiceCore.class, updateTrigger);
+
+            odb.addDeleteTrigger(Category.class, deleteTrigger);
+            odb.addDeleteTrigger(Subcategory.class, deleteTrigger);
+            odb.addDeleteTrigger(ServiceCore.class, deleteTrigger);
+
+        } else {
+            System.err.println("no DB initialized!");
+        }
     }
 
     private void initFormListeners() {
-        //JTABLE mouse adapter
-        jTable1.addMouseListener(new MouseAdapter() {
+        tableRemoveMenu.addActionListener(new ActionListener() {
 
-            @Override
-            public void mouseClicked(MouseEvent e) {
-                if (e.getClickCount() == 2 && e.getButton() == MouseEvent.BUTTON1) {
-                    IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 3))).add(Where.equal("y", jTable1.getModel().getValueAt(jTable1.getSelectedRow(), 4))));
+            public void actionPerformed(ActionEvent e) {
+                if (jTable1.getSelectedRow() !=-1) {
+                    int selection = jTable1.convertRowIndexToModel(jTable1.getSelectedRow());
+                    IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", jTable1.getModel().getValueAt(selection, 3))).add(Where.equal("y", jTable1.getModel().getValueAt(selection, 4))));
+                    Objects cats = odb.getObjects(query);
+                    if (cats != null && !cats.isEmpty()) {
+                        ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
+                        ServiceCore sc = sa.getServiceCore();
+                        ServiceDescription sd = sc.getServiceDescription();
+                        removeServiceByDescription(sd);
+                        odb.commit();
+                    } else {
+                        System.err.println("Service empty!");
+                    }
+                } else {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
+                }
+            }
+        });
+        //JTABLE EDIT MENU
+        tableEditMenu.addActionListener(new ActionListener() {
+
+            public void actionPerformed(ActionEvent e) {
+                if (jTable1.getSelectedRow() !=-1) {
+                    int selection = jTable1.convertRowIndexToModel(jTable1.getSelectedRow());
+                    IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", jTable1.getModel().getValueAt(selection, 3))).add(Where.equal("y", jTable1.getModel().getValueAt(selection, 4))));
                     Objects cats = odb.getObjects(query);
                     if (cats != null && !cats.isEmpty()) {
                         ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
@@ -75,8 +124,10 @@ public class DatabaseManager extends javax.swing.JDialog {
                         ServiceEditor se = new ServiceEditor(null, true, sc);
                         se.setVisible(true);
                     } else {
-                        System.out.println("cell selection error!");
+                        System.err.println("Service empty!");
                     }
+                } else {
+                    JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
                 }
             }
         });
@@ -91,27 +142,28 @@ public class DatabaseManager extends javax.swing.JDialog {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
                         System.out.println("Removing category: " + jTree1.getLastSelectedPathComponent().toString());
                         Object[] options = {"Yes", "No", "Cancel"};
-                        int n = JOptionPane.showOptionDialog(rootPane, "Remove category " + jTree1.getLastSelectedPathComponent().toString() + "? Removing category will cause all of its subcategories and services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove category " +
+                                jTree1.getLastSelectedPathComponent().toString() +
+                                "? Removing category will cause all of its subcategories and services be removed as well!",
+                                "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
                         if (n == 0) {
-                            IQuery query1 = new CriteriaQuery(ServiceDescription.class, Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
+                            IQuery query1 = new CriteriaQuery(ServiceDescription.class,
+                                    Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
                             Objects services = odb.getObjects(query1);
                             //remove services inside category
                             if (!services.isEmpty() && services != null) {
                                 System.out.println("number of services to be deleted: " + services.size());
                                 while (services.hasNext()) {
                                     ServiceDescription sd = (ServiceDescription) services.next();
-                                    ServiceCore sc = sd.getServiceCore();
-                                    ServiceAttributes sa = sc.getServiceAttributes();
-                                    odb.delete(sa);
-                                    odb.delete(sd);
-                                    odb.delete(sc);
+                                    removeServiceByDescription(sd);
                                 }
                                 odb.commit();
                             } else {
                                 System.out.println("No services in category!");
                             }
                             //remove subcategories inside category
-                            IQuery query = new CriteriaQuery(Subcategory.class, Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
+                            IQuery query = new CriteriaQuery(Subcategory.class,
+                                    Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
                             Objects subcategories = odb.getObjects(query);
                             if (!subcategories.isEmpty() && subcategories != null) {
                                 System.out.println("number of subcategories to be deleted: " + subcategories.size());
@@ -134,8 +186,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                             } else {
                                 System.err.println("No category match!");
                             }
-                            refreshTree();
-                            reloadServicesTable();
+                            refreshTreeData();
+                            refreshTableModel();
                         }
                     } else if (jTree1.getSelectionPath().getPath().length == 3) {
                         System.out.println("Removing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
@@ -173,8 +225,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                             } else {
                                 System.out.println("No such subcategory!");
                             }
-                            refreshTree();
-                            reloadServicesTable();
+                            refreshTreeData();
+                            refreshTableModel();
                         }
                     }
                 }
@@ -255,12 +307,11 @@ public class DatabaseManager extends javax.swing.JDialog {
                                         JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
                                     } else {
                                         category.addSubcategory(new Subcategory(category, newsubCat));
-                                        odb.store(category);
-                                        odb.commit();
+                                        addSubcategory(category, newsubCat);
                                     }
                                 }
                             }
-                            refreshTree();
+                            refreshTreeData();
                         }
                     } else {
                         JOptionPane.showMessageDialog(DatabaseManager.this, "Selection is not a category!", "Error!", JOptionPane.ERROR_MESSAGE);
@@ -303,8 +354,6 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 cat.setName(newcat);
                                 odb.store(cat);
                                 odb.commit();
-                                refreshTree();
-                                initServicesTable();
                             }
                         }
 
@@ -336,7 +385,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                                     }
                                 }
                             }
-                            refreshTree();
+                            refreshTreeData();
                         }
                     }
                 }
@@ -344,7 +393,91 @@ public class DatabaseManager extends javax.swing.JDialog {
         });
     }
 
-    public void reloadServicesTable() {
+    public void initServicesTable() {
+        Vector v = null;
+
+        jTable1.setToolTipText("Double click to edit!");
+        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
+
+        //JTABLE selection listener
+        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+
+            @Override
+            public void valueChanged(ListSelectionEvent e) {
+                int selectedRow;
+                jTextArea1.setText("");
+                if (odb != null) {
+                    if (jTable1.getSelectedRow() == -1) {
+                        selectedRow = 0;
+                    } else {
+                        selectedRow = jTable1.convertRowIndexToModel(jTable1.getSelectedRow());
+                    }
+                    
+                    System.out.println("Selected row " + selectedRow);
+                    if (selectedRow != -1) {
+                        Float sx = (Float) jTable1.getModel().getValueAt(selectedRow, 3);
+                        Float sy = (Float) jTable1.getModel().getValueAt(selectedRow, 4);
+                        System.out.println("SX " + sx + " sy " + sy);
+
+                        IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", sx)).add(Where.equal("y", sy)));
+
+                        Objects cats = odb.getObjects(query);
+                        if (cats != null && !cats.isEmpty()) {
+                            ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
+                            ServiceDescription sd = sa.getServiceCore().getServiceDescription();
+
+                            Subcategory subCat = sd.getServiceSubCategory();
+
+                            String sSubCat = "no subcategory";
+                            String sAdditional = "no additional info";
+                            String sCategory = "no category";
+                            String sStreet = "no service street";
+                            String sName = "no service name";
+                            String sNumber = "no service number";
+
+                            if (subCat != null) {
+                                sSubCat = subCat.getName();
+                            }
+                            if (sd.getAdditionaInfo() != null) {
+                                sAdditional = sd.getAdditionaInfo();
+                            }
+                            if (sd.getCategory() != null) {
+                                sCategory = sd.getCategory().getName();
+                            }
+                            if (sd.getServiceStreet() != null) {
+                                sStreet = sd.getServiceStreet();
+                            }
+                            if (sd.getServiceName() != null) {
+                                sName = sd.getServiceName();
+                            }
+                            if (sd.getServiceNumber() != null) {
+                                sNumber = sd.getServiceNumber();
+                            }
+
+                            jTextArea1.setText("Attributes:\nService at x: " + sa.getX() +
+                                    " y: " + sa.getY() +
+                                    "\nDescription:\nName: " + sName +
+                                    "\nStreet: " + sStreet +
+                                    "\nNumber: " + sNumber +
+                                    "\nCategory: " + sCategory +
+                                    "\nSubcategory: " + sSubCat +
+                                    "\nAdditional: " + sAdditional);
+                        } else {
+                            System.out.println("empty selection");
+                        }
+                    } else {
+                        System.err.println(this.getClass().getCanonicalName() + " valueChanged -> selected row is -1 !!!");
+                    }
+
+                } else {
+                    System.out.println("db not initialized!");
+                }
+            }
+        });
+        refreshTableModel();
+    }
+
+    public void refreshTableModel() {
         Vector v = new Vector();
 
         if (odb != null) {
@@ -358,8 +491,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                     return false;
                 }
             };
-
             model.setColumnIdentifiers(columns);
+
             if (!services.isEmpty()) {
                 while (services.hasNext()) {
                     v = new Vector();
@@ -375,10 +508,10 @@ public class DatabaseManager extends javax.swing.JDialog {
                     v.add(sc.getServiceAttributes().getY());
                     model.addRow(v);
                 }
-                jTable1.setModel(model);
             } else {
-                jTable1.setModel(model);
+                System.out.println("no services avaliable!");
             }
+            jTable1.setModel(model);
         } else {
             System.err.println("DataBase not initialized!");
         }
@@ -387,6 +520,14 @@ public class DatabaseManager extends javax.swing.JDialog {
     private void addNewService() {
         ServiceFactory sf = new ServiceFactory(null, true);
         sf.setVisible(true);
+    }
+
+    private void removeServiceByDescription(ServiceDescription sd) {
+        ServiceCore sc = sd.getServiceCore();
+        ServiceAttributes sa = sc.getServiceAttributes();
+        odb.delete(sa);
+        odb.delete(sd);
+        odb.delete(sc);
     }
 
     @SuppressWarnings("unchecked")
@@ -431,6 +572,14 @@ public class DatabaseManager extends javax.swing.JDialog {
 
             }
         ));
+        jTable1.addMouseListener(new java.awt.event.MouseAdapter() {
+            public void mousePressed(java.awt.event.MouseEvent evt) {
+                jTable1MousePressed(evt);
+            }
+            public void mouseReleased(java.awt.event.MouseEvent evt) {
+                jTable1MouseReleased(evt);
+            }
+        });
         jScrollPane1.setViewportView(jTable1);
 
         javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
@@ -441,7 +590,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         );
         jPanel2Layout.setVerticalGroup(
             jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 266, Short.MAX_VALUE)
+            .addComponent(jScrollPane1, javax.swing.GroupLayout.DEFAULT_SIZE, 263, Short.MAX_VALUE)
         );
 
         jButton3.setFont(new java.awt.Font("Verdana", 0, 11));
@@ -524,7 +673,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         );
         jPanel3Layout.setVerticalGroup(
             jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 488, Short.MAX_VALUE)
+            .addComponent(jScrollPane3, javax.swing.GroupLayout.DEFAULT_SIZE, 484, Short.MAX_VALUE)
         );
 
         jTabbedPane1.addTab("Categories", jPanel3);
@@ -544,7 +693,6 @@ public class DatabaseManager extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-//        disconnectDatabase();
         Constants.setManagerWindow(null);
     }//GEN-LAST:event_formWindowClosing
 
@@ -553,20 +701,24 @@ public class DatabaseManager extends javax.swing.JDialog {
     }//GEN-LAST:event_jButton3ActionPerformed
 
     private void jTree1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MouseReleased
-        if (evt.isPopupTrigger()) {
-            popup.show(evt.getComponent(), evt.getX(), evt.getY());
-        }
+        showTreePopup(evt);
 }//GEN-LAST:event_jTree1MouseReleased
 
     private void jTree1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MousePressed
-        if (evt.isPopupTrigger()) {
-            popup.show(evt.getComponent(), evt.getX(), evt.getY());
-        }
+        showTreePopup(evt);
 }//GEN-LAST:event_jTree1MousePressed
 
     private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
         Constants.setManagerWindow(this);
     }//GEN-LAST:event_formWindowOpened
+
+    private void jTable1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MousePressed
+        showTablePopup(evt);
+    }//GEN-LAST:event_jTable1MousePressed
+
+    private void jTable1MouseReleased(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MouseReleased
+        showTablePopup(evt);
+    }//GEN-LAST:event_jTable1MouseReleased
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JButton jButton3;
@@ -586,11 +738,16 @@ public class DatabaseManager extends javax.swing.JDialog {
     private void addCategory(String category) {
         odb.store(new Category(category));
         odb.commit();
-        refreshTree();
+    }
+
+    private void addSubcategory(Category category, String subcategory) {
+        category.addSubcategory(new Subcategory(category, subcategory));
+        odb.store(category);
+        odb.commit();
     }
 
     private void loadTreePopup() {
-        popup = new JPopupMenu();
+        treePopup = new JPopupMenu();
 
         newMenu = new JMenu("New");
         categoryMenu = new JMenuItem("Category");
@@ -601,39 +758,35 @@ public class DatabaseManager extends javax.swing.JDialog {
         newMenu.add(categoryMenu);
         newMenu.add(subcategoryMenu);
 
-        popup.add(newMenu);
-        popup.add(new JPopupMenu.Separator());
-        popup.add(editMenu);
-        popup.add(removeMenu);
+        treePopup.add(newMenu);
+        treePopup.add(new JPopupMenu.Separator());
+        treePopup.add(editMenu);
+        treePopup.add(removeMenu);
     }
 
-    /**
-     *
-     * @param name
-     * @return
-     */
-    public static ImageIcon getIcon(String name) {
-        return getIcon(name, "png");
+    private void loadTablePopup() {
+        tablePopup = new JPopupMenu();
+
+        tableRemoveMenu = new JMenuItem("Remove");
+        tableEditMenu = new JMenuItem("Edit");
+
+        tablePopup.add(tableEditMenu);
+        tablePopup.add(tableRemoveMenu);
     }
 
-    /**
-     *
-     * @param name
-     * @param ext
-     * @return
-     */
-    public static ImageIcon getIcon(String name, String ext) {
-        String imgLocation = DataBaseConfig.getIconPath() + name + "." + ext;
-        URL imageURL = DatabaseManager.class.getResource(imgLocation);
-        if (imageURL == null) {
-            System.err.println("Resource not found: " + imgLocation);
-            return null;
-        } else {
-            return new ImageIcon(imageURL);
+    private void showTreePopup(MouseEvent evt) {
+        if (evt.isPopupTrigger()) {
+            treePopup.show(evt.getComponent(), evt.getX(), evt.getY());
         }
     }
 
-    private void refreshTree() {
+    private void showTablePopup(MouseEvent evt) {
+        if (evt.isPopupTrigger()) {
+            tablePopup.show(evt.getComponent(), evt.getX(), evt.getY());
+        }
+    }
+
+    private void refreshTreeData() {
         Category category;
         Subcategory subcategory;
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("root");
@@ -673,70 +826,79 @@ public class DatabaseManager extends javax.swing.JDialog {
                     }
                     model.reload();
                 }
-
             }
         } else {
             System.out.println("Categories is null");
         }
-
     }
 
     /**
      *
+     * @param name
+     * @return
      */
-    public void initServicesTable() {
-        Vector v = null;
+    public static ImageIcon getIcon(String name) {
+        return getIcon(name, "png");
+    }
 
-        jTable1.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        jTable1.setToolTipText("Double click to edit!");
-        jTable1.getSelectionModel().addListSelectionListener(new ListSelectionListener() {
+    /**
+     *
+     * @param name
+     * @param ext
+     * @return
+     */
+    public static ImageIcon getIcon(String name, String ext) {
+        String imgLocation = DataBaseConfig.getIconPath() + name + "." + ext;
+        URL imageURL = DatabaseManager.class.getResource(imgLocation);
+        if (imageURL == null) {
+            System.err.println("Resource not found: " + imgLocation);
+            return null;
+        } else {
+            return new ImageIcon(imageURL);
+        }
+    }
 
-            @Override
-            public void valueChanged(ListSelectionEvent e) {
-                jTextArea1.setText("");
-                if (odb != null) {
-                    int selectedRow = jTable1.getSelectedRow();
-                    System.out.println("Selected row " + selectedRow);
-                    if (selectedRow != -1) {
-                        Float sx = (Float) jTable1.getModel().getValueAt(selectedRow, 3);
-                        Float sy = (Float) jTable1.getModel().getValueAt(selectedRow, 4);
-                        System.out.println("SX " + sx + " sy " + sy);
+    private class ODBInsertTrigger extends InsertTrigger {
 
-                        IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", sx)).add(Where.equal("y", sy)));
+        @Override
+        public boolean beforeInsert(Object object) {
+            //System.out.println("before inserting " + object);
+            return true;
+        }
 
-                        Objects cats = odb.getObjects(query);
-                        if (cats != null && !cats.isEmpty()) {
-                            ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
-                            ServiceDescription sd = sa.getServiceCore().getServiceDescription();
+        @Override
+        public void afterInsert(Object arg0, OID arg1) {
+            System.out.println("after inserting " + arg0 + " OID: " + arg1);
+            refreshTreeData();
+            refreshTableModel();
+        }
+    }
 
-                            Subcategory subCat = sd.getServiceSubCategory();
-                            String sSubCat = "no subcategory";
-                            if (subCat != null) {
-                                sSubCat = subCat.getName();
-                            }
-                            /*
-                             *  FIXME null pointer exception !!!!!!!!!!!!
-                             */
-                            jTextArea1.setText("Attributes:\nService at x: " + sa.getX() +
-                                    " y: " + sa.getY() +
-                                    "\nDescription:\nName: " + sd.getServiceName() +
-                                    "\nStreet: " + sd.getServiceStreet() +
-                                    "\nNumber: " + sd.getServiceNumber() +
-                                    "\nCategory: " + sd.getCategory().getName() +
-                                    "\nSubcategory: " + sSubCat +
-                                    "\nAdditional: " + sd.getAdditionaInfo());
-                        } else {
-                            System.out.println("empty selection");
-                        }
-                    } else {
-                        System.err.println(this.getClass().getCanonicalName() + " valueChanged -> selected row is -1 !!!");
-                    }
+    private class ODBDeleteTrigger extends DeleteTrigger {
 
-                } else {
-                    System.out.println("db not initialized!");
-                }
-            }
-        });
-        reloadServicesTable();
+        @Override
+        public boolean beforeDelete(Object arg0, OID arg1) {
+            return true;
+        }
+
+        @Override
+        public void afterDelete(Object arg0, OID arg1) {
+            refreshTreeData();
+            refreshTableModel();
+        }
+    }
+
+    private class ODBUpdateTrigger extends UpdateTrigger {
+
+        @Override
+        public boolean beforeUpdate(ObjectRepresentation arg0, Object arg1, OID arg2) {
+            return true;
+        }
+
+        @Override
+        public void afterUpdate(ObjectRepresentation arg0, Object arg1, OID arg2) {
+            refreshTreeData();
+            refreshTableModel();
+        }
     }
 }

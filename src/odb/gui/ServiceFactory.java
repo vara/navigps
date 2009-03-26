@@ -386,7 +386,7 @@ public class ServiceFactory extends javax.swing.JDialog {
                 sc.getServiceDescription().setServiceCore(sc);
                 odb.store(sc);
                 odb.commit();
-                Constants.getManagerWindow().reloadServicesTable();
+                Constants.getManagerWindow().refreshTableModel();
                 ServiceFactory.this.dispose();
             }
         }
