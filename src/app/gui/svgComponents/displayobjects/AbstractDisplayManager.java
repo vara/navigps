@@ -20,7 +20,7 @@ public abstract class AbstractDisplayManager {
     public abstract void putObject(Object object,SVGOMPoint point);
     public abstract void putObject(final Vector object);
     public abstract void removeLastServices();
-    public abstract void updateService(Object element);
+    public abstract void updateService(final Object element);
     public abstract Object createObject(ServiceCore sc);
     public abstract Vector createObject(Vector<ServiceCore> vsc);
 }

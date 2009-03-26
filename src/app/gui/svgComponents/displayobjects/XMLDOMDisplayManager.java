@@ -175,7 +175,7 @@ public class XMLDOMDisplayManager extends AbstractDisplayManager{
 
     @Override
     public void updateService(Object element) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        //throw new UnsupportedOperationException("Not supported yet.");
     }
 
     @Override

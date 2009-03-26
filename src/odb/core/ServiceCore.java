@@ -1,5 +1,7 @@
 package odb.core;
 
+import org.neodatis.odb.OID;
+
 /**
  *
  * @author ACME
@@ -7,6 +9,7 @@ package odb.core;
 public class ServiceCore {
     private ServiceAttributes serviceAttributes;
     private ServiceDescription serviceDescription;
+    private OID oid;
 
     /**
      *
@@ -44,5 +47,19 @@ public class ServiceCore {
      */
     public void setServiceAttributes(ServiceAttributes serviceAttributes) {
         this.serviceAttributes = serviceAttributes;
+    }
+
+    /**
+     * @return the oid
+     */
+    public OID getOID() {
+        return oid;
+    }
+
+    /**
+     * @param oid the oid to set
+     */
+    public void setOID(OID oid) {
+        this.oid = oid;
     }
 }

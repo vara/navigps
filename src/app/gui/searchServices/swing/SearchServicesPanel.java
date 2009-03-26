@@ -16,8 +16,6 @@ import app.utils.NaviPoint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
-import java.net.URISyntaxException;
-import java.net.URL;
 import java.util.Vector;
 import javax.swing.AbstractAction;
 import javax.swing.JMenuItem;
@@ -34,14 +32,12 @@ import odb.core.Search;
 import odb.core.ServiceCore;
 import odb.core.ServiceDescription;
 import odb.utils.Constants;
-import org.apache.batik.dom.svg.SVGDOMImplementation;
-import org.apache.batik.util.SVGConstants;
+import org.apache.batik.css.engine.value.css2.DisplayManager;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
 import org.neodatis.odb.ObjectRepresentation;
 import org.neodatis.odb.core.trigger.InsertTrigger;
 import org.neodatis.odb.core.trigger.UpdateTrigger;
-import org.w3c.dom.Element;
 
 /**
  *
@@ -96,10 +92,9 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         ODB odb = Constants.getDbConnection();
         if(odb != null ){
             odb.addInsertTrigger(Category.class,new MyInsertTrigger());
+            
             odb.addUpdateTrigger(Category.class, new MyUpdateTriger());
-
-
-            odb.addUpdateTrigger(ServiceDescription.class,new MyUpdateTriger());
+            odb.addUpdateTrigger(ServiceCore.class,new MyUpdateTriger());
             return true;
         }
         return false;
@@ -345,6 +340,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jButtonSearch.addActionListener(al);
     }
 
+    private AbstractDisplayManager getDisplayManager(){
+        return MainWindowIWD.getSVGCanvas().getDisplayManager();
+    }
+
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
 
         final Vector<String> services = getSelectedServices();
@@ -363,7 +362,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                             new Search(), "searchCategoryRadius", pt, obj);
                     Vector subResult = (Vector) rv.getRet();
                     
-                    AbstractDisplayManager dm = MainWindowIWD.getSVGCanvas().getDisplayManager();
+                    AbstractDisplayManager dm = getDisplayManager();
 
                     if(jRadioButton1.isSelected()){
                         dm.removeLastServices();
@@ -543,7 +542,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         @Override
         public void afterInsert(Object object, OID oid) {
             //System.out.println("after insert object with id "+oid+"("+object.getClass().getName()+")");
-            System.out.println("Insert trigger DB");
+            //System.out.println("Insert trigger DB");
             reloadCategory();
         }
     }
@@ -551,17 +550,18 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     public class MyUpdateTriger extends UpdateTrigger{
 
         @Override
-        public boolean beforeUpdate(ObjectRepresentation oldObjectRepresentation, Object newObject, OID oid) {
+        public boolean beforeUpdate(ObjectRepresentation oldObjectRepresentation, Object newObject, OID oid) {            
             return true;
         }
 
         @Override
-        public void afterUpdate(ObjectRepresentation oldObjectRepresentation, Object newObject, OID oid) {
-            
+        public void afterUpdate(ObjectRepresentation oldObjectRepresentation, Object newObject, OID oid) {            
             if(newObject instanceof Category){
                 reloadCategory();
-            }else if(newObject instanceof ServiceCore){
-
+            }else if(newObject instanceof ServiceCore){                
+                AbstractDisplayManager dm = getDisplayManager();
+                ((ServiceCore)newObject).setOID(oid);
+                dm.updateService(newObject);
             }
         }
     }

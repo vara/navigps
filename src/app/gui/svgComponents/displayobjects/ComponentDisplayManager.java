@@ -9,13 +9,9 @@ import app.gui.MainWindowIWD;
 import app.gui.svgComponents.Canvas;
 import app.gui.svgComponents.SVGCanvasLayers;
 import app.gui.svgComponents.SynchronizedSVGLayer;
-import app.utils.GraphicsUtilities;
 import app.utils.MyLogger;
 import app.utils.NaviPoint;
-import config.SVGConfiguration;
-import java.awt.image.BufferedImage;
-import java.io.IOException;
-import java.net.URL;
+import java.awt.Component;
 import java.util.Vector;
 import java.util.logging.Level;
 import odb.core.ServiceCore;
@@ -61,8 +57,28 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
     }
 
     @Override
-    public void updateService(Object element) {
-        throw new UnsupportedOperationException("Not supported yet.");
+    public void updateService(final Object element) {
+        new Thread(new Runnable() {
+            @Override
+            public void run() {
+                if(element instanceof ServiceCore){
+                    ServiceCore sc = (ServiceCore)element;
+                    Component[] comps = getDisplayLayer().getComponents();
+                    for (Component c : comps) {
+                        ObjectService os = (ObjectService)c;
+                        if(os.getOID().equals(sc.getOID())){
+                            os.updateService(sc);
+                            String msg = "Service \'"+os.getServiceName()+"\' has been changed";
+                            MainWindowIWD.getBridgeInformationPipe().currentStatusChanged(msg);
+                            System.out.println(msg);
+                            return;
+                        }
+                    }
+                }else{
+                    MyLogger.log.log(Level.WARNING, "Method UpdateService \"argument is not instance class ServiceCore\"");
+                }
+            }
+        }).start();
     }
 
     @Override
@@ -74,25 +90,10 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
 
         String serviceStreet = sc.getServiceDescription().getServiceStreet();
         String serviceNumber = sc.getServiceDescription().getServiceNumber();
-        serviceDesc+="<br>Street :<b>"+serviceStreet+" "+serviceNumber+"</b>";
-        ObjectService ob = null;
+        serviceDesc+="<br>Street :<b>"+serviceStreet+" "+serviceNumber+"</b>";        
         NaviPoint np = new NaviPoint(sc.getServiceAttributes().getX(),
                 sc.getServiceAttributes().getY());
-        try {
-
-            URL url = MainWindowIWD.createNavigationIconPath("test/"+groupName,"png");
-            BufferedImage bi = GraphicsUtilities.loadCompatibleImage(url);
-            BufferedImage thumbImg = GraphicsUtilities.createThumbnail(bi, 
-                    SVGConfiguration.getInformationIconSize());
-            ob = new ObjectService(thumbImg, serviceDesc,groupName,serviceName, np);
-
-        } catch (IOException ex) {
-            ob = new ObjectService(null, serviceDesc,groupName,serviceName, np);
-            String msg = ex + "[ for group name "+groupName+" ]";
-            MyLogger.log.log(Level.WARNING, msg);
-        }
-
-        return ob;
+        return new ObjectService(serviceDesc,groupName,serviceName,sc.getOID(), np);
     }
 
     @Override

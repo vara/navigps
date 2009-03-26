@@ -5,16 +5,20 @@ import app.gui.MyPopupMenu;
 import app.gui.detailspanel.AlphaJPanel;
 import app.gui.svgComponents.ServicesContainer;
 import app.utils.GraphicsUtilities;
+import app.utils.MyLogger;
 import app.utils.NaviPoint;
+import config.SVGConfiguration;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
+import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
 import java.awt.geom.AffineTransform;
 import java.awt.image.BufferedImage;
 import java.net.URL;
+import java.util.logging.Level;
 import javax.swing.ImageIcon;
 import javax.swing.JComponent;
 import javax.swing.JMenuItem;
@@ -23,6 +27,8 @@ import net.java.balloontip.BalloonTip;
 import net.java.balloontip.styles.BalloonTipStyle;
 import net.java.balloontip.styles.ModernBalloonStyle;
 import net.java.balloontip.utils.ToolTipUtils;
+import odb.core.ServiceCore;
+import org.neodatis.odb.OID;
 
 /**
  *
@@ -30,6 +36,7 @@ import net.java.balloontip.utils.ToolTipUtils;
  */
 public class ObjectService extends AlphaJPanel implements ObjectToDisplayService{
 
+    private static ImageIcon iconinfo = null;
     /**
      * @return the iconinfo
      */
@@ -38,7 +45,6 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     }
 
     private ImageIcon icon = null;
-    private static ImageIcon iconinfo = null;
 
     private String description = "";
     private String category = "";
@@ -49,17 +55,19 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
     private ObjectMouseListener ml = new ObjectMouseListener();
 
-    private String toolTipString;    
+    private OID objectId;
 
-    public ObjectService(BufferedImage img,String desc,String group,String servicesName,NaviPoint point){
+    private BalloonTip balloon;
+
+    public ObjectService(String desc,String group,String servicesName,OID id,NaviPoint point){
         super(null);
         setOpaque(false);
-        if(img != null)
-            icon = new ImageIcon(img);
+
         description = desc;
         category = group;
         this.serviceName = servicesName;
         xy = point;
+        objectId = id;
 
         defaultInstall();
     }
@@ -67,25 +75,21 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     private void defaultInstall(){
 
         if(getIconinfo() == null){
-            try {
-                String href = MainWindowIWD.createNavigationIconPath("test/GlobalInfo","png").toURI().toString();
-                BufferedImage bi = GraphicsUtilities.loadCompatibleImage(new URL(href));
-                iconinfo = new ImageIcon(GraphicsUtilities.createThumbnail(bi, 28));
-
-            } catch (Exception ex) {
-                System.err.println(""+ex);
-            }
+            iconinfo = loadIcon("GlobalInfo");
         }
-
+        updateIcon();
         updateObject();
-        installMouseListener();
+        installMouseListener();        
+        
+        createTooltip(createToolTipString());
+    }
 
-        toolTipString = "<html><table>" +
+    public String createToolTipString(){
+
+        return "<html><table>" +
                         "<tr><td>"+getServiceName()+"</td></tr>"+
                         "<tr><td>"+getDescription()+"</td></tr>"+
                         "</table></html>";
-        
-        setToolTip(toolTipString);
     }
 
     public void installMouseListener(){
@@ -105,6 +109,10 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
             g.drawImage(getIconinfo().getImage(), iconGap,iconGap, null);
         else
             g.drawRect(0, 0,getWidth()-1, getHeight()-1);
+    }
+
+    public void updateIcon(){        
+        icon = ObjectService.loadIcon(getCategory());
     }
 
     @Override
@@ -132,14 +140,16 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         return serviceName;
     }
 
-    public void setToolTip(final String text) {
-        BalloonTipStyle style = new ModernBalloonStyle(15,15,new Color(248,249,211),new Color(249,239,184),new Color(73,158,236));
-        ((ModernBalloonStyle)style).enableAntiAliasing(true);
-        ((ModernBalloonStyle)style).setBorderThickness(2);
-        BalloonTip balloon = new BalloonTip(this, toolTipString, style, BalloonTip.Orientation.LEFT_ABOVE, BalloonTip.AttachLocation.ALIGNED, 15, 10, false);
-        balloon.setIcon(getIcon());
-        balloon.enableClickToHide(true);
-        ToolTipUtils.balloonToToolTip(balloon,0, 3000);
+    private void createTooltip(final String text) {
+        if(getBalloonTip() == null){
+            BalloonTipStyle style = new ModernBalloonStyle(15,15,new Color(248,249,211),new Color(249,239,184),new Color(73,158,236));
+            ((ModernBalloonStyle)style).enableAntiAliasing(true);
+            ((ModernBalloonStyle)style).setBorderThickness(2);
+            balloon = new BalloonTip(this, text, style, BalloonTip.Orientation.LEFT_ABOVE, BalloonTip.AttachLocation.ALIGNED, 15, 10, false);
+            getBalloonTip().setIcon(getIcon());
+            getBalloonTip().enableClickToHide(true);
+            ToolTipUtils.balloonToToolTip(getBalloonTip(),0, 3000);
+        }
 	}
 
 
@@ -147,7 +157,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     public String toString() {
         String msg = getClass().getCanonicalName()+" [ Service Name : "+getServiceName()+
                 " ; Description : "+getDescription()+" ; Group Name : "+getCategory()+
-                " ; icon size : "+getIcon().getIconWidth()+","+getIcon().getIconHeight()+
+                " ; icon : "+getIcon()+
                 " ; Component bounds : "+getBounds()+" ]";
         return msg;
     }
@@ -178,6 +188,71 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
             return parent;
         }
         return null;
+    }
+
+    public static ImageIcon loadIcon(String name){
+        try {
+            URL href = MainWindowIWD.createNavigationIconPath("test/"+name,"png");
+            BufferedImage bi = GraphicsUtilities.loadCompatibleImage(href);
+            return new ImageIcon(GraphicsUtilities.createThumbnail(bi, SVGConfiguration.getInformationIconSize()));
+
+        } catch (Exception ex) {
+            String msg = ex + "[ for group name "+name+" ]";
+            MyLogger.log.log(Level.WARNING, msg);
+        }
+        return null;
+    }
+
+    @Override
+    public OID getOID() {
+        return objectId;
+    }
+
+    @Override
+    public void updateService(ServiceCore sc) {
+        String gName = sc.getServiceDescription().getCategory().getName();
+        String sName = sc.getServiceDescription().getServiceName();
+        String sDesc = sc.getServiceDescription().getAdditionaInfo();
+        String sStreet = sc.getServiceDescription().getServiceStreet();
+        String sNumber = sc.getServiceDescription().getServiceNumber();
+
+        sDesc+="<br>Street :<b>"+sStreet+" "+sNumber+"</b>";
+
+        boolean needUpdateTooltipText = false;
+
+        if(!getCategory().equals(gName)){            
+            category = gName;
+            updateIcon();
+            getBalloonTip().setIcon(getIcon());
+        }
+
+        if(!getServiceName().equals(sName)){            
+            serviceName = sName;
+            needUpdateTooltipText = true;
+        }
+
+        if(!getDescription().equals(sDesc)){            
+            description = sDesc;
+            needUpdateTooltipText = true;
+        }
+
+        if(needUpdateTooltipText){
+            getBalloonTip().setText(createToolTipString());
+        }
+        NaviPoint np = new NaviPoint(sc.getServiceAttributes().getX(),
+                sc.getServiceAttributes().getY());
+        if(!xy.equals(np)){
+            xy = np;
+            ServicesContainer container = (ServicesContainer)getParent();
+            transformCoordinate(container.getTransform());
+        }
+    }
+
+    /**
+     * @return the balloon
+     */
+    public BalloonTip getBalloonTip() {
+        return balloon;
     }
 
     private class ObjectMouseListener extends MouseInputAdapter{

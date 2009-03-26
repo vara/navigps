@@ -4,6 +4,7 @@ import java.util.Vector;
 import bridge.ODBridge;
 import odb.utils.Constants;
 import org.neodatis.odb.ODB;
+import org.neodatis.odb.OID;
 import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
 import org.neodatis.odb.core.query.criteria.Where;
@@ -112,10 +113,14 @@ public class Search implements ODBridge {
                 IQuery query1 = new CriteriaQuery(ServiceDescription.class, Where.equal("category.name", category.get(i)));
                 Objects res = odb.getObjects(query1);
                 while (res.hasNext()) {
-                    ServiceDescription obj = (ServiceDescription) res.next();
+                    Object object = res.next();
+                    ServiceDescription obj = (ServiceDescription) object;
                     ServiceAttributes sa = obj.getServiceCore().getServiceAttributes();
                     if (Math.pow(sa.getX() - x, 2) + Math.pow(sa.getY() - y, 2) <= Math.pow(radius, 2)) {
-                        v.add(obj.getServiceCore());
+                        ServiceCore sc = obj.getServiceCore();
+                        OID oid = odb.getObjectId(obj.getServiceCore());
+                        sc.setOID(oid);
+                        v.add(sc);
                     }
                 }
             }
