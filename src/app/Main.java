@@ -27,7 +27,7 @@ public class Main {
      * @param args
      */
     public static void main(String[] args) {
-        args = new String[]{"-Vg","-sp","-V","-f","./resources/maps/MapWorld.svg","-ws","800","600"};
+        //args = new String[]{"-Vg","-sp","-V","-f","./resources/maps/MapWorld.svg","-ws","800","600"};
         //System.setProperty("sun.java2d.noddraw", "true");
         //System.setProperty("swing.aatext", "true");
         Main app = new Main(args);

@@ -11,7 +11,6 @@ import config.SVGConfiguration;
 import java.awt.Color;
 import java.awt.Container;
 import java.awt.Graphics;
-import java.awt.Point;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseEvent;
@@ -75,7 +74,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     private void defaultInstall(){
 
         if(getIconinfo() == null){
-            iconinfo = loadIcon("GlobalInfo");
+            iconinfo = loadThumbnailIcon("GlobalInfo");
         }
         updateIcon();
         updateObject();
@@ -112,7 +111,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     }
 
     public void updateIcon(){        
-        icon = ObjectService.loadIcon(getCategory());
+        icon = ObjectService.loadThumbnailIcon(getCategory());
     }
 
     @Override
@@ -190,7 +189,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         return null;
     }
 
-    public static ImageIcon loadIcon(String name){
+    public static ImageIcon loadThumbnailIcon(String name){
         try {
             URL href = MainWindowIWD.createNavigationIconPath("test/"+name,"png");
             BufferedImage bi = GraphicsUtilities.loadCompatibleImage(href);

@@ -355,33 +355,35 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
      * @param ext
      * @return
      */
-    public static ImageIcon createNavigationIcon(String imageName, String ext) {
-        String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
-        URL imageURL = MainWindowIWD.class.getResource(imgLocation);
-
-        if (imageURL == null) {
-            System.err.println("Resource not found: " + imgLocation);
-            return null;
-        } else {
-            return new ImageIcon(imageURL);
-
-        }
+    public static ImageIcon createNavigationIcon(String imageName, String ext) {        
+        return createNavigationIcon(imageName, ext, true);
     }
 
+    public static ImageIcon createNavigationIcon(String imageName, String ext,boolean errOut){
+        URL imageURL = createNavigationIconPath(imageName, ext,errOut);
+        if (imageURL != null) {
+            return new ImageIcon(imageURL);
+        }
+        return null;
+    }
     /**
      *
      * @param imageName
      * @param ext
      * @return
      */
-    public static URL createNavigationIconPath(String imageName, String ext) {
+    public static URL createNavigationIconPath(String imageName, String ext,boolean errOut) {
         String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
         URL imageURL = MainWindowIWD.class.getResource(imgLocation);
-        if (imageURL == null) {
+        if (imageURL == null && errOut) {
             System.err.println("Resource not found: " + imgLocation);
             return null;
         }
         return imageURL;
+    }
+
+    public static URL createNavigationIconPath(String imageName, String ext) {        
+        return createNavigationIconPath(imageName, ext, true);
     }
 
     /**

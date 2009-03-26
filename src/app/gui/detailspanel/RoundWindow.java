@@ -57,7 +57,7 @@ public class RoundWindow extends RoundJPanel
     private boolean decoratedWindow = true;
 
     private Animator animator;
-    private int animationDuration = 4000;
+    private int animationDuration = 3000;
 
     private AbstractDecoratePanel decorate = new DecoratePanel();
     private RoundWindowRootPane rootPane;
