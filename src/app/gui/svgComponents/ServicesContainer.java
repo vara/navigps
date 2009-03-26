@@ -27,4 +27,28 @@ public class ServicesContainer extends SynchronizedSVGLayer{
         }
         needUpdate = false;
     }
+
+    @Override
+    protected void addImpl(Component comp, Object constraints, int index) {
+        
+        if(comp instanceof ObjectService){
+            if(checkDuplcateComponet((ObjectService)comp)){
+                return;
+            }
+        }
+        super.addImpl(comp, constraints, index);
+    }
+
+    private boolean checkDuplcateComponet(ObjectService os){
+        boolean isDuplcate = false;
+        Component [] comps = getComponents();
+        for (Component childs : comps) {
+            ObjectService childObjectServ = (ObjectService)childs;
+            if(os.getOID().equals(childObjectServ.getOID())){
+                isDuplcate = true;
+                break;
+            }
+        }
+        return isDuplcate;
+    }
 }
