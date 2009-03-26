@@ -1,5 +1,6 @@
 package odb.gui;
 
+import app.utils.NaviPoint;
 import java.awt.event.KeyEvent;
 import java.util.Vector;
 import javax.swing.DefaultComboBoxModel;
@@ -43,6 +44,11 @@ public class ServiceFactory extends javax.swing.JDialog {
         }
         jComboBox1.setModel(new DefaultComboBoxModel(v));
         jComboBox1.setEnabled(true);
+    }
+
+    public void setCoordinate(NaviPoint np){
+        jTextField4.setText(Float.toString(np.getX()));
+        jTextField5.setText(Float.toString(np.getY()));
     }
 
     private void fillSubcategoryCombo() {
