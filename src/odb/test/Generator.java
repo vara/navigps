@@ -32,7 +32,7 @@ class Generator {
             ServiceAttributes service = new ServiceAttributes();
             service.setX(i);
             service.setY(i);
-            ServiceDescription sd = new ServiceDescription(String.valueOf(i), String.valueOf(i), String.valueOf(i), c, s, String.valueOf(i));
+            ServiceDescription sd = new ServiceDescription(String.valueOf(i), String.valueOf(i), String.valueOf(i), c, s, String.valueOf(i),"City"+i);
             ServiceCore sc = new ServiceCore(service, sd);
             sc.getServiceAttributes().setServiceCore(sc);
             sc.getServiceDescription().setServiceCore(sc);

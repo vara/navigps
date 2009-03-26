@@ -13,14 +13,16 @@ public class ServiceDescription {
     private Subcategory serviceSubCategory;
     private String additionaInfo;
     private ServiceCore sc;
+    private String city;
 
-    public ServiceDescription(String number, String name, String street, Category category, Subcategory subcategory, String additionalInfo) {
+    public ServiceDescription(String number, String name, String street, Category category, Subcategory subcategory, String additionalInfo,String city) {
         this.serviceNumber = number;
         this.serviceName = name;
         this.serviceStreet = street;
         this.category = category;
         this.serviceSubCategory = subcategory;
         this.additionaInfo = additionalInfo;
+        this.city = city;
     }
 
     /**
@@ -127,6 +129,20 @@ public class ServiceDescription {
                 " [ Category : "+getCategory()+" [ Number :"+getServiceNumber()+
                 " Name : "+getServiceName()+" Streat : "+getServiceStreet()+" ]]";
         return msg;
+    }
+
+    /**
+     * @return the city
+     */
+    public String getCity() {
+        return city;
+    }
+
+    /**
+     * @param city the city to set
+     */
+    public void setCity(String city) {
+        this.city = city;
     }
 
 
