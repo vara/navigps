@@ -158,7 +158,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         setTitle(Version.getVersion());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        ImageIcon img = MainWindowIWD.createNavigationIcon("test/NaviGPS4");
+        ImageIcon img = MainWindowIWD.createNavigationIcon("logo/NaviGPS4");
         if(img!=null){
             setIconImage(img.getImage());
         }
