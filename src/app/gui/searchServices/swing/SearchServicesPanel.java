@@ -34,6 +34,7 @@ import odb.utils.Constants;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
 import org.neodatis.odb.ObjectRepresentation;
+import org.neodatis.odb.core.trigger.DeleteTrigger;
 import org.neodatis.odb.core.trigger.InsertTrigger;
 import org.neodatis.odb.core.trigger.UpdateTrigger;
 
@@ -93,6 +94,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             
             odb.addUpdateTrigger(Category.class, new MyUpdateTriger());
             odb.addUpdateTrigger(ServiceCore.class,new MyUpdateTriger());
+            odb.addDeleteTrigger(Category.class, new MyDeletTriger());
             return true;
         }
         return false;
@@ -561,6 +563,19 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 ((ServiceCore)newObject).setOID(oid);
                 dm.updateService(newObject);
             }
+        }
+    }
+
+    public class MyDeletTriger extends DeleteTrigger{
+
+        @Override
+        public boolean beforeDelete(Object object, OID oid) {
+            return true;
+        }
+
+        @Override
+        public void afterDelete(Object object, OID oid) {
+            reloadCategory();
         }
     }
 }
