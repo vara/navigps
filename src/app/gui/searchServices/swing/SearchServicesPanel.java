@@ -94,7 +94,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             
             odb.addUpdateTrigger(Category.class, new MyUpdateTriger());
             odb.addUpdateTrigger(ServiceCore.class,new MyUpdateTriger());
-            odb.addDeleteTrigger(Category.class, new MyDeletTriger());
+            odb.addDeleteTrigger(Category.class, new MyDeleteTriger());
             return true;
         }
         return false;
@@ -566,7 +566,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         }
     }
 
-    public class MyDeletTriger extends DeleteTrigger{
+    public class MyDeleteTriger extends DeleteTrigger{
 
         @Override
         public boolean beforeDelete(Object object, OID oid) {
