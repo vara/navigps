@@ -1,10 +1,12 @@
 package app.gui.searchServices.swing;
 
+import app.utils.ImageList;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Insets;
 import javax.swing.BorderFactory;
+import javax.swing.ImageIcon;
 import javax.swing.JCheckBox;
 import javax.swing.JPanel;
 import javax.swing.JTree;
@@ -15,6 +17,7 @@ import javax.swing.tree.DefaultTreeCellRenderer;
  * @author wara
  */
 public class JCheckBoxTreeRenderer extends DefaultTreeCellRenderer {
+
     private JPanel panel = new JPanel();
     /**
      *
@@ -33,6 +36,7 @@ public class JCheckBoxTreeRenderer extends DefaultTreeCellRenderer {
 
         panel.setOpaque(false);
         checkBox.setOpaque(false);
+
     }
     @Override
     public Component getTreeCellRendererComponent(JTree tree, Object value, boolean selected,
@@ -49,6 +53,12 @@ public class JCheckBoxTreeRenderer extends DefaultTreeCellRenderer {
         } else {
             checkBox.setSelected(false);
         }
+
+        ImageIcon img = ImageList.getIcon(""+value,false);        
+        if(leaf){
+            setLeafIcon(img);
+        }
+        
         Component comp = super.getTreeCellRendererComponent(tree, value, selected, expanded, leaf, row, hasFocus);
         comp.setForeground(Color.WHITE);
         setForeground(Color.WHITE);
@@ -63,6 +73,5 @@ public class JCheckBoxTreeRenderer extends DefaultTreeCellRenderer {
     @Override
     public Color getBackground() {
         return null;
-    }
-
+    }    
 }

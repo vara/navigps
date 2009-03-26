@@ -30,9 +30,7 @@ import javax.swing.tree.TreeModel;
 import odb.core.Category;
 import odb.core.Search;
 import odb.core.ServiceCore;
-import odb.core.ServiceDescription;
 import odb.utils.Constants;
-import org.apache.batik.css.engine.value.css2.DisplayManager;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
 import org.neodatis.odb.ObjectRepresentation;
@@ -430,7 +428,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             public void run() {
                 setServices(new Search().getCategories());
                 MainWindowIWD.getBridgeInformationPipe().
-                        currentStatusChanged("Category Tree reload");
+                        currentStatusChanged("Category Tree reloaded");
             }
         });
     }
@@ -502,7 +500,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     public void setServices(Vector<String> value) {
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Services");
         DynamicUtilTreeNode.createChildren(root, value);
-        DefaultTreeModel dtm = new DefaultTreeModel(root, true);
+        DefaultTreeModel dtm = new DefaultTreeModel(root, false);
         jTree1.setModel(dtm);
     }
 
