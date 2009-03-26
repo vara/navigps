@@ -1,10 +1,14 @@
 package odb.gui;
 
+import app.gui.MainWindowIWD;
+import app.utils.NaviPoint;
+import app.utils.Utils;
 import config.DataBaseConfig;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.awt.event.WindowAdapter;
+import java.awt.event.WindowEvent;
 import java.net.URL;
 import java.util.Vector;
 import javax.swing.ImageIcon;
@@ -15,7 +19,7 @@ import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.RowSorterEvent;
+import javax.swing.event.MouseInputAdapter;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -36,6 +40,7 @@ import org.neodatis.odb.core.trigger.DeleteTrigger;
 import org.neodatis.odb.core.trigger.InsertTrigger;
 import org.neodatis.odb.core.trigger.UpdateTrigger;
 import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
+import org.w3c.dom.svg.SVGDocument;
 
 /**
  * @author ACME
@@ -53,6 +58,9 @@ public class DatabaseManager extends javax.swing.JDialog {
     private ODBUpdateTrigger updateTrigger = new ODBUpdateTrigger();
     private ODBDeleteTrigger deleteTrigger = new ODBDeleteTrigger();
 
+    private WindowCloseListener winOpenCloseListener = new WindowCloseListener();
+    private MouseCoordinateListener mouseCoordListener = new MouseCoordinateListener();
+
     /** Creates new form Manager
      * @param parent
      * @param modal
@@ -60,6 +68,8 @@ public class DatabaseManager extends javax.swing.JDialog {
     public DatabaseManager(java.awt.Frame parent, boolean modal) {
         super(parent, modal);
         setLocationRelativeTo(parent);
+        addWindowListener(winOpenCloseListener);
+
         initComponents();
         refreshTreeData();
         loadTreePopup();
@@ -121,7 +131,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                     if (cats != null && !cats.isEmpty()) {
                         ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
                         ServiceCore sc = sa.getServiceCore();
-                        ServiceEditor se = new ServiceEditor(null, true, sc);
+                        ServiceEditor se = new ServiceEditor(null, false, sc);
                         se.setVisible(true);
                     } else {
                         System.err.println("Service empty!");
@@ -517,8 +527,14 @@ public class DatabaseManager extends javax.swing.JDialog {
         }
     }
 
-    private void addNewService() {
+    private void addNewService(){
+        addNewService(null);
+    }
+
+    private void addNewService(NaviPoint np) {
         ServiceFactory sf = new ServiceFactory(null, true);
+        if(np != null)
+            sf.setCoordinate(np);
         sf.setVisible(true);
     }
 
@@ -900,5 +916,34 @@ public class DatabaseManager extends javax.swing.JDialog {
             refreshTreeData();
             refreshTableModel();
         }
+    }
+
+    private class MouseCoordinateListener extends MouseInputAdapter{
+        @Override
+        public void mouseClicked(MouseEvent e) {
+            System.out.println("mouse klicked");
+            SVGDocument doc = MainWindowIWD.getSVGCanvas().getSVGDocument();
+            if(doc!=null){
+                NaviPoint retPoint =
+                    Utils.getLocalPointFromDomElement(doc.getRootElement(),e.getX(),e.getY());
+                addNewService(retPoint);
+            }
+        }
+    }
+
+    class WindowCloseListener extends WindowAdapter{
+
+        @Override
+        public void windowClosing(WindowEvent e) {
+            System.out.println("Window closing");
+            MainWindowIWD.getSVGCanvas().removeMouseListener(mouseCoordListener);
+        }
+
+        @Override
+        public void windowOpened(WindowEvent e) {
+            System.out.println("Window opened");
+            MainWindowIWD.getSVGCanvas().addMouseListener(mouseCoordListener);
+        }
+
     }
 }

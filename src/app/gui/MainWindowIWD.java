@@ -494,7 +494,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                DatabaseManager odb = new DatabaseManager(MainWindowIWD.this, true);
+                DatabaseManager odb = new DatabaseManager(MainWindowIWD.this, false);
                 odb.setVisible(true);
             }
         });
