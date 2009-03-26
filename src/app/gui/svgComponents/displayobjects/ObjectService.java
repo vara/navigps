@@ -68,6 +68,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         xy = point;
         objectId = id;
 
+
         defaultInstall();
     }
 
@@ -147,7 +148,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
             balloon = new BalloonTip(this, text, style, BalloonTip.Orientation.LEFT_ABOVE, BalloonTip.AttachLocation.ALIGNED, 15, 10, false);
             getBalloonTip().setIcon(getIcon());
             getBalloonTip().enableClickToHide(true);
-            ToolTipUtils.balloonToToolTip(getBalloonTip(),0, 3000);
+            ToolTipUtils.balloonToToolTip(getBalloonTip(),0, 5000);
         }
 	}
 
@@ -214,8 +215,9 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         String sDesc = sc.getServiceDescription().getAdditionaInfo();
         String sStreet = sc.getServiceDescription().getServiceStreet();
         String sNumber = sc.getServiceDescription().getServiceNumber();
+        String sCity = sc.getServiceDescription().getCity();
 
-        sDesc+="<br>Street :<b>"+sStreet+" "+sNumber+"</b>";
+        sDesc+="<br>Street: <b>"+sStreet+" "+sNumber+"</b><br>City: "+sCity;
 
         boolean needUpdateTooltipText = false;
 
@@ -253,6 +255,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
     public BalloonTip getBalloonTip() {
         return balloon;
     }
+
 
     private class ObjectMouseListener extends MouseInputAdapter{
         @Override

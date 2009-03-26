@@ -178,10 +178,6 @@ public class DatabaseManager extends javax.swing.JDialog {
 
                             //remove subcategories inside category
 
-                            /*
-                             * FIXME category remove
-                             */
-
                             IQuery query1 = new CriteriaQuery(Subcategory.class,
                                     Where.equal("category.name", selectedNode));
                             Objects subcategories = odb.getObjects(query1);
@@ -288,7 +284,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                 }
             }
         });
-        //POPUP subcategory menu listener
+        //POPUP subcategory menu listener !!
         subcategoryMenu.addActionListener(new ActionListener() {
 
             @Override
@@ -341,7 +337,7 @@ public class DatabaseManager extends javax.swing.JDialog {
 
             }
         });
-        //POPUP edit menu listener
+        //POPUP edit menu listener !!
         editMenu.addActionListener(new ActionListener() {
 
             @Override

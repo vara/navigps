@@ -90,7 +90,8 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
 
         String serviceStreet = sc.getServiceDescription().getServiceStreet();
         String serviceNumber = sc.getServiceDescription().getServiceNumber();
-        serviceDesc+="<br>Street :<b>"+serviceStreet+" "+serviceNumber+"</b>";        
+        String serviceCity = sc.getServiceDescription().getCity();
+        serviceDesc+="<br>Street: <b>"+serviceStreet+" "+serviceNumber+"</b><br>City: "+serviceCity;
         NaviPoint np = new NaviPoint(sc.getServiceAttributes().getX(),
                 sc.getServiceAttributes().getY());
         return new ObjectService(serviceDesc,groupName,serviceName,sc.getOID(), np);
