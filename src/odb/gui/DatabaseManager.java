@@ -3,7 +3,6 @@ package odb.gui;
 import config.DataBaseConfig;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
-import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.net.URL;
 import java.util.Vector;
@@ -15,7 +14,6 @@ import javax.swing.JPopupMenu;
 import javax.swing.ListSelectionModel;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
-import javax.swing.event.RowSorterEvent;
 import javax.swing.table.DefaultTableModel;
 import javax.swing.tree.DefaultMutableTreeNode;
 import javax.swing.tree.DefaultTreeCellRenderer;
@@ -43,11 +41,11 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
 public class DatabaseManager extends javax.swing.JDialog {
 
     private ODB odb = Constants.getDbConnection();
-    private JPopupMenu treePopup, tablePopup;
+    private JPopupMenu treePopup,  tablePopup;
     private JMenuItem categoryMenu;
     private JMenuItem subcategoryMenu;
-    private JMenuItem editMenu,tableEditMenu;
-    private JMenuItem removeMenu,tableRemoveMenu;
+    private JMenuItem editMenu,  tableEditMenu;
+    private JMenuItem removeMenu,  tableRemoveMenu;
     private JMenu newMenu;
     private ODBInsertTrigger insertTrigger = new ODBInsertTrigger();
     private ODBUpdateTrigger updateTrigger = new ODBUpdateTrigger();
@@ -92,7 +90,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         tableRemoveMenu.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if (jTable1.getSelectedRow() !=-1) {
+                if (jTable1.getSelectedRow() != -1) {
                     int selection = jTable1.convertRowIndexToModel(jTable1.getSelectedRow());
                     IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", jTable1.getModel().getValueAt(selection, 3))).add(Where.equal("y", jTable1.getModel().getValueAt(selection, 4))));
                     Objects cats = odb.getObjects(query);
@@ -114,7 +112,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         tableEditMenu.addActionListener(new ActionListener() {
 
             public void actionPerformed(ActionEvent e) {
-                if (jTable1.getSelectedRow() !=-1) {
+                if (jTable1.getSelectedRow() != -1) {
                     int selection = jTable1.convertRowIndexToModel(jTable1.getSelectedRow());
                     IQuery query = new CriteriaQuery(ServiceAttributes.class, Where.and().add(Where.equal("x", jTable1.getModel().getValueAt(selection, 3))).add(Where.equal("y", jTable1.getModel().getValueAt(selection, 4))));
                     Objects cats = odb.getObjects(query);
@@ -134,11 +132,14 @@ public class DatabaseManager extends javax.swing.JDialog {
         //POPUP remove menu listener
         removeMenu.addActionListener(new ActionListener() {
 
+            
+
             @Override
             public void actionPerformed(ActionEvent e) {
                 if (jTree1.isSelectionEmpty()) {
                     JOptionPane.showMessageDialog(DatabaseManager.this, "Nothing selected!", "Error!", JOptionPane.ERROR_MESSAGE);
                 } else {
+                    String selectedNode = jTree1.getLastSelectedPathComponent().toString();
                     if (jTree1.getSelectionPath().getPath().length == 2) {
                         System.out.println("Removing category: " + jTree1.getLastSelectedPathComponent().toString());
                         Object[] options = {"Yes", "No", "Cancel"};
@@ -147,9 +148,10 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 "? Removing category will cause all of its subcategories and services be removed as well!",
                                 "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
                         if (n == 0) {
-                            IQuery query1 = new CriteriaQuery(ServiceDescription.class,
-                                    Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
-                            Objects services = odb.getObjects(query1);
+
+                            IQuery query = new CriteriaQuery(ServiceDescription.class,
+                                    Where.equal("category.name", selectedNode));
+                            Objects services = odb.getObjects(query);
                             //remove services inside category
                             if (!services.isEmpty() && services != null) {
                                 System.out.println("number of services to be deleted: " + services.size());
@@ -161,10 +163,16 @@ public class DatabaseManager extends javax.swing.JDialog {
                             } else {
                                 System.out.println("No services in category!");
                             }
+
                             //remove subcategories inside category
-                            IQuery query = new CriteriaQuery(Subcategory.class,
-                                    Where.equal("category.name", jTree1.getLastSelectedPathComponent().toString()));
-                            Objects subcategories = odb.getObjects(query);
+
+                            /*
+                             * FIXME category remove
+                             */
+
+                            IQuery query1 = new CriteriaQuery(Subcategory.class,
+                                    Where.equal("category.name", selectedNode));
+                            Objects subcategories = odb.getObjects(query1);
                             if (!subcategories.isEmpty() && subcategories != null) {
                                 System.out.println("number of subcategories to be deleted: " + subcategories.size());
                                 while (subcategories.hasNext()) {
@@ -176,7 +184,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 System.out.println("No subcategories in category!");
                             }
                             //remove selected category
-                            IQuery query2 = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                            IQuery query2 = new CriteriaQuery(Category.class,
+                                    Where.equal("name", selectedNode));
                             Objects cats = odb.getObjects(query2);
                             if (!cats.isEmpty() && cats != null) {
                                 System.out.println("Categories to be deleted: " + cats.size());
@@ -190,12 +199,12 @@ public class DatabaseManager extends javax.swing.JDialog {
                             refreshTableModel();
                         }
                     } else if (jTree1.getSelectionPath().getPath().length == 3) {
-                        System.out.println("Removing subcategory: " + jTree1.getLastSelectedPathComponent().toString());
+                        System.out.println("Removing subcategory: " + selectedNode);
                         Object[] options = {"Yes", "No", "Cancel"};
-                        int n = JOptionPane.showOptionDialog(rootPane, "Remove subcategory " + jTree1.getLastSelectedPathComponent().toString() + "? Removing subcategory will cause all of its services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
+                        int n = JOptionPane.showOptionDialog(rootPane, "Remove subcategory " + selectedNode + "? Removing subcategory will cause all of its services be removed as well!", "Prompt", JOptionPane.YES_NO_CANCEL_OPTION, JOptionPane.QUESTION_MESSAGE, null, options, null);
                         if (n == 0) {
-                            IQuery query1 = new CriteriaQuery(ServiceDescription.class, Where.equal("serviceSubCategory.name", jTree1.getLastSelectedPathComponent().toString()));
-                            Objects services = odb.getObjects(query1);
+                            IQuery query3 = new CriteriaQuery(ServiceDescription.class, Where.equal("serviceSubCategory.name", jTree1.getLastSelectedPathComponent().toString()));
+                            Objects services = odb.getObjects(query3);
                             //remove services inside category
                             if (!services.isEmpty() && services != null) {
                                 System.out.println("number of services to be deleted: " + services.size());
@@ -212,8 +221,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 System.out.println("No services in category!");
                             }
                             //remove subcategory
-                            IQuery query = new CriteriaQuery(Subcategory.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
-                            Objects subcategories = odb.getObjects(query);
+                            IQuery query4 = new CriteriaQuery(Subcategory.class, Where.equal("name", selectedNode));
+                            Objects subcategories = odb.getObjects(query4);
                             if (!subcategories.isEmpty() && subcategories != null) {
                                 System.out.println("number of subcategories to be deleted: " + subcategories.size());
                                 Subcategory sub = (Subcategory) subcategories.getFirst();
@@ -412,7 +421,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                     } else {
                         selectedRow = jTable1.convertRowIndexToModel(jTable1.getSelectedRow());
                     }
-                    
+
                     System.out.println("Selected row " + selectedRow);
                     if (selectedRow != -1) {
                         Float sx = (Float) jTable1.getModel().getValueAt(selectedRow, 3);
