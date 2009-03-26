@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.gui.svgComponents.displayobjects;
 
 import app.gui.MainWindowIWD;
@@ -90,6 +85,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
                         "<tr><td>"+getDescription()+"</td></tr>"+
                         "</table></html>";
         
+        setToolTip(toolTipString);
     }
 
     public void installMouseListener(){
@@ -138,6 +134,8 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
     public void setToolTip(final String text) {
         BalloonTipStyle style = new ModernBalloonStyle(15,15,new Color(248,249,211),new Color(249,239,184),new Color(73,158,236));
+        ((ModernBalloonStyle)style).enableAntiAliasing(true);
+        ((ModernBalloonStyle)style).setBorderThickness(2);
         BalloonTip balloon = new BalloonTip(this, toolTipString, style, BalloonTip.Orientation.LEFT_ABOVE, BalloonTip.AttachLocation.ALIGNED, 15, 10, false);
         balloon.setIcon(getIcon());
         balloon.enableClickToHide(true);
@@ -186,7 +184,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         @Override
         public void mouseEntered(MouseEvent e) {
             //System.err.println(ObjectService.this.toString());
-            setToolTip(toolTipString);
+            //setToolTip(toolTipString);
         }
 
         @Override

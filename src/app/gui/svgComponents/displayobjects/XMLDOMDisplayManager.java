@@ -5,17 +5,28 @@
 
 package app.gui.svgComponents.displayobjects;
 
+import app.gui.MainWindowIWD;
 import app.gui.svgComponents.Canvas;
+import config.SVGConfiguration;
+import java.net.URISyntaxException;
+import java.net.URL;
 import java.util.Vector;
+import odb.core.ServiceCore;
 import org.apache.batik.bridge.UpdateManager;
+import org.apache.batik.dom.events.DOMMouseEvent;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.swing.svg.SVGDocumentLoaderEvent;
 import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
+import org.apache.batik.util.SVGConstants;
 import org.w3c.dom.Element;
 import org.w3c.dom.Node;
 import org.w3c.dom.Text;
+import org.w3c.dom.events.Event;
+import org.w3c.dom.events.EventListener;
+import org.w3c.dom.events.EventTarget;
 import org.w3c.dom.svg.SVGDocument;
+import org.w3c.dom.svg.SVGElement;
 
 /**
  *
@@ -24,7 +35,6 @@ import org.w3c.dom.svg.SVGDocument;
 public class XMLDOMDisplayManager extends AbstractDisplayManager{
     
     private UpdateManager updateManager;
-
     private SVGDocument doc;
 
     public static final String SERVICES_NAME = "GroupServices";
@@ -118,7 +128,7 @@ public class XMLDOMDisplayManager extends AbstractDisplayManager{
     /**
      *
      * @param object
-     * @param point
+     * @param point declarate only when object is String
      */
     @Override
     public void putObject(final Object object, final SVGOMPoint point) {
@@ -129,6 +139,8 @@ public class XMLDOMDisplayManager extends AbstractDisplayManager{
 
                     if(object instanceof String){
                         putText((String)object, point);
+                    }else if(object instanceof Element){
+                        putElement((Element)object);
                     }
                 }
             });
@@ -147,17 +159,82 @@ public class XMLDOMDisplayManager extends AbstractDisplayManager{
     }
 
     @Override
-    public void putObject(final Vector<Element> object) {
+    public void putObject(final Vector object) {
         if(checkDisplaManager()){
             updateManager.getUpdateRunnableQueue().invokeLater(new Runnable() {
                 @Override
                 public void run(){
-                    for (Element element : object) {
-                        putElement(element);
+                    for (Object e : object) {
+                        if(e instanceof Element)
+                            putElement((Element)e);
                     }
                 }
             });
         }
+    }
+
+    @Override
+    public void updateService(Object element) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Object createObject(ServiceCore sc) {
+
+        String xlinkNS = SVGConstants.XLINK_NAMESPACE_URI;
+        String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+
+        String groupName = sc.getServiceDescription().getCategory().getName();
+        String serviceName = sc.getServiceDescription().getServiceName();
+        String serviceDesc = sc.getServiceDescription().getAdditionaInfo();
+        String serviceStreet = sc.getServiceDescription().getServiceStreet();
+        String serviceNumber = sc.getServiceDescription().getServiceNumber();
+        serviceDesc+="<br>Street :<b>"+serviceStreet+" "+serviceNumber+"</b>";
+
+        Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "image");
+        service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
+        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
+        service.setAttributeNS(null, "width", ""+SVGConfiguration.getInformationIconSize());
+        service.setAttributeNS(null, "height",""+SVGConfiguration.getInformationIconSize());
+        service.setAttributeNS(null, "groupName", groupName);
+        service.setAttributeNS(null, "serviceName", serviceName);
+        service.setAttributeNS(null, "serviceDesc", serviceDesc);
+
+        service.setAttributeNS(null, "xmlns:xlink", "http://www.w3.org/1999/xlink");
+        String path = "";
+
+        try {
+            URL url = MainWindowIWD.createNavigationIconPath("test/"+groupName,"png");
+            if(url != null){
+                path = url.toURI().toString();
+            }
+        } catch (URISyntaxException ex) {}
+
+        service.setAttributeNS(xlinkNS, SVGConstants.XLINK_HREF_QNAME,path);
+
+        EventTarget evT = (EventTarget)service;
+        evT.addEventListener("click", new EventListener() {
+
+            @Override
+            public void handleEvent(Event evt) {
+                SVGElement element = (SVGElement) evt.getTarget();
+                DOMMouseEvent elEvt = (DOMMouseEvent)evt;
+                int xxx = elEvt.getClientX();
+                int yyy = elEvt.getClientY();
+                System.out.println("x: "+xxx+" y: "+yyy+" Element: "+element.getNodeName());
+            }
+        }, false);
+
+        return service;
+    }
+
+    @Override
+    public Vector createObject(Vector<ServiceCore> vsc) {
+        Vector<Element> vele = new Vector<Element>();
+        for (ServiceCore sc : vsc) {
+            vele.add((Element)createObject(sc));
+        }
+        return vele;
     }
 
     protected class LoaderTreeListener implements SVGDocumentLoaderListener{

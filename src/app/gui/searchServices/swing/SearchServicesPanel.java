@@ -32,12 +32,15 @@ import javax.swing.tree.TreeModel;
 import odb.core.Category;
 import odb.core.Search;
 import odb.core.ServiceCore;
+import odb.core.ServiceDescription;
 import odb.utils.Constants;
 import org.apache.batik.dom.svg.SVGDOMImplementation;
 import org.apache.batik.util.SVGConstants;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
+import org.neodatis.odb.ObjectRepresentation;
 import org.neodatis.odb.core.trigger.InsertTrigger;
+import org.neodatis.odb.core.trigger.UpdateTrigger;
 import org.w3c.dom.Element;
 
 /**
@@ -48,7 +51,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     private JScrollPane jScrollPane1;
     private JCheckBoxTree jTree1;
-    private String svgNS = SVGDOMImplementation.SVG_NAMESPACE_URI;
+    
 
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {
@@ -85,14 +88,18 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         reloadCategory();
 
-        addTriggerToDB();
+        addTriggersToDB();
     }
 
-    protected boolean addTriggerToDB(){
+    protected boolean addTriggersToDB(){
 
         ODB odb = Constants.getDbConnection();
         if(odb != null ){
-            odb.addInsertTrigger(Category.class,new MyTrigger());
+            odb.addInsertTrigger(Category.class,new MyInsertTrigger());
+            odb.addUpdateTrigger(Category.class, new MyUpdateTriger());
+
+
+            odb.addUpdateTrigger(ServiceDescription.class,new MyUpdateTriger());
             return true;
         }
         return false;
@@ -121,7 +128,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         gCurrentY = new javax.swing.JFormattedTextField();
         gCenterX = new javax.swing.JFormattedTextField();
         gCenterY = new javax.swing.JFormattedTextField();
-        jButton1 = new javax.swing.JButton();
+        jButtonSearch = new javax.swing.JButton();
         jPanel7 = new javax.swing.JPanel();
         jLabel7 = new javax.swing.JLabel();
         jPanel5 = new javax.swing.JPanel();
@@ -186,11 +193,11 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         gCenterY.setOpaque(false);
         jPanel1.add(gCenterY, new org.netbeans.lib.awtextra.AbsoluteConstraints(100, 140, 80, -1));
 
-        jButton1.setText("Search");
-        jButton1.setFocusPainted(false);
-        jButton1.addActionListener(new java.awt.event.ActionListener() {
+        jButtonSearch.setText("Search");
+        jButtonSearch.setFocusPainted(false);
+        jButtonSearch.addActionListener(new java.awt.event.ActionListener() {
             public void actionPerformed(java.awt.event.ActionEvent evt) {
-                jButton1ActionPerformed(evt);
+                jButtonSearchActionPerformed(evt);
             }
         });
 
@@ -220,7 +227,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 .addContainerGap()
                 .addGroup(jPanel4Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING)
                     .addComponent(jPanel7, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
-                    .addComponent(jButton1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
+                    .addComponent(jButtonSearch, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE)
                     .addComponent(jPanel1, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, 195, Short.MAX_VALUE))
                 .addContainerGap())
         );
@@ -231,7 +238,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
                 .addComponent(jPanel1, javax.swing.GroupLayout.PREFERRED_SIZE, 200, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.UNRELATED)
-                .addComponent(jButton1, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addComponent(jButtonSearch, javax.swing.GroupLayout.PREFERRED_SIZE, 45, javax.swing.GroupLayout.PREFERRED_SIZE)
                 .addContainerGap())
         );
 
@@ -280,7 +287,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
         jPanel3.setOpaque(false);
 
-        jRadioButton1.setFont(new java.awt.Font("Dialog", 1, 10)); // NOI18N
+        jRadioButton1.setFont(new java.awt.Font("Dialog", 1, 10));
         jRadioButton1.setForeground(new java.awt.Color(238, 239, 239));
         jRadioButton1.setText("Remove Last search");
         jRadioButton1.setContentAreaFilled(false);
@@ -335,10 +342,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
      * @param al
      */
     public void addActionForSearchButton(ActionListener al) {
-        jButton1.addActionListener(al);
+        jButtonSearch.addActionListener(al);
     }
 
-    private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+    private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
 
         final Vector<String> services = getSelectedServices();
         if (!services.isEmpty()) {
@@ -346,74 +353,26 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             final double cx = ((Number) gCenterX.getValue()).doubleValue();
             final double cy = ((Number) gCenterY.getValue()).doubleValue();
             new Thread(new Runnable() {
-
                 @Override
                 public void run() {
-
-                    Vector<Element> serviceElements = new Vector(); //result elements
+                    
                     Object obj[] = {services, cx, cy, radius};
                     Class[] pt = {Vector.class, double.class, double.class, double.class};
                     //test reflection
                     ReturnValue rv = InvokeUtils.invokeWithTime(
                             new Search(), "searchCategoryRadius", pt, obj);
                     Vector subResult = (Vector) rv.getRet();
+                    
                     AbstractDisplayManager dm = MainWindowIWD.getSVGCanvas().getDisplayManager();
 
                     if(jRadioButton1.isSelected()){
                         dm.removeLastServices();
                     }
-                    String xlinkNS = SVGConstants.XLINK_NAMESPACE_URI;
 
-                    for (int i = 0; i < subResult.size(); i++) {
-                        ServiceCore sc = (ServiceCore) subResult.get(i);
+                    Vector retVal = dm.createObject(subResult);
+                    dm.putObject(retVal);
 
-                        String groupName = sc.getServiceDescription().getCategory().getName();
-                        String serviceName = sc.getServiceDescription().getServiceName();
-                        String serviceDesc = sc.getServiceDescription().getAdditionaInfo();
-                        String serviceStreet = sc.getServiceDescription().getServiceStreet();
-                        String serviceNumber = sc.getServiceDescription().getServiceNumber();
-
-                        serviceDesc+="<br>Street :<b>"+serviceStreet+" "+serviceNumber+"</b>";
-
-                        Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "image");
-                        service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
-                        service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
-                        service.setAttributeNS(null, "width", "28");
-                        service.setAttributeNS(null, "height", "28");
-                        service.setAttributeNS(null, "groupName", groupName);
-                        service.setAttributeNS(null, "serviceName", serviceName);
-                        service.setAttributeNS(null, "serviceDesc", serviceDesc);
-
-                        service.setAttributeNS(null, "xmlns:xlink", "http://www.w3.org/1999/xlink");
-                        String path = "";
-                        try {
-                            URL url = MainWindowIWD.createNavigationIconPath("test/"+groupName,"png");
-                            if(url != null){
-                                path = url.toURI().toString();
-                            }
-                        } catch (URISyntaxException ex) {
-
-                        }
-                        service.setAttributeNS(xlinkNS, SVGConstants.XLINK_HREF_QNAME,path);
-
-                        /*
-                        EventTarget evT = (EventTarget)service;
-                        evT.addEventListener("click", new EventListener() {
-
-                            @Override
-                            public void handleEvent(Event evt) {
-                                SVGElement element = (SVGElement) evt.getTarget();
-                                DOMMouseEvent elEvt = (DOMMouseEvent)evt;
-                                int xxx = elEvt.getClientX();
-                                int yyy = elEvt.getClientY();
-                                System.out.println("x: "+xxx+" y: "+yyy+" Element: "+element.getNodeName());
-                            }
-                        }, false);
-                        */
-                        serviceElements.add(service);
-                    }
-                    dm.putObject(serviceElements);
-                    String summaryMsg = "found "+serviceElements.size() + " services";
+                    String summaryMsg = "found "+subResult.size() + " services";
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + summaryMsg);
                     MainWindowIWD.getBridgeInformationPipe().currentStatusChanged(summaryMsg);
 
@@ -429,8 +388,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             }
             MainWindowIWD.getBridgeInformationPipe().currentStatusChanged(msg);
         }
-    //System.out.println(catResult);
-    }//GEN-LAST:event_jButton1ActionPerformed
+}//GEN-LAST:event_jButtonSearchActionPerformed
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JFormattedTextField gCenterX;
@@ -438,7 +396,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     private javax.swing.JFormattedTextField gCurrentX;
     private javax.swing.JFormattedTextField gCurrentY;
     private javax.swing.JFormattedTextField gRadius;
-    private javax.swing.JButton jButton1;
+    private javax.swing.JButton jButtonSearch;
     private javax.swing.JLabel jLabel1;
     private javax.swing.JLabel jLabel2;
     private javax.swing.JLabel jLabel3;
@@ -574,7 +532,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     }
 
-    public class MyTrigger extends InsertTrigger {
+    public class MyInsertTrigger extends InsertTrigger {
 
         @Override
         public boolean beforeInsert(Object object) {
@@ -585,7 +543,26 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         @Override
         public void afterInsert(Object object, OID oid) {
             //System.out.println("after insert object with id "+oid+"("+object.getClass().getName()+")");
+            System.out.println("Insert trigger DB");
             reloadCategory();
+        }
+    }
+
+    public class MyUpdateTriger extends UpdateTrigger{
+
+        @Override
+        public boolean beforeUpdate(ObjectRepresentation oldObjectRepresentation, Object newObject, OID oid) {
+            return true;
+        }
+
+        @Override
+        public void afterUpdate(ObjectRepresentation oldObjectRepresentation, Object newObject, OID oid) {
+            
+            if(newObject instanceof Category){
+                reloadCategory();
+            }else if(newObject instanceof ServiceCore){
+
+            }
         }
     }
 }

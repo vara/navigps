@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.gui.svgComponents;
 
 import app.gui.svgComponents.displayobjects.ObjectService;
@@ -31,6 +26,5 @@ public class ServicesContainer extends SynchronizedSVGLayer{
             System.out.println(getClass().getCanonicalName()+" updateComponentsCoordinates component count "+comps.length);
         }
         needUpdate = false;
-        //revalidate();
     }
 }

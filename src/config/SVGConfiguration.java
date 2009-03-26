@@ -13,11 +13,26 @@ import java.awt.geom.Point2D;
  */
 public class SVGConfiguration {
 
+    /**
+     * @return the informationIconSize
+     */
+    public static int getInformationIconSize() {
+        return informationIconSize;
+    }
+
+    /**
+     * @param aInformationIconSize the informationIconSize to set
+     */
+    public static void setInformationIconSize(int aInformationIconSize) {
+        informationIconSize = aInformationIconSize;
+    }
+
     private double zoomInRateX = 1.25;
     private double zoomInRateY = 1.25;
     private double zoomOutRateX = 0.75;
     private double zoomOutRateY = 0.75;
 
+    private static int informationIconSize = 28;
     
     /**
      *

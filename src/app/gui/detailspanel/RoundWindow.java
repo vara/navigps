@@ -481,6 +481,15 @@ public class RoundWindow extends RoundJPanel
         return retVal;
     }
 
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 89 * hash + (this.rootPane != null ? this.rootPane.hashCode() : 0);
+        hash = 89 * hash + (this.innerGap != null ? this.innerGap.hashCode() : 0);
+        hash = 89 * hash + this.decorateAndContentGap;
+        return hash;
+    }
+
     private class WindowDisplayBehavior implements TimingTarget{
         @Override
         public void timingEvent(float arg0) {

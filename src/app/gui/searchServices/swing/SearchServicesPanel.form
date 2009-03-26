@@ -75,7 +75,7 @@
                       <EmptySpace max="-2" attributes="0"/>
                       <Group type="103" groupAlignment="1" attributes="0">
                           <Component id="jPanel7" alignment="0" max="32767" attributes="0"/>
-                          <Component id="jButton1" alignment="0" pref="195" max="32767" attributes="1"/>
+                          <Component id="jButtonSearch" alignment="0" pref="195" max="32767" attributes="1"/>
                           <Component id="jPanel1" alignment="0" pref="195" max="32767" attributes="3"/>
                       </Group>
                       <EmptySpace max="-2" attributes="0"/>
@@ -89,7 +89,7 @@
                       <EmptySpace max="32767" attributes="0"/>
                       <Component id="jPanel1" min="-2" pref="200" max="-2" attributes="1"/>
                       <EmptySpace type="unrelated" max="-2" attributes="0"/>
-                      <Component id="jButton1" min="-2" pref="45" max="-2" attributes="0"/>
+                      <Component id="jButtonSearch" min="-2" pref="45" max="-2" attributes="0"/>
                       <EmptySpace max="-2" attributes="0"/>
                   </Group>
               </Group>
@@ -251,13 +251,13 @@
                 </Component>
               </SubComponents>
             </Container>
-            <Component class="javax.swing.JButton" name="jButton1">
+            <Component class="javax.swing.JButton" name="jButtonSearch">
               <Properties>
                 <Property name="text" type="java.lang.String" value="Search"/>
                 <Property name="focusPainted" type="boolean" value="false"/>
               </Properties>
               <Events>
-                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButton1ActionPerformed"/>
+                <EventHandler event="actionPerformed" listener="java.awt.event.ActionListener" parameters="java.awt.event.ActionEvent" handler="jButtonSearchActionPerformed"/>
               </Events>
             </Component>
             <Container class="javax.swing.JPanel" name="jPanel7">

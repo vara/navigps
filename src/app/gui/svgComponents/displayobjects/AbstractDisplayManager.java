@@ -2,8 +2,8 @@ package app.gui.svgComponents.displayobjects;
 
 import app.gui.svgComponents.Canvas;
 import java.util.Vector;
+import odb.core.ServiceCore;
 import org.apache.batik.dom.svg.SVGOMPoint;
-import org.w3c.dom.Element;
 
 /**
  *
@@ -18,6 +18,9 @@ public abstract class AbstractDisplayManager {
     }
     
     public abstract void putObject(Object object,SVGOMPoint point);
-    public abstract void putObject(final Vector<Element> object);
+    public abstract void putObject(final Vector object);
     public abstract void removeLastServices();
+    public abstract void updateService(Object element);
+    public abstract Object createObject(ServiceCore sc);
+    public abstract Vector createObject(Vector<ServiceCore> vsc);
 }
