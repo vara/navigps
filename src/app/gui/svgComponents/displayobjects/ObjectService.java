@@ -192,7 +192,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
     public static ImageIcon loadThumbnailIcon(String name){
         try {
-            URL href = MainWindowIWD.createNavigationIconPath("test/"+name,"png");
+            URL href = MainWindowIWD.createNavigationIconPath("services/"+name,"png");
             BufferedImage bi = GraphicsUtilities.loadCompatibleImage(href);
             return new ImageIcon(GraphicsUtilities.createThumbnail(bi, SVGConfiguration.getInformationIconSize()));
 

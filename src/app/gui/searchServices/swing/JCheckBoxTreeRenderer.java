@@ -1,6 +1,6 @@
 package app.gui.searchServices.swing;
 
-import app.utils.ImageList;
+import app.gui.searchServices.ImageListForServices;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -54,7 +54,7 @@ public class JCheckBoxTreeRenderer extends DefaultTreeCellRenderer {
             checkBox.setSelected(false);
         }
 
-        ImageIcon img = ImageList.getIcon(""+value,false);        
+        ImageIcon img = ImageListForServices.getIcon(""+value,false);
         if(leaf){
             setLeafIcon(img);
         }

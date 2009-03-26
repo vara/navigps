@@ -3,8 +3,9 @@
  * and open the template in the editor.
  */
 
-package app.utils;
+package app.gui.searchServices;
 
+import app.utils.*;
 import app.gui.MainWindowIWD;
 import java.awt.image.BufferedImage;
 import java.net.URL;
@@ -15,29 +16,31 @@ import javax.swing.ImageIcon;
  *
  * @author wara
  */
-public class ImageList {
+public class ImageListForServices {
+
     private static HashMap <String,ImageIcon> icons = new HashMap<String,ImageIcon>();
 
     public static ImageIcon getIcon(String name,boolean verb){
 
         ImageIcon img = icons.get(name);
         if(img == null){
-            ImageIcon tmpIco = loadThumbnailIcon(name, 16,verb);
-            if(tmpIco != null){
-                icons.put(name, tmpIco);
-                return tmpIco;
+            BufferedImage buffIco = loadThumbnailIcon(name, 16,verb);
+            if(buffIco != null){
+                ImageIcon imIco = new ImageIcon(buffIco);
+                icons.put(name, imIco);
+                return imIco;
             }
             return null;
         }
         return img;
     }
 
-    protected static ImageIcon loadThumbnailIcon(String name,int size,boolean verb){
+    protected static BufferedImage loadThumbnailIcon(String name,int size,boolean verb){
         try {
             
-            URL href = MainWindowIWD.createNavigationIconPath("test/"+name,"png",verb);
+            URL href = MainWindowIWD.createNavigationIconPath("services/"+name,"png",verb);
             BufferedImage bi = GraphicsUtilities.loadCompatibleImage(href);
-            return new ImageIcon(GraphicsUtilities.createThumbnail(bi,size));
+            return GraphicsUtilities.createThumbnail(bi,size);
 
         } catch (Exception ex) {}
         return null;

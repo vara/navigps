@@ -4,7 +4,6 @@ import app.gui.MainWindowIWD;
 import app.gui.searchServices.SearchServices;
 import app.gui.svgComponents.displayobjects.AbstractDisplayManager;
 import app.gui.svgComponents.displayobjects.ComponentDisplayManager;
-import app.gui.svgComponents.displayobjects.XMLDOMDisplayManager;
 import config.SVGConfiguration;
 import java.awt.BorderLayout;
 import java.awt.Cursor;
