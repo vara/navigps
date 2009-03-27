@@ -57,7 +57,7 @@ public class RoundWindow extends RoundJPanel
     private boolean decoratedWindow = true;
 
     private Animator animator;
-    private int animationDuration = 3000;
+    private int animationDuration = 1300;
 
     private AbstractDecoratePanel decorate = new DecoratePanel();
     private RoundWindowRootPane rootPane;
@@ -80,8 +80,8 @@ public class RoundWindow extends RoundJPanel
         addFocusListener(this);
         super.setLayout(new BorderLayout(0,getDecorateAndContentGap()));
         
-        animator = new Animator(animationDuration, 1,
-                RepeatBehavior.LOOP, new WindowDisplayBehavior());
+        animator = new Animator(getAnimationDuration(), 1,
+                RepeatBehavior.REVERSE, new WindowDisplayBehavior());
 
         //((DecoratePanel)decorate).addActionListenerToCloseButton(new CloseAction());
 
@@ -490,6 +490,21 @@ public class RoundWindow extends RoundJPanel
         return hash;
     }
 
+    /**
+     * @return the animationDuration
+     */
+    public int getAnimationDuration() {
+        return animationDuration;
+    }
+
+    /**
+     * @param animationDuration the animationDuration to set
+     */
+    public void setAnimationDuration(int animationDuration) {
+        this.animationDuration = animationDuration;
+        animator.setDuration(getAnimationDuration());
+    }
+
     private class WindowDisplayBehavior implements TimingTarget{
         @Override
         public void timingEvent(float arg0) {
@@ -503,7 +518,7 @@ public class RoundWindow extends RoundJPanel
                 setAlphaToAllRootWindow(arg0);
                 getContentPane().setAlpha(arg0);
                 getDecoratePanel().setAlpha(arg0);
-                repaint();
+                repaint(0,0,getWidth(),getHeight());
             }else
                 animator.stop();
         }

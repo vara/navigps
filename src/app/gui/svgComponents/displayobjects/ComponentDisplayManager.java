@@ -38,10 +38,10 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
     public void putObject(Vector object) {
         for (Object e : object) {
             if(e instanceof ObjectService)
+                //((ObjectService)e).setVisible(false);
                 getDisplayLayer().add((ObjectService)e);
         }
         getDisplayLayer().updateComponent();
- 
     }
 
     @Override

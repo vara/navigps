@@ -146,7 +146,8 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
             ((ModernBalloonStyle)style).enableAntiAliasing(true);
             ((ModernBalloonStyle)style).setBorderThickness(2);
             balloon = new BalloonTip(this, text, style, BalloonTip.Orientation.LEFT_ABOVE, BalloonTip.AttachLocation.ALIGNED, 15, 10, false);
-            getBalloonTip().setAlpha(0.8f);
+            getBalloonTip().setUpperThresholdAlpha(0.85f);
+            getBalloonTip().setAnimationDuration(350);
             getBalloonTip().setIcon(getIcon());
             getBalloonTip().enableClickToHide(true);
             ToolTipUtils.balloonToToolTip(getBalloonTip(),0, 5000);
