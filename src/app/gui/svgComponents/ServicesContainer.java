@@ -22,8 +22,7 @@ public class ServicesContainer extends SynchronizedSVGLayer{
             Component [] comps = getComponents();            
             for (Component c : comps) {
                 ((ObjectService)c).transformCoordinate(at);
-            }
-            System.out.println(getClass().getCanonicalName()+" updateComponentsCoordinates component count "+comps.length);
+            }            
         }
         needUpdate = false;
     }
@@ -37,6 +36,24 @@ public class ServicesContainer extends SynchronizedSVGLayer{
             }
         }
         super.addImpl(comp, constraints, index);
+    }
+
+    @Override
+    public void remove(Component comp) {
+        if(comp instanceof ObjectService){
+            ((ObjectService)comp).dispose();
+        }
+        super.remove(comp);
+    }
+
+
+    @Override
+    public void removeAll() {        
+        Component [] comps = getComponents();
+        for (Component c : comps) {
+            ((ObjectService)c).dispose();
+        }        
+        super.removeAll();        
     }
 
     private boolean checkDuplcateComponet(ObjectService os){

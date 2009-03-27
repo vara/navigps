@@ -146,6 +146,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
             ((ModernBalloonStyle)style).enableAntiAliasing(true);
             ((ModernBalloonStyle)style).setBorderThickness(2);
             balloon = new BalloonTip(this, text, style, BalloonTip.Orientation.LEFT_ABOVE, BalloonTip.AttachLocation.ALIGNED, 15, 10, false);
+            getBalloonTip().setAlpha(0.8f);
             getBalloonTip().setIcon(getIcon());
             getBalloonTip().enableClickToHide(true);
             ToolTipUtils.balloonToToolTip(getBalloonTip(),0, 5000);
@@ -256,6 +257,23 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         return balloon;
     }
 
+    public void dispose(){
+
+        getBalloonTip().closeBalloon();
+        uninstallMouseListener();
+        removeAll();
+
+        //balloon = null;
+        //icon = null;
+        //objectId = null;
+        //ml=null;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.out.println(getClass().getCanonicalName()+" method 'Finalize'");
+    }
 
     private class ObjectMouseListener extends MouseInputAdapter{
         @Override
@@ -276,9 +294,10 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
                     public void actionPerformed(ActionEvent e) {
                         Container parent = ObjectService.getServicesContainer(ObjectService.this);                        
                         if(parent != null){
-                            parent.remove(ObjectService.this);
-                            parent.repaint();
                             String msg = "Removed service \""+ObjectService.this.getServiceName()+"\"";
+                            parent.remove(ObjectService.this);                            
+                            parent.repaint();
+                            
                             MainWindowIWD.getBridgeInformationPipe().
                                     currentStatusChanged(msg);
                             System.out.println(msg);
