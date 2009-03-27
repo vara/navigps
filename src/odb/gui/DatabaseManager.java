@@ -57,7 +57,6 @@ public class DatabaseManager extends javax.swing.JDialog {
     private ODBInsertTrigger insertTrigger = new ODBInsertTrigger();
     private ODBUpdateTrigger updateTrigger = new ODBUpdateTrigger();
     private ODBDeleteTrigger deleteTrigger = new ODBDeleteTrigger();
-
     private WindowCloseListener winOpenCloseListener = new WindowCloseListener();
     private MouseCoordinateListener mouseCoordListener = new MouseCoordinateListener();
 
@@ -131,8 +130,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                     if (cats != null && !cats.isEmpty()) {
                         ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
                         ServiceCore sc = sa.getServiceCore();
-                        ServiceEditor se = new ServiceEditor(null, false, sc);
-                        se.setVisible(true);
+                        invokeServiceEditor(sc);
                     } else {
                         System.err.println("Service empty!");
                     }
@@ -143,8 +141,6 @@ public class DatabaseManager extends javax.swing.JDialog {
         });
         //POPUP remove menu listener
         removeMenu.addActionListener(new ActionListener() {
-
-            
 
             @Override
             public void actionPerformed(ActionEvent e) {
@@ -185,7 +181,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 System.out.println("number of subcategories to be deleted: " + subcategories.size());
                                 while (subcategories.hasNext()) {
                                     Subcategory sub = (Subcategory) subcategories.next();
-                                    odb.delete(sub);
+                                    Category catt = sub.getCategory();
+                                    removeSubcategory(catt, sub);
                                 }
                                 odb.commit();
                             } else {
@@ -213,16 +210,12 @@ public class DatabaseManager extends javax.swing.JDialog {
                         if (n == 0) {
                             IQuery query3 = new CriteriaQuery(ServiceDescription.class, Where.equal("serviceSubCategory.name", jTree1.getLastSelectedPathComponent().toString()));
                             Objects services = odb.getObjects(query3);
-                            //remove services inside category
+                            //remove services inside subcategory
                             if (!services.isEmpty() && services != null) {
                                 System.out.println("number of services to be deleted: " + services.size());
                                 while (services.hasNext()) {
                                     ServiceDescription sd = (ServiceDescription) services.next();
-                                    ServiceCore sc = sd.getServiceCore();
-                                    ServiceAttributes sa = sc.getServiceAttributes();
-                                    odb.delete(sa);
-                                    odb.delete(sd);
-                                    odb.delete(sc);
+                                    removeServiceByDescription(sd);
                                 }
                                 odb.commit();
                             } else {
@@ -235,9 +228,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                                 System.out.println("number of subcategories to be deleted: " + subcategories.size());
                                 Subcategory sub = (Subcategory) subcategories.getFirst();
                                 Category catt = sub.getCategory();
-                                catt.removeSubcategory(sub);
-                                odb.delete(sub);
-                                odb.store(catt);
+                                removeSubcategory(catt, sub);
                                 odb.commit();
                             } else {
                                 System.out.println("No such subcategory!");
@@ -249,7 +240,6 @@ public class DatabaseManager extends javax.swing.JDialog {
                 }
             }
         });
-
         //POPUP category menu listener
         categoryMenu.addActionListener(new ActionListener() {
 
@@ -284,7 +274,7 @@ public class DatabaseManager extends javax.swing.JDialog {
                 }
             }
         });
-        //POPUP subcategory menu listener !!
+        //POPUP subcategory menu listener
         subcategoryMenu.addActionListener(new ActionListener() {
 
             @Override
@@ -293,11 +283,8 @@ public class DatabaseManager extends javax.swing.JDialog {
                     JOptionPane.showMessageDialog(DatabaseManager.this, "No category selected!", "Error!", JOptionPane.ERROR_MESSAGE);
                 } else {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
-                        boolean FL_DS = false;
                         String newsubCat = JOptionPane.showInputDialog(DatabaseManager.this, "Enter new subcategory name:", "new subcategory");
-
                         if (newsubCat == null) {
-                            //cancel
                         } else if (newsubCat.equals("")) {
                             JOptionPane.showMessageDialog(DatabaseManager.this, "You have to input name!", "Warning", JOptionPane.ERROR_MESSAGE);
                         } else {
@@ -307,28 +294,24 @@ public class DatabaseManager extends javax.swing.JDialog {
 
                             if (category.getSubcategories() == null) {
                                 category.setSubcategories(new Vector());
-                                category.addSubcategory(new Subcategory(category, newsubCat));
-                                odb.store(category);
+                                addSubcategory(category, newsubCat);
                                 odb.commit();
                             } else {
                                 if (category.getSubcategories().isEmpty()) {
-                                    category.addSubcategory(new Subcategory(category, newsubCat));
+                                    addSubcategory(category, newsubCat);
+                                    odb.commit();
                                 } else {
                                     for (Object sub : category.getSubcategories()) {
                                         Subcategory sc = (Subcategory) sub;
                                         if (sc.getName().equalsIgnoreCase(newsubCat)) {
-                                            FL_DS = true;
+                                            JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                                            return;
                                         }
                                     }
-                                    if (FL_DS) {
-                                        JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
-                                    } else {
-                                        category.addSubcategory(new Subcategory(category, newsubCat));
-                                        addSubcategory(category, newsubCat);
-                                    }
+                                    addSubcategory(category, newsubCat);
+                                    odb.commit();
                                 }
                             }
-                            refreshTreeData();
                         }
                     } else {
                         JOptionPane.showMessageDialog(DatabaseManager.this, "Selection is not a category!", "Error!", JOptionPane.ERROR_MESSAGE);
@@ -337,7 +320,7 @@ public class DatabaseManager extends javax.swing.JDialog {
 
             }
         });
-        //POPUP edit menu listener !!
+        //POPUP edit menu listener
         editMenu.addActionListener(new ActionListener() {
 
             @Override
@@ -350,23 +333,16 @@ public class DatabaseManager extends javax.swing.JDialog {
                     if (jTree1.getSelectionPath().getPath().length == 2) {
                         String newcat = JOptionPane.showInputDialog("Please input new name for the selected category " + jTree1.getLastSelectedPathComponent().toString() + ":", "new name");
                         if (newcat == null) {
-//                            cancel
                         } else if (newcat.equalsIgnoreCase("")) {
                             JOptionPane.showMessageDialog(DatabaseManager.this, "You have to enter valid category name!", "Warning", JOptionPane.ERROR_MESSAGE);
                         } else {
-                            Objects categories = odb.getObjects(Category.class);
-                            while (categories.hasNext()) {
-                                Category c = (Category) categories.next();
-                                if (c.getName().equalsIgnoreCase(newcat)) {
-                                    FL_D = true;
-                                    break;
-                                }
-                            }
-                            if (FL_D) {
+                            IQuery query = new CriteriaQuery(Category.class, Where.equal("name", newcat));
+                            Objects categories = odb.getObjects(query);
+                            if (!categories.isEmpty()) {
                                 JOptionPane.showMessageDialog(DatabaseManager.this, "Category already exists! Change category name.", "Warning", JOptionPane.ERROR_MESSAGE);
                             } else {
-                                IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
-                                Objects cats = odb.getObjects(query);
+                                IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", jTree1.getLastSelectedPathComponent().toString()));
+                                Objects cats = odb.getObjects(query1);
                                 Category cat = (Category) cats.getFirst();
                                 cat.setName(newcat);
                                 odb.store(cat);
@@ -386,23 +362,20 @@ public class DatabaseManager extends javax.swing.JDialog {
                             for (Object subcategory : c.getSubcategories()) {
                                 Subcategory s = (Subcategory) subcategory;
                                 if (s.getName().equalsIgnoreCase(newsubcat)) {
-                                    FL_DD = true;
+                                    JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
+                                    return;
                                 }
                             }
-                            if (FL_DD) {
-                                JOptionPane.showMessageDialog(DatabaseManager.this, "Subcategory already exists! Change new subcategory name.", "Warning", JOptionPane.ERROR_MESSAGE);
-                            } else {
-                                for (Object subcategory : c.getSubcategories()) {
-                                    Subcategory s = (Subcategory) subcategory;
-                                    if (s.getName().equalsIgnoreCase(jTree1.getLastSelectedPathComponent().toString())) {
-                                        s.setName(newsubcat);
-                                        odb.store(c);
-                                        odb.commit();
-                                        break;
-                                    }
+
+                            for (Object subcategory : c.getSubcategories()) {
+                                Subcategory s = (Subcategory) subcategory;
+                                if (s.getName().equalsIgnoreCase(jTree1.getLastSelectedPathComponent().toString())) {
+                                    s.setName(newsubcat);
+                                    odb.store(c);
+                                    odb.commit();
+                                    break;
                                 }
                             }
-                            refreshTreeData();
                         }
                     }
                 }
@@ -494,6 +467,11 @@ public class DatabaseManager extends javax.swing.JDialog {
         refreshTableModel();
     }
 
+    private void invokeServiceEditor(ServiceCore sc) {
+        ServiceEditor se = new ServiceEditor(null, false, sc);
+        se.setVisible(true);
+    }
+
     public void refreshTableModel() {
         Vector v = new Vector();
 
@@ -534,14 +512,15 @@ public class DatabaseManager extends javax.swing.JDialog {
         }
     }
 
-    private void addNewService(){
+    private void addNewService() {
         addNewService(null);
     }
 
     private void addNewService(NaviPoint np) {
         ServiceFactory sf = new ServiceFactory(null, true);
-        if(np != null)
+        if (np != null) {
             sf.setCoordinate(np);
+        }
         sf.setVisible(true);
     }
 
@@ -551,6 +530,12 @@ public class DatabaseManager extends javax.swing.JDialog {
         odb.delete(sa);
         odb.delete(sd);
         odb.delete(sc);
+    }
+
+    private void removeSubcategory(Category catt, Subcategory sub) {
+        catt.removeSubcategory(sub);
+        odb.delete(sub);
+        odb.store(catt);
     }
 
     @SuppressWarnings("unchecked")
@@ -573,14 +558,6 @@ public class DatabaseManager extends javax.swing.JDialog {
         setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
         setTitle("Database manager");
         setCursor(new java.awt.Cursor(java.awt.Cursor.HAND_CURSOR));
-        addWindowListener(new java.awt.event.WindowAdapter() {
-            public void windowClosing(java.awt.event.WindowEvent evt) {
-                formWindowClosing(evt);
-            }
-            public void windowOpened(java.awt.event.WindowEvent evt) {
-                formWindowOpened(evt);
-            }
-        });
 
         jPanel2.setBorder(javax.swing.BorderFactory.createTitledBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 2, true), "Avaliable services", javax.swing.border.TitledBorder.DEFAULT_JUSTIFICATION, javax.swing.border.TitledBorder.DEFAULT_POSITION, new java.awt.Font("Tahoma", 0, 11), new java.awt.Color(51, 153, 255))); // NOI18N
 
@@ -715,10 +692,6 @@ public class DatabaseManager extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
-    private void formWindowClosing(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowClosing
-        Constants.setManagerWindow(null);
-    }//GEN-LAST:event_formWindowClosing
-
     private void jButton3ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton3ActionPerformed
         addNewService();
     }//GEN-LAST:event_jButton3ActionPerformed
@@ -730,10 +703,6 @@ public class DatabaseManager extends javax.swing.JDialog {
     private void jTree1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTree1MousePressed
         showTreePopup(evt);
 }//GEN-LAST:event_jTree1MousePressed
-
-    private void formWindowOpened(java.awt.event.WindowEvent evt) {//GEN-FIRST:event_formWindowOpened
-        Constants.setManagerWindow(this);
-    }//GEN-LAST:event_formWindowOpened
 
     private void jTable1MousePressed(java.awt.event.MouseEvent evt) {//GEN-FIRST:event_jTable1MousePressed
         showTablePopup(evt);
@@ -925,20 +894,21 @@ public class DatabaseManager extends javax.swing.JDialog {
         }
     }
 
-    private class MouseCoordinateListener extends MouseInputAdapter{
+    private class MouseCoordinateListener extends MouseInputAdapter {
+
         @Override
         public void mouseClicked(MouseEvent e) {
             System.out.println("mouse klicked");
             SVGDocument doc = MainWindowIWD.getSVGCanvas().getSVGDocument();
-            if(doc!=null){
+            if (doc != null) {
                 NaviPoint retPoint =
-                    Utils.getLocalPointFromDomElement(doc.getRootElement(),e.getX(),e.getY());
+                        Utils.getLocalPointFromDomElement(doc.getRootElement(), e.getX(), e.getY());
                 addNewService(retPoint);
             }
         }
     }
 
-    class WindowCloseListener extends WindowAdapter{
+    class WindowCloseListener extends WindowAdapter {
 
         @Override
         public void windowClosing(WindowEvent e) {
@@ -951,6 +921,5 @@ public class DatabaseManager extends javax.swing.JDialog {
             System.out.println("Window opened");
             MainWindowIWD.getSVGCanvas().addMouseListener(mouseCoordListener);
         }
-
     }
 }

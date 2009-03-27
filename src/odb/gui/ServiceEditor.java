@@ -372,7 +372,6 @@ public class ServiceEditor extends javax.swing.JDialog {
 
             odb.store(sc);
             odb.commit();
-            Constants.getManagerWindow().refreshTableModel();
             this.dispose();
         }
     }//GEN-LAST:event_jButton1ActionPerformed
