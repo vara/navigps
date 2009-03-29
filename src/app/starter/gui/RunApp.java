@@ -11,15 +11,41 @@
 
 package app.starter.gui;
 
+import app.navigps.NaviGPSCore;
+import app.navigps.gui.detailspanel.AlphaJPanel;
+import app.ArgumentsStartUp.core.AbstractParameter;
+import app.navigps.Version;
+import app.navigps.utils.GraphicsUtilities;
+import java.awt.BorderLayout;
+import java.awt.Graphics;
+import java.awt.Graphics2D;
+import java.awt.image.BufferedImage;
+import java.io.IOException;
+import java.net.URL;
+import java.util.Vector;
+
 /**
  *
  * @author wara
  */
 public class RunApp extends javax.swing.JFrame {
 
+
     /** Creates new form RunApp */
     public RunApp() {
+        setTitle(Version.getVersion()+" (Starter)");
         initComponents();
+
+        PanelForImage.setLayout(new BorderLayout(2, 2));
+        PanelForImage.add(new ImagePanel("icons/logo/NaviGPS3.png"),BorderLayout.CENTER);
+
+        Vector<AbstractParameter> vec = NaviGPSCore.getAllparameters();
+        for (AbstractParameter ap : vec) {
+            System.out.println(""+ap.getOption());
+        }
+
+        //NaviGPSCore nc = new NaviGPSCore();
+        //nc.execute(new ArrayList<String>());
     }
 
     /** This method is called from within the constructor to
@@ -31,18 +57,82 @@ public class RunApp extends javax.swing.JFrame {
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        jPanel2 = new javax.swing.JPanel();
+        jPanel3 = new javax.swing.JPanel();
+        jPanel1 = new javax.swing.JPanel();
+        PanelForImage = new javax.swing.JPanel();
+        PanelInfoText = new javax.swing.JPanel();
 
-        javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
-        getContentPane().setLayout(layout);
-        layout.setHorizontalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 400, Short.MAX_VALUE)
+        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        getContentPane().setLayout(new java.awt.BorderLayout(2, 2));
+
+        jPanel3.setBorder(javax.swing.BorderFactory.createLineBorder(new java.awt.Color(0, 0, 0)));
+
+        javax.swing.GroupLayout jPanel3Layout = new javax.swing.GroupLayout(jPanel3);
+        jPanel3.setLayout(jPanel3Layout);
+        jPanel3Layout.setHorizontalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 560, Short.MAX_VALUE)
         );
-        layout.setVerticalGroup(
-            layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
-            .addGap(0, 300, Short.MAX_VALUE)
+        jPanel3Layout.setVerticalGroup(
+            jPanel3Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 24, Short.MAX_VALUE)
         );
+
+        javax.swing.GroupLayout jPanel2Layout = new javax.swing.GroupLayout(jPanel2);
+        jPanel2.setLayout(jPanel2Layout);
+        jPanel2Layout.setHorizontalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+        jPanel2Layout.setVerticalGroup(
+            jPanel2Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(javax.swing.GroupLayout.Alignment.TRAILING, jPanel2Layout.createSequentialGroup()
+                .addContainerGap()
+                .addComponent(jPanel3, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                .addContainerGap())
+        );
+
+        getContentPane().add(jPanel2, java.awt.BorderLayout.SOUTH);
+
+        PanelForImage.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+        PanelForImage.setLayout(new java.awt.BorderLayout());
+
+        PanelInfoText.setBorder(new javax.swing.border.LineBorder(new java.awt.Color(0, 0, 0), 1, true));
+
+        javax.swing.GroupLayout PanelInfoTextLayout = new javax.swing.GroupLayout(PanelInfoText);
+        PanelInfoText.setLayout(PanelInfoTextLayout);
+        PanelInfoTextLayout.setHorizontalGroup(
+            PanelInfoTextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 285, Short.MAX_VALUE)
+        );
+        PanelInfoTextLayout.setVerticalGroup(
+            PanelInfoTextLayout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGap(0, 216, Short.MAX_VALUE)
+        );
+
+        javax.swing.GroupLayout jPanel1Layout = new javax.swing.GroupLayout(jPanel1);
+        jPanel1.setLayout(jPanel1Layout);
+        jPanel1Layout.setHorizontalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addComponent(PanelForImage, javax.swing.GroupLayout.PREFERRED_SIZE, 293, javax.swing.GroupLayout.PREFERRED_SIZE)
+                .addPreferredGap(javax.swing.LayoutStyle.ComponentPlacement.RELATED)
+                .addComponent(PanelInfoText, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+        );
+        jPanel1Layout.setVerticalGroup(
+            jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.LEADING)
+            .addGroup(jPanel1Layout.createSequentialGroup()
+                .addGroup(jPanel1Layout.createParallelGroup(javax.swing.GroupLayout.Alignment.TRAILING, false)
+                    .addComponent(PanelForImage, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE)
+                    .addComponent(PanelInfoText, javax.swing.GroupLayout.Alignment.LEADING, javax.swing.GroupLayout.DEFAULT_SIZE, javax.swing.GroupLayout.DEFAULT_SIZE, Short.MAX_VALUE))
+                .addGap(182, 182, 182))
+        );
+
+        getContentPane().add(jPanel1, java.awt.BorderLayout.CENTER);
 
         pack();
     }// </editor-fold>//GEN-END:initComponents
@@ -58,7 +148,52 @@ public class RunApp extends javax.swing.JFrame {
         });
     }
 
+    public static BufferedImage loadimage(String name){
+
+        URL href = RunApp.class.getResource("resources/graphics/"+name);
+        BufferedImage tmpBi = null;
+        try {
+            tmpBi = GraphicsUtilities.loadCompatibleImage(href);
+
+        } catch (IOException ex) {
+            System.err.println(""+ex);
+        }
+
+        return tmpBi;
+    }
+
     // Variables declaration - do not modify//GEN-BEGIN:variables
+    private javax.swing.JPanel PanelForImage;
+    private javax.swing.JPanel PanelInfoText;
+    private javax.swing.JPanel jPanel1;
+    private javax.swing.JPanel jPanel2;
+    private javax.swing.JPanel jPanel3;
     // End of variables declaration//GEN-END:variables
 
+
+    class ImagePanel extends AlphaJPanel{
+
+        private BufferedImage bi = null;
+
+        private String imgName;
+
+        public ImagePanel(String imgName){
+            this.imgName = imgName;
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            Graphics2D g2= (Graphics2D)g;
+            super.paintComponent(g2);
+
+            int width = getWidth();
+            int height = getHeight();
+            if(bi==null || bi.getWidth() != width || bi.getHeight()!=height){
+               BufferedImage tmpB = loadimage(imgName);
+               bi = GraphicsUtilities.createThumbnail(tmpB, width, height);
+            }
+            g2.drawImage(bi, 0, 0, rootPane);
+        }
+
+    }
 }
