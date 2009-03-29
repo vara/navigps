@@ -2,8 +2,7 @@ package app.navigps.gui;
 
 import app.navigps.gui.VerboseTextPane.PanelForVerboseWindow;
 import app.navigps.gui.buttons.ToolBarButton;
-import app.navigps.ArgumentsStartUp;
-import app.navigps.Main;
+import app.navigps.NaviGPSCore;
 import app.navigps.Version;
 import app.navigps.gui.buttons.ToolBarToggleButton;
 import app.navigps.gui.displayItemsMap.DetailsPanel;
@@ -109,9 +108,9 @@ import org.w3c.dom.svg.SVGSVGElement;
  *
  * @author vara
  */
-public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemListener, WindowStateListener {
+public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemListener, WindowStateListener {
 
-    private Main core;
+    private NaviGPSCore core;
     private JPanel panelWithToolBars;
     private StatusPanel statusPanel;
     private StatusInfoPanel statusInfoPanel = new StatusInfoPanel();
@@ -135,7 +134,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
      *
      * @param c
      */
-    public MainWindowIWD(Main c) {
+    public NaviRootWindow(NaviGPSCore c) {
         super(GUIConfiguration.getGraphicDevice().getDefaultConfiguration());
 
         System.setOut(getVerboseStream().getOutputStream());
@@ -158,22 +157,12 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         setTitle(Version.getVersion());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        ImageIcon img = MainWindowIWD.createNavigationIcon("logo/NaviGPS4");
+        ImageIcon img = NaviRootWindow.createNavigationIcon("logo/NaviGPS4");
         if(img!=null){
             setIconImage(img.getImage());
         }
-        setDisplayMode();        
+        setDisplayMode();
         
-    }
-
-    /**
-     *
-     * @param c
-     * @param arg
-     */
-    public MainWindowIWD(Main c, ArgumentsStartUp arg) {
-        this(c);
-    //openSVGDocument(filePath);
     }
 
     public static final SVGBridgeComponents getBridgeInformationPipe() {
@@ -187,7 +176,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             Constants.setDbConnection(odb);
             odb = null;
         } catch (Exception ex) {
-            JOptionPane.showMessageDialog(MainWindowIWD.this, ex.getMessage());
+            JOptionPane.showMessageDialog(NaviRootWindow.this, ex.getMessage());
         }
     }
 
@@ -374,7 +363,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
      */
     public static URL createNavigationIconPath(String imageName, String ext,boolean errOut) {
         String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
-        URL imageURL = MainWindowIWD.class.getResource(imgLocation);
+        URL imageURL = NaviRootWindow.class.getResource(imgLocation);
         if (imageURL == null && errOut) {
             System.err.println("Resource not found: " + imgLocation);
             return null;
@@ -494,7 +483,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
             @Override
             public void actionPerformed(ActionEvent e) {
 
-                DatabaseManager odb = new DatabaseManager(MainWindowIWD.this, false);
+                DatabaseManager odb = new DatabaseManager(NaviRootWindow.this, false);
                 odb.setVisible(true);
             }
         });
@@ -509,7 +498,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
                     Constants.getDbConnection().close();
                     System.err.println("ODB: disconnecting");
                 } catch (Exception exc) {
-                    JOptionPane.showMessageDialog(MainWindowIWD.this, exc.getMessage());
+                    JOptionPane.showMessageDialog(NaviRootWindow.this, exc.getMessage());
                 }
             }
         });
@@ -986,9 +975,9 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
         }
     }
 
-    private void setDisplayMode() {
+    public void setDisplayMode() {
         final GraphicsDevice device = GUIConfiguration.getGraphicDevice();
-        synchronized (MainWindowIWD.this) {
+        synchronized (NaviRootWindow.this) {
             new Thread(new Runnable() {
 
                 @Override
@@ -1007,7 +996,7 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
                                 } catch (InterruptedException ex) {
                                 }
                                 setUndecorated(true);
-                                device.setFullScreenWindow(MainWindowIWD.this);
+                                device.setFullScreenWindow(NaviRootWindow.this);
 
                             } else {
 
@@ -1036,6 +1025,11 @@ public class MainWindowIWD extends JFrame implements WindowFocusListener, ItemLi
                 }
             }).start();
         }
+    }
+    
+    @Override
+    public void setVisible(boolean b) {
+        super.setVisible(b);
     }
 
     /**

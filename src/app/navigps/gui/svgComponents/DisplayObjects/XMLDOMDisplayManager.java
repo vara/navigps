@@ -5,7 +5,7 @@
 
 package app.navigps.gui.svgComponents.DisplayObjects;
 
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.svgComponents.Canvas;
 import app.config.SVGConfiguration;
 import java.net.URISyntaxException;
@@ -191,7 +191,7 @@ public class XMLDOMDisplayManager extends AbstractDisplayManager{
         String serviceNumber = sc.getServiceDescription().getServiceNumber();
         serviceDesc+="<br>Street :<b>"+serviceStreet+" "+serviceNumber+"</b>";
 
-        Element service = MainWindowIWD.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "image");
+        Element service = NaviRootWindow.getSVGCanvas().getSVGDocument().createElementNS(svgNS, "image");
         service.setAttributeNS(null, "x", String.valueOf(sc.getServiceAttributes().getX()));
         service.setAttributeNS(null, "y", String.valueOf(sc.getServiceAttributes().getY()));
         service.setAttributeNS(null, "width", ""+SVGConfiguration.getInformationIconSize());
@@ -204,7 +204,7 @@ public class XMLDOMDisplayManager extends AbstractDisplayManager{
         String path = "";
 
         try {
-            URL url = MainWindowIWD.createNavigationIconPath("test/"+groupName,"png");
+            URL url = NaviRootWindow.createNavigationIconPath("test/"+groupName,"png");
             if(url != null){
                 path = url.toURI().toString();
             }

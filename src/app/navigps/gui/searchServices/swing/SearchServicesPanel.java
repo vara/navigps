@@ -6,7 +6,7 @@
 package app.navigps.gui.searchServices.swing;
 
 
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.MyPopupMenu;
 import app.navigps.gui.Scrollbar.ui.LineScrollBarUI;
 import app.navigps.gui.svgComponents.DisplayObjects.AbstractDisplayManager;
@@ -341,7 +341,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
     }
 
     private AbstractDisplayManager getDisplayManager(){
-        return MainWindowIWD.getSVGCanvas().getDisplayManager();
+        return NaviRootWindow.getSVGCanvas().getDisplayManager();
     }
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
@@ -373,7 +373,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
                     String summaryMsg = "found "+subResult.size() + " services";
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + summaryMsg);
-                    MainWindowIWD.getBridgeInformationPipe().currentStatusChanged(summaryMsg);
+                    NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(summaryMsg);
 
                 }
             }).start();
@@ -385,7 +385,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             }else{
                 msg = "No database initialized";
             }
-            MainWindowIWD.getBridgeInformationPipe().currentStatusChanged(msg);
+            NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
         }
 }//GEN-LAST:event_jButtonSearchActionPerformed
 
@@ -429,7 +429,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
             @Override
             public void run() {
                 setServices(new Search().getCategories());
-                MainWindowIWD.getBridgeInformationPipe().
+                NaviRootWindow.getBridgeInformationPipe().
                         currentStatusChanged("Category Tree reloaded");
             }
         });

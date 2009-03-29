@@ -67,7 +67,7 @@ public class MainConfiguration {
      *
      * @param verbose
      */
-    public static void setMode(boolean verbose){
+    public static void setModeVerboseConsole(boolean verbose){
         modeVerbose = verbose;
     }
     

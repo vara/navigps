@@ -6,7 +6,7 @@
 package app.navigps.gui.searchServices;
 
 import app.navigps.utils.GraphicsUtilities;
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import java.awt.image.BufferedImage;
 import java.net.URL;
 import java.util.HashMap;
@@ -38,7 +38,7 @@ public class ImageListForServices {
     protected static BufferedImage loadThumbnailIcon(String name,int size,boolean verb){
         try {
             
-            URL href = MainWindowIWD.createNavigationIconPath("services/"+name,"png",verb);
+            URL href = NaviRootWindow.createNavigationIconPath("services/"+name,"png",verb);
             BufferedImage bi = GraphicsUtilities.loadCompatibleImage(href);
             return GraphicsUtilities.createThumbnail(bi,size);
 

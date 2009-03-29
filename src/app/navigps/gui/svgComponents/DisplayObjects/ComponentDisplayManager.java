@@ -5,7 +5,7 @@
 
 package app.navigps.gui.svgComponents.DisplayObjects;
 
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.svgComponents.Canvas;
 import app.navigps.gui.svgComponents.SVGCanvasLayers;
 import app.navigps.gui.svgComponents.SynchronizedSVGLayer;
@@ -69,7 +69,7 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
                         if(os.getOID().equals(sc.getOID())){
                             os.updateService(sc);
                             String msg = "Service \'"+os.getServiceName()+"\' has been changed";
-                            MainWindowIWD.getBridgeInformationPipe().currentStatusChanged(msg);
+                            NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
                             System.out.println(msg);
                             return;
                         }

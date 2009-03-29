@@ -1,6 +1,6 @@
 package app.database.odb.gui;
 
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.utils.NaviPoint;
 import app.navigps.utils.Utils;
 import app.config.DataBaseConfig;
@@ -899,7 +899,7 @@ public class DatabaseManager extends javax.swing.JDialog {
         @Override
         public void mouseClicked(MouseEvent e) {
             System.out.println("mouse klicked");
-            SVGDocument doc = MainWindowIWD.getSVGCanvas().getSVGDocument();
+            SVGDocument doc = NaviRootWindow.getSVGCanvas().getSVGDocument();
             if (doc != null) {
                 NaviPoint retPoint =
                         Utils.getLocalPointFromDomElement(doc.getRootElement(), e.getX(), e.getY());
@@ -913,13 +913,13 @@ public class DatabaseManager extends javax.swing.JDialog {
         @Override
         public void windowClosing(WindowEvent e) {
             System.out.println("Window closing");
-            MainWindowIWD.getSVGCanvas().removeMouseListener(mouseCoordListener);
+            NaviRootWindow.getSVGCanvas().removeMouseListener(mouseCoordListener);
         }
 
         @Override
         public void windowOpened(WindowEvent e) {
             System.out.println("Window opened");
-            MainWindowIWD.getSVGCanvas().addMouseListener(mouseCoordListener);
+            NaviRootWindow.getSVGCanvas().addMouseListener(mouseCoordListener);
         }
     }
 }

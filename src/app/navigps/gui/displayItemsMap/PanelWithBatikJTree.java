@@ -5,7 +5,7 @@
 
 package app.navigps.gui.displayItemsMap;
 
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.Scrollbar.ui.LineScrollBarUI;
 import app.navigps.gui.svgComponents.DOMDocumentTree;
 import app.navigps.gui.svgComponents.DOMDocumentTreeController;
@@ -407,10 +407,10 @@ public class PanelWithBatikJTree extends JScrollPane{
         public NodeRenderer() {
             setBackgroundNonSelectionColor(new Color(0,0,0,0));
             String folder = "batik/treerenderer/";
-            elementIcon = MainWindowIWD.createNavigationIcon(folder+"element","gif");
-            commentIcon = MainWindowIWD.createNavigationIcon(folder+"comment", "gif");
-            piIcon =MainWindowIWD.createNavigationIcon(folder+"pi", "gif");
-            textIcon = MainWindowIWD.createNavigationIcon(folder+"text", "gif");
+            elementIcon = NaviRootWindow.createNavigationIcon(folder+"element","gif");
+            commentIcon = NaviRootWindow.createNavigationIcon(folder+"comment", "gif");
+            piIcon =NaviRootWindow.createNavigationIcon(folder+"pi", "gif");
+            textIcon = NaviRootWindow.createNavigationIcon(folder+"text", "gif");
             setIconTextGap(8);
 
         }

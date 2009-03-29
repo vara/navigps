@@ -1,7 +1,7 @@
 package app.navigps.gui.searchServices;
 
 import app.navigps.gui.searchServices.swing.SearchServicesPanel;
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.detailspanel.RoundWindow;
 import app.navigps.gui.detailspanel.RoundWindowUtils;
 import app.navigps.gui.svgComponents.Canvas;
@@ -106,7 +106,7 @@ public class SearchServices extends SynchronizedSVGLayer{
         if (roundWindowInstace == null || !roundWindowInstace.equals(rw)) {
             //System.out.println("Initial round window and fill content");
             roundWindowInstace = rw;
-            roundWindowInstace.setIcon(MainWindowIWD.createNavigationIcon("searchServices32"));
+            roundWindowInstace.setIcon(NaviRootWindow.createNavigationIcon("searchServices32"));
             roundWindowInstace.setDynamicRevalidate(true);
             roundWindowInstace.setUpperThresholdAlpha(0.6f);
             roundWindowInstace.setAlpha(0.0f);

@@ -1,6 +1,6 @@
 package app.navigps.gui.svgComponents;
 
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.searchServices.SearchServices;
 import app.navigps.gui.svgComponents.DisplayObjects.AbstractDisplayManager;
 import app.navigps.gui.svgComponents.DisplayObjects.ComponentDisplayManager;
@@ -63,7 +63,7 @@ public class Canvas extends JSVGCanvas{
 
     private SVGConfiguration svgConfig = new SVGConfiguration();
     
-    private SVGBridgeComponents listeners = MainWindowIWD.
+    private SVGBridgeComponents listeners = NaviRootWindow.
                         getBridgeInformationPipe();
 
     private MouseGestures mouseIteraction;

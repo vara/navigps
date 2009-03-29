@@ -1,6 +1,6 @@
 package app.navigps.gui.svgComponents.DisplayObjects;
 
-import app.navigps.gui.MainWindowIWD;
+import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.MyPopupMenu;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import app.navigps.gui.svgComponents.ServicesContainer;
@@ -194,7 +194,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
     public static ImageIcon loadThumbnailIcon(String name){
         try {
-            URL href = MainWindowIWD.createNavigationIconPath("services/"+name,"png");
+            URL href = NaviRootWindow.createNavigationIconPath("services/"+name,"png");
             BufferedImage bi = GraphicsUtilities.loadCompatibleImage(href);
             return new ImageIcon(GraphicsUtilities.createThumbnail(bi, SVGConfiguration.getInformationIconSize()));
 
@@ -299,7 +299,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
                             parent.remove(ObjectService.this);                            
                             parent.repaint();
                             
-                            MainWindowIWD.getBridgeInformationPipe().
+                            NaviRootWindow.getBridgeInformationPipe().
                                     currentStatusChanged(msg);
                             System.out.println(msg);
                         }
@@ -315,7 +315,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
                             parent.removeAll();
                             parent.repaint();
                             String msg = "Removed "+count+" services";
-                            MainWindowIWD.getBridgeInformationPipe().
+                            NaviRootWindow.getBridgeInformationPipe().
                                     currentStatusChanged(msg);
                             System.out.println(msg);
                         }
