@@ -5,7 +5,7 @@ import app.navigps.gui.MyPopupMenu;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import app.navigps.gui.svgComponents.ServicesContainer;
 import app.navigps.utils.GraphicsUtilities;
-import app.navigps.utils.MyLogger;
+import app.navigps.utils.NaviLogger;
 import app.navigps.utils.NaviPoint;
 import app.config.SVGConfiguration;
 import java.awt.Color;
@@ -200,7 +200,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
         } catch (Exception ex) {
             String msg = ex + "[ for group name "+name+" ]";
-            MyLogger.log.log(Level.WARNING, msg);
+            NaviLogger.log.log(Level.WARNING, msg);
         }
         return null;
     }

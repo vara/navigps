@@ -160,7 +160,7 @@ public class Utils {
             returnTransform.preConcatenate(destTransform);
 
         } catch (NoninvertibleTransformException e) {
-            MyLogger.log.severe(e.getMessage());
+            NaviLogger.log.severe(e.getMessage());
         }
         //System.out.println("retTran "+returnTransform);
         return returnTransform;

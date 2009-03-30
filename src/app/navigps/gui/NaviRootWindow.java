@@ -18,7 +18,7 @@ import app.navigps.gui.svgComponents.SVGLayerScrollPane;
 import app.navigps.gui.svgComponents.UpdateComponentsAdapter;
 import app.navigps.utils.BridgeForVerboseMode;
 import app.navigps.utils.MyFileFilter;
-import app.navigps.utils.MyLogger;
+import app.navigps.utils.NaviLogger;
 import app.navigps.utils.OutputVerboseStream;
 import app.navigps.utils.Utils;
 import app.config.DataBaseConfig;
@@ -142,7 +142,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
         addWindowFocusListener(this);
 
-        MyLogger.log.log(Level.FINE, "Constructor " + getClass().toString());
+        NaviLogger.log.log(Level.FINE, "Constructor " + getClass().toString());
         core = c;
 
         setSize(GUIConfiguration.getWindowSize());
@@ -161,7 +161,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         if(img!=null){
             setIconImage(img.getImage());
         }
-        setDisplayMode();
+        //setDisplayMode();
         
     }
 
@@ -604,7 +604,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             openSVGDocument(file);
         } else {
             System.err.println("File " + path + " doesn't exist !!!");
-            MyLogger.log.log(Level.WARNING, "File " + path + " doesn't exist !!!");
+            NaviLogger.log.log(Level.WARNING, "File " + path + " doesn't exist !!!");
         }
 
     }

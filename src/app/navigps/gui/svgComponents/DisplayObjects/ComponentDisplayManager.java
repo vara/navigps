@@ -9,7 +9,7 @@ import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.svgComponents.Canvas;
 import app.navigps.gui.svgComponents.SVGCanvasLayers;
 import app.navigps.gui.svgComponents.SynchronizedSVGLayer;
-import app.navigps.utils.MyLogger;
+import app.navigps.utils.NaviLogger;
 import app.navigps.utils.NaviPoint;
 import java.awt.Component;
 import java.util.Vector;
@@ -75,7 +75,7 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
                         }
                     }
                 }else{
-                    MyLogger.log.log(Level.WARNING, "Method UpdateService \"argument is not instance class ServiceCore\"");
+                    NaviLogger.log.log(Level.WARNING, "Method UpdateService \"argument is not instance class ServiceCore\"");
                 }
             }
         }).start();

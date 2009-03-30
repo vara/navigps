@@ -6,7 +6,7 @@
 package app.navigps.gui.VerboseTextPane;
 
 import app.navigps.gui.MyPopupMenu;
-import app.navigps.utils.MyLogger;
+import app.navigps.utils.NaviLogger;
 import app.navigps.utils.OutputVerboseStreamAdapter;
 import java.awt.Color;
 import java.awt.Component;
@@ -184,7 +184,7 @@ public class MyTextPane extends JTextPane{
                 }
             }
         } catch (BadLocationException ex) {
-            MyLogger.log.logp(Level.WARNING,getClass().getName(),
+            NaviLogger.log.logp(Level.WARNING,getClass().getName(),
                     "addEndTextnl(String str)","str \""+str+"\"",ex);
         }
     }

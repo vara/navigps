@@ -8,7 +8,7 @@ import app.ArgumentsStartUp.NoValueParameter;
 import app.ArgumentsStartUp.SizeValueParameter;
 import app.ArgumentsStartUp.core.AbstractParameter;
 import app.ArgumentsStartUp.core.ParametersContainer;
-import app.navigps.utils.MyLogger;
+import app.navigps.utils.NaviLogger;
 import java.awt.Dimension;
 import java.io.File;
 import java.util.ArrayList;
@@ -26,17 +26,16 @@ public class NaviGPSCore {
 
         if(ParametersContainer.isEmpty()){
             ParametersContainer.putParameter(createParametrs());
-        }
-        
-        MyLogger.log.log(Level.FINE,"Start main application");        
+        }        
+        NaviLogger.log.log(Level.FINE,"Start main application");
     }
     
     /**
      *
      * @param args
      */
-    public static void main(String[] args) {
-        //args = new String[]{"-Vg","-sp","-V","-f","./resources/maps/MapWorld.svg","-ws","1100,1100"};
+    public static void main(String[] args){
+        //args = new String[]{"-Vg","-sp","-V","-fuy","./resources/maps/MapWorld.svg","-ws","800,600"};
         //System.setProperty("sun.java2d.noddraw", "true");
         //System.setProperty("swing.aatext", "true");
         NaviGPSCore app = new NaviGPSCore();
@@ -45,10 +44,16 @@ public class NaviGPSCore {
         for (int i=0; i<args.length; i++){
             arguments.add(args[i]);
         }
-        app.execute(arguments);        
+        try {
+            app.parseParameters(arguments);
+        } catch (Exception ex) {
+            NaviLogger.log.log(Level.WARNING, ex.getMessage());
+            return;
+        }
+        initGui(app);
     }
 
-    public void execute(ArrayList<String> args){
+    public void parseParameters(ArrayList<String> args) throws Exception{
         int iArgs = args.size();
         for (int i = 0; i < iArgs; i++) {
             String string = args.get(i);
@@ -56,12 +61,12 @@ public class NaviGPSCore {
             AbstractParameter optionHandler = ParametersContainer.getParameter(string);
             if (optionHandler == null){
                 // Assume v is a source.
-                System.err.println("Not recognizied parameter "+string);
+                throw new Exception("Not recognizied parameter "+string+".\nTry run application with option '-h'");
             } else {
                 int nOptionArgs = optionHandler.getOptionValuesLength();
                 if (i + nOptionArgs >= iArgs){
-                    System.err.println("Error not enough option values for : "+ optionHandler.getOption());
-                    return;
+                    throw new Exception("Error not enough option values for : "+ optionHandler.getOption());
+                    
                 }
 
                 String[] optionValues = new String[nOptionArgs];
@@ -74,17 +79,15 @@ public class NaviGPSCore {
                     optionHandler.handleOption(optionValues);
                 } catch(IllegalArgumentException e){
                     e.printStackTrace();
-                    System.err.println("Error: illegal argument for option "+optionHandler.getOption() +" : "+
+                    throw new Exception("Error: illegal argument for option "+optionHandler.getOption() +" : "+
                                          optionValuesToString(optionValues)+".\nTry run application with option '-h'");
-                    return;
+                    
                 }
                 if(optionHandler.isExit()){
                     System.exit(0);
                 }
             }
-        }
-
-        NaviGPSCore.initGui(this);
+        }        
     }
 
     /**
@@ -155,7 +158,7 @@ public class NaviGPSCore {
             @Override
             public void handleOption() {
                 MainConfiguration.setModeVerboseConsole(true);
-                System.out.println("parameter -V");
+                //System.out.println("parameter -V");
             }
 
             @Override
@@ -169,7 +172,7 @@ public class NaviGPSCore {
             @Override
             public void handleOption() {
                 MainConfiguration.setModeVerboseGui(true);
-                System.out.println("parameter -Vg");
+                //System.out.println("parameter -Vg");
             }
 
             @Override
@@ -183,7 +186,7 @@ public class NaviGPSCore {
             @Override
             public void handleOption() {
                 MainConfiguration.setShowDocumentProperties(true);
-                System.out.println("parameter -sp");
+                //System.out.println("parameter -sp");
             }
 
             @Override
@@ -191,7 +194,7 @@ public class NaviGPSCore {
                 return "\t-sp \t(Show properties) create window in app with properties chart file";
             }
         });
-
+/*
         params.add(new FileValueParameter("-cf") {
             @Override
             public void handleOption(File optionValue) {
@@ -203,12 +206,12 @@ public class NaviGPSCore {
                 return "\t-c  \t(path to configuration file) not suported yet !!!";
             }
         });
-
+*/
         params.add(new FileValueParameter("-f") {
             @Override
             public void handleOption(File optionValue) {
                 MainConfiguration.setPathChartToFile(optionValue.getAbsolutePath());
-                System.out.println("parameter -f");
+                //System.out.println("parameter -f");
             }
             @Override
             public String getOptionDescription() {
@@ -221,7 +224,7 @@ public class NaviGPSCore {
             @Override
             public void handleOption(Dimension dimensionValue) {
                 GUIConfiguration.setWindowSize(dimensionValue);
-                System.out.println("parameter -ws "+dimensionValue);
+                //System.out.println("parameter -ws "+dimensionValue);
             }
 
             @Override
@@ -258,7 +261,7 @@ public class NaviGPSCore {
 
             @Override
             public String getOptionDescription() {
-                return "\t-h  \t(help -- Show this text)";
+                return "\t-h  \t(help -- Show help text)";
             }
 
             @Override

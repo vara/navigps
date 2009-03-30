@@ -1,6 +1,6 @@
 package app.navigps.gui;
 
-import app.navigps.utils.MyLogger;
+import app.navigps.utils.NaviLogger;
 import app.navigps.utils.OutputVerboseStream;
 import app.navigps.utils.Utils;
 import java.awt.BasicStroke;
@@ -87,7 +87,7 @@ public class MemoryGui extends JComponent implements Runnable,
     
     private void init(){
 		
-        MyLogger.log.log(Level.FINE, "Init Memory Gui");
+        NaviLogger.log.log(Level.FINE, "Init Memory Gui");
         chart = new Chart();
         setBounds(0,1,getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint()+1);
         setPreferredSize(new Dimension(getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint()+1));
@@ -196,7 +196,7 @@ public class MemoryGui extends JComponent implements Runnable,
             }
         } catch (InterruptedException ex) {
             PrintStream pr;
-            MyLogger.log.log(Level.WARNING, getClass().getName() + "\n" + ex);
+            NaviLogger.log.log(Level.WARNING, getClass().getName() + "\n" + ex);
         }
     }
     
