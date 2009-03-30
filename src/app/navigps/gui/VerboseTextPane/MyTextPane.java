@@ -6,6 +6,8 @@
 package app.navigps.gui.VerboseTextPane;
 
 import app.navigps.gui.MyPopupMenu;
+import app.navigps.gui.NaviRootWindow;
+import app.navigps.utils.MyFileFilter;
 import app.navigps.utils.NaviLogger;
 import app.navigps.utils.OutputVerboseStreamAdapter;
 import java.awt.Color;
@@ -19,16 +21,23 @@ import java.awt.event.InputEvent;
 import java.awt.event.KeyEvent;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileWriter;
+import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
+import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.ComponentUI;
@@ -103,6 +112,8 @@ public class MyTextPane extends JTextPane{
         actions.add(new ShowTimeAction(ShowTimeAction.SHOW_TIME,
                         null,
                         "Show/Hide Time Stemp", KeyEvent.VK_T));
+        actions.add(new SaveAsAction("SaveAs...",
+                        null, "Save content area text", KeyEvent.VK_S));
 
         addMouseListener(new MouseForVerboseTextPane());
 
@@ -285,7 +296,7 @@ public class MyTextPane extends JTextPane{
     /**
      *
      */
-    public class ClearAllAction extends AbstractAction{
+    private class ClearAllAction extends AbstractAction{
 
         /**
          *
@@ -315,7 +326,7 @@ public class MyTextPane extends JTextPane{
     /**
      *
      */
-    public class ShowTimeAction extends AbstractAction{
+    private class ShowTimeAction extends AbstractAction{
 
         /**
          *
@@ -357,6 +368,77 @@ public class MyTextPane extends JTextPane{
         }
     }
 
+    private class SaveAsAction extends AbstractAction{
+
+        public SaveAsAction(String text, ImageIcon icon,
+                           String desc, Integer mnemonic){
+            super(text);
+            putValue(AbstractAction.SMALL_ICON, icon);
+            putValue(AbstractAction.SHORT_DESCRIPTION, desc);
+            putValue(AbstractAction.MNEMONIC_KEY, mnemonic);
+            putValue(AbstractAction.ACCELERATOR_KEY,
+		    KeyStroke.getKeyStroke(mnemonic,InputEvent.ALT_DOWN_MASK));
+            setEnabled(true);
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            File currentDir = null;
+            String msg = "";
+
+            currentDir = new File(System.getProperty("user.dir"));
+
+            JFileChooser chooser = new JFileChooser();
+            String fileFilter = "txt";
+            chooser.addChoosableFileFilter(new MyFileFilter(new String[]{"txt"}, fileFilter));
+            chooser.setAcceptAllFileFilterUsed(false);
+            chooser.setCurrentDirectory(currentDir);
+            int retour = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(MyTextPane.this));
+            if (retour == JFileChooser.APPROVE_OPTION) {
+                    File file = chooser.getSelectedFile();
+                    String str = getText();
+                    System.out.println("'"+str+"'");              
+
+                    if(!writeToFile(file, str)){
+                        return;
+                    }
+                    msg = "Saving to file : " + file.getName();
+            }else{
+                msg = "Save command cancelled by user.";
+            }
+            NaviLogger.log.fine(msg);
+            NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
+        }
+
+        private boolean writeToFile(File file,String str){
+            FileWriter fw = null;
+            boolean monitor = true;
+            try {
+                    System.out.println(""+file);
+                    if(!file.canWrite()){
+                        System.err.println("Can not write to file !!!");
+                    }
+                    fw = new FileWriter(file);
+                    BufferedWriter bw = new BufferedWriter(fw);
+                    bw.write(str);
+
+                } catch (IOException ex) {
+                    System.err.println(""+ex);
+                    NaviLogger.log.log(Level.WARNING, "Write to file exception", ex);
+                    monitor = false;
+                } finally {
+                    try {
+                        fw.flush();
+                        fw.close();
+                    } catch (IOException ex) {
+                        System.err.println(""+ex);
+                        NaviLogger.log.log(Level.WARNING, "Close file exception", ex);
+                        monitor = false;
+                    }
+                }
+            return monitor;
+        }
+    }
     /**
      *
      */
@@ -368,9 +450,11 @@ public class MyTextPane extends JTextPane{
                 for (Action action : actions) {
                     popup.add(new JMenuItem(action));
                 }
+                /*
                 for (Action action : getActions()) {
                     popup.add(new JMenuItem(action));
                 }
+                */
                 popup.show(MyTextPane.this,e.getX(),e.getY());
             }
         }
