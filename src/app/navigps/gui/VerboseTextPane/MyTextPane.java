@@ -28,12 +28,12 @@ import java.io.IOException;
 import java.util.Date;
 import java.util.LinkedList;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.ImageIcon;
 import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
+import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
@@ -370,6 +370,10 @@ public class MyTextPane extends JTextPane{
 
     private class SaveAsAction extends AbstractAction{
 
+        private String CANCEL = "Save command cancelled by user.";
+        private String SAVING = "Saving LOG to file : ";
+        private String CAN_NOT_WRITE = "Can not write to file !!!";
+
         public SaveAsAction(String text, ImageIcon icon,
                            String desc, Integer mnemonic){
             super(text);
@@ -393,50 +397,70 @@ public class MyTextPane extends JTextPane{
             chooser.addChoosableFileFilter(new MyFileFilter(new String[]{"txt"}, fileFilter));
             chooser.setAcceptAllFileFilterUsed(false);
             chooser.setCurrentDirectory(currentDir);
-            int retour = chooser.showSaveDialog(SwingUtilities.getWindowAncestor(MyTextPane.this));
+            int retour = chooser.showSaveDialog(null);
             if (retour == JFileChooser.APPROVE_OPTION) {
                     File file = chooser.getSelectedFile();
-                    String str = getText();
-                    System.out.println("'"+str+"'");              
+                    NaviLogger.log.log(Level.FINE, "Prepare to "+SAVING+file);
+                    if(!file.exists()){
+                        try {
+                            file.createNewFile();                            
+                            if (!file.canWrite()) {
+                                msg = CAN_NOT_WRITE;
+                                NaviLogger.log.log(Level.WARNING, msg);
+                                return;
+                            }                          
 
-                    if(!writeToFile(file, str)){
-                        return;
+                        } catch (IOException ex) {
+                            NaviLogger.log.log(Level.WARNING, "Create new file exception",ex);
+                            return;
+                        }
+                    }else{
+                        int option = JOptionPane.showConfirmDialog(
+                                         MyTextPane.this.getTopLevelAncestor(),
+                                        "Override existing file ?", "Override File",
+                                         JOptionPane.YES_NO_OPTION,
+                                         JOptionPane.INFORMATION_MESSAGE,
+                                         NaviRootWindow.LOGO_APPICATION_IMAGE);
+                        if(option!=0){
+                            NaviLogger.log.log(Level.FINE, CANCEL);
+                            return;
+                        }
                     }
-                    msg = "Saving to file : " + file.getName();
+
+                    String str = getText();
+                    writeToFile(file, str);
             }else{
-                msg = "Save command cancelled by user.";
-            }
-            NaviLogger.log.fine(msg);
-            NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
+                msg = CANCEL;
+            }            
         }
 
-        private boolean writeToFile(File file,String str){
-            FileWriter fw = null;
-            boolean monitor = true;
-            try {
-                    System.out.println(""+file);
-                    if(!file.canWrite()){
-                        System.err.println("Can not write to file !!!");
-                    }
-                    fw = new FileWriter(file);
-                    BufferedWriter bw = new BufferedWriter(fw);
-                    bw.write(str);
-
-                } catch (IOException ex) {
-                    System.err.println(""+ex);
-                    NaviLogger.log.log(Level.WARNING, "Write to file exception", ex);
-                    monitor = false;
-                } finally {
+        private void writeToFile(final File file,final String str){
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    FileWriter fw = null;
                     try {
-                        fw.flush();
-                        fw.close();
+                        fw = new FileWriter(file);
+                        BufferedWriter bw = new BufferedWriter(fw);
+                        bw.write(str);
+                        bw.flush();                   
+
                     } catch (IOException ex) {
-                        System.err.println(""+ex);
-                        NaviLogger.log.log(Level.WARNING, "Close file exception", ex);
-                        monitor = false;
+                        NaviLogger.log.log(Level.WARNING, "Write to file exception", ex);
+
+                    } finally {
+                        try {
+                              fw.close();
+                              String msg = SAVING+ file.getName();
+                              NaviLogger.log.log(Level.FINE, msg);
+                              System.err.println(""+msg);
+                              NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
+                        } catch (IOException ex) {
+                            NaviLogger.log.log(Level.WARNING, "Close file exception", ex);
+                        }
                     }
                 }
-            return monitor;
+            }).start();
         }
     }
     /**

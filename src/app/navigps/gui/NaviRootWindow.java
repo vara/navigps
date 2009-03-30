@@ -93,6 +93,7 @@ import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
 import app.database.odb.gui.DatabaseManager;
 import app.database.odb.utils.Constants;
+import java.awt.Image;
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.gvt.CanvasGraphicsNode;
@@ -127,7 +128,10 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     private DockingWindowsTheme currentTheme = new ShapedGradientDockingTheme();
     private RootWindowProperties properties = new RootWindowProperties();
     private Vector<View> views = new Vector<View>();
+    
     private static int ICON_SIZE = 8;
+
+    public static final ImageIcon LOGO_APPICATION_IMAGE = NaviRootWindow.createNavigationIcon("logo/NaviGPS4");
 
     //private MySplitPane paneForProperties = new MySplitPane();    
     /**
@@ -157,9 +161,8 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         setTitle(Version.getVersion());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        ImageIcon img = NaviRootWindow.createNavigationIcon("logo/NaviGPS4");
-        if(img!=null){
-            setIconImage(img.getImage());
+        if(LOGO_APPICATION_IMAGE!=null){
+            setIconImage(LOGO_APPICATION_IMAGE.getImage());
         }
         //setDisplayMode();
         
