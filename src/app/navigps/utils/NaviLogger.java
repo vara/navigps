@@ -15,7 +15,7 @@ import java.util.logging.SimpleFormatter;
  *
  * @author vara
  */
-public class MyLogger{
+public class NaviLogger{
 
     /**
      *
@@ -26,7 +26,7 @@ public class MyLogger{
     /**
      *
      */
-    public MyLogger(){
+    public NaviLogger(){
 	
 	try {
 	    
