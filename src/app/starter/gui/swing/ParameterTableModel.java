@@ -59,8 +59,10 @@ public class ParameterTableModel extends AbstractTableModel{
     }
 
     @Override
-    public boolean isCellEditable(int row, int col){   
-        return true;//getValueAt(row,col) instanceof SingleValueParameter;
+    public boolean isCellEditable(int row, int col){
+        if (col == 0) {
+            return false;
+        } else return true;//getValueAt(row,col) instanceof SingleValueParameter;
     }
 
     public void insertRow(AbstractParameter param){
@@ -98,6 +100,6 @@ public class ParameterTableModel extends AbstractTableModel{
 
     public void clear(){
         rowData.clear();
-    }
+    }          
 }
 
