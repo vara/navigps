@@ -787,40 +787,44 @@ public class DatabaseManager extends javax.swing.JDialog {
         ImageIcon openIcon = DatabaseManager.getIcon("8");
         ImageIcon closedIcon = DatabaseManager.getIcon("5");
 
-        Objects categories = odb.getObjects(Category.class);
-        if (categories != null) {
-            if (categories.isEmpty()) {
-                System.out.println("jTree model: no categories present");
-                jTree1.setModel(new DefaultTreeModel(root));
-                DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
-                model.reload();
-
-            } else {
-                jTree1.setModel(new DefaultTreeModel(root));
-                DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
-
-                DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
-                renderer.setLeafIcon(leafIcon);
-                renderer.setClosedIcon(closedIcon);
-                renderer.setOpenIcon(openIcon);
-                jTree1.setCellRenderer(renderer);
-
-                while (categories.hasNext()) {
-                    category = (Category) categories.next();
-                    DefaultMutableTreeNode cat = new DefaultMutableTreeNode(category.getName());
-                    model.insertNodeInto(cat, root, root.getChildCount());
-                    if (category.getSubcategories() != null) {
-                        for (int i = 0; i < category.getSubcategories().size(); i++) {
-                            subcategory = (Subcategory) category.getSubcategories().get(i);
-                            DefaultMutableTreeNode sub = new DefaultMutableTreeNode(subcategory.getName());
-                            model.insertNodeInto(sub, cat, cat.getChildCount());
-                        }
-                    }
+        if (odb != null) {
+            Objects categories = odb.getObjects(Category.class);
+            if (categories != null) {
+                if (categories.isEmpty()) {
+                    System.out.println("jTree model: no categories present");
+                    jTree1.setModel(new DefaultTreeModel(root));
+                    DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
                     model.reload();
+
+                } else {
+                    jTree1.setModel(new DefaultTreeModel(root));
+                    DefaultTreeModel model = (DefaultTreeModel) jTree1.getModel();
+
+                    DefaultTreeCellRenderer renderer = new DefaultTreeCellRenderer();
+                    renderer.setLeafIcon(leafIcon);
+                    renderer.setClosedIcon(closedIcon);
+                    renderer.setOpenIcon(openIcon);
+                    jTree1.setCellRenderer(renderer);
+
+                    while (categories.hasNext()) {
+                        category = (Category) categories.next();
+                        DefaultMutableTreeNode cat = new DefaultMutableTreeNode(category.getName());
+                        model.insertNodeInto(cat, root, root.getChildCount());
+                        if (category.getSubcategories() != null) {
+                            for (int i = 0; i < category.getSubcategories().size(); i++) {
+                                subcategory = (Subcategory) category.getSubcategories().get(i);
+                                DefaultMutableTreeNode sub = new DefaultMutableTreeNode(subcategory.getName());
+                                model.insertNodeInto(sub, cat, cat.getChildCount());
+                            }
+                        }
+                        model.reload();
+                    }
                 }
+            } else {
+                System.out.println("Categories is null");
             }
         } else {
-            System.out.println("Categories is null");
+            System.out.println("database not initialized!");
         }
     }
 

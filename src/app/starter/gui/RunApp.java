@@ -79,9 +79,7 @@ public class RunApp extends javax.swing.JFrame {
         tableParam.setModel(ptm);
         tableParam.setSelectionMode(
                     ListSelectionModel.SINGLE_SELECTION);
-
-        tableParam.addMouseListener(new JTableButtonMouseListener(tableParam));
-        tableParam.addMouseMotionListener(new JTableButtonMouseListener(tableParam));
+        
         tableParam.getSelectionModel().addListSelectionListener(new RowListener());
         
         //TableColumn tc = tableParam.getColumnModel().getColumn(1);
@@ -395,9 +393,8 @@ public class RunApp extends javax.swing.JFrame {
             ObjectParameterForJTable obj =
                     (ObjectParameterForJTable)tableParam.getModel().getValueAt(row, 1);
             if(col == 0){
-                String msg = obj.getAbstractParam().getOptionDescription();
-                String ns = msg.replaceAll("(\r\n|\r|\n|\n\r)", "<br>");
-                alphaDescPanel.setText("<html><div style=\"text-indent: 20px;\">"+ns+"</div> </html>");
+                String msg = obj.getAbstractParam().getOptionDescription();                
+                alphaDescPanel.setText(createHtmlInfo(msg));
                 return;
             }                
 
@@ -408,12 +405,20 @@ public class RunApp extends javax.swing.JFrame {
                 File f = openFileChoserWindow((String)val);
                 if(f!=null){
                     obj.setValueForTable(f.getAbsolutePath());
+                }else{
+                    return;
                 }
             }
-            
+            System.err.println("Value changed");
             tableParam.getModel().setValueAt(obj, row, 1);
             ((AbstractTableModel)tableParam.getModel()).
                                     fireTableRowsUpdated(row, row);
+        }
+
+        protected String createHtmlInfo(String str){
+            String ns = str.replaceAll("(\r\n|\r|\n|\n\r)", "<br>");
+            String retString = "<html><div style=\"text-indent: 20px;\">"+ns+"</div> </html>";
+            return retString;
         }
 
         @Override
@@ -441,7 +446,7 @@ public class RunApp extends javax.swing.JFrame {
             }                      
         }
     }
-
+/*
     class JTableButtonMouseListener extends MouseInputAdapter{
             
         private JTable jTable;
@@ -512,5 +517,6 @@ public class RunApp extends javax.swing.JFrame {
             forwardEventToButton(e);
         }
     }
+ */
 }
 
