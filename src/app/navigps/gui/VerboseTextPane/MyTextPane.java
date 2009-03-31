@@ -37,7 +37,6 @@ import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
 import javax.swing.JViewport;
 import javax.swing.KeyStroke;
-import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.ComponentUI;
@@ -52,7 +51,7 @@ import javax.swing.text.StyledDocument;
 import javax.swing.text.TabSet;
 import javax.swing.text.TabStop;
 
-/**
+/** 
  * Created on 2008-12-18, 13:53:36
  * @author vara
  */

@@ -986,7 +986,6 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                 @Override
                 public void run() {
                     SwingUtilities.invokeLater(new Runnable() {
-
                         @Override
                         public void run() {
                             System.err.println(new Date() + "\n\t Change Display mode !!! ");
@@ -1000,9 +999,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                                 }
                                 setUndecorated(true);
                                 device.setFullScreenWindow(NaviRootWindow.this);
-
                             } else {
-
                                 if (isVisible()) {
                                     System.out.println("Window invisible");
                                     setVisible(false);
@@ -1060,6 +1057,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             String info = "User set " +
                     (GUIConfiguration.getModeScreen() == GUIConfiguration.FULL_SCREEN ? "full screen mode" : "frame mode");
             svgListeners.currentStatusChanged(info);
+            System.out.println(info);
         }
     }
 

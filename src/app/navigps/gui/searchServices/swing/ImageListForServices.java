@@ -3,7 +3,7 @@
  * and open the template in the editor.
  */
 
-package app.navigps.gui.searchServices;
+package app.navigps.gui.searchServices.swing;
 
 import app.navigps.utils.GraphicsUtilities;
 import app.navigps.gui.NaviRootWindow;

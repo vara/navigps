@@ -1,6 +1,6 @@
 package app.navigps.gui.searchServices.swing;
 
-import app.navigps.gui.searchServices.ImageListForServices;
+import app.navigps.gui.searchServices.swing.ImageListForServices;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
