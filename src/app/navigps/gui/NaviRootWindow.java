@@ -115,9 +115,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     private StatusPanel statusPanel;
     private StatusInfoPanel statusInfoPanel = new StatusInfoPanel();
     private Action openSVGFileAction,  zoomOutAction,  zoomInAction,  zoomAction,  fitToPanelAction,  searchServicesAction;
-    
     private static SVGCanvasLayers canvaslayers;
-
     private JCheckBoxMenuItem[] cbmOptionsForToolBars;
     private JToolBar toolBarFile,  toolBarZoom,  toolBarSerch,  toolBarMemMonitor;
     private static SVGBridgeListeners svgListeners = new SVGBridgeListeners();
@@ -127,9 +125,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     private DockingWindowsTheme currentTheme = new ShapedGradientDockingTheme();
     private RootWindowProperties properties = new RootWindowProperties();
     private Vector<View> views = new Vector<View>();
-    
     private static int ICON_SIZE = 8;
-
     public static final ImageIcon LOGO_APPICATION_IMAGE = NaviRootWindow.createNavigationIcon("logo/NaviGPS4");
 
     //private MySplitPane paneForProperties = new MySplitPane();    
@@ -160,26 +156,31 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         setTitle(Version.getVersion());
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 
-        if(LOGO_APPICATION_IMAGE!=null){
+        if (LOGO_APPICATION_IMAGE != null) {
             setIconImage(LOGO_APPICATION_IMAGE.getImage());
         }
-        //setDisplayMode();
-        
+    //setDisplayMode();
+
     }
 
     public static final SVGBridgeComponents getBridgeInformationPipe() {
         return svgListeners;
     }
 
-    private void connectDatabase() {
-        try {
-            System.err.println("ODB: connecting");
-            ODB odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
-            Constants.setDbConnection(odb);
-            odb = null;
-        } catch (Exception ex) {
-            JOptionPane.showMessageDialog(NaviRootWindow.this, ex.getMessage());
+    private void connectDatabase(String databasePath, String fileName) {
+        if ((databasePath != null && !databasePath.equalsIgnoreCase(""))&&(fileName != null && !fileName.equalsIgnoreCase(""))) {
+            try {
+                System.err.println("ODB: connecting");
+                ODB odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
+                Constants.setDbConnection(odb);
+            } catch (Exception ex) {
+                //NaviLogger.log.log(Level.SEVERE, ex.getMessage());
+                JOptionPane.showMessageDialog(NaviRootWindow.this, ex.getMessage());
+            }
+        } else {
+            //throw parameter exception
         }
+
     }
 
     private void initComponents() {
@@ -215,6 +216,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         setDefaultLayout();
         getContentPane().add(rootWindow, BorderLayout.CENTER);
         creatToolBars();	//must be before creatMenuBar()
+
         creatMenuBar();
         createStatusPanel();	//must be before createCanvasPanel()
 
@@ -239,8 +241,10 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             int minus = 0;
             if (MainConfiguration.isModeVerboseGui()) {
                 minus = 2;//first and last window (CanvasWindow and DebugWindow)
+
             } else {
                 minus = 1; //only first window
+
             }
             View[] splitTab = new View[views.size() - minus];
             //only windows on left side
@@ -346,24 +350,25 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
      * @param ext
      * @return
      */
-    public static ImageIcon createNavigationIcon(String imageName, String ext) {        
+    public static ImageIcon createNavigationIcon(String imageName, String ext) {
         return createNavigationIcon(imageName, ext, true);
     }
 
-    public static ImageIcon createNavigationIcon(String imageName, String ext,boolean errOut){
-        URL imageURL = createNavigationIconPath(imageName, ext,errOut);
+    public static ImageIcon createNavigationIcon(String imageName, String ext, boolean errOut) {
+        URL imageURL = createNavigationIconPath(imageName, ext, errOut);
         if (imageURL != null) {
             return new ImageIcon(imageURL);
         }
         return null;
     }
+
     /**
      *
      * @param imageName
      * @param ext
      * @return
      */
-    public static URL createNavigationIconPath(String imageName, String ext,boolean errOut) {
+    public static URL createNavigationIconPath(String imageName, String ext, boolean errOut) {
         String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
         URL imageURL = NaviRootWindow.class.getResource(imgLocation);
         if (imageURL == null && errOut) {
@@ -373,7 +378,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         return imageURL;
     }
 
-    public static URL createNavigationIconPath(String imageName, String ext) {        
+    public static URL createNavigationIconPath(String imageName, String ext) {
         return createNavigationIconPath(imageName, ext, true);
     }
 
@@ -562,8 +567,8 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     }
 
     protected SVGCanvasLayers createCanvas() {
-        
-        canvaslayers = new SVGCanvasLayers();        
+
+        canvaslayers = new SVGCanvasLayers();
         getSVGCanvas().setBackground(Color.white);
         return canvaslayers;
     }
@@ -623,7 +628,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
      */
     public void openSVGDocument(File file) {
         if (getSVGCanvas().getSVGDocument() != null) {
-            svgListeners.documentClosed();            
+            svgListeners.documentClosed();
         }
         getSVGCanvas().setURI(file.toURI().toString());
     }
@@ -665,7 +670,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         return canvaslayers;
     }
 
-    public static Canvas getSVGCanvas(){
+    public static Canvas getSVGCanvas() {
         return getSVGCanvasLayers().getSvgCanvas();
     }
 
@@ -803,7 +808,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             getVerboseStream().outputVerboseStream("Zoom out");
         }
     }
-    
+
     private class ZoomAction extends AbstractAction {
 
         public ZoomAction(String text, ImageIcon icon,
@@ -859,7 +864,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         public void actionPerformed(ActionEvent e) {
 
             SVGDocument doc = getSVGCanvas().getSVGDocument();
-            if(doc!=null){
+            if (doc != null) {
                 SVGSVGElement el = doc.getRootElement();
                 String viewBoxStr = el.getAttributeNS(null, SVGConstants.SVG_VIEW_BOX_ATTRIBUTE);
                 float[] rect = ViewBox.parseViewBoxAttribute(el, viewBoxStr, null);
@@ -868,22 +873,22 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                 Rectangle2D bounds = gn.getBounds();
 
                 CanvasGraphicsNode cgn = getSVGCanvas().getCanvasGraphicsNode();
-                String msg = "-------- Transforms SVG Document --------\n"+
-                    "\t" + getClass().getName() + "\n"+
-                    "ViewingTransform\t" + getSVGCanvas().getViewingTransform()+"\n"+
-                    "ViewBoxTransform\t" + getSVGCanvas().getViewBoxTransform()+"\n"+
-                    "RenderingTransform\t" + getSVGCanvas().getRenderingTransform()+"\n"+
-                    "PaintingTransform\t" + getSVGCanvas().getPaintingTransform()+"\n"+
-                    "InitialTransform\t" + getSVGCanvas().getInitialTransform()+"\n"+
-                    "Visible Rect\t" + getSVGCanvas().getVisibleRect()+"\n"+
-                    "ViewBox Rect\t" + rect2d + "\t" + bounds+"\n"+
-                    "-------- Transform Graphics Nood -------"+"\n"+
-                    "PositionTransform\t" + cgn.getPositionTransform()+"\n"+
-                    "ViewingTransform\t" + cgn.getViewingTransform()+"\n"+
-                    "GlobalTransform\t" + cgn.getGlobalTransform()+"\n"+
-                    "InverseTransform\t" + cgn.getInverseTransform()+"\n"+
-                    "Transform\t" + cgn.getTransform()+"\n"+
-                    "----------------------------------------";
+                String msg = "-------- Transforms SVG Document --------\n" +
+                        "\t" + getClass().getName() + "\n" +
+                        "ViewingTransform\t" + getSVGCanvas().getViewingTransform() + "\n" +
+                        "ViewBoxTransform\t" + getSVGCanvas().getViewBoxTransform() + "\n" +
+                        "RenderingTransform\t" + getSVGCanvas().getRenderingTransform() + "\n" +
+                        "PaintingTransform\t" + getSVGCanvas().getPaintingTransform() + "\n" +
+                        "InitialTransform\t" + getSVGCanvas().getInitialTransform() + "\n" +
+                        "Visible Rect\t" + getSVGCanvas().getVisibleRect() + "\n" +
+                        "ViewBox Rect\t" + rect2d + "\t" + bounds + "\n" +
+                        "-------- Transform Graphics Nood -------" + "\n" +
+                        "PositionTransform\t" + cgn.getPositionTransform() + "\n" +
+                        "ViewingTransform\t" + cgn.getViewingTransform() + "\n" +
+                        "GlobalTransform\t" + cgn.getGlobalTransform() + "\n" +
+                        "InverseTransform\t" + cgn.getInverseTransform() + "\n" +
+                        "Transform\t" + cgn.getTransform() + "\n" +
+                        "----------------------------------------";
                 getVerboseStream().outputVerboseStream(msg);
             }
         }
@@ -973,10 +978,10 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             putValue(AbstractAction.SELECTED_KEY, new Boolean(en));
             SearchServices ss = getSVGCanvas().getSearchServices();
             ss.setEnabledSearchServices(en);
-            if(en){
+            if (en) {
                 int count = canvaslayers.getComponentCountInLayer(SVGCanvasLayers.SEARCH_SERVICES_LAYER);
-                System.err.println("component count on SVGCanvasLayers.SEARCH_SERVICES_LAYER "+count);
-                canvaslayers.add(ss,SVGCanvasLayers.SEARCH_SERVICES_LAYER);
+                System.err.println("component count on SVGCanvasLayers.SEARCH_SERVICES_LAYER " + count);
+                canvaslayers.add(ss, SVGCanvasLayers.SEARCH_SERVICES_LAYER);
             }
             String info = "Search services " + (en ? "enabled" : "disabled");
             svgListeners.currentStatusChanged(info);
@@ -991,6 +996,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                 @Override
                 public void run() {
                     SwingUtilities.invokeLater(new Runnable() {
+
                         @Override
                         public void run() {
                             System.err.println(new Date() + "\n\t Change Display mode !!! ");
@@ -1031,7 +1037,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             }).start();
         }
     }
-    
+
     @Override
     public void setVisible(boolean b) {
         super.setVisible(b);
@@ -1085,12 +1091,10 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         public static final byte COMPONENT_POSITON = 0;
         public static final byte SCREEN_POSITION = 1;
         public static final byte ROOT_SVGELEMENT_POSITION = 2;
-
         private static final String SUFFIX = "position";
         private static final String S_COMPONENT_POSITON = "Component";
         private static final String S_SCREEN_POSITION = "Screen";
         private static final String S_ROOT_SVGELEMENT_POSITION = "SVG ROOT";
-
         private byte displayPosition;
         private JLabel xLabel = new JLabel();
         private JLabel yLabel = new JLabel();
@@ -1114,8 +1118,8 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             getBumpArea().addMouseListener(new BumpAreaListener());
         }
 
-        public byte [] getTabPosition(){
-            return new byte [] {COMPONENT_POSITON,SCREEN_POSITION,ROOT_SVGELEMENT_POSITION};
+        public byte[] getTabPosition() {
+            return new byte[]{COMPONENT_POSITON, SCREEN_POSITION, ROOT_SVGELEMENT_POSITION};
         }
 
         public String getStringNamePosition(byte position) {
@@ -1130,14 +1134,16 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             return "";
         }
         // this function ;}}}} (i dont have time !)
-        public byte getNumPosition(String str){
-            byte [] tabPos = getTabPosition();
+
+        public byte getNumPosition(String str) {
+            byte[] tabPos = getTabPosition();
             for (int i = 0; i < tabPos.length; i++) {
-                if(str.equals(getStringNamePosition(tabPos[i]))){
+                if (str.equals(getStringNamePosition(tabPos[i]))) {
                     return tabPos[i];
                 }
             }
             return COMPONENT_POSITON; //default ;}
+
         }
 
         @Override
@@ -1157,7 +1163,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                         case SCREEN_POSITION:
                             setTextCoordinate(e.getXOnScreen() + "", "" + e.getYOnScreen());
                             break;
-                        case ROOT_SVGELEMENT_POSITION:                            
+                        case ROOT_SVGELEMENT_POSITION:
                             SVGOMPoint svgp =
                                     Utils.getLocalPointFromDomElement(
                                     doc.getRootElement(), e.getX(), e.getY());
@@ -1167,7 +1173,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                 }
             }
         }
-        
+
         private void setTextCoordinate(String x, String y) {
             xLabel.setText(x);
             yLabel.setText(y);
@@ -1190,13 +1196,14 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             getBumpArea().setToolTipText(strTooltip);
         }
 
-        private class BumpAreaListener extends MouseInputAdapter implements ActionListener{
+        private class BumpAreaListener extends MouseInputAdapter implements ActionListener {
+
             @Override
-            public void mousePressed(MouseEvent e){
-                byte [] tabPos = getTabPosition();
+            public void mousePressed(MouseEvent e) {
+                byte[] tabPos = getTabPosition();
                 MyPopupMenu popup = new MyPopupMenu();
                 for (int i = 0; i < tabPos.length; i++) {
-                    JMenuItem mi= new JMenuItem(getStringNamePosition(tabPos[i]));
+                    JMenuItem mi = new JMenuItem(getStringNamePosition(tabPos[i]));
                     mi.addActionListener(this);
                     popup.add(mi);
                 }
@@ -1205,7 +1212,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
             @Override
             public void actionPerformed(ActionEvent e) {
-                JMenuItem mi = (JMenuItem)e.getSource();
+                JMenuItem mi = (JMenuItem) e.getSource();
                 byte pos = getNumPosition(mi.getText());
                 setDisplayPosition(pos);
             }
