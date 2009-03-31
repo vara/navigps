@@ -21,6 +21,7 @@ import app.navigps.Version;
 import app.navigps.gui.DefaultAlphaLabelPanel;
 import app.navigps.utils.GraphicsUtilities;
 import app.navigps.utils.MyFileFilter;
+import app.navigps.utils.NaviLogger;
 import app.starter.gui.swing.ObjectParameterForJTable;
 import app.starter.gui.swing.ParameterTableModel;
 import app.starter.gui.swing.TableRendererForFileParameter;
@@ -37,6 +38,7 @@ import java.io.IOException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
+import java.util.logging.Level;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
@@ -76,7 +78,7 @@ public class RunApp extends javax.swing.JFrame {
         tableParam.setSelectionMode(
                     ListSelectionModel.SINGLE_SELECTION);
         
-        tableParam.getSelectionModel().addListSelectionListener(new RowListener());
+        //tableParam.getSelectionModel().addListSelectionListener(new RowListener());
         
         //TableColumn tc = tableParam.getColumnModel().getColumn(1);
         //tc.setCellRenderer(new TableRendererForFileValue());
@@ -250,7 +252,9 @@ public class RunApp extends javax.swing.JFrame {
     * @param args the command line arguments
     */
     public static void main(String args[]) {
+        NaviLogger.log.log(Level.FINEST, "Run starter gui");
         java.awt.EventQueue.invokeLater(new Runnable() {
+            @Override
             public void run() {
                 new RunApp().setVisible(true);
             }

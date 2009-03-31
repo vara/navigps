@@ -21,11 +21,14 @@ import org.jdesktop.animation.timing.TimingTarget;
  */
 public class DefaultAlphaLabelPanel extends AlphaJPanel{
 
-    private Animator animator;
-    private int animationDuration = 2000;
+    public static final int DEFAULT_CLOSE_DELAY = 4000;
+    public static final int DEFAULT_ANIM_DURATION = 2000;
+
+    private final Animator animator;
+    private int animationDuration = DEFAULT_ANIM_DURATION;
 
     private Timer closeTimer;
-    private int closeDelay = 4000;
+    private int closeDelay = DEFAULT_CLOSE_DELAY;
 
     private AlphaJPanel content = new AlphaJPanel();
     private JLabel contentText = new JLabel();
@@ -98,17 +101,25 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
             }
         });
     }
+
+    public boolean closeTimerIsRunning(){
+        return closeTimer.isRunning();
+    }
+
+    public boolean animatorIsRunning(){
+        return animator.isRunning();
+    }
     /**
      *
      */
     protected void startTimer(){
 
-        if(closeTimer.isRunning()){
+        if(closeTimerIsRunning()){
             closeTimer.restart();
         }else{
             closeTimer.start();
         }
-        if(animator.isRunning()){
+        if(animatorIsRunning()){
             animator.cancel();
         }
     }
@@ -137,7 +148,7 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
      */
     public void setCloseDelay(int closeDelay) {
         this.closeDelay = closeDelay;
-        closeTimer.setDelay(getCloseDelay());
+        closeTimer.setInitialDelay(getCloseDelay());
     }
 
     /**
@@ -152,12 +163,14 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
      */
     public void setAnimationDuration(int animationDuration) {
         this.animationDuration = animationDuration;
+        synchronized(animator){
         if(animator.isRunning()){
             animator.stop();
             animator.setDuration(getAnimationDuration());
             animator.start();
         }else
             animator.setDuration(getAnimationDuration());
+        }
     }
 
     /**
@@ -175,6 +188,12 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         if(!contentText.getText().equals(""))
             startTimer();
     }
+    /**
+     * Override this method to inform when animator
+     * work complet
+     */
+    public void animationFinished(){
+    }
 
     /**
      * @return the contentText
@@ -188,10 +207,6 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
      */
     protected class AnimatorBehaviour implements TimingTarget{
 
-        /**
-         *
-         * @param arg0
-         */
         @Override
         public void timingEvent(float arg0) {
             if(!getContent().setAlpha(arg0)){
@@ -214,7 +229,9 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
          *
          */
         @Override
-        public void end() {}
+        public void end() {
+            animationFinished();
+        }
         /**
          *
          */

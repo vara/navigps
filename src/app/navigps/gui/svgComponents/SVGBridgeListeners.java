@@ -5,6 +5,7 @@
 
 package app.navigps.gui.svgComponents;
 
+import app.database.odb.utils.ODBConnection;
 import java.io.File;
 import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
 import org.apache.batik.swing.gvt.GVTTreeRendererListener;
@@ -45,6 +46,10 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     public void documentLoadingCompleted(SVGDocumentLoaderEvent e) {	
         currentStatusChanged("Document Loading Completed");
         setSvgFileObject(new File(e.getSVGDocument().getDocumentURI()));
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        //maybe this place to init DB is not good idea
+        ODBConnection.connect("", "");
+        //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
     }
     /**
      *

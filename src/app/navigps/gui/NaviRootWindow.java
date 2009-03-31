@@ -21,7 +21,6 @@ import app.navigps.utils.MyFileFilter;
 import app.navigps.utils.NaviLogger;
 import app.navigps.utils.OutputVerboseStream;
 import app.navigps.utils.Utils;
-import app.config.DataBaseConfig;
 import app.config.GUIConfiguration;
 import app.config.MainConfiguration;
 import java.awt.BorderLayout;
@@ -71,7 +70,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
@@ -92,15 +90,15 @@ import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
 import app.database.odb.gui.DatabaseManager;
-import app.database.odb.utils.Constants;
+import app.database.odb.utils.ODBConnection;
+import java.util.LinkedList;
+import java.util.NoSuchElementException;
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.gvt.CanvasGraphicsNode;
 import org.apache.batik.gvt.GraphicsNode;
 import org.apache.batik.swing.svg.AbstractJSVGComponent;
 import org.apache.batik.util.SVGConstants;
-import org.neodatis.odb.ODB;
-import org.neodatis.odb.ODBFactory;
 import org.w3c.dom.svg.SVGDocument;
 import org.w3c.dom.svg.SVGSVGElement;
 
@@ -146,7 +144,6 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
         setSize(GUIConfiguration.getWindowSize());
         setLayout(new BorderLayout());
-        connectDatabase();
         initComponents();
 
         if (MainConfiguration.getPathToChartFile() != null) {
@@ -165,23 +162,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
     public static final SVGBridgeComponents getBridgeInformationPipe() {
         return svgListeners;
-    }
-
-    private void connectDatabase(String databasePath, String fileName) {
-        if ((databasePath != null && !databasePath.equalsIgnoreCase(""))&&(fileName != null && !fileName.equalsIgnoreCase(""))) {
-            try {
-                System.err.println("ODB: connecting");
-                ODB odb = ODBFactory.open(DataBaseConfig.getDefaultDatabasePath() + DataBaseConfig.getDatabaseFilename());
-                Constants.setDbConnection(odb);
-            } catch (Exception ex) {
-                //NaviLogger.log.log(Level.SEVERE, ex.getMessage());
-                JOptionPane.showMessageDialog(NaviRootWindow.this, ex.getMessage());
-            }
-        } else {
-            //throw parameter exception
-        }
-
-    }
+    }    
 
     private void initComponents() {
 
@@ -390,6 +371,9 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         statusPanel = new StatusPanel();
 
         statusInfoPanel.getBumpArea().setVisible(false);
+        statusInfoPanel.setQueueEnabled(true);
+        statusInfoPanel.setMaxEtemInQueue(3);
+
         statusPanel.addToPanelFromPosition(statusInfoPanel, StatusPanel.LEFT_PANEL);
 
         CoordinateInfoPanel cip = new CoordinateInfoPanel();
@@ -486,12 +470,22 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
         JMenuItem odbManager = new JMenuItem("ODBManager");
         odbManager.addActionListener(new ActionListener() {
-
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                DatabaseManager odb = new DatabaseManager(NaviRootWindow.this, false);
-                odb.setVisible(true);
+                // BUG in GUI DataBaseMnager !!!!
+                //remove this check block when praise or (somebody) mobilize to repair
+                // null pointer exceptionSSS !
+                //
+                if(ODBConnection.isConnected()){                    
+                    SwingUtilities.invokeLater(new Runnable() {
+                        @Override
+                        public void run() {
+                            DatabaseManager odb = new 
+                                    DatabaseManager(NaviRootWindow.this, false);
+                            odb.setVisible(true);
+                        }
+                    });
+                }
             }
         });
 
@@ -500,19 +494,9 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
             @Override
             public void actionPerformed(ActionEvent e) {
-
-                try {
-                    ODB db = Constants.getDbConnection();
-                    if(db != null){
-                        db.close();
-                        String msg = "ODB: disconnecting";
-                        System.out.println(msg);
-                        NaviLogger.log.log(Level.FINE,msg);
-                    }
-                    
-                } catch (Exception exc) {
-                    JOptionPane.showMessageDialog(NaviRootWindow.this, exc.getMessage());
-                }
+                String msg = ODBConnection.disconnect();
+                NaviRootWindow.getBridgeInformationPipe().
+                        currentStatusChanged(msg);
             }
         });
 
@@ -619,7 +603,6 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             System.err.println("File " + path + " doesn't exist !!!");
             NaviLogger.log.log(Level.WARNING, "File " + path + " doesn't exist !!!");
         }
-
     }
 
     /**
@@ -695,6 +678,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             ((MemoryGui) toolBarMemMonitor.getComponentAtIndex(0)).setVisible(selected);
         }
     }
+    
     private static final Icon BUTTON_ICON = new Icon() {
 
         @Override
@@ -913,6 +897,8 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         @Override
         public void documentClosed() {
             setComponetsEnableWhenDocumentLoaded(false);
+            String msg = ODBConnection.disconnect();
+            NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
         }
     }
 
@@ -1073,7 +1059,11 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     }
 
     private class StatusInfoPanel extends DefaultAlphaLabelPanel
-            implements StatusChangedListener {
+            implements StatusChangedListener,Runnable{
+
+        private final LinkedList<String> stringQueue = new LinkedList<String>();
+        private int maxEtemInQueue = 2;
+        private boolean queueEnabled = false;
 
         public StatusInfoPanel() {
             setAnimatorEnabled(true);
@@ -1081,7 +1071,66 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
         @Override
         public void currentStatusChanged(String str) {
-            setText(str);
+            if( (!closeTimerIsRunning() && !animatorIsRunning() ) || !isQueueEnabled()){
+                setText(str);
+            }else{                
+                //synchronized(stringQueue){
+                    if(getCloseDelay() == DEFAULT_CLOSE_DELAY)
+                        setCloseDelay(100);
+                    if(stringQueue.size()>getMaxEtemInQueue())
+                        stringQueue.removeFirst();                    
+                    stringQueue.add(str);
+                //}                
+            }
+        }
+
+        @Override
+        public void animationFinished() {
+            //dont removed this check block ! NoSuchElementException !
+            if(!stringQueue.isEmpty()){
+                new Thread(this).start();
+            }
+        }
+
+        @Override
+        public void run() {
+            try{
+                //Display last element with default deleay option
+                if(stringQueue.size()==1){
+                    setCloseDelay(DEFAULT_CLOSE_DELAY);
+                }
+                String str = stringQueue.getFirst();
+                stringQueue.removeFirst();                
+                setText(str);                
+            }catch(NoSuchElementException ex){}
+        }
+
+        /**
+         * @return the queueEnabled
+         */
+        public boolean isQueueEnabled() {
+            return queueEnabled;
+        }
+
+        /**
+         * @param queueEnabled the queueEnabled to set
+         */
+        public void setQueueEnabled(boolean queueEnabled) {
+            this.queueEnabled = queueEnabled;
+        }
+
+        /**
+         * @return the maxEtemInQueue
+         */
+        public int getMaxEtemInQueue() {
+            return maxEtemInQueue;
+        }
+
+        /**
+         * @param maxEtemInQueue the maxEtemInQueue to set
+         */
+        public void setMaxEtemInQueue(int maxEtemInQueue) {
+            this.maxEtemInQueue = maxEtemInQueue;
         }
     }
 
