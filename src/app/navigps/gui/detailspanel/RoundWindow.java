@@ -1,9 +1,12 @@
 package app.navigps.gui.detailspanel;
 
+import app.navigps.gui.detailspanel.LoacationManager.LocationManager;
 import app.navigps.gui.repaintmanager.AlphaRepaintManager;
 import app.navigps.gui.borders.AlphaBorder;
 import app.navigps.gui.borders.OvalBorder;
 import app.navigps.gui.borders.RoundBorder;
+import app.navigps.gui.detailspanel.LoacationManager.LeftLocation;
+import app.navigps.gui.detailspanel.LoacationManager.RightLocation;
 import app.navigps.utils.Utils;
 import java.awt.BorderLayout;
 import java.awt.Color;
@@ -16,12 +19,11 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.LayoutManager;
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
 import java.awt.event.MouseEvent;
-import java.awt.event.MouseListener;
-import java.awt.event.MouseMotionListener;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.Icon;
 import javax.swing.RepaintManager;
@@ -37,16 +39,8 @@ import org.jdesktop.animation.timing.TimingTarget;
  * @author vara
  */
 public class RoundWindow extends RoundJPanel
-        implements MouseListener,MouseMotionListener,FocusListener{
-
-
-    private int sensitiveMouseReaction = 8;        
-
-    private boolean resizeWidthPanel = false;
-    private boolean resizeHeghtPanel = false;
-    private boolean cursorChanged = false;
-
-    private boolean needRevalidate = false;
+                         implements FocusListener{
+    
     private boolean dynamicRevalidate = false;
 
     private Dimension defaultSize = new Dimension(330,400);
@@ -65,16 +59,14 @@ public class RoundWindow extends RoundJPanel
     private Insets innerGap = new Insets(7,7,7,7);
     private int decorateAndContentGap = 5;
 
-    /**
-     *
-     */
+    private LocationManager location;
+
     public RoundWindow(){
         super(20,20);
         setSize(defaultSize);
-        addMouseListener(this);
-        addMouseMotionListener(this);
+
         OvalBorder mainBorder = (OvalBorder)getRoundBorder();
-        mainBorder.setInsets(new Insets(3,3,3,0));
+        mainBorder.setInsets(new Insets(3,3,3,3));
 
         setFocusable(true);
         addFocusListener(this);
@@ -94,7 +86,9 @@ public class RoundWindow extends RoundJPanel
         setRootPane(createRootPane());
         getContentPane().setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
                 mainBorder.getRecH(), mainBorder.getBorderColor()));
+
         super.setEnabled(false);
+        setLocationManager(new LeftLocation(this));
     }
 
     /**
@@ -161,7 +155,6 @@ public class RoundWindow extends RoundJPanel
      * @param str
      */
     public void setTitle(String str){
-
         getDecoratePanel().setTitle(str);
     }
 
@@ -207,31 +200,35 @@ public class RoundWindow extends RoundJPanel
         Container parent = getParent();
         if(parent == null)
             return;
-
-        int x = (getParent().getWidth()-getWidth());
-        int y = (getParent().getHeight()-getHeight())>>1;
-        updateMyUI(x, y, getWidth(), getHeight());
+        Rectangle rec = location.updateLocation(getParent());
+        updateMyUI(rec);
+        //int x = (getParent().getWidth()-getWidth());
+        //int y = (getParent().getHeight()-getHeight())>>1;
+        //updateMyUI(x, y, getWidth(), getHeight());
         
         //getVerboseStream().outputVerboseStream(getClass().getSimpleName()+" UpdateMyUI\n Parent size ["+width+","+height+"]" +
         //        "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");
     }
-    /**
-     *
-     * @param x
-     * @param y
-     * @param width
-     * @param height
-     */
-    public void updateMyUI(final int x,final int y,final int width,final int height){
+
+    protected void updateMyUI(int x,int y) {
+        updateMyUI(x,y, getWidth(), getHeight());
+    }
+
+    protected void updateMyUI(final Rectangle rec){
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
-                setBounds(x,y, width, height);
+                setBounds(rec);
                 if(isDynamicRevalidate())
                     revalidate();
             }
         });
-     }
+    }
+
+    protected void updateMyUI(int x,int y,int width,int height){
+        updateMyUI(new Rectangle(x, y, width, height));
+    }
+
     private void installRepaintManager() {
         AlphaRepaintManager manager = new AlphaRepaintManager();
         RepaintManager.setCurrentManager(manager);
@@ -282,72 +279,7 @@ public class RoundWindow extends RoundJPanel
         Insets inner = getInnerGap();
         return new Insets(in.top+inner.top, in.left+inner.left,
                 in.bottom+inner.bottom, in.right+inner.right);
-    }
-
-    @Override
-    public void mouseClicked(MouseEvent e) {
-        
-//        if(!toggleButton.isVisible())
-  //          toggleButton.showToggleButton();
-    //    else
-      //      toggleButton.hideToggleButton();
-    }
-
-    @Override
-    public void mousePressed(MouseEvent e) {
-       
-        if(e.getButton()==MouseEvent.BUTTON1 && e.getX()<sensitiveMouseReaction){
-            System.out.println("Resize X side "+getClass().getSimpleName());
-            resizeWidthPanel = true;
-        }else if(e.getButton()==MouseEvent.BUTTON1 && e.getY()<sensitiveMouseReaction){
-            System.out.println("Resize Y side "+getClass().getSimpleName());
-            resizeHeghtPanel = true;
-        }
-    }
-    @Override
-    public void mouseReleased(MouseEvent e) {
-
-        if(needRevalidate || !isDynamicRevalidate()){                        
-            revalidate();
-            needRevalidate=false;
-        }
-        resizeWidthPanel = false;
-        resizeHeghtPanel = false;
-    }
-    @Override
-    public void mouseEntered(MouseEvent e) {}
-    @Override
-    public void mouseExited(MouseEvent e) {
-        //resizeWidthPanel = false;
-        //resizeHeghtPanel = false;
-    }
-    @Override
-    public void mouseDragged(MouseEvent e) {
-        if(resizeWidthPanel || resizeHeghtPanel){
-            int width =0,height = 0;
-            if(resizeWidthPanel){
-                width = getWidth()-e.getX()+2;
-                setSize(width, getHeight());
-            }
-            else{
-                height = getHeight()-e.getY();
-                setSize(getWidth(), height);
-            }
-            updateMyUI();
-            needRevalidate=true;
-        }
-    }
-    @Override
-    public void mouseMoved(MouseEvent e) {
-        
-        if(e.getX()<sensitiveMouseReaction||e.getY()<sensitiveMouseReaction){
-            setCursor(Cursor.getPredefinedCursor( e.getX()<sensitiveMouseReaction ?
-                                      Cursor.W_RESIZE_CURSOR:Cursor.N_RESIZE_CURSOR));
-            cursorChanged = true;           
-        }else if(cursorChanged && !resizeWidthPanel&&!resizeHeghtPanel){
-            setCursor(Cursor.getDefaultCursor());
-        }
-    }
+    }  
 
     /**
      * @return the decoratePanel
@@ -503,6 +435,22 @@ public class RoundWindow extends RoundJPanel
     public void setAnimationDuration(int animationDuration) {
         this.animationDuration = animationDuration;
         animator.setDuration(getAnimationDuration());
+    }
+
+    /**
+     * @param location the location to set
+     */
+    public void setLocationManager(LocationManager location) {
+
+        if(this.location != null){
+            removeMouseListener(this.location);
+            removeMouseMotionListener(this.location);
+        }
+
+        this.location = location;
+
+        addMouseListener(location);
+        addMouseMotionListener(location);
     }
 
     private class WindowDisplayBehavior implements TimingTarget{
