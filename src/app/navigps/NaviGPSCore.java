@@ -137,7 +137,7 @@ public class NaviGPSCore {
 
         Vector<AbstractParameter> params = new Vector<AbstractParameter>();
         
-        System.out.println("<TEST> Create difined parameters. This text should be shown only once.");
+        System.out.println("<TEST> Create defined parameters. This text should be shown only once.");
 
         params.add(new NoValueParameter("-v") {
             @Override
@@ -146,11 +146,11 @@ public class NaviGPSCore {
             }
             @Override
             public void handleOption() {
-                System.out.println("Version : "+Version.getVersion());
+                System.out.println("Version: "+Version.getVersion());
             }
             @Override
             public String getOptionDescription() {
-                return "\t-v  \t(version) print version application";
+                return "-v\n(version) print application version";
             }
         });
 
@@ -163,7 +163,7 @@ public class NaviGPSCore {
 
             @Override
             public String getOptionDescription() {
-                return "\t-V  \t(verbose mode) result return by function only on console";
+                return "-V\n(verbose mode) result returned by functions shown only on console";
             }
         });
 
@@ -177,7 +177,7 @@ public class NaviGPSCore {
 
             @Override
             public String getOptionDescription() {
-                return "\t-Vg \t(verbose mode) like -v + create window in gui with the same result on console";
+                return "-Vg\n(verbose mode) like -v + create window in gui with console results";
             }
         });
 
@@ -191,7 +191,7 @@ public class NaviGPSCore {
 
             @Override
             public String getOptionDescription() {
-                return "\t-sp \t(Show properties) create window in app with properties chart file";
+                return "-sp\n(Show properties) create window in app with properties of chart file";
             }
         });
 /*
@@ -215,7 +215,7 @@ public class NaviGPSCore {
             }
             @Override
             public String getOptionDescription() {
-                return "\t-f  \t(path to chart file) file format documents must by only svg !!!";
+                return "-f\n(path to chart file) file format must be svg only!";
             }
         });
 
@@ -229,9 +229,9 @@ public class NaviGPSCore {
 
             @Override
             public String getOptionDescription() {
-                return "\t-ws \t(window size  eq. -ws 800,600 ) " +
-                           "\n\t\t\tIt takes two arguments defining the size of the total number of main window." +
-                           "\n\t\t\tIf there is to adopt the size of a window the size of screen resolution";
+                return "-ws\n(window size  eq. -ws 800,600 ) " +
+                           "\nIt takes two arguments to define the size of main window." +
+                           "\nIf specified arguments exceed screen resolution they will be brought down to current resolution";
             }
         });
 
@@ -244,7 +244,7 @@ public class NaviGPSCore {
 
             @Override
             public String getOptionDescription() {
-                return "\t-fs \t(Display root window in full screen mode)";
+                return "-fs\n(Display root window in full screen mode)";
             }
         });
 
@@ -261,7 +261,7 @@ public class NaviGPSCore {
 
             @Override
             public String getOptionDescription() {
-                return "\t-h  \t(help -- Show help text)";
+                return "-h\n(help -- Show help text)";
             }
 
             @Override
