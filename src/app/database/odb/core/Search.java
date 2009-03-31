@@ -36,11 +36,11 @@ public class Search implements ODBBridge {
                     v.add((String) c.getName());
                 }
             } else {
-                System.err.println("No categories avaliable!");
+                System.err.println(getClass().getCanonicalName()+" No categories avaliable!");
             }
 
         } else {
-            System.err.println("No database initialized!");
+            System.err.println(getClass().getCanonicalName()+" No database initialized!");
         }
 
         return v;
@@ -66,15 +66,15 @@ public class Search implements ODBBridge {
                         v.add((String) sub.getName());
                     }
                 } else {
-                    System.err.println("Subcategories empty or null!");
+                    System.err.println(getClass().getCanonicalName()+" Subcategories empty or null!");
                 }
 
             } else {
-                System.err.println("Category doesn't exist!");
+                System.err.println(getClass().getCanonicalName()+" Category doesn't exist!");
             }
 
         } else {
-            System.err.println("No database initialized");
+            System.err.println(getClass().getCanonicalName()+" No database initialized");
         }
         return v;
     }
@@ -125,7 +125,7 @@ public class Search implements ODBBridge {
                 }
             }
         } else {
-            System.err.println("No database initialized");
+            System.err.println(getClass().getCanonicalName()+" No database initialized");
         }
         return v;
     }

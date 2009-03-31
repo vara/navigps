@@ -10,6 +10,7 @@ import app.config.DataBaseConfig;
 import app.navigps.utils.NaviLogger;
 import java.io.File;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.ODBFactory;
 
@@ -22,6 +23,8 @@ public class ODBConnection {
     public static final String PREFIX = "ODB:";
     public static final String CONNECTING_INFO = PREFIX+" connecting ...";
     public static final String CONNECTED_INFO = PREFIX+" connected ! ";
+
+    public static final String DISCONNECTING_INFO = PREFIX+" disconnecting ... ";
     public static final String DISCONNECTED_INFO = PREFIX+" disconnected ! ";
 
     public static final String ERROR_CONNECT = PREFIX+" can not connect ";
@@ -37,13 +40,13 @@ public class ODBConnection {
     public static String connect(String databasePath, String fileName) {
 
         String status = "";
-
-        if (checkFile(databasePath, fileName)) {
+        
+        if (!checkFile(databasePath, fileName)) {
             fileName =  DataBaseConfig.getDatabaseFilename();
             databasePath = DataBaseConfig.getDefaultDatabasePath();
         }
 
-        String msg = "[ DB name "+fileName+"]";
+        String msg = "[ DB name '"+fileName+"']";
         try {
 
             System.out.println(CONNECTING_INFO);
@@ -52,21 +55,27 @@ public class ODBConnection {
             ODB odb = ODBFactory.open(databasePath+fileName);
             Constants.setDbConnection(odb);
             status = CONNECTED_INFO+msg;
-            System.out.println(status);
-
+            NaviLogger.log.log(Level.FINE,status);
+            
         } catch (Exception ex) {
             status = ERROR_CONNECT+msg;
-            NaviLogger.log.log(Level.WARNING,status,ex);
+            NaviLogger.log.log(Level.WARNING,status,ex);            
         }
         return status;
     }
 
     public static String disconnect(){
 
-        if(!isConnected())
+        NaviLogger.log.log(Level.FINE,DISCONNECTING_INFO);
+
+        if(!isConnected()){
+            NaviLogger.log.log(Level.FINE,ERROR_DISCONNECT);
             return ERROR_DISCONNECT;
+        }
 
         Constants.getDbConnection().close();
+
+        NaviLogger.log.log(Level.FINE,DISCONNECTED_INFO);
         return DISCONNECTED_INFO;
     }
 

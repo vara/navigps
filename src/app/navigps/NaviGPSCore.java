@@ -47,7 +47,7 @@ public class NaviGPSCore {
         try {
             app.parseParameters(arguments);
         } catch (Exception ex) {
-            NaviLogger.log.log(Level.WARNING, ex.getMessage());
+            NaviLogger.log.log(Level.WARNING,"Parsering argument start up",ex);
             return;
         }
         initGui(app);

@@ -21,7 +21,7 @@ public class NaviLogger{
         try {
             String pathToFile = System.getProperty("user.dir");
             System.out.println(""+pathToFile);
-            FileHandler fh = new FileHandler(pathToFile+"/navigps.log", true);
+            FileHandler fh = new FileHandler(pathToFile+"/navigps.log", false);
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
             log = Logger.getLogger("app.navigps");            
