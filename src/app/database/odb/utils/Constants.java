@@ -1,6 +1,5 @@
 package app.database.odb.utils;
 
-import app.database.odb.gui.DatabaseManager;
 import org.neodatis.odb.ODB;
 
 /**
