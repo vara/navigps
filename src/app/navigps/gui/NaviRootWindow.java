@@ -93,7 +93,6 @@ import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
 import app.database.odb.gui.DatabaseManager;
 import app.database.odb.utils.Constants;
-import java.awt.Image;
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.gvt.CanvasGraphicsNode;
@@ -498,8 +497,14 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             public void actionPerformed(ActionEvent e) {
 
                 try {
-                    Constants.getDbConnection().close();
-                    System.err.println("ODB: disconnecting");
+                    ODB db = Constants.getDbConnection();
+                    if(db != null){
+                        db.close();
+                        String msg = "ODB: disconnecting";
+                        System.out.println(msg);
+                        NaviLogger.log.log(Level.FINE,msg);
+                    }
+                    
                 } catch (Exception exc) {
                     JOptionPane.showMessageDialog(NaviRootWindow.this, exc.getMessage());
                 }
