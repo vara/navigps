@@ -31,6 +31,11 @@ import app.database.odb.core.Category;
 import app.database.odb.core.Search;
 import app.database.odb.core.ServiceCore;
 import app.database.odb.utils.Constants;
+import app.navigps.gui.detailspanel.AlphaJPanel;
+import app.navigps.gui.detailspanel.LoacationManager.LeftLocation;
+import app.navigps.gui.detailspanel.RoundWindow;
+import java.awt.event.ComponentAdapter;
+import java.awt.event.ComponentEvent;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
 import org.neodatis.odb.ObjectRepresentation;
@@ -42,16 +47,22 @@ import org.neodatis.odb.core.trigger.UpdateTrigger;
  *
  * @author vara
  */
-public class SearchServicesPanel extends javax.swing.JPanel {
+public class SearchServicesPanel extends javax.swing.JPanel{
 
     private JScrollPane jScrollPane1;
     private JCheckBoxTree jTree1;
     
+    //for test !!!
+    private RoundWindow rWindow;
+    private ServicesInfoDisplayedList servlistPanel = new ServicesInfoDisplayedList();
 
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {
         initComponents();
         initValue();
+
+        
+
         Vector<String> val = new Vector<String>();
 
         jTree1 = new JCheckBoxTree();
@@ -346,6 +357,10 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
 
+        if(rWindow == null){
+            createRoundWindowForServicesList();            
+        }
+        
         final Vector<String> services = getSelectedServices();
         if (!services.isEmpty()) {
             final double radius = ((Number) gRadius.getValue()).doubleValue();
@@ -366,10 +381,24 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
                     if(jRadioButton1.isSelected()){
                         dm.removeLastServices();
+                        servlistPanel.getListModel().removeAll();
                     }
 
                     Vector retVal = dm.createObject(subResult);
                     dm.putObject(retVal);
+
+                    servlistPanel.getListModel().addServices(subResult);
+                    
+                    if(!retVal.isEmpty()){
+                        if(!rWindow.isEnabled()){
+                            rWindow.updateMyUI();
+                            rWindow.setEnabled(true);
+                        }
+                    }else{
+                        if(rWindow.isEnabled() && servlistPanel.getListModel().isEmpty()){
+                            rWindow.setEnabled(false);
+                        }
+                    }
 
                     String summaryMsg = "found "+subResult.size() + " services";
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + summaryMsg);
@@ -495,6 +524,26 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         return val;
     }
 
+    private void createRoundWindowForServicesList(){
+        rWindow = new RoundWindow();
+        AlphaJPanel container = NaviRootWindow.getSVGCanvasLayers().getModalContainer();
+        rWindow.setLocationManager(new LeftLocation(rWindow));
+        rWindow.setDynamicRevalidate(true);
+        rWindow.setTitle("Services List");
+        rWindow.setDecorateWindow(true);
+        rWindow.setUpperThresholdAlpha(0.6f);
+        rWindow.setAlpha(0.0f);
+        rWindow.getContentPane().setUpperThresholdAlpha(0.75f);
+        container.add(rWindow);
+        rWindow.getContentPane().add(servlistPanel);
+        container.addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                rWindow.updateMyUI();
+            }
+        });
+    }
+
     /**
      *
      * @param value
@@ -506,7 +555,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         jTree1.setModel(dtm);
     }
 
-    class ReloadJTree extends AbstractAction{
+    private class ReloadJTree extends AbstractAction{
 
         public ReloadJTree(String name) {
             super(name);
@@ -518,7 +567,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         }
     }
 
-    class MouseEventReloadJTree extends MouseInputAdapter{
+    private class MouseEventReloadJTree extends MouseInputAdapter{
         @Override
         public void mousePressed(MouseEvent e) {
             if(e.getButton() == MouseEvent.BUTTON3){
@@ -531,7 +580,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
 
     }
 
-    public class MyInsertTrigger extends InsertTrigger {
+    private class MyInsertTrigger extends InsertTrigger {
 
         @Override
         public boolean beforeInsert(Object object) {
@@ -547,7 +596,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         }
     }
 
-    public class MyUpdateTriger extends UpdateTrigger{
+    private class MyUpdateTriger extends UpdateTrigger{
 
         @Override
         public boolean beforeUpdate(ObjectRepresentation oldObjectRepresentation, Object newObject, OID oid) {            
@@ -566,7 +615,7 @@ public class SearchServicesPanel extends javax.swing.JPanel {
         }
     }
 
-    public class MyDeleteTriger extends DeleteTrigger{
+    private class MyDeleteTriger extends DeleteTrigger{
 
         @Override
         public boolean beforeDelete(Object object, OID oid) {

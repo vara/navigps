@@ -386,7 +386,7 @@ public class RunApp extends javax.swing.JFrame {
 
         @Override
         public void mouseClicked(MouseEvent e) {
-            System.out.println("MouseClicked");
+            //System.out.println("MouseClicked");
             int row = rowAtPoint(e.getPoint());
             int col = columnAtPoint(e.getPoint());
 

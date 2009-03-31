@@ -5,13 +5,11 @@ import app.navigps.gui.repaintmanager.AlphaRepaintManager;
 import app.navigps.gui.borders.AlphaBorder;
 import app.navigps.gui.borders.OvalBorder;
 import app.navigps.gui.borders.RoundBorder;
-import app.navigps.gui.detailspanel.LoacationManager.LeftLocation;
 import app.navigps.gui.detailspanel.LoacationManager.RightLocation;
 import app.navigps.utils.Utils;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
-import java.awt.Cursor;
 import java.awt.Dimension;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
@@ -23,7 +21,6 @@ import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
-import java.awt.event.MouseEvent;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.Icon;
 import javax.swing.RepaintManager;
@@ -61,6 +58,12 @@ public class RoundWindow extends RoundJPanel
 
     private LocationManager location;
 
+    /*
+     * Default options are:
+     *   Location: RightLocation
+     *   Border: OvalBorder with instets (3,3,3,3)
+     */
+
     public RoundWindow(){
         super(20,20);
         setSize(defaultSize);
@@ -87,8 +90,11 @@ public class RoundWindow extends RoundJPanel
         getContentPane().setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
                 mainBorder.getRecH(), mainBorder.getBorderColor()));
 
+        getContentPane().setAlpha(0.0f);
+        getDecoratePanel().setAlpha(0.0f);
+
         super.setEnabled(false);
-        setLocationManager(new LeftLocation(this));
+        setLocationManager(new RightLocation(this));
     }
 
     /**
