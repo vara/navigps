@@ -2,7 +2,6 @@ package app.navigps.gui.detailspanel;
 
 import app.navigps.gui.detailspanel.LoacationManager.LocationManager;
 import app.navigps.gui.repaintmanager.AlphaRepaintManager;
-import app.navigps.gui.borders.AlphaBorder;
 import app.navigps.gui.borders.OvalBorder;
 import app.navigps.gui.borders.RoundBorder;
 import app.navigps.gui.detailspanel.LoacationManager.RightLocation;
@@ -16,16 +15,18 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.LayoutManager;
-import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
+import java.awt.event.ActionListener;
 import java.awt.event.FocusEvent;
 import java.awt.event.FocusListener;
+import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
+import java.util.Vector;
 import javax.swing.Icon;
 import javax.swing.RepaintManager;
 import javax.swing.SwingUtilities;
-import javax.swing.border.Border;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.Animator.Direction;
 import org.jdesktop.animation.timing.Animator.RepeatBehavior;
@@ -33,11 +34,16 @@ import org.jdesktop.animation.timing.TimingTarget;
 
 /**
  * Created on 2008-12-08, 21:25:25
- * @author vara
+ * @author Gzregorz (vara) Warywoda
  */
 public class RoundWindow extends RoundJPanel
                          implements FocusListener{
-    
+
+    public static final int CLOSE_WINDOW_ACTION = 0;
+    public static final int OPEN_WINDOW_ACTION = 1;
+
+    private static int currentAction = OPEN_WINDOW_ACTION;
+
     private boolean dynamicRevalidate = false;
 
     private Dimension defaultSize = new Dimension(330,400);
@@ -58,6 +64,8 @@ public class RoundWindow extends RoundJPanel
 
     private LocationManager location;
 
+    private WindowDisplayBehavior winBehavior = new WindowDisplayBehavior();
+
     /*
      * Default options are:
      *   Location: RightLocation
@@ -76,32 +84,59 @@ public class RoundWindow extends RoundJPanel
         super.setLayout(new BorderLayout(0,getDecorateAndContentGap()));
         
         animator = new Animator(getAnimationDuration(), 1,
-                RepeatBehavior.REVERSE, new WindowDisplayBehavior());
+                RepeatBehavior.REVERSE,getWinBehavior());
 
-        //((DecoratePanel)decorate).addActionListenerToCloseButton(new CloseAction());
-
-        installRepaintManager();
+        //((DecoratePanel)decorate).addActionListenerToCloseButton(new CloseAction());       
 
         //contentPane.setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
           //      mainBorder.getRecH(), mainBorder.getBorderColor()));
 
         add(decorate,BorderLayout.NORTH);
         setRootPane(createRootPane());
-        getContentPane().setBorder(new OvalBorder(3,5,3,5, mainBorder.getRecW(),
-                mainBorder.getRecH(), mainBorder.getBorderColor()));
 
         getContentPane().setAlpha(0.0f);
         getDecoratePanel().setAlpha(0.0f);
 
         super.setEnabled(false);
         setLocationManager(new RightLocation(this));
+
+        winBehavior.addStartAction(new ActionListener() {
+            @Override
+            public void actionPerformed(ActionEvent e) {
+                if(e.getID() == OPEN_WINDOW_ACTION){
+                    installRepaintManager();
+                }
+            }
+        });
     }
 
     /**
-     *
+     * Resize container
      */
     public void pack(){
-        validate();
+        
+        //getContentPane().revalidate();
+        ContentPaneForRoundWindow container = (ContentPaneForRoundWindow)getContentPane();
+        //System.out.println("coount "+container.getComponentCount());
+        Dimension contentPaneSize = container.getSize();
+        Insets contentInsets = container.getInsets();
+
+        Insets rootPaneInsets = getRoundWindowRootPane().getInsets();
+        Insets winInsets = getInsets();
+        int width = contentPaneSize.width + contentInsets.left+ contentInsets.right+
+                    rootPaneInsets.left + rootPaneInsets.right +
+                    winInsets.left + winInsets.right;
+        int height  = contentPaneSize.height + contentInsets.top+ contentInsets.bottom+
+                      rootPaneInsets.top + rootPaneInsets.bottom +
+                      winInsets.top + winInsets.bottom;
+
+        //setSize(width, height);
+        revalidate();
+
+        //System.err.println("Content size: "+contentPaneSize+
+        //        " Insets rootPane: "+rootPaneInsets+
+        //        " Insets Window "+winInsets+" window size "+getSize());
+        updateMyUI();
     }
 
     /**
@@ -109,17 +144,17 @@ public class RoundWindow extends RoundJPanel
      * @return
      */
     public boolean isEmpty(){
-        return !(getRoundWindowRootPane().getContentPane().getComponents().length>0);
+        return !(getRoundWindowRootPane().getContentPane().getComponentCount()>0);
     }
     
     /**
      *
-     * @return
+     * @return Rectangle represent window shape
      */
     public RoundRectangle2D getWindowShape(){
-        Point.Double corners = getRoundCorner();
+        Point2D corners = getRoundCorner();
         return new RoundRectangle2D.Double(
-                0,0, getWidth(), getHeight(),corners.x,corners.y);
+                0,0, getWidth(), getHeight(),corners.getX(),corners.getY());
     }
 
     protected RoundWindowRootPane createRootPane(){
@@ -145,6 +180,7 @@ public class RoundWindow extends RoundJPanel
     public void clearWindow(){
         setIcon(null);
         setTitle("");
+        getDecoratePanel().getContent().setIcon(null);
         getContentPane().removeAll();
     }
 
@@ -193,9 +229,11 @@ public class RoundWindow extends RoundJPanel
         if(val){
            animator.setStartFraction(frac);
            animator.setStartDirection(Direction.FORWARD);
+           currentAction = OPEN_WINDOW_ACTION;
         }else{
            animator.setStartFraction(Math.max(getContentPane().getAlpha(),getAlpha()));
            animator.setStartDirection(Direction.BACKWARD);
+           currentAction = CLOSE_WINDOW_ACTION;
         }
         animator.start();
     }
@@ -236,8 +274,12 @@ public class RoundWindow extends RoundJPanel
     }
 
     private void installRepaintManager() {
-        AlphaRepaintManager manager = new AlphaRepaintManager();
-        RepaintManager.setCurrentManager(manager);
+        RepaintManager rpm = RepaintManager.currentManager(this);
+        if(!(rpm instanceof AlphaRepaintManager)){
+            System.err.println("Install "+AlphaRepaintManager.class.getName());
+            AlphaRepaintManager manager = new AlphaRepaintManager();
+            RepaintManager.setCurrentManager(manager);
+        }
     }
     
 
@@ -322,11 +364,8 @@ public class RoundWindow extends RoundJPanel
      * @return
      */
     public boolean setAlphaBorder(float alphaBorder){
-        Border bord = getBorder();
-        if(bord instanceof AlphaBorder){
-            return ((AlphaBorder)bord).setAlpha(alphaBorder);
-        }
-        return false;
+        RoundBorder border = getRoundBorder();
+        return border.setAlpha(alphaBorder);
     }
 
     /**
@@ -459,9 +498,48 @@ public class RoundWindow extends RoundJPanel
         addMouseMotionListener(location);
     }
 
-    private class WindowDisplayBehavior implements TimingTarget{
+    /**
+     * @return the winBehavior
+     */
+    public WindowDisplayBehavior getWinBehavior() {
+        return winBehavior;
+    }
+
+    /**
+     * @param winBehavior the winBehavior to set
+     */
+    public void setWinBehavior(WindowDisplayBehavior winBehavior) {
+        this.winBehavior = winBehavior;
+    }
+
+    public class WindowDisplayBehavior implements TimingTarget{
+
+        private Vector <ActionListener> startAction = new Vector<ActionListener>();
+        private Vector <ActionListener> endAction = new Vector<ActionListener>();
+
+        public void addStartAction(ActionListener al){
+            if(!startAction.contains(al)){
+                startAction.add(al);
+            }
+        }
+
+        public void removeStartAction(ActionListener al){
+            startAction.remove(al);
+        }
+
+        public void addEndAction(ActionListener al){
+            if(!endAction.contains(al)){
+                endAction.add(al);
+            }
+        }
+
+        public void removeEndAction(ActionListener al){
+            endAction.remove(al);
+        }
+
         @Override
         public void timingEvent(float arg0) {
+            //System.out.println(""+arg0);
             if(arg0>0 && arg0<Math.max(getContentPane().getUpperThresholdAlpha(),
                                        getUpperThresholdAlpha())){
                 Color outerColor = ((OvalBorder)getRoundBorder()).getBorderColor();
@@ -480,11 +558,33 @@ public class RoundWindow extends RoundJPanel
         public void begin() {
             if(isEnabled())
                 setVisible(isEnabled());
+
+            final ActionEvent ae = new ActionEvent(this, currentAction, "start");
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (ActionListener al : startAction) {
+                        al.actionPerformed(ae);
+                    }
+                }
+            }).start();
         }
         @Override
         public void end() {
-            if(!isEnabled())
-                setVisible(isEnabled());
+            if(!isEnabled()){
+                setVisible(isEnabled());                
+            }
+
+            final ActionEvent ae = new ActionEvent(this, currentAction, "end");            
+            new Thread(new Runnable() {
+                @Override
+                public void run() {
+                    for (ActionListener al : endAction) {
+                        al.actionPerformed(ae);
+                    }
+                }
+            }).start();
+
         }
         @Override
         public void repeat() {
