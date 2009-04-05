@@ -12,22 +12,24 @@ import java.util.logging.SimpleFormatter;
  */
 public class NaviLogger{
 
+    public static final String LOGGER_NAME = "app.navigps";
+
     static{
         new NaviLogger();
     }
-    public static Logger log;
+    public static Logger logger;
     
     public NaviLogger(){	
         try {
+
             String pathToFile = System.getProperty("user.dir");
-            System.out.println(""+pathToFile);
+            //System.out.println(""+pathToFile);
             FileHandler fh = new FileHandler(pathToFile+"/navigps.log", false);
             SimpleFormatter formatter = new SimpleFormatter();
             fh.setFormatter(formatter);
-            log = Logger.getLogger("app.navigps");            
-            log.addHandler(fh);
-            log.setLevel(Level.ALL);
-
+            logger = Logger.getLogger(LOGGER_NAME);
+            logger.addHandler(fh);
+            logger.setLevel(Level.ALL);
 
         } catch (IOException ex) {
             ex.printStackTrace();
