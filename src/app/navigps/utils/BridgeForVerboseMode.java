@@ -18,6 +18,13 @@ import java.util.LinkedList;
  */
 public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
 
+    /**
+     * @return the instance
+     */
+    public static BridgeForVerboseMode getInstance() {
+        return instance;
+    }
+
     private LinkedList<OutputVerboseStream> updateComponents =
 			new LinkedList<OutputVerboseStream>();
     
@@ -29,10 +36,11 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
     public static final Console console =
                         new Console();
 
+    private static BridgeForVerboseMode instance = new BridgeForVerboseMode();
     /**
      *
      */
-    public BridgeForVerboseMode(){
+    public BridgeForVerboseMode(){       
         if(MainConfiguration.getMode())
             addComponentsWithOutputStream(console);
     }
