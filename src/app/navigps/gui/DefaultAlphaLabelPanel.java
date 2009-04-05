@@ -114,7 +114,6 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
                 else getContentText().setText(txt);
 
                 if(isEnabled() && isAnimatorEnabled()){
-                    System.out.println(txt+" start timer");
                     startTimers();
                 }
             }

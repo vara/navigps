@@ -7,8 +7,10 @@ import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Insets;
 import java.awt.RenderingHints;
 import java.awt.event.ActionListener;
+import javax.swing.Icon;
 import javax.swing.JButton;
 import javax.swing.JLabel;
 
@@ -28,6 +30,8 @@ public class DecoratePanel extends AbstractDecoratePanel{
         setOpaque(false);
         setPreferredSize(new Dimension(10,30));
         init();
+        setRoundCorner(5,5);
+        setInsets(new Insets(0,0,0,0));
     }
 
     /**
@@ -60,8 +64,7 @@ public class DecoratePanel extends AbstractDecoratePanel{
         super.paintComponent(g);
         Graphics2D g2 = (Graphics2D)g;
         g2.setRenderingHint(RenderingHints.KEY_ANTIALIASING,RenderingHints.VALUE_ANTIALIAS_ON);        
-    }   
-
+    }
     
     /**
      *
@@ -97,5 +100,10 @@ public class DecoratePanel extends AbstractDecoratePanel{
     @Override
     public void setContent(JLabel content) {
         this.content = content;
+    }
+
+    @Override
+    public void setIcon(Icon ico) {
+        getContent().setIcon(ico);
     }
 }

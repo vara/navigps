@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.detailspanel;
 
 import app.navigps.gui.borders.OvalBorder;
@@ -16,12 +11,12 @@ import java.awt.geom.RoundRectangle2D;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public class ContentPaneForRoundWindow extends RoundJPanel implements AlphaInterface{
 
 
-    private Color [] colorBorderEfect = {new Color(200,200,255,200),
+    private final Color [] colorBorderEfect = {new Color(200,200,255,200),
                                          new Color(255,255,255,100)};
 
     /**
