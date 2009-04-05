@@ -15,9 +15,11 @@ import java.awt.Container;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.BorderLayout;
+import java.awt.event.ActionListener;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -46,21 +48,25 @@ public class SearchServices extends SynchronizedSVGLayer{
     private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
     private SSMouseEvents me = new SSMouseEvents();   
 
-    PropertyChangeListener removeContent = new PropertyChangeListener(){
+    private ActionListener closeAction = new ActionListener() {
+                @Override
+                public void actionPerformed(ActionEvent e) {
+                    if(RoundWindow.CLOSE_WINDOW_ACTION == e.getID()){
+                        //System.err.println("id: "+e.getID());
+                        //setEnabledSearchServices(false);
+                        uninstall();
+                        enabled = false;
+                    }
+                }
+            };
 
+    private PropertyChangeListener removeContent = new PropertyChangeListener(){
         @Override
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(ALPHA_CHANGE)) {
-                float newAlpha = (Float) evt.getNewValue();
-                float oldAlpha = (Float) evt.getOldValue();
                 //System.out.println("new Alpa "+newAlpha);
-                if (setAlpha(newAlpha)) {
+                if (setAlpha((Float) evt.getNewValue())) {
                     repaint();
-                }
-                if (newAlpha <= .015f && oldAlpha>newAlpha) {
-                    setEnabledSearchServices(false);
-                    uninstall();
-                    enabled = false;
                 }
             }
         }
@@ -73,10 +79,19 @@ public class SearchServices extends SynchronizedSVGLayer{
     private void install() {
 
         //svgCanvas.add(synch,BorderLayout.CENTER);
+        System.out.println("Mouse listeners "+svgCanvas.getMouseListeners().length);
+
+        svgCanvas.removeMouseMotionListener(me);
+        svgCanvas.removeMouseListener(me);
+
+
         svgCanvas.addMouseMotionListener(me);
         svgCanvas.addMouseListener(me);
+
+        System.out.println("Mouse listeners after "+svgCanvas.getMouseListeners().length);
         if(roundWindowInstace != null){
             roundWindowInstace.addPropertyChangeListener(removeContent);
+            roundWindowInstace.getWinBehavior().addEndAction(closeAction);
             Container cont = roundWindowInstace.getContentPane();
             cont.setLayout(new BorderLayout());
             cont.add(guiForSearchServ,BorderLayout.CENTER);
@@ -87,12 +102,14 @@ public class SearchServices extends SynchronizedSVGLayer{
         System.out.println(getClass().getCanonicalName()+" [install components]");
     }
 
-    public void uninstall(){
+    public void uninstall(){      
 
-        removeMouseMotionListener(me);
+        svgCanvas.removeMouseMotionListener(me);
         svgCanvas.removeMouseListener(me);
+        
         roundWindowInstace.getContentPane().remove(guiForSearchServ);
         roundWindowInstace.removePropertyChangeListener(removeContent);
+        //roundWindowInstace.getWinBehavior().removeEndAction(closeAction);
         Container parent = getParent();
         if(parent!=null){
             parent.remove(this);
@@ -115,9 +132,7 @@ public class SearchServices extends SynchronizedSVGLayer{
             roundWindowInstace.setVisible(false);                        
         } else {
             System.out.println(getClass().getCanonicalName() + " [content roundWin no changed]");
-        }
-        roundWindowInstace.pack();
-        roundWindowInstace.setEnabled(true);
+        }        
     }
 
     public void setEnabledSearchServices(boolean val){        
@@ -129,6 +144,8 @@ public class SearchServices extends SynchronizedSVGLayer{
                 if (cont != null) {
                     installRoundWindow((RoundWindow) cont);
                     install();
+                    roundWindowInstace.pack();
+                    roundWindowInstace.setEnabled(true);
                 }
 
             } else {
