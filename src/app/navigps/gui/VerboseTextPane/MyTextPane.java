@@ -194,7 +194,7 @@ public class MyTextPane extends JTextPane{
                 }
             }
         } catch (BadLocationException ex) {
-            NaviLogger.log.logp(Level.WARNING,getClass().getName(),
+            NaviLogger.logger.logp(Level.WARNING,getClass().getName(),
                     "addEndTextnl(String str)","str \""+str+"\"",ex);
         }
     }
@@ -399,18 +399,18 @@ public class MyTextPane extends JTextPane{
             int retour = chooser.showSaveDialog(null);
             if (retour == JFileChooser.APPROVE_OPTION) {
                     File file = chooser.getSelectedFile();
-                    NaviLogger.log.log(Level.FINE, "Prepare to "+SAVING+file);
+                    NaviLogger.logger.log(Level.FINE, "Prepare to "+SAVING+file);
                     if(!file.exists()){
                         try {
                             file.createNewFile();                            
                             if (!file.canWrite()) {
                                 msg = CAN_NOT_WRITE;
-                                NaviLogger.log.log(Level.WARNING, msg);
+                                NaviLogger.logger.log(Level.WARNING, msg);
                                 return;
                             }                          
 
                         } catch (IOException ex) {
-                            NaviLogger.log.log(Level.WARNING, "Create new file exception",ex);
+                            NaviLogger.logger.log(Level.WARNING, "Create new file exception",ex);
                             return;
                         }
                     }else{
@@ -421,7 +421,7 @@ public class MyTextPane extends JTextPane{
                                          JOptionPane.INFORMATION_MESSAGE,
                                          NaviRootWindow.LOGO_APPICATION_IMAGE);
                         if(option!=0){
-                            NaviLogger.log.log(Level.FINE, CANCEL);
+                            NaviLogger.logger.log(Level.FINE, CANCEL);
                             return;
                         }
                     }
@@ -445,17 +445,17 @@ public class MyTextPane extends JTextPane{
                         bw.flush();                   
 
                     } catch (IOException ex) {
-                        NaviLogger.log.log(Level.WARNING, "Write to file exception", ex);
+                        NaviLogger.logger.log(Level.WARNING, "Write to file exception", ex);
 
                     } finally {
                         try {
                               fw.close();
                               String msg = SAVING+ file.getName();
-                              NaviLogger.log.log(Level.FINE, msg);
+                              NaviLogger.logger.log(Level.FINE, msg);
                               System.err.println(""+msg);
                               NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
                         } catch (IOException ex) {
-                            NaviLogger.log.log(Level.WARNING, "Close file exception", ex);
+                            NaviLogger.logger.log(Level.WARNING, "Close file exception", ex);
                         }
                     }
                 }

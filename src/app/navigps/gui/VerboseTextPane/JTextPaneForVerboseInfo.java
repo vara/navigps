@@ -19,8 +19,7 @@ import javax.swing.JTextPane;
 
 public class JTextPaneForVerboseInfo extends JScrollPane{
 
-    private MyTextPane textPane = new MyTextPane();
-    
+    private MyTextPane textPane = new MyTextPane();   
     
     /**
      *
@@ -31,6 +30,7 @@ public class JTextPaneForVerboseInfo extends JScrollPane{
         setViewportView(textPane);
         getVerticalScrollBar().addAdjustmentListener(new AdjustmentListener() {
 
+            @Override
             public void adjustmentValueChanged(AdjustmentEvent e) {
                 if (!e.getValueIsAdjusting()) {
                     return;
