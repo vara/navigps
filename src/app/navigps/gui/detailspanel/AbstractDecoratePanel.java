@@ -5,13 +5,14 @@
 
 package app.navigps.gui.detailspanel;
 
+import javax.swing.Icon;
 import javax.swing.JLabel;
 
 /**
  *
  * @author wara
  */
-public abstract class AbstractDecoratePanel extends AlphaJPanel{
+public abstract class AbstractDecoratePanel extends RoundJPanel{
 
     /**
      *
@@ -33,4 +34,6 @@ public abstract class AbstractDecoratePanel extends AlphaJPanel{
      * @param lab
      */
     abstract public void setContent(JLabel lab);
+
+    abstract public void setIcon(Icon ico);
 }

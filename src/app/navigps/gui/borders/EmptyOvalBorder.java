@@ -27,6 +27,15 @@ public class EmptyOvalBorder extends OvalBorder{
     public EmptyOvalBorder(double recW,double recH){
         super(recH, recH);
     }
+
+    public EmptyOvalBorder(int top, int left, int bottom, int right){
+        super(top, left, bottom, right);
+    }
+
+    public EmptyOvalBorder(int top, int left, int bottom, int right,double recW,double recH){
+        super(top, left, bottom, right, recW, recH);
+    }
+
     /**
      *
      * @param c
