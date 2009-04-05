@@ -8,6 +8,7 @@ import app.ArgumentsStartUp.NoValueParameter;
 import app.ArgumentsStartUp.SizeValueParameter;
 import app.ArgumentsStartUp.core.AbstractParameter;
 import app.ArgumentsStartUp.core.ParametersContainer;
+import app.navigps.utils.BridgeForVerboseMode;
 import app.navigps.utils.NaviLogger;
 import java.awt.Dimension;
 import java.io.File;
@@ -18,49 +19,65 @@ import javax.swing.SwingUtilities;
 
 /**
  *
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public class NaviGPSCore {    
-    
-    public NaviGPSCore(){        
+
+    private ArrayList<String> parameters;
+
+    public NaviGPSCore(ArrayList<String> arg){
+
+        this.parameters = arg;
+        //Intercept all output streams
+        System.setOut(BridgeForVerboseMode.getInstance().getOutputStream());
+        System.setErr(BridgeForVerboseMode.getInstance().getErrOutputStream());
 
         if(ParametersContainer.isEmpty()){
             ParametersContainer.putParameter(createParametrs());
         }        
-        NaviLogger.log.log(Level.FINE,"Start main application");
+        NaviLogger.logger.log(Level.FINE,"Start main application");
+
     }
     
     /**
      *
      * @param args
      */
-    public static void main(String[] args){
+    public static void main(String[] args){     
+        
         //args = new String[]{"-Vg","-sp","-V","-fuy","./resources/maps/MapWorld.svg","-ws","800,600"};
         //System.setProperty("sun.java2d.noddraw", "true");
         //System.setProperty("swing.aatext", "true");
-        NaviGPSCore app = new NaviGPSCore();
 
         ArrayList<String> arguments = new ArrayList<String>();
         for (int i=0; i<args.length; i++){
             arguments.add(args[i]);
         }
+        NaviGPSCore app = new NaviGPSCore(arguments);
         try {
-            app.parseParameters(arguments);
+            app.executeParameters();
         } catch (Exception ex) {
-            NaviLogger.log.log(Level.WARNING,"Parsering argument start up",ex);
             return;
         }
         initGui(app);
     }
 
-    public void parseParameters(ArrayList<String> args) throws Exception{
+    public void executeParameters() throws Exception{
+        try {
+            parseParameters(parameters);
+        } catch (Exception ex) {
+            NaviLogger.logger.log(Level.WARNING,"Parsering argument start up",ex);
+            throw ex;
+        }
+    }
+
+    private void parseParameters(ArrayList<String> args) throws Exception{
         int iArgs = args.size();
         for (int i = 0; i < iArgs; i++) {
             String string = args.get(i);
             //System.err.println("** '"+string+"'");
             AbstractParameter optionHandler = ParametersContainer.getParameter(string);
-            if (optionHandler == null){
-                // Assume v is a source.
+            if (optionHandler == null){                
                 throw new Exception("Not recognizied parameter "+string+".\nTry run application with option '-h'");
             } else {
                 int nOptionArgs = optionHandler.getOptionValuesLength();
@@ -95,11 +112,18 @@ public class NaviGPSCore {
      * @param m
      */
     protected static void initGui(final NaviGPSCore m){
+        
         SwingUtilities.invokeLater(new Runnable() {
             @Override
-            public void run() {
+            public void run() {                
                 NaviRootWindow nw = new NaviRootWindow(m);
-                nw.setDisplayMode();
+                nw.setSize(GUIConfiguration.getWindowSize());
+                nw.initComponents();
+                if (MainConfiguration.getPathToChartFile() != null) {
+                    nw.openSVGDocument(MainConfiguration.getPathToChartFile());
+                }
+                nw.setTitle(Version.getVersion());
+                nw.setDisplayMode();                    
             }
         });
     }
@@ -158,6 +182,8 @@ public class NaviGPSCore {
             @Override
             public void handleOption() {
                 MainConfiguration.setModeVerboseConsole(true);
+                BridgeForVerboseMode.getInstance().
+                        addComponentsWithOutputStream(BridgeForVerboseMode.console);
                 //System.out.println("parameter -V");
             }
 

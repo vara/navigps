@@ -15,33 +15,29 @@ import app.ArgumentsStartUp.FileValueParameter;
 import app.ArgumentsStartUp.NoValueParameter;
 import app.ArgumentsStartUp.SizeValueParameter;
 import app.navigps.NaviGPSCore;
-import app.navigps.gui.detailspanel.AlphaJPanel;
 import app.ArgumentsStartUp.core.AbstractParameter;
+import app.navigps.SplashScreen.WindowSplashScreen;
 import app.navigps.Version;
 import app.navigps.gui.DefaultAlphaLabelPanel;
-import app.navigps.utils.GraphicsUtilities;
 import app.navigps.utils.MyFileFilter;
 import app.navigps.utils.NaviLogger;
 import app.starter.gui.swing.ObjectParameterForJTable;
 import app.starter.gui.swing.ParameterTableModel;
 import app.starter.gui.swing.TableRendererForFileParameter;
 import app.starter.gui.swing.TableRendererForNoParameter;
+import app.starter.gui.swing.utils.ImageAlphaJPanel;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.event.MouseEvent;
 import java.awt.event.MouseListener;
-import java.awt.image.BufferedImage;
 import java.io.File;
-import java.io.IOException;
-import java.net.URL;
 import java.util.ArrayList;
 import java.util.Vector;
 import java.util.logging.Level;
 import javax.swing.JFileChooser;
 import javax.swing.JTable;
 import javax.swing.ListSelectionModel;
+import javax.swing.SwingUtilities;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 import javax.swing.plaf.metal.MetalLabelUI;
@@ -65,7 +61,7 @@ public class RunApp extends javax.swing.JFrame {
         initComponents();
 
         PanelForImage.setLayout(new BorderLayout(2, 2));
-        PanelForImage.add(new ImagePanel("icons/logo/NaviGPS3.png"),BorderLayout.CENTER);
+        PanelForImage.add(new ImageAlphaJPanel("icons/logo/LogoNaviGPSBig.png"),BorderLayout.CENTER);
 
         Vector<AbstractParameter> vec = NaviGPSCore.getAllparameters();
         for (AbstractParameter ap : vec) {            
@@ -207,7 +203,7 @@ public class RunApp extends javax.swing.JFrame {
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
         // TODO add your handling code here:
-        ArrayList <String> selectedParams = new ArrayList<String>();
+        final ArrayList <String> selectedParams = new ArrayList<String>();
         int row = tableParam.getModel().getRowCount();
         for (int i = 0; i < row; i++) {
             ObjectParameterForJTable obj = 
@@ -229,18 +225,16 @@ public class RunApp extends javax.swing.JFrame {
             }           
         }
         {
-            NaviGPSCore ng=null;
-            ng = new NaviGPSCore();
-            try {
+            SwingUtilities.invokeLater(new Runnable() {
 
-                ng.parseParameters(selectedParams);
-            } catch (Exception ex) {
-                alphaDescPanel.setText("<html>"+ex.getMessage());
-                return;
-            }
-            ng.reload();
+                @Override
+                public void run() {
+                    WindowSplashScreen wss = new WindowSplashScreen(selectedParams);
+                    wss.setVisible(true);
+                    wss.startTest();
+                }
+            });
 
-            
             setVisible(false);
             getContentPane().removeAll();
             removeNotify();
@@ -252,7 +246,7 @@ public class RunApp extends javax.swing.JFrame {
     * @param args the command line arguments
     */
     public static void main(String args[]) {
-        NaviLogger.log.log(Level.FINEST, "Run starter gui");
+        NaviLogger.logger.log(Level.FINEST, "Run starter gui");
         java.awt.EventQueue.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -261,19 +255,7 @@ public class RunApp extends javax.swing.JFrame {
         });
     }
 
-    public static BufferedImage loadimage(String name){
-
-        URL href = RunApp.class.getResource("resources/graphics/"+name);
-        BufferedImage tmpBi = null;
-        try {
-            tmpBi = GraphicsUtilities.loadCompatibleImage(href);
-
-        } catch (IOException ex) {
-            System.err.println(""+ex);
-        }
-
-        return tmpBi;
-    }
+    
 
     // Variables declaration - do not modify//GEN-BEGIN:variables
     private javax.swing.JPanel PanelDescription;
@@ -309,32 +291,7 @@ public class RunApp extends javax.swing.JFrame {
             }
         }
         return null;
-    }
-
-    class ImagePanel extends AlphaJPanel{
-
-        private BufferedImage bi = null;
-
-        private String imgName;
-
-        public ImagePanel(String imgName){
-            this.imgName = imgName;
-        }
-
-        @Override
-        protected void paintComponent(Graphics g) {
-            Graphics2D g2= (Graphics2D)g;
-            super.paintComponent(g2);
-
-            int width = getWidth();
-            int height = getHeight();
-            if(bi==null || bi.getWidth() != width || bi.getHeight()!=height){
-               BufferedImage tmpB = loadimage(imgName);
-               bi = GraphicsUtilities.createThumbnail(tmpB, width, height);
-            }
-            g2.drawImage(bi, 0, 0, rootPane);
-        }
-    }
+    }   
 
     class MyJTable extends JTable implements MouseListener{
 

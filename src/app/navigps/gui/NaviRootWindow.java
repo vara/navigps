@@ -91,6 +91,8 @@ import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
 import app.database.odb.gui.DatabaseManager;
 import app.database.odb.utils.ODBConnection;
+import app.navigps.WindowInitialEvent;
+import app.navigps.WindowInitialListener;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import org.apache.batik.bridge.ViewBox;
@@ -112,19 +114,23 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     private JPanel panelWithToolBars;
     private StatusPanel statusPanel;
     private StatusInfoPanel statusInfoPanel = new StatusInfoPanel();
-    private Action openSVGFileAction,  zoomOutAction,  zoomInAction,  zoomAction,  fitToPanelAction,  searchServicesAction;
-    private static SVGCanvasLayers canvaslayers;
+    private Action openSVGFileAction,  zoomOutAction,  zoomInAction,  zoomAction,  fitToPanelAction,  searchServicesAction;    
     private JCheckBoxMenuItem[] cbmOptionsForToolBars;
-    private JToolBar toolBarFile,  toolBarZoom,  toolBarSerch,  toolBarMemMonitor;
-    private static SVGBridgeListeners svgListeners = new SVGBridgeListeners();
-    private OutputVerboseStream verboseStream = new BridgeForVerboseMode();
+    private JToolBar toolBarFile,  toolBarZoom,  toolBarSerch,  toolBarMemMonitor;        
     private RootWindow rootWindow;
     private ViewMap viewMap = new ViewMap();//key -int i object -View
     private DockingWindowsTheme currentTheme = new ShapedGradientDockingTheme();
     private RootWindowProperties properties = new RootWindowProperties();
     private Vector<View> views = new Vector<View>();
+
+    private static SVGCanvasLayers canvaslayers;
+    private static SVGBridgeListeners svgListeners = new SVGBridgeListeners();
+
+    private static LinkedList <WindowInitialListener> windowInitialListeners =
+                                            new LinkedList<WindowInitialListener>();
+
     private static int ICON_SIZE = 8;
-    public static final ImageIcon LOGO_APPICATION_IMAGE = NaviRootWindow.createNavigationIcon("logo/NaviGPS4");
+    public static final ImageIcon LOGO_APPICATION_IMAGE = NaviRootWindow.createNavigationIcon("logo/LogoNaviGPS64x64");
 
     //private MySplitPane paneForProperties = new MySplitPane();    
     /**
@@ -134,37 +140,46 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     public NaviRootWindow(NaviGPSCore c) {
         super(GUIConfiguration.getGraphicDevice().getDefaultConfiguration());
 
-        System.setOut(getVerboseStream().getOutputStream());
-        System.setErr(getVerboseStream().getErrOutputStream());
-
-        addWindowFocusListener(this);
-
-        NaviLogger.log.log(Level.FINE, "Constructor " + getClass().toString());
-        core = c;
-
-        setSize(GUIConfiguration.getWindowSize());
-        setLayout(new BorderLayout());
-        initComponents();
-
-        if (MainConfiguration.getPathToChartFile() != null) {
-            openSVGDocument(MainConfiguration.getPathToChartFile());
+        final WindowInitialEvent we = new WindowInitialEvent(this, System.nanoTime());
+        for (WindowInitialListener wi : windowInitialListeners) {
+            wi.initialPrepare(we);
         }
 
-        setTitle(Version.getVersion());
-        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        NaviLogger.logger.log(Level.FINE, "Initialize components ...");
 
+        addWindowFocusListener(this);
+        
+        core = c;
+
+        setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
+        
         if (LOGO_APPICATION_IMAGE != null) {
             setIconImage(LOGO_APPICATION_IMAGE.getImage());
         }
+        NaviLogger.logger.log(Level.FINE, "Initialize gui window completed");
     //setDisplayMode();
 
+        final WindowInitialEvent wec = new WindowInitialEvent(this, System.nanoTime());
+        for (WindowInitialListener wi : windowInitialListeners) {
+            wi.initialCompleted(wec);
+        }
+
+        //setLocationRelativeTo(null);
+    }
+
+    public static void addWindowinitialListener(WindowInitialListener wil){
+        windowInitialListeners.add(wil);
+    }
+    
+    public static void removeWindowinitialListener(WindowInitialListener wil){
+        windowInitialListeners.remove(wil);
     }
 
     public static final SVGBridgeComponents getBridgeInformationPipe() {
         return svgListeners;
     }    
 
-    private void initComponents() {
+    public void initComponents() {
 
         openSVGFileAction = new OpenSVGFileAction("Open SVG document ...",
                 createNavigationIcon("open16"), "Open SVG Document",
@@ -209,7 +224,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     }
 
     public OutputVerboseStream getVerboseStream() {
-        return verboseStream;
+        return BridgeForVerboseMode.getInstance();
     }
 
     private void setDefaultLayout() {
@@ -371,16 +386,16 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         statusPanel = new StatusPanel();
 
         statusInfoPanel.getBumpArea().setVisible(false);
-        statusInfoPanel.setQueueEnabled(true);
-        statusInfoPanel.setMaxEtemInQueue(3);
+        //statusInfoPanel.setQueueEnabled(true);
+        //statusInfoPanel.setMaxEtemInQueue(3);
 
         statusPanel.addToPanelFromPosition(statusInfoPanel, StatusPanel.LEFT_PANEL);
 
         CoordinateInfoPanel cip = new CoordinateInfoPanel();
         cip.setBorder(StatusPanel.getDefaultBorder());
-        TitleLabelUI titleUi = (TitleLabelUI) cip.getContentText().getUI();
-        titleUi.setTextLayout(TitleLabelUI.CENTER_VERTICAL | TitleLabelUI.CENTER_HORIZONTAL);
-        titleUi.setHorizontalCalibrated(0);
+        //TitleLabelUI titleUi = (TitleLabelUI) cip.getContentText().getUI();
+        //titleUi.setTextLayout(TitleLabelUI.CENTER_VERTICAL | TitleLabelUI.CENTER_HORIZONTAL);
+        //titleUi.setHorizontalCalibrated(0);
 
         getSVGCanvas().addMouseMotionListener(cip);
         statusPanel.addToPanelFromPosition(Box.createHorizontalGlue(), StatusPanel.RIGHT_PANEL);
@@ -495,6 +510,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             @Override
             public void actionPerformed(ActionEvent e) {
                 String msg = ODBConnection.disconnect();
+                System.out.println(msg);
                 NaviRootWindow.getBridgeInformationPipe().
                         currentStatusChanged(msg);
             }
@@ -577,15 +593,16 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                 chooser.setCurrentDirectory(new File(uri));
             } catch (URISyntaxException ex) {
                 System.err.println("" + ex);
+                NaviLogger.logger.log(Level.FINE, "Open svg file [method openFileChoserWindow()]",ex);
             }
         }
         int retour = chooser.showOpenDialog(this);
         if (retour == JFileChooser.APPROVE_OPTION) {
             try {
                 openSVGDocument(chooser.getSelectedFile());
-
-            } catch (Exception e1) {
-                getVerboseStream().outputVerboseStream(e1.getMessage());
+            } catch (Exception ex) {
+                getVerboseStream().outputVerboseStream(ex.getMessage());
+                NaviLogger.logger.log(Level.FINE, "Open svg file [method openFileChoserWindow()]",ex);
             }
         }
     }
@@ -600,8 +617,9 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         if (file.exists()) {
             openSVGDocument(file);
         } else {
-            System.err.println("File " + path + " doesn't exist !!!");
-            NaviLogger.log.log(Level.WARNING, "File " + path + " doesn't exist !!!");
+            String msg = "File " + path + " doesn't exist !!!";
+            System.err.println(msg);
+            NaviLogger.logger.log(Level.WARNING, msg);
         }
     }
 
@@ -610,7 +628,15 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
      * @param file
      */
     public void openSVGDocument(File file) {
+
+        NaviLogger.logger.log(Level.FINE, "Try opened SVG document "+file.getAbsolutePath());
+
         if (getSVGCanvas().getSVGDocument() != null) {
+
+            /*
+             * Notify all object of closing documnet
+             */
+
             svgListeners.documentClosed();
         }
         getSVGCanvas().setURI(file.toURI().toString());
@@ -649,10 +675,20 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         searchServicesAction.setEnabled(b);
     }
 
+    /*
+     * To retrieve the object instances do not use this method.
+     * This method is subject to a NullPointerException.
+     */
+    @Deprecated
     public static SVGCanvasLayers getSVGCanvasLayers() {
         return canvaslayers;
     }
 
+    /*
+     * To retrieve the object instances do not use this method.
+     * This method is subject to a NullPointerException.
+     */
+    @Deprecated
     public static Canvas getSVGCanvas() {
         return getSVGCanvasLayers().getSvgCanvas();
     }
@@ -734,7 +770,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
     @Override
     public void windowStateChanged(WindowEvent e) {
-        throw new UnsupportedOperationException("Not supported yet.");
+        getVerboseStream().outputVerboseStream("windowStateChanged");
     }
 
     private class OpenSVGFileAction extends AbstractAction {
@@ -898,6 +934,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         public void documentClosed() {
             setComponetsEnableWhenDocumentLoaded(false);
             String msg = ODBConnection.disconnect();
+            System.out.println(msg);
             NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
         }
     }
