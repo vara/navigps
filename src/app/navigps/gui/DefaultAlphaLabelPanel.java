@@ -1,12 +1,14 @@
 package app.navigps.gui;
 
 import app.navigps.gui.detailspanel.AlphaJPanel;
-import app.navigps.gui.label.ui.TitleLabelUI;
 import java.awt.BorderLayout;
 import java.awt.Dimension;
 import java.awt.GridLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.Map;
 import javax.swing.JLabel;
 import javax.swing.SwingUtilities;
 import javax.swing.Timer;
@@ -37,6 +39,10 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
 
     private BumpArea bumpArea = new BumpArea();
 
+    //for test
+    private Map <String,ActionListener> actionText =
+            Collections.synchronizedMap(new HashMap<String,ActionListener>());
+
     /**
      *
      */
@@ -58,10 +64,10 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         content.add(contentText);
         contentText.setText("");
 
-        TitleLabelUI tlui = new TitleLabelUI(TitleLabelUI.LEFT|TitleLabelUI.CENTER_VERTICAL);
-        tlui.setHorizontalCalibrated(3);
-
-        contentText.setUI(tlui);
+        //there is bug check it
+        //TitleLabelUI tlui = new TitleLabelUI(TitleLabelUI.LEFT|TitleLabelUI.CENTER_VERTICAL);
+        //tlui.setHorizontalCalibrated(3);
+        //contentText.setUI(tlui);
 
         animator = new Animator(getAnimationDuration(), 1,
             RepeatBehavior.LOOP, new AnimatorBehaviour());
@@ -82,21 +88,34 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         return bumpArea;
     }
 
+    public void addActionText(String str,ActionListener al){
+        actionText.put(str,al);
+    }
+
+    public void removeActionText(String al){
+        actionText.remove(al);
+    }
+
+    public void removeAllActionText(){
+        actionText.clear();
+    }
+
     /**
      *
      * @param txt
      */
-    public void setText(final String txt){
+    public synchronized void setText(final String txt){
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 content.setAlpha(content.getUpperThresholdAlpha());
-                boolean needrepaint = txt.equals(getContentText().getText());
-                if(needrepaint) repaint();
+                if( txt.equals(getContentText().getText()) )
+                    repaint();
                 else getContentText().setText(txt);
 
                 if(isEnabled() && isAnimatorEnabled()){
-                    startTimer();
+                    System.out.println(txt+" start timer");
+                    startTimers();
                 }
             }
         });
@@ -109,10 +128,20 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
     public boolean animatorIsRunning(){
         return animator.isRunning();
     }
+
+    protected void stopTimers(){
+        if(closeTimerIsRunning()){
+            closeTimer.stop();
+        }
+        if(animatorIsRunning()){
+            animator.stop();
+        }
+    }
+
     /**
      *
      */
-    protected void startTimer(){
+    protected void startTimers(){
 
         if(closeTimerIsRunning()){
             closeTimer.restart();
@@ -131,6 +160,8 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         if(fraction == -1){
             fraction = getContent().getAlpha();
         }
+        if(animatorIsRunning())
+            animator.stop();
         animator.setStartFraction(fraction);
         animator.setStartDirection(Direction.BACKWARD);
         animator.start();
@@ -185,8 +216,11 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
      */
     public void setAnimatorEnabled(boolean animatorEnabled) {
         this.animatorEnabled = animatorEnabled;
-        if(!contentText.getText().equals(""))
-            startTimer();
+        if(!contentText.getText().equals("") && animatorEnabled)
+            startTimers();
+        else{
+            stopTimers();
+        }
     }
     /**
      * Override this method to inform when animator
@@ -231,6 +265,15 @@ public class DefaultAlphaLabelPanel extends AlphaJPanel{
         @Override
         public void end() {
             animationFinished();
+            if(!actionText.isEmpty()){
+                String txt = getContentText().getText();
+                ActionListener al = actionText.get(txt);
+                if(al!=null){
+                    ActionEvent ae = new ActionEvent(DefaultAlphaLabelPanel.this,
+                            0, txt);
+                    al.actionPerformed(ae);
+                }
+            }
         }
         /**
          *
