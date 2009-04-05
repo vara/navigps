@@ -1,21 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.searchServices.swing;
 
 import app.database.odb.core.ServiceCore;
+import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (wara) Warywoda
  */
 public class ServiceListModel extends AbstractListModel{
 
-    private Vector<ServiceCore> vServices = new Vector<ServiceCore>();
+    private ArrayList<ServiceCore> arrayServices = new ArrayList<ServiceCore>();
 
     public ServiceListModel(){
     }
@@ -26,42 +22,45 @@ public class ServiceListModel extends AbstractListModel{
 
     @Override
     public int getSize() {
-        return vServices.size();
+        return arrayServices.size();
     }
 
     @Override
     public Object getElementAt(int index) {
-        return vServices.get(index).getServiceDescription().getServiceName();
+        return arrayServices.get(index);
     }
-
-
-
+    
     public void addServices(Vector<ServiceCore> vServiceCore){
-        int lastIndex = vServices.size()-1;
-        vServices.addAll(vServiceCore);
-        fireContentsChanged(this, lastIndex,vServices.size()-1);
+        int lastIndex = arrayServices.size()-1;
+        arrayServices.addAll(vServiceCore);
+        fireContentsChanged(this, lastIndex,arrayServices.size()-1);
     }
 
     public void setAllServices(Vector<ServiceCore> vServiceCore){
-        vServices.clear();
-        vServices.addAll(vServiceCore);
-        fireContentsChanged(this, 0,vServices.size()-1);
+        arrayServices.clear();
+        arrayServices.addAll(vServiceCore);
+        fireContentsChanged(this, 0,arrayServices.size()-1);
     }
 
     public void removeElementAt(int index) {
-       vServices.remove(index);
+       arrayServices.remove(index);
        fireIntervalRemoved(this, index, index);
     }
 
     public void removeAll(){
-        int index = vServices.size()-1;
-        vServices.clear();
+        int index = arrayServices.size()-1;
+        arrayServices.clear();
         if(index >=0)
             fireIntervalRemoved(this, 0, index);
     }
 
     public boolean isEmpty(){
-        System.out.println("is Empty "+vServices.isEmpty());
-        return vServices.isEmpty();
+        return arrayServices.isEmpty();
     }
+
+    @Override
+    public String toString() {
+        return arrayServices.toString();
+    }
+
 }

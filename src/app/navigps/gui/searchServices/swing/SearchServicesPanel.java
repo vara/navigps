@@ -30,12 +30,23 @@ import javax.swing.tree.TreeModel;
 import app.database.odb.core.Category;
 import app.database.odb.core.Search;
 import app.database.odb.core.ServiceCore;
+import app.database.odb.utils.ConnectionListener;
 import app.database.odb.utils.Constants;
+import app.database.odb.utils.ODBConnection;
+import app.navigps.gui.borders.EmptyOvalBorder;
 import app.navigps.gui.detailspanel.AlphaJPanel;
+import app.navigps.gui.detailspanel.ContentPaneForRoundWindow;
 import app.navigps.gui.detailspanel.LoacationManager.LeftLocation;
 import app.navigps.gui.detailspanel.RoundWindow;
+import app.navigps.gui.svgComponents.SVGCanvasLayers;
+import app.navigps.utils.NaviLogger;
+import java.awt.BorderLayout;
+import java.awt.Container;
+import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.util.logging.Level;
+import javax.swing.JRootPane;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
 import org.neodatis.odb.ObjectRepresentation;
@@ -50,32 +61,30 @@ import org.neodatis.odb.core.trigger.UpdateTrigger;
 public class SearchServicesPanel extends javax.swing.JPanel{
 
     private JScrollPane jScrollPane1;
-    private JCheckBoxTree jTree1;
+    private JCheckBoxTree jCheckBox;
     
     //for test !!!
     private RoundWindow rWindow;
     private ServicesInfoDisplayedList servlistPanel = new ServicesInfoDisplayedList();
 
     /** Creates new form SearchServicesPanel */
-    public SearchServicesPanel() {
+    public SearchServicesPanel() {        
         initComponents();
         initValue();
-
-        
-
+        initListenersDB();
         Vector<String> val = new Vector<String>();
 
-        jTree1 = new JCheckBoxTree();
-        jTree1.setRootVisible(false);
-        jTree1.setShowsRootHandles(true);
+        jCheckBox = new JCheckBoxTree();
+        jCheckBox.setRootVisible(false);
+        jCheckBox.setShowsRootHandles(true);
         setServices(val);
 
-        jScrollPane1 = new JScrollPane(jTree1);
+        jScrollPane1 = new JScrollPane(jCheckBox);
         jScrollPane1.setOpaque(false);
         jScrollPane1.setBorder(null);
         jScrollPane1.getViewport().setOpaque(false);
         jScrollPane1.getViewport().setBorder(null);
-        jTree1.addMouseListener(new MouseEventReloadJTree());
+        jCheckBox.addMouseListener(new MouseEventReloadJTree());
 
         JScrollBar scbH = jScrollPane1.getHorizontalScrollBar();
         JScrollBar scbV = jScrollPane1.getVerticalScrollBar();
@@ -87,14 +96,15 @@ public class SearchServicesPanel extends javax.swing.JPanel{
         scbH.removeAll();
         scbV.removeAll();
 
-        jTree1.setOpaque(false);
-        jTree1.setFocusable(false);
+        jCheckBox.setOpaque(false);
+        jCheckBox.setFocusable(false);
 
-        panelForJTree.add(jScrollPane1);
+        panelForJTree.add(jScrollPane1);       
+    }
 
-        reloadCategory();
-
-        addTriggersToDB();
+    protected void initListenersDB(){
+        ODBConnection.getInstance().
+                addConnectionListener(new ODBConnectionListener());
     }
 
     protected boolean addTriggersToDB(){
@@ -352,7 +362,15 @@ public class SearchServicesPanel extends javax.swing.JPanel{
     }
 
     private AbstractDisplayManager getDisplayManager(){
-        return NaviRootWindow.getSVGCanvas().getDisplayManager();
+        SVGCanvasLayers svgCanvaasLayers = getSVGCanvasLayers();
+        if(svgCanvaasLayers != null){
+            return svgCanvaasLayers.getSvgCanvas().getDisplayManager();
+        }else{
+            String msg = "Can't find display manager ! ";
+            System.err.println(msg);
+            NaviLogger.logger.log(Level.WARNING, msg);
+        }
+        return null;
     }
 
     private void jButtonSearchActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButtonSearchActionPerformed
@@ -379,6 +397,8 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                     
                     AbstractDisplayManager dm = getDisplayManager();
 
+                    if(dm == null) return;
+
                     if(jRadioButton1.isSelected()){
                         dm.removeLastServices();
                         servlistPanel.getListModel().removeAll();
@@ -397,6 +417,7 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                     }else{
                         if(rWindow.isEnabled() && servlistPanel.getListModel().isEmpty()){
                             rWindow.setEnabled(false);
+                            servlistPanel.getAnimamtionLayer().dispose();
                         }
                     }
 
@@ -502,13 +523,13 @@ public class SearchServicesPanel extends javax.swing.JPanel{
         boolean checked = false;
         boolean anyChecked = false;
 
-        int selRows = jTree1.getRowCount();
+        int selRows = jCheckBox.getRowCount();
         for (int i = 0; i < selRows; i++) {
-            if (!(checked = ((JCheckBoxTree) jTree1).isChecked(jTree1.getPathForRow(i)))) {
-                anyChecked = ((JCheckBoxTree) jTree1).isAnyChildChecked(jTree1.getPathForRow(i));
+            if (!(checked = ((JCheckBoxTree) jCheckBox).isChecked(jCheckBox.getPathForRow(i)))) {
+                anyChecked = ((JCheckBoxTree) jCheckBox).isAnyChildChecked(jCheckBox.getPathForRow(i));
             }
             if (checked || anyChecked) {
-                TreeModel model = jTree1.getModel();
+                TreeModel model = jCheckBox.getModel();
                 Object child = model.getChild(model.getRoot(), i);
                 if (child instanceof DefaultMutableTreeNode) {
                     Object data = ((DefaultMutableTreeNode) child).getUserObject();
@@ -526,22 +547,51 @@ public class SearchServicesPanel extends javax.swing.JPanel{
 
     private void createRoundWindowForServicesList(){
         rWindow = new RoundWindow();
-        AlphaJPanel container = NaviRootWindow.getSVGCanvasLayers().getModalContainer();
-        rWindow.setLocationManager(new LeftLocation(rWindow));
-        rWindow.setDynamicRevalidate(true);
-        rWindow.setTitle("Services List");
-        rWindow.setDecorateWindow(true);
-        rWindow.setUpperThresholdAlpha(0.6f);
-        rWindow.setAlpha(0.0f);
-        rWindow.getContentPane().setUpperThresholdAlpha(0.75f);
-        container.add(rWindow);
-        rWindow.getContentPane().add(servlistPanel);
-        container.addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                rWindow.updateMyUI();
+        SVGCanvasLayers svgcl = getSVGCanvasLayers();
+        if(svgcl!=null){
+
+            AlphaJPanel container = svgcl.getModalContainer();
+            rWindow.setLocationManager(new LeftLocation(rWindow));
+            rWindow.setDynamicRevalidate(true);
+            rWindow.setTitle("Services List");
+            rWindow.setDecorateWindow(true);
+            rWindow.setUpperThresholdAlpha(0.75f);
+            rWindow.setAlpha(0.0f);
+            rWindow.getContentPane().setUpperThresholdAlpha(0.75f);
+            rWindow.getContentPane().setLayout(new BorderLayout(10, 10));
+            rWindow.getContentPane().add(servlistPanel,BorderLayout.CENTER);
+            ((ContentPaneForRoundWindow)rWindow.getContentPane()).
+                    setInsets(new Insets(10,10,10,10));
+
+            JRootPane root = getRootPane();
+            root.setGlassPane(servlistPanel.getAnimamtionLayer());
+            servlistPanel.getAnimamtionLayer().setVisible(true);
+            
+
+            container.add(rWindow);            
+            container.addComponentListener(new ComponentAdapter() {
+                @Override
+                public void componentResized(ComponentEvent e) {
+                    rWindow.updateMyUI();
+                }
+            });
+        }else{
+            String msg = "Can't initial round window for search services list,\n"+
+                    "SVGCanvasLayers need -> Not Found  !!!";
+            System.err.println(getClass().getCanonicalName()+" "+msg);
+        }
+    }
+
+    private SVGCanvasLayers getSVGCanvasLayers(){
+        SVGCanvasLayers svgCanvasLayer = null;
+        Container parent = this;
+        while((parent = parent.getParent())!=null){
+            if(parent instanceof SVGCanvasLayers){
+                System.err.println("Found SVGCanvaaslayer");
+                return (SVGCanvasLayers)parent;
             }
-        });
+        }
+        return svgCanvasLayer;
     }
 
     /**
@@ -552,7 +602,7 @@ public class SearchServicesPanel extends javax.swing.JPanel{
         DefaultMutableTreeNode root = new DefaultMutableTreeNode("Services");
         DynamicUtilTreeNode.createChildren(root, value);
         DefaultTreeModel dtm = new DefaultTreeModel(root, false);
-        jTree1.setModel(dtm);
+        jCheckBox.setModel(dtm);
     }
 
     private class ReloadJTree extends AbstractAction{
@@ -625,6 +675,19 @@ public class SearchServicesPanel extends javax.swing.JPanel{
         @Override
         public void afterDelete(Object object, OID oid) {
             reloadCategory();
+        }
+    }
+
+    private class ODBConnectionListener implements ConnectionListener{
+
+        @Override
+        public void connectionOpened() {
+            reloadCategory();
+            addTriggersToDB();
+        }
+
+        @Override
+        public void connectionClosed() {            
         }
     }
 }
