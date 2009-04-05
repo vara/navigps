@@ -44,6 +44,9 @@ import java.awt.Graphics;
 import java.awt.GraphicsEnvironment;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
+import java.awt.color.ColorSpace;
+import java.awt.image.BufferedImageOp;
+import java.awt.image.ColorConvertOp;
 import java.io.IOException;
 import java.net.URL;
 import javax.imageio.ImageIO;
@@ -559,5 +562,11 @@ public class GraphicsUtilities {
             // Unmanages the image
             img.setRGB(x, y, w, h, pixels, 0, w);
         }
+    }
+
+    public static BufferedImage convertToGrayscale(BufferedImage source) {
+        BufferedImageOp op = new ColorConvertOp(
+                               ColorSpace.getInstance(ColorSpace.CS_GRAY), null);
+        return op.filter(source, null);
     }
 }
