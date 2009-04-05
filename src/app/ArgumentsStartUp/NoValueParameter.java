@@ -4,7 +4,7 @@ import app.ArgumentsStartUp.core.AbstractParameter;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public abstract class NoValueParameter extends AbstractParameter{
 

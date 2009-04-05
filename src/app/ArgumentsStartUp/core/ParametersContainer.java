@@ -8,7 +8,7 @@ import java.util.Vector;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public class ParametersContainer {
 

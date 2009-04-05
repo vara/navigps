@@ -4,7 +4,7 @@ import java.io.File;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public abstract class FileValueParameter extends SingleValueParameter{
 

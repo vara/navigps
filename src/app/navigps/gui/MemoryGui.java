@@ -37,7 +37,7 @@ import javax.swing.border.Border;
 
 /**
  *
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public class MemoryGui extends JComponent implements Runnable,
 						     MouseListener{
@@ -87,7 +87,7 @@ public class MemoryGui extends JComponent implements Runnable,
     
     private void init(){
 		
-        NaviLogger.log.log(Level.FINE, "Init Memory Gui");
+        NaviLogger.logger.log(Level.FINE, "Init Memory Gui");
         chart = new Chart();
         setBounds(0,1,getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint()+1);
         setPreferredSize(new Dimension(getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint()+1));
@@ -196,7 +196,7 @@ public class MemoryGui extends JComponent implements Runnable,
             }
         } catch (InterruptedException ex) {
             PrintStream pr;
-            NaviLogger.log.log(Level.WARNING, getClass().getName() + "\n" + ex);
+            NaviLogger.logger.log(Level.WARNING, getClass().getName() + "\n" + ex);
         }
     }
     

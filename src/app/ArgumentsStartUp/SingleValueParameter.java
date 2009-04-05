@@ -1,15 +1,10 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.ArgumentsStartUp;
 
 import app.ArgumentsStartUp.core.AbstractParameter;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public abstract class SingleValueParameter extends AbstractParameter{
 
