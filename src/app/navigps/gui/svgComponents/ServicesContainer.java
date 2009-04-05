@@ -46,6 +46,16 @@ public class ServicesContainer extends SynchronizedSVGLayer{
         super.remove(comp);
     }
 
+    public ObjectService getObject(long oid){
+        Component [] comps = getComponents();
+        for (Component childs : comps) {
+            ObjectService childObjectServ = (ObjectService)childs;
+            if(childObjectServ.getOID().getObjectId() == oid){
+                return childObjectServ;
+            }
+        }
+        return null;
+    }
 
     @Override
     public void removeAll() {        
