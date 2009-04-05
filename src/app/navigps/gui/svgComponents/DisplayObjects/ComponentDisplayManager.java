@@ -15,6 +15,7 @@ import java.awt.Component;
 import java.util.Vector;
 import java.util.logging.Level;
 import app.database.odb.core.ServiceCore;
+import app.navigps.gui.svgComponents.ServicesContainer;
 import org.apache.batik.dom.svg.SVGOMPoint;
 
 /**
@@ -23,7 +24,7 @@ import org.apache.batik.dom.svg.SVGOMPoint;
  */
 public class ComponentDisplayManager extends AbstractDisplayManager{
 
-    private Vector <ObjectToDisplayService> services = new Vector<ObjectToDisplayService>(100);
+    //private Vector <ObjectToDisplayService> services = new Vector<ObjectToDisplayService>(100);
 
     public ComponentDisplayManager(Canvas can) {
         super(can);
@@ -46,7 +47,7 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
 
     @Override
     public void removeLastServices() {
-        services.removeAllElements();
+        //services.removeAllElements();
         getDisplayLayer().removeAll();
         getDisplayLayer().repaint();
     }
@@ -75,7 +76,7 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
                         }
                     }
                 }else{
-                    NaviLogger.log.log(Level.WARNING, "Method UpdateService \"argument is not instance class ServiceCore\"");
+                    NaviLogger.logger.log(Level.WARNING, "Method UpdateService \"argument is not instance class ServiceCore\"");
                 }
             }
         }).start();
@@ -105,5 +106,15 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
             vos.add((ObjectService)createObject(os));
         }
         return vos;
+    }
+
+    @Override
+    public Object getObject(long oid) {
+        return ((ServicesContainer)getDisplayLayer()).getObject(oid);
+    }
+
+    @Override
+    public Vector getAllObjects() {
+        throw new UnsupportedOperationException("Not supported yet.");
     }
 }

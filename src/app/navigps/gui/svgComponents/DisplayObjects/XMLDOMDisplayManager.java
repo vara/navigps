@@ -237,6 +237,16 @@ public class XMLDOMDisplayManager extends AbstractDisplayManager{
         return vele;
     }
 
+    @Override
+    public Object getObject(long oid) {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
+    @Override
+    public Vector getAllObjects() {
+        throw new UnsupportedOperationException("Not supported yet.");
+    }
+
     protected class LoaderTreeListener implements SVGDocumentLoaderListener{
 
         @Override

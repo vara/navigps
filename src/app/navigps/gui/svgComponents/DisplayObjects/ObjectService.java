@@ -35,7 +35,7 @@ import org.neodatis.odb.OID;
  */
 public class ObjectService extends AlphaJPanel implements ObjectToDisplayService{
 
-    private static ImageIcon iconinfo = null;
+    public static ImageIcon iconinfo = null;
     /**
      * @return the iconinfo
      */
@@ -200,7 +200,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
 
         } catch (Exception ex) {
             String msg = ex + "[ for group name "+name+" ]";
-            NaviLogger.log.log(Level.WARNING, msg);
+            NaviLogger.logger.log(Level.WARNING, msg);
         }
         return null;
     }

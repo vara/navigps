@@ -23,4 +23,6 @@ public abstract class AbstractDisplayManager {
     public abstract void updateService(final Object element);
     public abstract Object createObject(ServiceCore sc);
     public abstract Vector createObject(Vector<ServiceCore> vsc);
+    public abstract Object getObject(long oid);
+    public abstract Vector getAllObjects();
 }
