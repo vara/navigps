@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.svgComponents;
 
 import app.database.odb.utils.ODBConnection;
@@ -18,7 +13,7 @@ import org.apache.batik.swing.svg.SVGDocumentLoaderListener;
 
 /**
  *
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public class SVGBridgeListeners extends SVGBridgeComponents implements 
                     SVGDocumentLoaderListener,
@@ -39,6 +34,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     public void documentLoadingStarted(SVGDocumentLoaderEvent e) {
         setRederingStatus(true);
         currentStatusChanged("Document Loading Started ...");
+        NaviLogger.logger.log(Level.FINE,"Loading documnet Started ...",e);
     }
     /**
      *
@@ -53,6 +49,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
         String msg = ODBConnection.connect("", "");
         System.out.println(msg);
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+        NaviLogger.logger.log(Level.FINE,"Loading documnet completed ",e);
     }
     /**
      *
@@ -60,6 +57,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
      */
     @Override
     public void documentLoadingCancelled(SVGDocumentLoaderEvent e) {
+        NaviLogger.logger.log(Level.WARNING,"Loading documnet canceled !",e);
         currentStatusChanged("Document Loading Cancelled !");
     }
     /**
@@ -67,7 +65,8 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
      * @param e
      */
     @Override
-    public void documentLoadingFailed(SVGDocumentLoaderEvent e) {	
+    public void documentLoadingFailed(SVGDocumentLoaderEvent e) {
+        NaviLogger.logger.log(Level.WARNING,"Loading documnet failed !",e);
         currentStatusChanged("Document Loading Failed !");
     }
     
@@ -90,6 +89,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
                       "\ngetOutline \t"+e.getGVTRoot().getOutline()+
                       "\ngetBounds \t"+e.getGVTRoot().getBounds();
         System.out.println(info);
+        NaviLogger.logger.log(Level.FINE,"GVT tree build completed !",e);
     }
     /**
      *
@@ -98,6 +98,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     @Override
     public void gvtBuildCancelled(GVTTreeBuilderEvent e) {
         currentStatusChanged("Document Build Cancelled !");
+        NaviLogger.logger.log(Level.WARNING,"GVT tree build cancelled !",e);
     }
     /**
      *
@@ -106,6 +107,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     @Override
     public void gvtBuildFailed(GVTTreeBuilderEvent e) {
         currentStatusChanged("Document Build Failed !");
+        NaviLogger.logger.log(Level.WARNING,"GVT tree build failed !",e);
     }
     /**
      *
@@ -114,6 +116,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     @Override
     public void gvtBuildStarted(GVTTreeBuilderEvent e) {        
         currentStatusChanged("Documnet Build Started");
+        NaviLogger.logger.log(Level.FINE,"GVT tree build started !",e);
     }    
     
     /**

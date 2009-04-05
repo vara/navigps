@@ -42,6 +42,7 @@ public class SVGCanvasLayers extends JLayeredPane{
     public static final Integer THUMBNAIL_LAYER = new Integer(JLayeredPane.DEFAULT_LAYER+10);
 
     private Canvas svgCanvas;
+    private RoundWindow detailsPane;
 
     private AlphaJPanel componentContainer;
     private AlphaJPanel modalContainer;
@@ -62,7 +63,17 @@ public class SVGCanvasLayers extends JLayeredPane{
     private void createDefaultContainers(){
         modalContainer = new AlphaJPanel(null);
         getModalContainer().setOpaque(false);
-        createRoundWindowProperties();
+        detailsPane = createRoundWindowProperties();
+        getModalContainer().add(getDetailsPane());
+        getModalContainer().addComponentListener(new ComponentAdapter() {
+            @Override
+            public void componentResized(ComponentEvent e) {
+                Container cont = RoundWindowUtils.getRoundWindowFromContainer((Container)e.getSource());
+                if(cont != null){
+                    ((RoundWindow)cont).updateMyUI();
+                }
+            }
+        });
 
         componentContainer = new AlphaJPanel(null);
         getComponentContainer().setOpaque(false);
@@ -75,29 +86,20 @@ public class SVGCanvasLayers extends JLayeredPane{
 
         add(getModalContainer(),MODAL_LAYER);
         add(getComponentContainer(),DEFAULT_LAYER);
-        add(getThumbnailContainer(), THUMBNAIL_LAYER);
+        add(getThumbnailContainer(),THUMBNAIL_LAYER);
         add(getServicesContainer(),DISPLAY_SERVICES_LAYER);
 
         createThumbnails();
     }
 
-    private void createRoundWindowProperties(){
-        RoundWindow detailsPane = new RoundWindow();
-        detailsPane.setDynamicRevalidate(true);
-        detailsPane.setUpperThresholdAlpha(0.6f);
-        detailsPane.setAlpha(0.0f);
-        detailsPane.getContentPane().setUpperThresholdAlpha(0.75f);
-        detailsPane.setVisible(false);
-        getModalContainer().add(detailsPane);
-        getModalContainer().addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                Container cont = RoundWindowUtils.getRoundWindowFromContainer((Container)e.getSource());
-                if(cont != null){
-                    ((RoundWindow)cont).updateMyUI();
-                }
-            }
-        });
+    private RoundWindow createRoundWindowProperties(){
+        RoundWindow rw = new RoundWindow();
+        rw.setDynamicRevalidate(true);
+        rw.setUpperThresholdAlpha(0.6f);
+        rw.setAlpha(0.0f);
+        rw.getContentPane().setUpperThresholdAlpha(0.75f);
+        rw.setVisible(false);
+        return rw;
     }
 
     private void createThumbnails(){
@@ -181,5 +183,12 @@ public class SVGCanvasLayers extends JLayeredPane{
      */
     public void setServicesContainer(AlphaJPanel servicesContainer) {
         this.servicesContainer = servicesContainer;
+    }
+
+    /**
+     * @return the detailsPane
+     */
+    public RoundWindow getDetailsPane() {
+        return detailsPane;
     }
 }
