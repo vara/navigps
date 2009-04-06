@@ -19,7 +19,9 @@ import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
 import java.awt.BorderLayout;
+import java.awt.Rectangle;
 import java.awt.event.ActionListener;
+import java.awt.geom.Rectangle2D.Float;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.event.MouseInputAdapter;
@@ -35,11 +37,11 @@ public class SearchServices extends SynchronizedSVGLayer{
 
     private NaviPoint centerPoint = new NaviPoint(0, 0);
     private NaviPoint currentPos = new NaviPoint(0, 0);
-    private double radius = 0;
+    private float radius = 0;
 
     private NaviPoint paintCenterPoint = new NaviPoint(0,0);
     private NaviPoint paintCurrentPos = new NaviPoint(0,0);
-    private double paintRadius = 0;
+    private float paintRadius = 0;
 
     private boolean enabled = false;
 
@@ -47,6 +49,8 @@ public class SearchServices extends SynchronizedSVGLayer{
     
     private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
     private SSMouseEvents me = new SSMouseEvents();   
+
+    private Rectangle visibleArea = new Rectangle(0, 0);
 
     private ActionListener closeAction = new ActionListener() {
                 @Override
@@ -65,8 +69,8 @@ public class SearchServices extends SynchronizedSVGLayer{
         public void propertyChange(PropertyChangeEvent evt) {
             if (evt.getPropertyName().equals(ALPHA_CHANGE)) {
                 //System.out.println("new Alpa "+newAlpha);
-                if (setAlpha((Float) evt.getNewValue())) {
-                    repaint();
+                if ( setAlpha( (java.lang.Float) evt.getNewValue()) ) {                    
+                        repaint(visibleArea);
                 }
             }
         }
@@ -165,16 +169,16 @@ public class SearchServices extends SynchronizedSVGLayer{
     
     @Override
     public void paintComponent(Graphics g) {
-                       
+        //g.drawRect(visibleArea.x,visibleArea.y,visibleArea.width,visibleArea.height);
         if(isEnabledSearchServices() && (int)paintRadius>0){
             super.paintComponent(g);
             Graphics2D g2 = (Graphics2D) g.create();            
-            paintCircle(g2, paintRadius, paintCenterPoint,paintCurrentPos);
+            paintCircle(g2, paintRadius, paintCenterPoint,paintCurrentPos);            
             g2.dispose();
         }
     }    
 
-    protected void paintCircle(Graphics2D g2, double radius, NaviPoint center, NaviPoint currPos) {
+    protected void paintCircle(Graphics2D g2, float radius, NaviPoint center, NaviPoint currPos) {
 
         float dash[] = {10.0f};
         float widthStroke = 1.0f;
@@ -219,11 +223,11 @@ public class SearchServices extends SynchronizedSVGLayer{
         guiForSearchServ.setCenterPoint(getCenterPoint());
     }
 
-    public void setRadius(double r) {
+    public void setRadius(float r) {
         radius = r;
     }
 
-    public double getRadius() {
+    public float getRadius() {
         return radius;
     }
 
@@ -236,10 +240,8 @@ public class SearchServices extends SynchronizedSVGLayer{
             currentPos.setLocation(svgPoint);            
         }
 
-        double rad = centerPoint.distance(getCurrentPosition());
-        setRadius(rad);
-        double radPaint = paintCenterPoint.distance(paintCurrentPos);
-        paintRadius = radPaint;
+        setRadius((float)centerPoint.distance(getCurrentPosition()));
+        paintRadius = (float)paintCenterPoint.distance(paintCurrentPos);
 
         guiForSearchServ.setRadius(getRadius());
         guiForSearchServ.setCurrentPos(getCurrentPosition());        
@@ -255,7 +257,10 @@ public class SearchServices extends SynchronizedSVGLayer{
                         doc.getRootElement(),tabPoints,null);                 
             paintCenterPoint.setLocation(retPoint[0]);
             paintCurrentPos.setLocation(retPoint[1]);
-            paintRadius = paintCenterPoint.distance(paintCurrentPos);
+            paintRadius = (float)paintCenterPoint.distance(paintCurrentPos);
+
+            visibleArea = paintCenterPoint.createAreaSquareI((float)paintRadius+
+                                                            SSMouseEvents.REPAINT_GAP);
             needUpdate = false;
         }
     }
@@ -273,6 +278,8 @@ public class SearchServices extends SynchronizedSVGLayer{
         private boolean dragged;
         private NaviPoint startPoint = new NaviPoint(0,0);
 
+        public static final int REPAINT_GAP = 10;
+
         @Override
         public void mousePressed(MouseEvent e) {
             if (e.getButton() == MouseEvent.BUTTON1 && !e.isAltDown() && !e.isControlDown() && !e.isShiftDown() && isEnabledSearchServices()) {
@@ -286,9 +293,25 @@ public class SearchServices extends SynchronizedSVGLayer{
         public void mouseDragged(MouseEvent e) {
 
             if (isEnabledSearchServices() && isDragged()) {
-                setCenterPoint(startPoint);                
+
+                setCenterPoint(startPoint);
+                float paintRadiusTmp = paintRadius;
                 setCurrentPosition(e.getX(),e.getY());
-                repaint();
+
+                boolean needReapint = true;
+                if(paintRadius < paintRadiusTmp ){
+                    // we need repaint only a bigger(current) painted area
+                    // only becouse we don't need twice (needRepaint sets on false)
+                    repaint(visibleArea);
+                    needReapint = false;                    
+                }
+                //calculate repainted area
+                visibleArea = paintCenterPoint.createAreaSquareI((float)paintRadius+REPAINT_GAP);
+                //If user increment radius then we need repaint bigger area.
+                //This block has been used only if radius is incrementing
+                if(needReapint){
+                    repaint(visibleArea);                   
+                }
             }
         }
         
