@@ -25,6 +25,7 @@ public class RoundWindowRootPane extends RoundJPanel{
      *
      */
     public RoundWindowRootPane(){
+        super(0,0);
         setInsets(new Insets(0,0,0,0));
         setGlassPane(createGlassPane());
         setLayeredPane(createLayeredPane());

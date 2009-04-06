@@ -417,7 +417,7 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                     }else{
                         if(rWindow.isEnabled() && servlistPanel.getListModel().isEmpty()){
                             rWindow.setEnabled(false);
-                            servlistPanel.getAnimamtionLayer().dispose();
+                            //servlistPanel.getAnimamtionLayer().dispose();
                         }
                     }
 
@@ -560,11 +560,13 @@ public class SearchServicesPanel extends javax.swing.JPanel{
             rWindow.getContentPane().setUpperThresholdAlpha(0.75f);
             rWindow.getContentPane().setLayout(new BorderLayout(10, 10));
             rWindow.getContentPane().add(servlistPanel,BorderLayout.CENTER);
+            rWindow.setEnabled(false);
             ((ContentPaneForRoundWindow)rWindow.getContentPane()).
                     setInsets(new Insets(10,10,10,10));
 
-            JRootPane root = getRootPane();
-            root.setGlassPane(servlistPanel.getAnimamtionLayer());
+            //JRootPane root = getRootPane();
+            //root.setGlassPane(servlistPanel.getAnimamtionLayer());
+            svgcl.add(servlistPanel.getAnimamtionLayer(), SVGCanvasLayers.POPUP_LAYER);
             servlistPanel.getAnimamtionLayer().setVisible(true);
             
 
