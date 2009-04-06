@@ -31,7 +31,7 @@ import org.neodatis.odb.OID;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (wara) Warywoda
  */
 public class ObjectService extends AlphaJPanel implements ObjectToDisplayService{
 

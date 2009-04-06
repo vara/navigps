@@ -152,7 +152,7 @@ public class WindowSplashScreen extends javax.swing.JFrame implements ActionList
             mSetWindowShape.invoke(null,this,roundRec);
 
         } catch (Exception ex) {
-            NaviLogger.logger.log(Level.WARNING, "Shaped window Splash", ex);
+            NaviLogger.logger.log(Level.WARNING, "Shaped window Splash <require at least jre 1.6u10>", ex);
             return;
         }
     }

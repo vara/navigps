@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.svgComponents.DisplayObjects;
 
 import app.navigps.gui.NaviRootWindow;
@@ -20,7 +15,7 @@ import org.apache.batik.dom.svg.SVGOMPoint;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (wara) Warywoda
  */
 public class ComponentDisplayManager extends AbstractDisplayManager{
 
