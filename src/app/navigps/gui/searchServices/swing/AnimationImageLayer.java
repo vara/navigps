@@ -69,7 +69,7 @@ public class AnimationImageLayer extends AlphaJPanel{
         return new Rectangle(x, y, width, height);
     }
 
-    public void showSpring(Rectangle bounds, Image image) {
+    public void startAnimateImage(Rectangle bounds, Image image) {
         
         this.bounds = bounds;
 
@@ -78,7 +78,7 @@ public class AnimationImageLayer extends AlphaJPanel{
         }        
         if(animator != null && animator.isRunning()){
             animator.stop();            
-            //if was dirty area clean it !
+            //clean dirty area !
             setZoom(1);
             repaint(visibleArea);
         }

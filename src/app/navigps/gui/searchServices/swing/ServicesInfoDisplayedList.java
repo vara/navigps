@@ -329,7 +329,7 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
                     location = SwingUtilities.convertPoint(os.getParent(), location,getAnimamtionLayer());
                     //location.y -= 13;
                     bounds.setLocation(location);
-                    getAnimamtionLayer().showSpring(bounds,ObjectService.iconinfo.getImage());
+                    getAnimamtionLayer().startAnimateImage(bounds,ObjectService.iconinfo.getImage());
                 }
 
             }
