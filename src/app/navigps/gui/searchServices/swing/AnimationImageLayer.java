@@ -32,6 +32,8 @@ public class AnimationImageLayer extends AlphaJPanel{
 
     private float zoom = 0.0f;
 
+    private Rectangle visibleArea = new Rectangle(0,0);
+
     public AnimationImageLayer(){
         setOpaque(false);
     }
@@ -39,23 +41,32 @@ public class AnimationImageLayer extends AlphaJPanel{
     @Override
     protected void paintComponent(Graphics g) {        
         if (image != null && bounds != null && animator.isRunning()) {                       
-            int width = image.getWidth(this);
-            width += (int) (image.getWidth(this) * MAGNIFY_FACTOR * getZoom());
 
-            int height = image.getHeight(this);
-            height += (int) (image.getHeight(this) * MAGNIFY_FACTOR * getZoom());
-
-            int x = (bounds.width - width) / 2;
-            int y = (bounds.height - height) / 2;
+            Rectangle area = calculateVisibleArea(getZoom());
 
             Graphics2D g2 = (Graphics2D) g.create();
             g2.setRenderingHint(RenderingHints.KEY_INTERPOLATION,
                     RenderingHints.VALUE_INTERPOLATION_BILINEAR);
 
             g2.setComposite(AlphaComposite.SrcOver.derive(1.0f - getZoom()));
-            g2.drawImage(image, x + bounds.x, y + bounds.y,
-                    width, height, null);            
+            g2.drawImage(image, area.x + bounds.x, area.y + bounds.y,
+                    area.width, area.height, null);
+            
+            g2.dispose();
         }
+    }
+
+    protected Rectangle calculateVisibleArea(float mul){
+        int width = image.getWidth(this);
+        width += (int) (image.getWidth(this) * MAGNIFY_FACTOR * mul);
+
+        int height = image.getHeight(this);
+        height += (int) (image.getHeight(this) * MAGNIFY_FACTOR * mul);
+
+        int x = (bounds.width - width) / 2;
+        int y = (bounds.height - height) / 2;
+        //System.out.println("x: "+x+" y: "+y+" w: "+width+" h: "+height);
+        return new Rectangle(x, y, width, height);
     }
 
     public void showSpring(Rectangle bounds, Image image) {
@@ -67,14 +78,21 @@ public class AnimationImageLayer extends AlphaJPanel{
         }        
         if(animator != null && animator.isRunning()){
             animator.stop();            
+            //if was dirty area clean it !
+            setZoom(1);
+            repaint(visibleArea);
         }
         animator = PropertySetter.createAnimator(500, this,
                 "zoom", 0.0f, 1.0f);
+
         animator.setAcceleration(0.2f);
         animator.setDeceleration(0.4f);
-        animator.start();
 
-        repaint();
+        animator.start();
+        Rectangle tmp = calculateVisibleArea(1);
+        visibleArea.setBounds(tmp.x + bounds.x, tmp.y +bounds.y,
+                    tmp.width, tmp.height);
+        repaint(visibleArea);
     }
 
     public float getZoom() {
@@ -83,7 +101,7 @@ public class AnimationImageLayer extends AlphaJPanel{
 
     public void setZoom(float zoom) {
         this.zoom = zoom;
-        repaint();
+        repaint(visibleArea);
     }
 
     public void dispose(){
