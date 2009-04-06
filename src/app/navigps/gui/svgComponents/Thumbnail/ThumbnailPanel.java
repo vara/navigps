@@ -4,10 +4,15 @@ import app.navigps.gui.borders.OvalBorder;
 import app.navigps.gui.detailspanel.RoundJPanel;
 import java.awt.BorderLayout;
 import java.awt.Color;
+import java.awt.Container;
 import java.awt.GradientPaint;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
+import java.awt.Point;
+import java.awt.Rectangle;
+import java.awt.event.MouseEvent;
 import javax.swing.SwingUtilities;
+import javax.swing.event.MouseInputAdapter;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.Animator.Direction;
 import org.jdesktop.animation.timing.Animator.RepeatBehavior;
@@ -23,6 +28,7 @@ public class ThumbnailPanel extends RoundJPanel{
     private int animationDuration = 10000;
     private Thumbnail thumbnail;
 
+    private PositionerListener mouselistener = new PositionerListener();
     /**
      *
      * @param tn
@@ -32,12 +38,24 @@ public class ThumbnailPanel extends RoundJPanel{
         setLayout(new BorderLayout());
         setOpaque(false);
         thumbnail = tn;
-        OvalBorder ob = new OvalBorder(1, 4, 1, 4,10,10);
+        OvalBorder ob = new OvalBorder(5, 5, 5, 5,10,10);
+        ob.setBorderColor(new Color(0,0,0));
         ob.setAlpha(0.8f);
         setBorder(ob);
         animator = new Animator(animationDuration, 1,
                 RepeatBehavior.LOOP,new AnimatorBehaviour());
         add(thumbnail,BorderLayout.CENTER);
+
+        installMouseListeners();
+    }
+
+    private void installMouseListeners(){
+        addMouseListener(mouselistener);
+        addMouseMotionListener(mouselistener);
+    }
+    private void uninstallMouseListeners(){
+        removeMouseListener(mouselistener);
+        removeMouseMotionListener(mouselistener);
     }
     /**
      *
@@ -56,6 +74,10 @@ public class ThumbnailPanel extends RoundJPanel{
             g2.fillRoundRect(0, 0, getWidth(), getHeight(),recw,recw);
             g2.dispose();
         }
+    }
+
+    protected void paintPositioner(Graphics2D g2){
+        
     }
 
     /**
@@ -125,17 +147,19 @@ public class ThumbnailPanel extends RoundJPanel{
         public void timingEvent(float arg0) {
             if(setAlpha(arg0)){
                 //System.out.println("Thumbnail panel alpha "+getAlpha());
+
             }
 
-            if(!thumbnail.setAlpha(arg0)){
-                animator.stop();
-            }else{
+            if(thumbnail.setAlpha(arg0)){
                 SwingUtilities.invokeLater(new Runnable() {
                     @Override
                     public void run() {
                         repaint();
                     }
                 });
+                
+            }else{
+                animator.stop();
             }
         }
         /**
@@ -159,5 +183,49 @@ public class ThumbnailPanel extends RoundJPanel{
          */
         @Override
         public void repeat() {}
+    }
+
+    class PositionerListener extends MouseInputAdapter{
+
+        private Point startPoint = new Point(0,0);
+        private boolean drag = false;
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            startPoint = e.getPoint();
+            drag = true;
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if(drag){
+                Point currentPoint = e.getPoint();
+                Point currLocation = getLocation();
+
+                int dx = currentPoint.x - startPoint.x;
+                int dy = currentPoint.y - startPoint.y;
+                //System.out.println("DX: "+dx+" DY: "+dy);
+                currLocation.translate(dx, dy);
+                Rectangle newBopunds = 
+                        new Rectangle(currLocation.x, currLocation.y, 
+                                          getWidth(), getHeight());
+                if(checkAccess(newBopunds)){
+                    setLocation(currLocation);                    
+                }
+            }
+        }
+
+        @Override
+        public void mouseReleased(MouseEvent e) {
+            drag =  false;
+        }
+
+        private boolean checkAccess(Rectangle rec){
+            Container parent = getParent();
+            if(parent != null){
+                return parent.getBounds().contains(rec);
+            }
+            return false;
+        }
     }
 }
