@@ -6,7 +6,9 @@
 package app.navigps.utils;
 
 import java.awt.Point;
+import java.awt.Rectangle;
 import java.awt.geom.AffineTransform;
+import java.awt.geom.Rectangle2D;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.w3c.dom.svg.SVGMatrix;
 import org.w3c.dom.svg.SVGPoint;
@@ -129,5 +131,27 @@ public class NaviPoint extends SVGOMPoint{
     @Override
     public String toString() {
         return "x: "+getX()+" y: "+getY();
+    }
+
+    /**
+     * Create area square to surround this point.
+     * Radius is a half the length of the side of the square.
+     *
+     * @param float - half the length of the side of the square
+     * @return Rectangle.Float - Square to surround this point
+     */
+    public Rectangle.Float createAreaSquareF(float radius){
+        return new Rectangle2D.Float(x-radius, y-radius, x+radius, y+radius);
+    }
+
+    /**
+     * Create area square to surround this point.
+     * Radius is a half the length of the side of the square.
+     *
+     * @param float - half the length of the side of the square
+     * @return Rectangle.Integer - Square to surround this point
+     */
+    public Rectangle createAreaSquareI(float radius){
+        return new Rectangle((int)(x-radius), (int)(y-radius),(int) (radius*2), (int)(radius*2));
     }
 }
