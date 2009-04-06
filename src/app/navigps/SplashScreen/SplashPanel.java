@@ -18,7 +18,6 @@ import java.awt.BorderLayout;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.JProgressBar;
-import javax.swing.SwingWorker;
 
 /**
  *
@@ -57,6 +56,12 @@ public class SplashPanel extends javax.swing.JPanel implements PropertyChangeLis
 
     public JProgressBar getProgressBar(){
         return jProgressBar1;
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.out.println(getClass().getCanonicalName()+ " Method Finalize !");
     }
 
     /** This method is called from within the constructor to

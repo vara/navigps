@@ -85,6 +85,12 @@ public class ReflectionPanel extends AlphaJPanel {
         installRepaintManager();        
         initialized = true;
     }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.out.println(getClass().getCanonicalName()+ " Method Finalize !");
+    }
     
     private void installRepaintManager() {
         ReflectionRepaintManager manager = new ReflectionRepaintManager();
