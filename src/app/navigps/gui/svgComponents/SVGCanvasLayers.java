@@ -8,11 +8,13 @@ package app.navigps.gui.svgComponents;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import app.navigps.gui.detailspanel.RoundWindow;
 import app.navigps.gui.detailspanel.RoundWindowUtils;
+import app.navigps.gui.detailspanel.SimpleBusyPanel;
 import app.navigps.gui.svgComponents.Thumbnail.Thumbnail;
 import app.navigps.gui.svgComponents.Thumbnail.ThumbnailPanel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.JLayeredPane;
@@ -48,6 +50,7 @@ public class SVGCanvasLayers extends JLayeredPane{
     private AlphaJPanel modalContainer;
     private AlphaJPanel thumbnailContainer;
     private AlphaJPanel servicesContainer;
+    private SimpleBusyPanel glassPane;
 
     /**
      *
@@ -58,6 +61,14 @@ public class SVGCanvasLayers extends JLayeredPane{
 
         setSVGCanvas(createSVGCanvas(), JLayeredPane.FRAME_CONTENT_LAYER);
         createDefaultContainers();
+    }
+
+    private void createGlasspane(){
+        setGlassPane(new CanvasBusyPanel());
+        getSvgCanvas().addSVGDocumentLoaderListener((CanvasBusyPanel)getGlassPane());
+        getSvgCanvas().addGVTTreeRendererListener((CanvasBusyPanel)getGlassPane());
+        getSvgCanvas().addGVTTreeRendererListener((CanvasBusyPanel)getGlassPane());
+        add(getGlassPane(),POPUP_LAYER);
     }
 
     private void createDefaultContainers(){
@@ -90,6 +101,8 @@ public class SVGCanvasLayers extends JLayeredPane{
         add(getServicesContainer(),DISPLAY_SERVICES_LAYER);
 
         createThumbnails();
+
+        createGlasspane();
     }
 
     private RoundWindow createRoundWindowProperties(){
@@ -190,5 +203,19 @@ public class SVGCanvasLayers extends JLayeredPane{
      */
     public RoundWindow getDetailsPane() {
         return detailsPane;
+    }
+
+    /**
+     * @return the glassPane
+     */
+    public SimpleBusyPanel getGlassPane() {
+        return glassPane;
+    }
+
+    /**
+     * @param glassPane the glassPane to set
+     */
+    public void setGlassPane(SimpleBusyPanel glassPane) {
+        this.glassPane = glassPane;
     }
 }
