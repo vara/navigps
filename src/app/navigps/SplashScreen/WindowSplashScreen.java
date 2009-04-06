@@ -15,7 +15,6 @@ import app.navigps.WindowInitialEvent;
 import app.navigps.WindowInitialListener;
 import app.navigps.gui.NaviRootWindow;
 import app.navigps.utils.NaviLogger;
-import com.sun.awt.AWTUtilities;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.GradientPaint;
@@ -34,12 +33,10 @@ import java.lang.reflect.Method;
 import java.util.ArrayList;
 import java.util.concurrent.ExecutionException;
 import java.util.logging.Level;
-import java.util.logging.Logger;
 import javax.swing.JComponent;
 import javax.swing.JPanel;
 import javax.swing.SwingWorker;
 import javax.swing.Timer;
-import sun.awt.AWTAccessor;
 
 /**
  *
@@ -97,7 +94,7 @@ public class WindowSplashScreen extends javax.swing.JFrame implements ActionList
     // <editor-fold defaultstate="collapsed" desc="Generated Code">//GEN-BEGIN:initComponents
     private void initComponents() {
 
-        setDefaultCloseOperation(javax.swing.WindowConstants.EXIT_ON_CLOSE);
+        setDefaultCloseOperation(javax.swing.WindowConstants.DISPOSE_ON_CLOSE);
 
         javax.swing.GroupLayout layout = new javax.swing.GroupLayout(getContentPane());
         getContentPane().setLayout(layout);
@@ -135,8 +132,7 @@ public class WindowSplashScreen extends javax.swing.JFrame implements ActionList
     }
 
     @Override
-    protected void finalize() throws Throwable {
-        super.finalize();
+    protected void finalize() throws Throwable {        
         System.out.println(getClass().getCanonicalName()+ " Method Finalize !");
     }
 
@@ -196,7 +192,6 @@ public class WindowSplashScreen extends javax.swing.JFrame implements ActionList
     }
 
     class Task extends SwingWorker<NaviRootWindow, Void> {
-
 
 
         @Override
@@ -267,6 +262,7 @@ public class WindowSplashScreen extends javax.swing.JFrame implements ActionList
                 System.err.println(""+ex);
             }            
             new CloseDelay(2500);
+            this.removePropertyChangeListener(splashPanel);
         }
 
         private void incrementProgress(int count){
@@ -291,12 +287,15 @@ public class WindowSplashScreen extends javax.swing.JFrame implements ActionList
 
         @Override
         public void actionPerformed(ActionEvent e) {
-            setVisible(false);
+                    
             getContentPane().removeAll();
-            removeNotify();
-            dispose();
+            reflectionPanel = null;
+            splashPanel = null;
+            args = null;
+            task = null;
+            setVisible(false);
+            dispose();            
         }
-
     }
 /*
 
