@@ -32,8 +32,13 @@ public class ServiceListModel extends AbstractListModel{
     
     public void addServices(Vector<ServiceCore> vServiceCore){
         int lastIndex = arrayServices.size()-1;
-        arrayServices.addAll(vServiceCore);
-        fireContentsChanged(this, lastIndex,arrayServices.size()-1);
+        for (ServiceCore sc : vServiceCore) {
+            if(!arrayServices.contains(sc)){
+                arrayServices.add(sc);
+            }
+        }
+        int currentIndex = arrayServices.size()-1;
+        fireContentsChanged(this, lastIndex,currentIndex);
     }
 
     public void setAllServices(Vector<ServiceCore> vServiceCore){

@@ -24,6 +24,7 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Vector;
+import javax.swing.JButton;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollBar;
@@ -46,7 +47,7 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
     public ServicesInfoDisplayedList() {
         initComponents();
 
-        jPanel1.setLayout(new BorderLayout());
+        jPanel1.setLayout(new BorderLayout(5,5));
 
         list = new JList(new ServiceListModel());
 
@@ -58,7 +59,7 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBorder(new OvalBorder(5,5,5,5,10, 10,new Color(204,219,255)));
+        scrollPane.setBorder(new OvalBorder(5,5,5,5,0, 0,new Color(204,219,255)));
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.getViewport().setBorder(null);
@@ -75,6 +76,7 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
         scrollPane.setViewportView(list);
 
         jPanel1.add(scrollPane,BorderLayout.CENTER);
+        jPanel1.add(new JButton("test"),BorderLayout.NORTH);
 
         jScrollPane1.setBorder(null);
         jScrollPane1.setOpaque(false);
@@ -290,7 +292,7 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
         jName.setText(sd.getServiceName());
         jCity.setText(sd.getCity());
         jStreet.setText(sd.getServiceStreet()+" "+sd.getServiceNumber());
-        jCoord.setText("x: "+Utils.roundsValue(sc.getServiceAttributes().getX(),2)+" y: "+Utils.roundsValue(sc.getServiceAttributes().getY(),2));
+        jCoord.setText(" x: "+Utils.roundsValue(sc.getServiceAttributes().getX(),2)+" y: "+Utils.roundsValue(sc.getServiceAttributes().getY(),2));
         jCategory.setText(sd.getCategory().getName());
         jAddit.setText(sd.getAdditionaInfo());
     }

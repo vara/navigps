@@ -11,7 +11,7 @@ import java.util.LinkedList;
 
 /**
  *
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public class SVGBridgeComponents implements StatusChangedListener,
                                     UpdateComponentsWhenChangedDoc{
