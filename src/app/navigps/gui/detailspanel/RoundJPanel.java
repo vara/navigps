@@ -12,6 +12,7 @@ import java.awt.Graphics2D;
 import java.awt.Insets;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
 import java.awt.geom.Point2D;
 import java.awt.geom.RoundRectangle2D;
 import javax.swing.border.Border;
@@ -64,7 +65,8 @@ public class RoundJPanel extends AlphaJPanel{
         inner.intersect(outer);
         //Rectangle2D rec2 = inner.getBounds2D();
         //System.out.println("visible rect x: "+rec2.getX()+" y: "+rec2.getY()+" w: "+rec2.getWidth()+" h: "+rec2.getHeight());
-        g2.setClip(inner);
+        GeneralPath gp = new GeneralPath(inner);
+        g2.setClip(gp);
         super.paintChildren(g2);        
     }
 
