@@ -25,7 +25,6 @@ import javax.swing.event.MouseInputAdapter;
 import net.java.balloontip.BalloonTip;
 import net.java.balloontip.styles.BalloonTipStyle;
 import net.java.balloontip.styles.ModernBalloonStyle;
-import net.java.balloontip.utils.ToolTipUtils;
 import app.database.odb.core.ServiceCore;
 import org.neodatis.odb.OID;
 
@@ -282,14 +281,14 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
             //System.err.println(ObjectService.this.toString());
             //setToolTip(toolTipString);
             //System.out.println("Mouse Entered on Service object "+getServiceName());
-            System.out.println(" ");
-            BallonDispalyManager.showBallon(balloon, 10, 3000);
+            if(e.getModifiers() == 0)
+                BallonDispalyManager.showBallon(balloon, 10, 3000);
         }
 
         @Override
         public void mousePressed(MouseEvent e) {
             if(e.getButton() == MouseEvent.BUTTON3){
-                MyPopupMenu popup = new MyPopupMenu();
+                MyPopupMenu popup = new MyPopupMenu("Actions");
                 JMenuItem miRemoveThis= new JMenuItem("Remove this service");
                 JMenuItem miRemoveAll= new JMenuItem("Remove all services");
                 miRemoveThis.addActionListener(new ActionListener() {

@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.svgComponents;
 
 import app.navigps.gui.StatusChangedListener;
@@ -29,7 +24,9 @@ public class SVGBridgeComponents implements StatusChangedListener,
     /**
      *
      */
-    public SVGBridgeComponents(){}
+    public SVGBridgeComponents(){
+        System.out.println("Create "+getClass().getCanonicalName());
+    }
     
     /**
      *

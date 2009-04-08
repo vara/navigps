@@ -925,6 +925,10 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                 public void run() {
                     setComponetsEnableWhenDocumentLoaded(true);
                     views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
+                    SVGCanvasLayers svgLay = getSVGCanvasLayers();
+                    if(svgLay != null){
+                        svgLay.updateSynchronizedLayers();
+                    }
                 }
             });
             w.start();

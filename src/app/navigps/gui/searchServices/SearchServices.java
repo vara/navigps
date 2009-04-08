@@ -21,7 +21,6 @@ import java.awt.geom.Ellipse2D;
 import java.awt.BorderLayout;
 import java.awt.Rectangle;
 import java.awt.event.ActionListener;
-import java.awt.geom.Rectangle2D.Float;
 import java.beans.PropertyChangeEvent;
 import java.beans.PropertyChangeListener;
 import javax.swing.event.MouseInputAdapter;

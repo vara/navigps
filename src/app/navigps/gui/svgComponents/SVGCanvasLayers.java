@@ -14,7 +14,6 @@ import app.navigps.gui.svgComponents.Thumbnail.ThumbnailPanel;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import javax.swing.JLayeredPane;
@@ -103,6 +102,23 @@ public class SVGCanvasLayers extends JLayeredPane{
         createThumbnails();
 
         createGlasspane();
+    }
+
+    public void updateSynchronizedLayers(){
+        Component [] comps = getComponents();
+        //for test
+        int countSynchLayers=0;        
+        for (Component comp : comps) {
+            if(comp instanceof SynchronizedSVGLayer){
+                ((SynchronizedSVGLayer)comp).updateComponent();
+                countSynchLayers++;
+            }
+        }
+        String msg = "***Update synchronized layers.\nFinished !\nStatus:\n\tAll components: "+
+                     comps.length+" including Synchronized layers: "+
+                     countSynchLayers+"\n****";
+
+        System.out.println(msg);
     }
 
     private RoundWindow createRoundWindowProperties(){
