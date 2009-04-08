@@ -66,7 +66,7 @@ public class RightLocation extends LocationManager{
                 height = root.getHeight()-e.getY();
                 root.setSize(root.getWidth(), height);
             }
-            root.updateMyUI();
+            root.updatePosition();
             needRevalidate=true;
         }
     }

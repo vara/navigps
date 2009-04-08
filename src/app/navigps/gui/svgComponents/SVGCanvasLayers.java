@@ -81,7 +81,7 @@ public class SVGCanvasLayers extends JLayeredPane{
             public void componentResized(ComponentEvent e) {
                 Container cont = RoundWindowUtils.getRoundWindowFromContainer((Container)e.getSource());
                 if(cont != null){
-                    ((RoundWindow)cont).updateMyUI();
+                    ((RoundWindow)cont).updatePosition();
                 }
             }
         });

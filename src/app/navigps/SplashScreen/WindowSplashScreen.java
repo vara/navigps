@@ -1,6 +1,6 @@
 
 /*
- * TestRelection.java
+ * WindowSplashScreen.java
  *
  * Created on 2009-04-01, 14:36:25
  */

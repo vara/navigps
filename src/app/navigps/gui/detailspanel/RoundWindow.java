@@ -136,7 +136,7 @@ public class RoundWindow extends RoundJPanel
         //System.err.println("Content size: "+contentPaneSize+
         //        " Insets rootPane: "+rootPaneInsets+
         //        " Insets Window "+winInsets+" window size "+getSize());
-        updateMyUI();
+        updatePosition();
     }
 
     /**
@@ -240,12 +240,12 @@ public class RoundWindow extends RoundJPanel
     /**
      *
      */
-    public void updateMyUI(){
+    public void updatePosition(){
         Container parent = getParent();
         if(parent == null)
             return;
         Rectangle rec = location.updateLocation(getParent());
-        updateMyUI(rec);
+        updatePosition(rec);
         //int x = (getParent().getWidth()-getWidth());
         //int y = (getParent().getHeight()-getHeight())>>1;
         //updateMyUI(x, y, getWidth(), getHeight());
@@ -254,11 +254,11 @@ public class RoundWindow extends RoundJPanel
         //        "\tLocation on parent component ["+getLocation().getX()+","+getLocation().y+"]");
     }
 
-    protected void updateMyUI(int x,int y) {
-        updateMyUI(x,y, getWidth(), getHeight());
+    protected void updatePosition(int x,int y) {
+        updatePosition(x,y, getWidth(), getHeight());
     }
 
-    protected void updateMyUI(final Rectangle rec){
+    protected void updatePosition(final Rectangle rec){
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
@@ -269,8 +269,8 @@ public class RoundWindow extends RoundJPanel
         });
     }
 
-    protected void updateMyUI(int x,int y,int width,int height){
-        updateMyUI(new Rectangle(x, y, width, height));
+    protected void updatePosition(int x,int y,int width,int height){
+        updatePosition(new Rectangle(x, y, width, height));
     }
 
     private void installRepaintManager() {

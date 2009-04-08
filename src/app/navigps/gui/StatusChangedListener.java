@@ -2,7 +2,7 @@ package app.navigps.gui;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public interface StatusChangedListener {
     /**

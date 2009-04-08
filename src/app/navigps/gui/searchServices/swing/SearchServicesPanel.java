@@ -411,7 +411,7 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                     
                     if(!retVal.isEmpty()){
                         if(!rWindow.isEnabled()){
-                            rWindow.updateMyUI();
+                            rWindow.updatePosition();
                             rWindow.setEnabled(true);
                         }
                     }else{
@@ -574,7 +574,7 @@ public class SearchServicesPanel extends javax.swing.JPanel{
             container.addComponentListener(new ComponentAdapter() {
                 @Override
                 public void componentResized(ComponentEvent e) {
-                    rWindow.updateMyUI();
+                    rWindow.updatePosition();
                 }
             });
         }else{

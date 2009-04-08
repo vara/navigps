@@ -19,7 +19,7 @@ import org.jdesktop.animation.timing.TimingTarget;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public class DefaultAlphaLabelPanel extends AlphaJPanel{
 
