@@ -150,7 +150,7 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
             getBalloonTip().setAnimationDuration(350);
             getBalloonTip().setIcon(getIcon());
             getBalloonTip().enableClickToHide(true);
-            ToolTipUtils.balloonToToolTip(getBalloonTip(),0, 5000);
+            //ToolTipUtils.balloonToToolTip(getBalloonTip(),0, 5000);
         }
 	}
 
@@ -281,6 +281,9 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         public void mouseEntered(MouseEvent e) {
             //System.err.println(ObjectService.this.toString());
             //setToolTip(toolTipString);
+            //System.out.println("Mouse Entered on Service object "+getServiceName());
+            System.out.println(" ");
+            BallonDispalyManager.showBallon(balloon, 10, 3000);
         }
 
         @Override
