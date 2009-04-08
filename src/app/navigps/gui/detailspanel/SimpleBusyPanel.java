@@ -92,7 +92,6 @@ public class SimpleBusyPanel extends RoundJPanel implements MouseListener{
     protected void paintComponent(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
         super.paintComponent(g2);
-        Color tmpColor = g.getColor();
         g2.setColor(backgroundColor);
         RoundRectangle2D round = computeVisibleChildrenArea();
         g2.fillRoundRect((int)round.getX(),(int)round.getY(),
@@ -115,7 +114,6 @@ public class SimpleBusyPanel extends RoundJPanel implements MouseListener{
         int y = ((height-(int)textBounds.getHeight())>>1);
 
 
-        Composite composite = g2.getComposite();
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.85f));
 
         g2.setRenderingHint(RenderingHints.KEY_TEXT_ANTIALIASING, RenderingHints.VALUE_TEXT_ANTIALIAS_ON);
@@ -127,9 +125,6 @@ public class SimpleBusyPanel extends RoundJPanel implements MouseListener{
         g2.setColor(new Color(190,190,190));
         g2.drawGlyphVector(gv, x+1, y+1);
 
-        g2.setColor(tmpColor);
-
-        g2.setComposite(composite);
     }
 
     @Override
@@ -164,28 +159,5 @@ public class SimpleBusyPanel extends RoundJPanel implements MouseListener{
      */
     public void setText(String text) {
         this.infoText = text;
-    }
-
-    class AnimatorBehaviour implements TimingTarget{
-
-        @Override
-        public void timingEvent(float arg0) {
-            if(!setAlpha(arg0)){
-                animator.stop();
-            }
-        }
-
-        @Override
-        public void begin() {
-        }
-
-        @Override
-        public void end() {
-        }
-
-        @Override
-        public void repeat() {
-        }
-
     }
 }

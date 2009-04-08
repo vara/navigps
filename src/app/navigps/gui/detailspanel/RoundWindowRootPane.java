@@ -33,11 +33,6 @@ public class RoundWindowRootPane extends RoundJPanel{
         setLayout(createRootLayout());
         updateUI();
     }
-    
-    /*
-     *  Methods to created all Root Pane
-     *
-     */
 
     /**
      *
@@ -85,7 +80,7 @@ public class RoundWindowRootPane extends RoundJPanel{
         return new RootLayout();
     }
     
-    /************************************************
+    /**
      * @return
      */
 
@@ -131,7 +126,7 @@ public class RoundWindowRootPane extends RoundJPanel{
         glassPane = glass;
         this.add(glassPane, 0);
         if (visible) {
-            repaint();
+            repaint(0,0,getWidth(),getHeight());
         }
     }
 
