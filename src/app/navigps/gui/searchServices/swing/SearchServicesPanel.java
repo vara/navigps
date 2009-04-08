@@ -33,20 +33,19 @@ import app.database.odb.core.ServiceCore;
 import app.database.odb.utils.ConnectionListener;
 import app.database.odb.utils.Constants;
 import app.database.odb.utils.ODBConnection;
-import app.navigps.gui.borders.EmptyOvalBorder;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import app.navigps.gui.detailspanel.ContentPaneForRoundWindow;
 import app.navigps.gui.detailspanel.LoacationManager.LeftLocation;
 import app.navigps.gui.detailspanel.RoundWindow;
 import app.navigps.gui.svgComponents.SVGCanvasLayers;
 import app.navigps.utils.NaviLogger;
+import app.navigps.utils.NaviUtilities;
 import java.awt.BorderLayout;
 import java.awt.Container;
 import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
 import java.util.logging.Level;
-import javax.swing.JRootPane;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
 import org.neodatis.odb.ObjectRepresentation;
@@ -362,7 +361,7 @@ public class SearchServicesPanel extends javax.swing.JPanel{
     }
 
     private AbstractDisplayManager getDisplayManager(){
-        SVGCanvasLayers svgCanvaasLayers = getSVGCanvasLayers();
+        SVGCanvasLayers svgCanvaasLayers = NaviUtilities.getSVGCanvasLayers(getParent());
         if(svgCanvaasLayers != null){
             return svgCanvaasLayers.getSvgCanvas().getDisplayManager();
         }else{
@@ -547,7 +546,7 @@ public class SearchServicesPanel extends javax.swing.JPanel{
 
     private void createRoundWindowForServicesList(){
         rWindow = new RoundWindow();
-        SVGCanvasLayers svgcl = getSVGCanvasLayers();
+        SVGCanvasLayers svgcl = NaviUtilities.getSVGCanvasLayers(getParent());
         if(svgcl!=null){
 
             AlphaJPanel container = svgcl.getModalContainer();
@@ -583,19 +582,6 @@ public class SearchServicesPanel extends javax.swing.JPanel{
             System.err.println(getClass().getCanonicalName()+" "+msg);
         }
     }
-
-    private SVGCanvasLayers getSVGCanvasLayers(){
-        SVGCanvasLayers svgCanvasLayer = null;
-        Container parent = this;
-        while((parent = parent.getParent())!=null){
-            if(parent instanceof SVGCanvasLayers){
-                System.err.println("Found SVGCanvaaslayer");
-                return (SVGCanvasLayers)parent;
-            }
-        }
-        return svgCanvasLayer;
-    }
-
     /**
      *
      * @param value
@@ -693,5 +679,3 @@ public class SearchServicesPanel extends javax.swing.JPanel{
         }
     }
 }
- 
-
