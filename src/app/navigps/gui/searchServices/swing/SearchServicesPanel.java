@@ -647,8 +647,10 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                 reloadCategory();
             }else if(newObject instanceof ServiceCore){                
                 AbstractDisplayManager dm = getDisplayManager();
-                ((ServiceCore)newObject).setOID(oid);
-                dm.updateService(newObject);
+                if(dm != null){
+                    ((ServiceCore)newObject).setOID(oid);
+                    dm.updateService(newObject);
+                }
             }
         }
     }

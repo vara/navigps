@@ -6,7 +6,7 @@ package app.database.odb.core;
  */
 public class Subcategory {
     
-    private String name;
+    private String name ="no subcategory";
     private Category category;
     
     /**
@@ -15,7 +15,7 @@ public class Subcategory {
      * @param name
      */
     public Subcategory(Category category,String name) {
-        this.name = name;
+        setName(name);
         this.category = category;
     }
 
@@ -32,7 +32,8 @@ public class Subcategory {
      * @param name
      */
     public void setName(String name) {
-        this.name = name;
+        if(name!=null)
+            this.name = name;
     }
 
     /**
@@ -50,4 +51,11 @@ public class Subcategory {
     public void setCategory(Category category) {
         this.category = category;
     }
+
+    @Override
+    public String toString() {
+        return "Subcategory: "+getName();
+    }
+
+
 }

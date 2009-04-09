@@ -54,9 +54,7 @@ public class ServiceAttributes {
 
     @Override
     public String toString() {
-        String msg = getClass().getCanonicalName()+
-                " [ x : "+getX()+" y : "+getY()+
-                " ServiceCore : "+getServiceCore()+" ]";
+        String msg ="x: "+getX()+" y: "+getY();
         return msg;
     }
 }

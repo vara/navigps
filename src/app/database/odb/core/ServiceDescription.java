@@ -6,23 +6,26 @@ package app.database.odb.core;
  */
 public class ServiceDescription {
 
-    private String serviceNumber;
-    private String serviceName;
-    private String serviceStreet;
-    private Category category;
+    private String serviceNumber = "no service number";;
+    private String serviceName = "no service name";
+    private String serviceStreet = "no service street";
+    private String serviceCity = "no city";
+    private String serviceAdditionaInfo = "no additional info";
+
+    private Category category ;
     private Subcategory serviceSubCategory;
-    private String additionaInfo;
+    
     private ServiceCore sc;
-    private String city;
+    
 
     public ServiceDescription(String number, String name, String street, Category category, Subcategory subcategory, String additionalInfo,String city) {
-        this.serviceNumber = number;
-        this.serviceName = name;
-        this.serviceStreet = street;
-        this.category = category;
-        this.serviceSubCategory = subcategory;
-        this.additionaInfo = additionalInfo;
-        this.city = city;
+        setServiceNumber(number);
+        setServiceName(name);
+        setServiceStreet(street);
+        setCategory(category);
+        setServiceSubCategory(subcategory);
+        setAdditionaInfo(additionalInfo);
+        setCity(city);
     }
 
     /**
@@ -36,7 +39,8 @@ public class ServiceDescription {
      * @param serviceNumber the serviceNumber to set
      */
     public void setServiceNumber(String serviceNumber) {
-        this.serviceNumber = serviceNumber;
+        if(serviceNumber != null)
+            this.serviceNumber = serviceNumber;
     }
 
     /**
@@ -50,7 +54,8 @@ public class ServiceDescription {
      * @param serviceName the serviceName to set
      */
     public void setServiceName(String serviceName) {
-        this.serviceName = serviceName;
+        if(serviceName!=null)
+            this.serviceName = serviceName;
     }
 
     /**
@@ -64,7 +69,8 @@ public class ServiceDescription {
      * @param serviceStreet the serviceStreet to set
      */
     public void setServiceStreet(String serviceStreet) {
-        this.serviceStreet = serviceStreet;
+        if(serviceStreet!=null)
+            this.serviceStreet = serviceStreet;
     }
 
     /**
@@ -78,21 +84,23 @@ public class ServiceDescription {
      * @param serviceSubCategory the serviceSubCategory to set
      */
     public void setServiceSubCategory(Subcategory serviceSubCategory) {
-        this.serviceSubCategory = serviceSubCategory;
+        if(serviceSubCategory != null)
+            this.serviceSubCategory = serviceSubCategory;
     }
 
     /**
      * @return the additionaInfo
      */
     public String getAdditionaInfo() {
-        return additionaInfo;
+        return serviceAdditionaInfo;
     }
 
     /**
      * @param additionaInfo the additionaInfo to set
      */
     public void setAdditionaInfo(String additionaInfo) {
-        this.additionaInfo = additionaInfo;
+        if(additionaInfo != null)
+            this.serviceAdditionaInfo = additionaInfo;
     }
 
     /**
@@ -106,7 +114,8 @@ public class ServiceDescription {
      * @param category the category to set
      */
     public void setCategory(Category category) {
-        this.category = category;
+        if(category != null)
+            this.category = category;
     }
 
     /**
@@ -120,14 +129,22 @@ public class ServiceDescription {
      * @param sc the sc to set
      */
     public void setServiceCore(ServiceCore sc) {
-        this.sc = sc;
+        if(sc != null)
+            this.sc = sc;
     }
 
     @Override
-    public String toString() {
-        String msg = getClass().getCanonicalName()+
-                " [ Category : "+getCategory()+" [ Number :"+getServiceNumber()+
-                " Name : "+getServiceName()+" Streat : "+getServiceStreet()+" ]]";
+    public String toString() {     
+
+        String msg = "Description:\nName: " + getServiceName() +
+                     "\nCity: "+getCity()+
+                     "\nStreet: " + getServiceStreet() +
+                     "\nNumber: " + getServiceNumber() +
+                     "\n" + getCategory() +
+                     "\nSubcategory: " + 
+                     (getServiceSubCategory() == null ? "no subcategory":getServiceSubCategory() )+
+                     "\nAdditional: " + getAdditionaInfo();
+        
         return msg;
     }
 
@@ -135,15 +152,14 @@ public class ServiceDescription {
      * @return the city
      */
     public String getCity() {
-        return city;
+        return serviceCity;
     }
 
     /**
      * @param city the city to set
      */
     public void setCity(String city) {
-        this.city = city;
+        if(city != null)
+            this.serviceCity = city;
     }
-
-
 }

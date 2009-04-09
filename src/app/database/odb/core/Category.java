@@ -9,7 +9,7 @@ import java.util.Vector;
  */
 public class Category {
     
-    private String name;
+    private String name = "no category";
     private Vector subcategories;
     private String icoPath;
     private String defaultIconExtension = ".png";
@@ -19,7 +19,7 @@ public class Category {
      * @param name
      */
     public Category(String name) {
-        this.name = name;
+        setName(name);
         subcategories = null;
         this.icoPath = DataBaseConfig.getIconPath()+name+defaultIconExtension;
     }
@@ -37,7 +37,8 @@ public class Category {
      * @param name
      */
     public void setName(String name) {
-        this.name = name;
+        if(name != null)
+            this.name = name;
     }
 
     /**
@@ -66,8 +67,7 @@ public class Category {
 
     @Override
     public String toString() {
-        String msg = getClass().getCanonicalName()+" [ Name : "+getName()+" ]";
-        return msg;
+        return "Category: " + getName();
     }
 
     /**

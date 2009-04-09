@@ -53,8 +53,15 @@ public class ServiceFactory extends javax.swing.JDialog {
 
     private void fillSubcategoryCombo() {
         Vector v = new Vector();
-
-        IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
+        Object objCategory = jComboBox1.getSelectedItem();
+        if(objCategory == null){
+            String msg = "Category fucking Null in db ala-module";
+            System.err.println(msg);
+            showErrroMessageDialog(msg+". Window has been terminated !");
+            this.dispose();
+            return;
+        }
+        IQuery query = new CriteriaQuery(Category.class, Where.equal("name",objCategory.toString()));
         Objects cat = odb.getObjects(query);
         Category c = (Category) cat.getFirst();
         if (c.getSubcategories() == null || c.getSubcategories().isEmpty()) {
@@ -370,6 +377,11 @@ public class ServiceFactory extends javax.swing.JDialog {
         pack();
     }// </editor-fold>//GEN-END:initComponents
 
+   public void showErrroMessageDialog(String txt){
+        JOptionPane.showMessageDialog(ServiceFactory.this, txt,
+                    "Warning", JOptionPane.ERROR_MESSAGE);
+    }
+
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
 
         if (jTextField4.getText().equalsIgnoreCase("") ||
@@ -378,8 +390,8 @@ public class ServiceFactory extends javax.swing.JDialog {
                 jTextField2.getText().equalsIgnoreCase("") ||
                 jTextField6.getText().equalsIgnoreCase("") ||
                 jTextField1.getText().equalsIgnoreCase("")) {
-            JOptionPane.showMessageDialog(ServiceFactory.this, "You have to input all required data!",
-                    "Warning", JOptionPane.ERROR_MESSAGE);
+                showErrroMessageDialog("You have to input all required data!");
+
         } else {
             String options[] = {"Yes", "No"};
             int n = JOptionPane.showOptionDialog(rootPane, "Create service " +
@@ -387,31 +399,38 @@ public class ServiceFactory extends javax.swing.JDialog {
                     JOptionPane.QUESTION_MESSAGE, null, options, null);
             if (n == 0) {
                 Subcategory s = null;
-                IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
+                String sCategory = jComboBox1.getSelectedItem().toString();
+                if(sCategory == null || sCategory.equals("")){
+                    showErrroMessageDialog("No selcted category !");
+                    return;
+                }
+                IQuery query1 = new CriteriaQuery(Category.class, Where.equal("name", sCategory));
                 Objects cat = odb.getObjects(query1);
-                Category c = (Category) cat.getFirst();
-                if (c.getSubcategories() == null || c.getSubcategories().isEmpty()) {
-                    System.out.println("creating service with empty subcategory");
-                } else {
-                    for (Object obj : c.getSubcategories()) {
-                        s = (Subcategory) obj;
-                        if (s.getName().equalsIgnoreCase(jComboBox2.getSelectedItem().toString())) {
-                            break;
-                        } else {
-                            s = null;
+                if(!cat.isEmpty()){
+                    Category c = (Category) cat.getFirst();
+                    if (c.getSubcategories() == null || c.getSubcategories().isEmpty()) {
+                        System.out.println("creating service with empty subcategory");
+                    } else {
+                        for (Object obj : c.getSubcategories()) {
+                            s = (Subcategory) obj;
+                            if (s.getName().equalsIgnoreCase(jComboBox2.getSelectedItem().toString())) {
+                                break;
+                            } else {
+                                s = null;
+                            }
                         }
                     }
-                }
 
-                ServiceAttributes service = new ServiceAttributes();
-                service.setX(Float.parseFloat(jTextField4.getText()));
-                service.setY(Float.parseFloat(jTextField5.getText()));
-                ServiceDescription sd = new ServiceDescription(jTextField3.getText(), jTextField1.getText(), jTextField2.getText(), c, s, jTextArea1.getText(),jTextField6.getText());
-                ServiceCore sc = new ServiceCore(service, sd);
-                sc.getServiceAttributes().setServiceCore(sc);
-                sc.getServiceDescription().setServiceCore(sc);
-                odb.store(sc);
-                odb.commit();
+                    ServiceAttributes service = new ServiceAttributes();
+                    service.setX(Float.parseFloat(jTextField4.getText()));
+                    service.setY(Float.parseFloat(jTextField5.getText()));
+                    ServiceDescription sd = new ServiceDescription(jTextField3.getText(), jTextField1.getText(), jTextField2.getText(), c, s, jTextArea1.getText(),jTextField6.getText());
+                    ServiceCore sc = new ServiceCore(service, sd);
+                    sc.getServiceAttributes().setServiceCore(sc);
+                    sc.getServiceDescription().setServiceCore(sc);
+                    odb.store(sc);
+                    odb.commit();
+                }
                 this.dispose();
             }
         }

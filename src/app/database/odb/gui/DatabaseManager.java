@@ -416,42 +416,9 @@ public class DatabaseManager extends javax.swing.JDialog {
                             ServiceAttributes sa = (ServiceAttributes) cats.getFirst();
                             ServiceDescription sd = sa.getServiceCore().getServiceDescription();
 
-                            Subcategory subCat = sd.getServiceSubCategory();
+                            String msg = "Attributes:\nService at "+sa+"\n"+sd;
+                            jTextArea1.setText(msg);
 
-                            String sSubCat = "no subcategory";
-                            String sAdditional = "no additional info";
-                            String sCategory = "no category";
-                            String sStreet = "no service street";
-                            String sName = "no service name";
-                            String sNumber = "no service number";
-
-                            if (subCat != null) {
-                                sSubCat = subCat.getName();
-                            }
-                            if (sd.getAdditionaInfo() != null) {
-                                sAdditional = sd.getAdditionaInfo();
-                            }
-                            if (sd.getCategory() != null) {
-                                sCategory = sd.getCategory().getName();
-                            }
-                            if (sd.getServiceStreet() != null) {
-                                sStreet = sd.getServiceStreet();
-                            }
-                            if (sd.getServiceName() != null) {
-                                sName = sd.getServiceName();
-                            }
-                            if (sd.getServiceNumber() != null) {
-                                sNumber = sd.getServiceNumber();
-                            }
-
-                            jTextArea1.setText("Attributes:\nService at x: " + sa.getX() +
-                                    " y: " + sa.getY() +
-                                    "\nDescription:\nName: " + sName +
-                                    "\nStreet: " + sStreet +
-                                    "\nNumber: " + sNumber +
-                                    "\nCategory: " + sCategory +
-                                    "\nSubcategory: " + sSubCat +
-                                    "\nAdditional: " + sAdditional);
                         } else {
                             System.out.println("empty selection");
                         }
