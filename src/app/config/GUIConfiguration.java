@@ -4,6 +4,7 @@ import java.awt.Dimension;
 import java.awt.GraphicsDevice;
 import java.awt.GraphicsEnvironment;
 import java.awt.Toolkit;
+import java.io.UnsupportedEncodingException;
 
 /**
  *
@@ -12,6 +13,8 @@ import java.awt.Toolkit;
 public class GUIConfiguration {   
     
     private static Dimension defaultWindowSize = Toolkit.getDefaultToolkit().getScreenSize();
+
+    private static String defaultGuiCharsEncoding = System.getProperty("file.encoding");
 
     /**
      *
@@ -23,6 +26,21 @@ public class GUIConfiguration {
     public static final byte FRAME_SCREEN = 1;
 
     private static byte modeScreen = FRAME_SCREEN;
+
+    /**
+     * @return the defaultGuiCharsEncoding
+     */
+    public static String getDefaultGuiCharsEncoding() {
+        return defaultGuiCharsEncoding;
+    }
+
+    /**
+     * @param aDefaultGuiCharsEncoding the defaultGuiCharsEncoding to set
+     */
+    public static void setDefaultGuiCharsEncoding(String aDefaultGuiCharsEncoding) throws UnsupportedEncodingException {
+        "test".getBytes(aDefaultGuiCharsEncoding);
+        defaultGuiCharsEncoding = aDefaultGuiCharsEncoding;
+    }
 
     /**
      *

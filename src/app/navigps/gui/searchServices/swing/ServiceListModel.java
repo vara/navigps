@@ -27,7 +27,9 @@ public class ServiceListModel extends AbstractListModel{
 
     @Override
     public Object getElementAt(int index) {
-        return arrayServices.get(index);
+        if(index>=0 && index<arrayServices.size())
+            return arrayServices.get(index);
+        return "Bad array index "+index;
     }
     
     public void addServices(Vector<ServiceCore> vServiceCore){

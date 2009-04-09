@@ -211,7 +211,14 @@ public class Utils {
         }
         return newArray;
     }
-    
+
+    public static int[] resizeArray(int[] tab,int expand){
+        int [] newArray = new int [tab.length+expand];
+        for (int i = 0; i < tab.length; i++) {
+            newArray[i] = tab[i];
+        }
+        return newArray;
+    }
     /**
      *
      * @param r

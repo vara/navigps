@@ -66,7 +66,7 @@ public class StringUtils {
      * @return the defaultEncoding
      */
     public static String getDefaultEncoding() {
-        return defaultEncoding;
+        return new String(defaultEncoding);
     }
 
     /**

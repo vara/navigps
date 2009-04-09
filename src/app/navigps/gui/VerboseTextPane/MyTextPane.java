@@ -183,7 +183,7 @@ public class MyTextPane extends JTextPane{
      * @param str
      * @param attr
      */
-    public synchronized void addEndText(String str,SimpleAttributeSet attr){
+    public void addEndText(String str,SimpleAttributeSet attr){
         try {
             ((StyledDocument)getDocument()).insertString(getDocument().getLength(), str, attr);            
             if(isAutoScroll()){
@@ -203,7 +203,7 @@ public class MyTextPane extends JTextPane{
      * @param str
      * @param attr
      */
-    public synchronized void addEndTextnl(String str,SimpleAttributeSet attr){
+    public void addEndTextnl(String str,SimpleAttributeSet attr){
         addEndText(str+"\n", attr);
     }
 

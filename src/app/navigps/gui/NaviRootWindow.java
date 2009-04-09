@@ -3,7 +3,6 @@ package app.navigps.gui;
 import app.navigps.gui.VerboseTextPane.PanelForVerboseWindow;
 import app.navigps.gui.buttons.ToolBarButton;
 import app.navigps.NaviGPSCore;
-import app.navigps.Version;
 import app.navigps.gui.buttons.ToolBarToggleButton;
 import app.navigps.gui.displayItemsMap.DetailsPanel;
 import app.navigps.gui.displayItemsMap.MainDetailsPanel;
@@ -93,6 +92,7 @@ import app.database.odb.gui.DatabaseManager;
 import app.database.odb.utils.ODBConnection;
 import app.navigps.WindowInitialEvent;
 import app.navigps.WindowInitialListener;
+import app.navigps.utils.Console;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import org.apache.batik.bridge.ViewBox;
@@ -368,7 +368,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         String imgLocation = "resources/graphics/icons/" + imageName + "." + ext;
         URL imageURL = NaviRootWindow.class.getResource(imgLocation);
         if (imageURL == null && errOut) {
-            System.err.println("Resource not found: " + imgLocation);
+            System.err.println("Resource not found: " + imgLocation);            
             return null;
         }
         return imageURL;
@@ -500,6 +500,8 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                             odb.setVisible(true);
                         }
                     });
+                }else{
+                    System.err.println("Can't Display the window (shit), no connected to data base !");
                 }
             }
         });

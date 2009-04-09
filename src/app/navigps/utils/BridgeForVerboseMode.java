@@ -1,20 +1,21 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.utils;
 
+import app.config.GUIConfiguration;
 import app.config.MainConfiguration;
+import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.io.Writer;
 import java.util.LinkedList;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 /**
  *
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
 
@@ -30,8 +31,8 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
     
     private PrintWriter out = new PrintWriter(new MyOutputStream(false),false);
     private PrintWriter err = new PrintWriter(new MyOutputStream(true),false);
-    private PrintStream sout = new PrintStream(new MyOutputStream(false),false);
-    private PrintStream serr = new PrintStream(new MyOutputStream(true),false);
+    private PrintStream sout ;
+    private PrintStream serr ;
 
     public static final Console console =
                         new Console();
@@ -40,7 +41,15 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
     /**
      *
      */
-    public BridgeForVerboseMode(){       
+    public BridgeForVerboseMode(){
+        try {
+            String encode = GUIConfiguration.getDefaultGuiCharsEncoding();
+            sout = new PrintStream(new MyOutputStream(false), false, encode);
+            serr = new PrintStream(new MyOutputStream(true),false,encode);
+        } catch (UnsupportedEncodingException ex) {
+            
+        }
+
         if(MainConfiguration.getMode())
             addComponentsWithOutputStream(console);
     }
@@ -50,7 +59,7 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
      * @param text
      */
     @Override
-    public void outputVerboseStream(String text){	
+    public void outputVerboseStream(String text){        
         for (OutputVerboseStream ucomp : updateComponents) {            
             ucomp.outputVerboseStream(text);
         }
@@ -69,7 +78,7 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
      * @param text
      */
     @Override
-    public void outputErrorVerboseStream(String text) {
+    public void outputErrorVerboseStream(String text) {        
         for (OutputVerboseStream ucomp : updateComponents) {            
             ucomp.outputErrorVerboseStream(text);
         }
@@ -124,8 +133,10 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
         }
         @Override
         public void write(int b) throws IOException {           
-            if(b!=10 && b!=13) //FIXED !!! bug. with '\n' 10 Linux 13 Winshit
+            if(b!=10 && b!=13){ //FIXED !!! bug. with '\n' 10 Linux 13 Winshit
                 addToBuffer(b);
+                //Console.out.print(Integer.toHexString(b)+" ");
+            }
             else
                 flush();
         }

@@ -9,17 +9,18 @@ import java.io.PrintStream;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public class Console extends OutputVerboseStreamAdapter{
-    /**
-     *
-     */
-    public static PrintStream out = System.out;
-    /**
-     *
-     */
-    public static PrintStream err = System.err;
+    
+    public static PrintStream out;    
+    public static PrintStream err;
+
+    static {
+            out = System.out;
+            err = System.err;
+    }
+
     /**
      *
      * @param text
