@@ -1,18 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.config;
+
+import java.io.UnsupportedEncodingException;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (wara) Warywoda
  */
 public class DataBaseConfig {
     private static String defaultDatabasePath = "./resources/odb/";
     private static String databaseFilename = "neodatis.odb";
     private static String iconPath = "resources/graphics/icons/";
+
+    private static String defaultDatabaseCharsEncoding = "UTF-8";
 
     /**
      * @return the defaultDatabasePath
@@ -54,5 +53,20 @@ public class DataBaseConfig {
      */
     public static void setIconPath(String aIconPath) {
         iconPath = aIconPath;
+    }
+
+    /**
+     * @return the defaultDatabaseCharsEncoding
+     */
+    public static String getDefaultDatabaseCharsEncoding() {
+        return defaultDatabaseCharsEncoding;
+    }
+
+    /**
+     * @param aDefaultDatabaseCharsEncoding the defaultDatabaseCharsEncoding to set
+     */
+    public static void setDefaultDatabaseCharsEncoding(String aDefaultDatabaseCharsEncoding) throws UnsupportedEncodingException {
+        "test".getBytes(aDefaultDatabaseCharsEncoding);
+        defaultDatabaseCharsEncoding = aDefaultDatabaseCharsEncoding;
     }
 }

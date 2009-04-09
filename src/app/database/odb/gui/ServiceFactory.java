@@ -57,7 +57,7 @@ public class ServiceFactory extends javax.swing.JDialog {
         if(objCategory == null){
             String msg = "Category fucking Null in db ala-module";
             System.err.println(msg);
-            showErrroMessageDialog(msg+". Window has been terminated !");
+            showErrroMessageDialog(msg+". Window will be terminated !");
             this.dispose();
             return;
         }

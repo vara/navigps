@@ -8,9 +8,11 @@ package app.database.odb.utils;
 
 import app.config.DataBaseConfig;
 import app.navigps.utils.NaviLogger;
+import app.navigps.utils.StringUtils;
 import java.io.File;
 import java.util.LinkedList;
 import java.util.logging.Level;
+import org.neodatis.odb.Configuration;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.ODBFactory;
 
@@ -59,6 +61,10 @@ public class ODBConnection {
 
             System.out.println(CONNECTING_INFO);
             NaviLogger.logger.log(Level.FINE, CONNECTING_INFO);
+
+            //for test set default chars encoding
+            Configuration.setDatabaseCharacterEncoding(
+                    DataBaseConfig.getDefaultDatabaseCharsEncoding());            
 
             ODB odb = ODBFactory.open(databasePath+fileName);
             Constants.setDbConnection(odb);
