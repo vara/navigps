@@ -24,7 +24,7 @@ public class EmptyOvalBorder extends OvalBorder{
      * @param recW
      * @param recH
      */
-    public EmptyOvalBorder(double recW,double recH){
+    public EmptyOvalBorder(float recW,float recH){
         super(recH, recH);
     }
 
@@ -32,7 +32,7 @@ public class EmptyOvalBorder extends OvalBorder{
         super(top, left, bottom, right);
     }
 
-    public EmptyOvalBorder(int top, int left, int bottom, int right,double recW,double recH){
+    public EmptyOvalBorder(int top, int left, int bottom, int right,float recW,float recH){
         super(top, left, bottom, right, recW, recH);
     }
 

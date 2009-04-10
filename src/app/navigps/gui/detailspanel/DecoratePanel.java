@@ -30,7 +30,7 @@ public class DecoratePanel extends AbstractDecoratePanel{
         setOpaque(false);
         setPreferredSize(new Dimension(10,30));
         init();
-        setRoundCorner(5,5);
+        setOuterCorners(5,5);
         setInsets(new Insets(0,0,0,0));
     }
 

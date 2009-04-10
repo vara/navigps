@@ -8,8 +8,8 @@ import java.awt.Insets;
  */
 public abstract class RoundBorder extends AlphaBorder{
 
-    private double recw=0;
-    private double rech=0;
+    private float recw=0;
+    private float rech=0;
     
     /**
      *
@@ -22,7 +22,7 @@ public abstract class RoundBorder extends AlphaBorder{
      * @param recw
      * @param rech
      */
-    public RoundBorder(double recw, double rech) {
+    public RoundBorder(float recw, float rech) {
          this.recw=recw;
          this.rech=rech;
     }
@@ -36,28 +36,28 @@ public abstract class RoundBorder extends AlphaBorder{
     /**
      * @return the recw
      */
-    public double getRecW() {
+    public float getRecW() {
         return recw;
     }
 
     /**
      * @param recw the recw to set
      */
-    public void setRecW(double recw) {
+    public void setRecW(float recw) {
         this.recw = recw;
     }
 
     /**
      * @return the rech
      */
-    public double getRecH() {
+    public float getRecH() {
         return rech;
     }
 
     /**
      * @param rech the rech to set
      */
-    public void setRecH(double rech) {
+    public void setRecH(float rech) {
         this.rech = rech;
     }
 
@@ -66,7 +66,7 @@ public abstract class RoundBorder extends AlphaBorder{
      * @param recw
      * @param rech
      */
-    public void setRound(double recw, double rech){
+    public void setRound(float recw, float rech){
         setRecH(rech);
         setRecW(recw);
     }

@@ -44,7 +44,7 @@ public class RotatedButton extends RoundButton{
          * @param size
          * @param round
          */
-        public RotatedButton(String text, boolean clockwise,Dimension size,double round) {
+        public RotatedButton(String text, boolean clockwise,Dimension size,float round) {
             this(text, clockwise, size);
             setRound(round, round);
         }

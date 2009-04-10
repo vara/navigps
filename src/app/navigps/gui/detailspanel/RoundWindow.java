@@ -152,7 +152,7 @@ public class RoundWindow extends RoundJPanel
      * @return Rectangle represent window shape
      */
     public RoundRectangle2D getWindowShape(){
-        Point2D corners = getRoundCorner();
+        Point2D corners = getOuterCorners();
         return new RoundRectangle2D.Double(
                 0,0, getWidth(), getHeight(),corners.getX(),corners.getY());
     }

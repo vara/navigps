@@ -18,8 +18,8 @@ import javax.swing.Action;
 public class RoundButton extends OpacityButton{
 
     private RoundRectangle2D visibleRec;
-    private double roundX=0;
-    private double roundY=0;
+    private float roundX=0;
+    private float roundY=0;
 
     /**
      *
@@ -49,7 +49,7 @@ public class RoundButton extends OpacityButton{
      * @param arcw
      * @param arch
      */
-    public RoundButton(String label,double arcw,double arch){
+    public RoundButton(String label,float arcw,float arch){
         this(label);
         roundX = arcw;
         roundY = arch;
@@ -88,28 +88,28 @@ public class RoundButton extends OpacityButton{
     /**
      * @return the roundX
      */
-    public double getRoundX() {
+    public float getRoundX() {
         return roundX;
     }
 
     /**
      * @param roundX the roundX to set
      */
-    public void setRoundX(double roundX) {
+    public void setRoundX(float roundX) {
         this.roundX = roundX;
     }
 
     /**
      * @return the roundY
      */
-    public double getRoundY() {
+    public float getRoundY() {
         return roundY;
     }
 
     /**
      * @param roundY the roundY to set
      */
-    public void setRoundY(double roundY) {
+    public void setRoundY(float roundY) {
         this.roundY = roundY;
     }
     /**
@@ -117,7 +117,7 @@ public class RoundButton extends OpacityButton{
      * @param arcw
      * @param arch
      */
-    public void setRound(double arcw,double arch){
+    public void setRound(float arcw,float arch){
         setRoundX(arcw);
         setRoundY(arch);
     }

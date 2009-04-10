@@ -23,6 +23,9 @@ import javax.swing.border.Border;
  */
 public class RoundJPanel extends AlphaJPanel{
 
+    private float innerCornerW;
+    private float innerCornerH;
+
     /**
      *
      */
@@ -35,9 +38,10 @@ public class RoundJPanel extends AlphaJPanel{
      * @param recW
      * @param recH
      */
-    public RoundJPanel(double recW,double recH){
+    public RoundJPanel(float recW,float recH){
         setOpaque(false);
         setBorder(new EmptyOvalBorder(recW,recH));
+        setInnerCorners(recW, recH);
     }
 
     /**
@@ -81,8 +85,8 @@ public class RoundJPanel extends AlphaJPanel{
         int canY = ins.top;
         int canWidth = bounds.width-ins.left-ins.right;
         int canHeight = bounds.height-ins.top-ins.bottom;
-        double arcx = getRoundBorder().getRecW();
-        double arcy = getRoundBorder().getRecH();
+        float arcx = getInnerCornerW();
+        float arcy = getInnerCornerH();
         return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
     }
 
@@ -91,7 +95,7 @@ public class RoundJPanel extends AlphaJPanel{
      * @param arcW
      * @param arcH
      */
-    public void setRoundCorner(double arcW,double arcH){
+    public void setOuterCorners(float arcW,float arcH){
         RoundBorder bord = getRoundBorder();
         bord.setRecW(arcW);
         bord.setRecH(arcH);
@@ -101,17 +105,17 @@ public class RoundJPanel extends AlphaJPanel{
      *
      * @param val
      */
-    public void setRoundCorner(Point2D.Double val){
-        setRoundCorner(val.getX(),val.getY());
+    public void setOuterCorners(Point2D.Float val){
+        setOuterCorners((float)val.getX(),(float)val.getY());
     }
 
     /**
      *
      * @return
      */
-    public Point2D getRoundCorner(){
+    public Point2D getOuterCorners(){
         RoundBorder bord = getRoundBorder();
-        return new Point2D.Double(bord.getRecW(),bord.getRecH());
+        return new Point2D.Float(bord.getRecW(),bord.getRecH());
     }
 
     /**
@@ -161,8 +165,53 @@ public class RoundJPanel extends AlphaJPanel{
     @Override
     public Graphics getGraphics() {
         Graphics g = super.getGraphics();
-        Point2D p = getRoundCorner();
+        Point2D p = getOuterCorners();
         g.setClip(new RoundRectangle2D.Double(0,0,getWidth(),getHeight(),p.getX(),p.getY()));
         return g;
+    }
+
+    /**
+     * @return the innerCornerW
+     */
+    public float getInnerCornerW() {
+        return innerCornerW;
+    }
+
+    /**
+     * @param innerCornerW the innerCornerW to set
+     */
+    public void setInnerCornerW(float innerCornerW) {
+        this.innerCornerW = innerCornerW;
+    }
+
+    /**
+     * @return the innerCornerH
+     */
+    public float getInnerCornerH() {
+        return innerCornerH;
+    }
+
+    /**
+     * @param innerCornerH the innerCornerH to set
+     */
+    public void setInnerCornerH(float innerCornerH) {
+        this.innerCornerH = innerCornerH;
+    }
+
+    public void setInnerCorners(float arcW,float arcH){
+        setInnerCornerW(arcW);
+        setInnerCornerH(arcH);
+    }
+
+    /**
+     *
+     * @param val
+     */
+    public void setInnerCorners(Point2D.Float val){
+        setInnerCorners((float)val.getX(),(float)val.getY());
+    }
+
+    public Point2D getInnerCorners(){
+        return new Point2D.Float(getInnerCornerW(),getInnerCornerH());
     }
 }

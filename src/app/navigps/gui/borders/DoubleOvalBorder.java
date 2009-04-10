@@ -207,14 +207,14 @@ public class DoubleOvalBorder extends OvalBorder{
     /**
      * @return the roundInnerH
      */
-    public double getRoundInnerH() {
+    public float getRoundInnerH() {
         return innerBorder.getRecH();
     }
 
     /**
      * @param arcH
      */
-    public void setRoundInnerH(double arcH) {
+    public void setRoundInnerH(float arcH) {
         innerBorder.setRecH(arcH);
     }
 }

@@ -35,7 +35,7 @@ public class ContentPaneForRoundWindow extends RoundJPanel implements AlphaInter
             super.paintComponent(g); //set alpha for content pane
             
             Graphics2D g2 = (Graphics2D)g.create();
-            Point2D roundCorner = getRoundCorner();
+            Point2D roundCorner = getOuterCorners();
             RoundRectangle2D borderShape = OvalBorder.createOuterShape(2,2,
                         getWidth()-4,getHeight()-5,roundCorner.getX(), roundCorner.getX(),null);
 

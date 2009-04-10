@@ -31,7 +31,7 @@ public class CanvasBusyPanel extends SimpleBusyPanel implements
 
     public CanvasBusyPanel(){
         setInsets(new Insets(0,0,0,0));
-        setRoundCorner(0,0);
+        setOuterCorners(0,0);
     }
     
     @Override

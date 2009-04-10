@@ -34,7 +34,7 @@ public class OvalBorder extends RoundBorder{
       * @param recw
       * @param rech
       */
-     public OvalBorder(double recw, double rech) {
+     public OvalBorder(float recw, float rech) {
         super(recw,rech);
      }
 
@@ -44,7 +44,7 @@ public class OvalBorder extends RoundBorder{
       * @param rech
       * @param topColor
       */
-     public OvalBorder(double recw, double rech, Color topColor) {
+     public OvalBorder(float recw, float rech, Color topColor) {
         this(recw,rech);
         borderColor = topColor;
         setAlpha((float)borderColor.getAlpha()/255);
@@ -61,7 +61,7 @@ public class OvalBorder extends RoundBorder{
       * @param rech
       * @param topColor
       */
-     public OvalBorder(int top, int left, int bottom, int right,double recw, double rech, Color topColor) {
+     public OvalBorder(int top, int left, int bottom, int right,float recw, float rech, Color topColor) {
         this(recw,rech);
         insets = new Insets(top, left, bottom, right);
         borderColor = topColor;
@@ -99,7 +99,7 @@ public class OvalBorder extends RoundBorder{
       * @param recw
       * @param rech
       */
-     public OvalBorder(int top, int left, int bottom, int right,double recw, double rech) {
+     public OvalBorder(int top, int left, int bottom, int right,float recw, float rech) {
         this(top, left, bottom, right);
         setRecH(rech);
         setRecW(recw);
