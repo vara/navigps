@@ -4,6 +4,7 @@ import app.database.odb.utils.ODBConnection;
 import app.navigps.utils.NaviLogger;
 import java.io.File;
 import java.util.logging.Level;
+import java.util.logging.Logger;
 import org.apache.batik.swing.gvt.GVTTreeRendererEvent;
 import org.apache.batik.swing.gvt.GVTTreeRendererListener;
 import org.apache.batik.swing.svg.GVTTreeBuilderEvent;
@@ -49,7 +50,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
         String msg = ODBConnection.connect("", "");
         System.out.println(msg);
         //!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-        NaviLogger.logger.log(Level.FINE,"Loading documnet completed ",e);
+        NaviLogger.logger.log(Level.FINE,"Loading documnet completed ",e);        
     }
     /**
      *
@@ -143,6 +144,7 @@ public class SVGBridgeListeners extends SVGBridgeComponents implements
     @Override
     public void gvtRenderingCompleted(GVTTreeRendererEvent e) {
         currentStatusChanged("Document Rendering Completed");
+        documentLoadingCompleted();
         setRederingStatus(false);
     }
     /**

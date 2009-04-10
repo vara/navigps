@@ -14,4 +14,6 @@ public interface UpdateComponentsWhenChangedDoc{
      *
      */
     void documentClosed();
+
+    void documentLoadingCompleted();
 }

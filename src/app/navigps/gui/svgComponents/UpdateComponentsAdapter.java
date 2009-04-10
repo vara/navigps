@@ -2,7 +2,7 @@ package app.navigps.gui.svgComponents;
 
 /**
  *
- * @author vara
+ * @author Gzregorz (vara) Warywoda
  */
 public abstract class UpdateComponentsAdapter implements UpdateComponentsWhenChangedDoc{
     
@@ -16,4 +16,7 @@ public abstract class UpdateComponentsAdapter implements UpdateComponentsWhenCha
      */
     @Override
     public void documentClosed(){}
+
+    @Override
+    public void documentLoadingCompleted() {}
 }

@@ -122,4 +122,16 @@ public class SVGBridgeComponents implements StatusChangedListener,
         });
         t.start();
     }
+
+    @Override
+    public void documentLoadingCompleted() {
+        Thread t = new Thread(new Runnable() {
+            @Override
+            public void run() {
+                for (UpdateComponentsWhenChangedDoc ucomp : updateComponets)
+                    ucomp.documentLoadingCompleted();
+            }
+        });
+        t.start();
+    }
 }

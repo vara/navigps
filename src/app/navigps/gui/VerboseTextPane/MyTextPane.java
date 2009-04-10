@@ -35,8 +35,8 @@ import javax.swing.JFileChooser;
 import javax.swing.JMenuItem;
 import javax.swing.JOptionPane;
 import javax.swing.JTextPane;
-import javax.swing.JViewport;
 import javax.swing.KeyStroke;
+import javax.swing.SwingUtilities;
 import javax.swing.event.DocumentEvent;
 import javax.swing.event.DocumentListener;
 import javax.swing.plaf.ComponentUI;
@@ -53,7 +53,7 @@ import javax.swing.text.TabStop;
 
 /** 
  * Created on 2008-12-18, 13:53:36
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public class MyTextPane extends JTextPane{
 
@@ -116,7 +116,7 @@ public class MyTextPane extends JTextPane{
 
         addMouseListener(new MouseForVerboseTextPane());
 
-        addEndText(new Date()+"\nVerbose text pane created ", errorAtributes);
+        addEndTextnl(new Date()+"\nVerbose text pane created ", errorAtributes);
     }
 
     @Override
@@ -183,20 +183,27 @@ public class MyTextPane extends JTextPane{
      * @param str
      * @param attr
      */
-    public void addEndText(String str,SimpleAttributeSet attr){
-        try {
-            ((StyledDocument)getDocument()).insertString(getDocument().getLength(), str, attr);            
-            if(isAutoScroll()){
-                Component c = getParent();
-                if(c instanceof JViewport){                    
-                    JViewport vp = (JViewport)c;
-                    vp.scrollRectToVisible(vp.getViewRect());
+    public void addEndText(final String str,final SimpleAttributeSet attr){
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                try {
+                    ((StyledDocument)getDocument()).
+                            insertString(getDocument().getLength(), str, attr);
+                   /* if(isAutoScroll()){
+                        Component c = getParent();
+                        if(c instanceof JViewport){
+                            JViewport vp = (JViewport)c;
+                            vp.scrollRectToVisible(vp.getViewRect());
+                        }
+                    }*/
+                } catch (BadLocationException ex) {
+                    NaviLogger.logger.logp(Level.WARNING,getClass().getName(),
+                            "addEndTextnl(String str)","str \""+str+"\"",ex);
                 }
             }
-        } catch (BadLocationException ex) {
-            NaviLogger.logger.logp(Level.WARNING,getClass().getName(),
-                    "addEndTextnl(String str)","str \""+str+"\"",ex);
-        }
+        });
     }
     /**
      *

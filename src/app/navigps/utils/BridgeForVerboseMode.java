@@ -2,16 +2,12 @@ package app.navigps.utils;
 
 import app.config.GUIConfiguration;
 import app.config.MainConfiguration;
-import java.io.BufferedWriter;
 import java.io.IOException;
 import java.io.OutputStream;
 import java.io.PrintStream;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.io.Writer;
 import java.util.LinkedList;
-import java.util.logging.Level;
-import java.util.logging.Logger;
 
 /**
  *
@@ -26,7 +22,7 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
         return instance;
     }
 
-    private LinkedList<OutputVerboseStream> updateComponents =
+    private final LinkedList<OutputVerboseStream> updateComponents =
 			new LinkedList<OutputVerboseStream>();
     
     private PrintWriter out = new PrintWriter(new MyOutputStream(false),false);
@@ -59,18 +55,25 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
      * @param text
      */
     @Override
-    public void outputVerboseStream(String text){        
-        for (OutputVerboseStream ucomp : updateComponents) {            
-            ucomp.outputVerboseStream(text);
+    public void outputVerboseStream(String text){
+        synchronized(updateComponents){
+            for (OutputVerboseStream ucomp : updateComponents) {
+                ucomp.outputVerboseStream(text);
+            }
         }
     }
-    public void addComponentsWithOutputStream(OutputVerboseStream l){	
-        if(l!=null)
-            updateComponents.add(l);
+    public void addComponentsWithOutputStream(OutputVerboseStream l){
+        if(l!=null){
+            synchronized(updateComponents){
+                updateComponents.add(l);
+            }
+        }
     }
     public boolean removeComponentFromOutputStream(OutputVerboseStream l){
         if(l!=null){
-            return updateComponents.remove(l);
+            synchronized(updateComponents){
+                return updateComponents.remove(l);
+            }
         }return false;
     }
     /**
@@ -78,10 +81,12 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
      * @param text
      */
     @Override
-    public void outputErrorVerboseStream(String text) {        
-        for (OutputVerboseStream ucomp : updateComponents) {            
-            ucomp.outputErrorVerboseStream(text);
-        }
+    public void outputErrorVerboseStream(String text) {
+        synchronized(updateComponents){
+            for (OutputVerboseStream ucomp : updateComponents) {
+                ucomp.outputErrorVerboseStream(text);
+            }
+        }        
     }
 
     /**
@@ -131,6 +136,7 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
             //lsep = System.getProperty("line.separator").getBytes()[0];
             this.err = err;
         }
+        
         @Override
         public void write(int b) throws IOException {           
             if(b!=10 && b!=13){ //FIXED !!! bug. with '\n' 10 Linux 13 Winshit
@@ -138,8 +144,9 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
                 //Console.out.print(Integer.toHexString(b)+" ");
             }
             else
-                flush();
+                flush();            
         }
+
         @Override
         public void flush(){
             if(count!=0){
@@ -151,18 +158,26 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
                 reset();          
             }
         }
+
+        @Override
+        public void close() throws IOException {            
+            reset();
+        }
+
         protected void addToBuffer(int val){            
             buf[count++]=(char) val;
             if(count==buf.length){
                 resizeArray(-1);
             }
         }
+
         private void resizeArray(int expand){
             if(expand==-1)
                 buf = Utils.resizeArray(buf, buf.length);
             else
                 buf = Utils.resizeArray(buf, expand);
         }
+
         public void reset(){
             count = 0;
         }

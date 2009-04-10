@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.utils;
 
 import java.io.PrintStream;
@@ -10,7 +5,7 @@ import java.io.PrintWriter;
 
 /**
  *
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public interface OutputVerboseStream {
 

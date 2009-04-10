@@ -92,7 +92,6 @@ import app.database.odb.gui.DatabaseManager;
 import app.database.odb.utils.ODBConnection;
 import app.navigps.WindowInitialEvent;
 import app.navigps.WindowInitialListener;
-import app.navigps.utils.Console;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import org.apache.batik.bridge.ViewBox;
@@ -600,12 +599,19 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         }
         int retour = chooser.showOpenDialog(this);
         if (retour == JFileChooser.APPROVE_OPTION) {
-            try {
-                openSVGDocument(chooser.getSelectedFile());
-            } catch (Exception ex) {
-                getVerboseStream().outputVerboseStream(ex.getMessage());
-                NaviLogger.logger.log(Level.FINE, "Open svg file [method openFileChoserWindow()]",ex);
-            }
+            final File file = chooser.getSelectedFile();
+
+            SwingUtilities.invokeLater(new Runnable() {
+                @Override
+                public void run() {
+                    try {
+                        openSVGDocument(file);
+                    } catch (Exception ex) {
+                        getVerboseStream().outputVerboseStream(ex.getMessage());
+                        NaviLogger.logger.log(Level.FINE, "Open svg file [method openFileChoserWindow()]",ex);
+                    }
+                }
+            });
         }
     }
 
@@ -922,15 +928,10 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         public void documentPrepareToModification() {
 
             Thread w = new Thread(new Runnable() {
-
                 @Override
                 public void run() {
                     setComponetsEnableWhenDocumentLoaded(true);
-                    views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());
-                    SVGCanvasLayers svgLay = getSVGCanvasLayers();
-                    if(svgLay != null){
-                        svgLay.updateSynchronizedLayers();
-                    }
+                    views.firstElement().getViewProperties().setTitle(svgListeners.getAbsoluteFilePath());                    
                 }
             });
             w.start();
@@ -939,9 +940,18 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         @Override
         public void documentClosed() {
             setComponetsEnableWhenDocumentLoaded(false);
-            String msg = ODBConnection.disconnect();
+            String msg = "Document closed.\n"+ODBConnection.disconnect();
             System.out.println(msg);
             NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(msg);
+            NaviLogger.logger.log(Level.FINE,msg);
+        }
+
+        @Override
+        public void documentLoadingCompleted() {
+            SVGCanvasLayers svgLay = getSVGCanvasLayers();
+            if(svgLay != null){
+                svgLay.updateSynchronizedLayers();
+            }
         }
     }
 
