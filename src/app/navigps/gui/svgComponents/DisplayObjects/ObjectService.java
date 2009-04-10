@@ -26,6 +26,7 @@ import net.java.balloontip.BalloonTip;
 import net.java.balloontip.styles.BalloonTipStyle;
 import net.java.balloontip.styles.ModernBalloonStyle;
 import app.database.odb.core.ServiceCore;
+import javax.swing.Timer;
 import org.neodatis.odb.OID;
 
 /**
@@ -275,14 +276,31 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
         System.out.println(getClass().getCanonicalName()+" method 'Finalize'");
     }
 
-    private class ObjectMouseListener extends MouseInputAdapter{
+    private class ObjectMouseListener extends MouseInputAdapter implements ActionListener{
+
+        private Timer initialTimer;
+        private int timeInitDelay = 500;
+
+        public ObjectMouseListener(){
+            initialTimer = new Timer(timeInitDelay, this);
+            initialTimer.setRepeats(false);
+        }
+
         @Override
         public void mouseEntered(MouseEvent e) {
             //System.err.println(ObjectService.this.toString());
             //setToolTip(toolTipString);
             //System.out.println("Mouse Entered on Service object "+getServiceName());
             if(e.getModifiers() == 0)
-                BallonDispalyManager.showBallon(balloon, 10, 3000);
+                initialTimer.start();
+        }
+
+        @Override
+        public void mouseExited(MouseEvent e) {
+            if(e.getModifiers() == 0){
+                if(initialTimer.isRunning())
+                    initialTimer.stop();
+            }
         }
 
         @Override
@@ -327,6 +345,11 @@ public class ObjectService extends AlphaJPanel implements ObjectToDisplayService
                 popup.add(miRemoveAll);
                 popup.show(ObjectService.this, e.getX(), e.getY());
             }
+        }
+
+        @Override
+        public void actionPerformed(ActionEvent e) {
+            BallonDispalyManager.showBallon(balloon, 10, 3000);
         }
     }
 }
