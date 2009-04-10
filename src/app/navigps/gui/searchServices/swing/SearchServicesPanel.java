@@ -36,6 +36,7 @@ import app.database.odb.utils.ODBConnection;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import app.navigps.gui.detailspanel.ContentPaneForRoundWindow;
 import app.navigps.gui.detailspanel.LoacationManager.LeftLocation;
+import app.navigps.gui.detailspanel.RoundJPanel;
 import app.navigps.gui.detailspanel.RoundWindow;
 import app.navigps.gui.svgComponents.SVGCanvasLayers;
 import app.navigps.utils.NaviLogger;
@@ -560,8 +561,9 @@ public class SearchServicesPanel extends javax.swing.JPanel{
             rWindow.getContentPane().setLayout(new BorderLayout(10, 10));
             rWindow.getContentPane().add(servlistPanel,BorderLayout.CENTER);
             rWindow.setEnabled(false);
-            ((ContentPaneForRoundWindow)rWindow.getContentPane()).
+            ((RoundJPanel)rWindow.getContentPane()).
                     setInsets(new Insets(10,10,10,10));
+            ((RoundJPanel)rWindow.getContentPane()).setInnerCorners(0,0);
 
             //JRootPane root = getRootPane();
             //root.setGlassPane(servlistPanel.getAnimamtionLayer());

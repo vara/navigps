@@ -41,6 +41,7 @@ public class ThumbnailPanel extends RoundJPanel{
         OvalBorder ob = new OvalBorder(5, 5, 5, 5,10,10);
         ob.setBorderColor(new Color(0,0,0));
         ob.setAlpha(0.8f);
+        setInnerCorners(1,1);
         setBorder(ob);
         animator = new Animator(animationDuration, 1,
                 RepeatBehavior.LOOP,new AnimatorBehaviour());

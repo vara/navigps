@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.detailspanel;
 
 import app.navigps.gui.borders.EmptyOvalBorder;
@@ -87,6 +82,12 @@ public class RoundJPanel extends AlphaJPanel{
         int canHeight = bounds.height-ins.top-ins.bottom;
         float arcx = getInnerCornerW();
         float arcy = getInnerCornerH();
+        if(canX == 0 || canY == 0){
+            if(arcx == .0f || arcy == .0f){
+                arcx = getRoundBorder().getRecW();
+                arcy = getRoundBorder().getRecH();
+            }
+        }
         return new RoundRectangle2D.Double(canX, canY, canWidth, canHeight, arcx,arcy);
     }
 
@@ -207,7 +208,7 @@ public class RoundJPanel extends AlphaJPanel{
      *
      * @param val
      */
-    public void setInnerCorners(Point2D.Float val){
+    public void setInnerCorners(Point2D val){
         setInnerCorners((float)val.getX(),(float)val.getY());
     }
 
