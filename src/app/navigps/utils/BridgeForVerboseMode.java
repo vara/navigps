@@ -42,9 +42,7 @@ public class BridgeForVerboseMode extends OutputVerboseStreamAdapter{
             String encode = GUIConfiguration.getDefaultGuiCharsEncoding();
             sout = new PrintStream(new MyOutputStream(false), false, encode);
             serr = new PrintStream(new MyOutputStream(true),false,encode);
-        } catch (UnsupportedEncodingException ex) {
-            
-        }
+        } catch (UnsupportedEncodingException ex) {}
 
         if(MainConfiguration.getMode())
             addComponentsWithOutputStream(console);

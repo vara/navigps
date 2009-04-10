@@ -30,8 +30,9 @@ public class CanvasBusyPanel extends SimpleBusyPanel implements
                                     GVTTreeRendererListener{
 
     public CanvasBusyPanel(){
-        setInsets(new Insets(0,0,0,0));
+        setInsets(new Insets(30,30,30,30));
         setOuterCorners(0,0);
+        setInnerCorners(20, 20);
     }
     
     @Override
