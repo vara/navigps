@@ -20,7 +20,7 @@ import javax.swing.JLabel;
  */
 public class DecoratePanel extends AbstractDecoratePanel{
 
-    private JButton closeButton = new JButton("X");
+    private JButton closeButton = new JButton("");
     private JLabel content = new JLabel();
 
     /**
@@ -30,7 +30,8 @@ public class DecoratePanel extends AbstractDecoratePanel{
         setOpaque(false);
         setPreferredSize(new Dimension(10,30));
         init();
-        setOuterCorners(5,5);
+        setOuterCorners(0,0);
+        setInnerCorners(0, 0);
         setInsets(new Insets(0,0,0,0));
     }
 
@@ -44,7 +45,15 @@ public class DecoratePanel extends AbstractDecoratePanel{
 
     private void init(){
         setLayout(new BorderLayout());
-        //add(closeButton);        
+        closeButton.setMargin(new Insets(1,1,1,1));
+        closeButton.setFocusPainted(false);
+        closeButton.setIconTextGap(0);
+        closeButton.setBorderPainted(false);
+        closeButton.setContentAreaFilled(false);
+        //closeButton.setRolloverIcon(RoundWindowUtils.getIcons("cancelOver.png", 30));
+        closeButton.setPressedIcon(RoundWindowUtils.getIcons("cancelPressed.png", 24));
+        closeButton.setIcon(RoundWindowUtils.getIcons("cancel.png", 24));
+        add(closeButton,BorderLayout.EAST);
         getContent().setFont(new Font("Ariel", Font.BOLD, 16));
 
         getContent().setUI(new TitleLabelUI());
@@ -105,5 +114,15 @@ public class DecoratePanel extends AbstractDecoratePanel{
     @Override
     public void setIcon(Icon ico) {
         getContent().setIcon(ico);
+    }
+
+    @Override
+    public void setVisibleCloseButton(boolean val) {
+        closeButton.setVisible(val);
+    }
+
+    @Override
+    public boolean isVisibleCloseButton(boolean val) {
+        return closeButton.isVisible();
     }
 }

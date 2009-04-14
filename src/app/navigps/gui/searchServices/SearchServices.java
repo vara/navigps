@@ -132,7 +132,8 @@ public class SearchServices extends SynchronizedSVGLayer{
             roundWindowInstace.setAlpha(0.0f);
             roundWindowInstace.getContentPane().setUpperThresholdAlpha(0.75f);
             roundWindowInstace.setTitle("Search Services");            
-            roundWindowInstace.setVisible(false);                        
+            roundWindowInstace.setVisible(false);
+            roundWindowInstace.getDecoratePanel().setVisibleCloseButton(false);
         } else {
             System.out.println(getClass().getCanonicalName() + " [content roundWin no changed]");
         }        
