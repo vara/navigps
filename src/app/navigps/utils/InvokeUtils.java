@@ -99,5 +99,9 @@ public class InvokeUtils{
         public void setMessage(Exception message) {
             this.message = message;
         }
+
+        public boolean isMessage(){
+            return message != null;
+        }
     }
 }

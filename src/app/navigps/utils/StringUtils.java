@@ -8,7 +8,7 @@ import java.util.logging.Logger;
  *
  * @author Grzegorz (vara) Warywoda
  */
-public class StringUtils {
+public final class StringUtils {
 
     private static String defaultEncoding = "UTF-8";
 
@@ -17,7 +17,7 @@ public class StringUtils {
     private static boolean doConvert = !isTheSame();
     
     private static boolean isTheSame(){
-	return CURRENT_ENCODING.equals(getDefaultEncoding());
+        return CURRENT_ENCODING.equals(getDefaultEncoding());
     }
 	    
     public static String encode(String str){

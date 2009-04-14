@@ -97,9 +97,10 @@ public class ComponentDisplayManager extends AbstractDisplayManager{
     public Vector createObject(Vector<ServiceCore> vsc) {
 
         Vector <ObjectService> vos = new Vector<ObjectService>();
-        for (ServiceCore os : vsc) {
-            vos.add((ObjectService)createObject(os));
-        }
+        if(vsc != null)
+            for (ServiceCore os : vsc) {
+                vos.add((ObjectService)createObject(os));
+            }
         return vos;
     }
 

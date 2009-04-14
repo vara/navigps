@@ -33,6 +33,7 @@ public class ServiceListModel extends AbstractListModel{
     }
     
     public void addServices(Vector<ServiceCore> vServiceCore){
+        if(vServiceCore == null) return;
         int lastIndex = arrayServices.size()-1;
         for (ServiceCore sc : vServiceCore) {
             if(!arrayServices.contains(sc)){

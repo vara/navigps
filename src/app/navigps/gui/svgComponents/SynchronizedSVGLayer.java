@@ -12,7 +12,7 @@ import org.w3c.dom.svg.SVGPoint;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 
 public abstract class SynchronizedSVGLayer extends AlphaJPanel{

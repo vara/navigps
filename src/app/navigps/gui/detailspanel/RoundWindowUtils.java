@@ -1,11 +1,15 @@
 package app.navigps.gui.detailspanel;
 
+import app.navigps.utils.GraphicsUtilities;
 import java.awt.Component;
 import java.awt.Container;
+import java.awt.image.BufferedImage;
+import java.net.URL;
+import javax.swing.ImageIcon;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public class RoundWindowUtils {
 
@@ -47,5 +51,28 @@ public class RoundWindowUtils {
             done = false;
             return retVal;
         }
+    }
+
+    public static ImageIcon getIcons(String name,int size){
+        BufferedImage bi = loadThumbnailIcon("resources/graphics/icons/", name, size, true);
+        if(bi != null){
+            return new ImageIcon(bi);
+        }
+        return null;
+    }
+
+    protected static BufferedImage loadThumbnailIcon(String path,String name,int size,boolean verb){
+        try {
+
+            URL href = RoundWindow.class.getResource(path+name);
+            BufferedImage bi = GraphicsUtilities.loadCompatibleImage(href);
+            return GraphicsUtilities.createThumbnail(bi,size);
+
+        } catch (Exception ex) {
+            if(verb){
+                System.err.println(""+ex);
+            }
+        }
+        return null;
     }
 }

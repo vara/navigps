@@ -1,8 +1,3 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.detailspanel.LoacationManager;
 
 import app.navigps.gui.detailspanel.*;
@@ -12,7 +7,7 @@ import javax.swing.event.MouseInputAdapter;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (vara) Warywoda
  */
 public abstract class LocationManager extends MouseInputAdapter{
 

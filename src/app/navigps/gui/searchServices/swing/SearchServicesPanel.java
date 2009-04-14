@@ -393,6 +393,9 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                     //test reflection
                     ReturnValue rv = InvokeUtils.invokeWithTime(
                             new Search(), "searchCategoryRadius", pt, obj);
+                    if(rv.isMessage()){
+                        System.out.println(""+rv.getMessage());
+                    }
                     Vector subResult = (Vector) rv.getRet();
                     
                     AbstractDisplayManager dm = getDisplayManager();
@@ -420,7 +423,6 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                             //servlistPanel.getAnimamtionLayer().dispose();
                         }
                     }
-
                     String summaryMsg = "found "+subResult.size() + " services";
                     System.out.println("Query finished, execution time: " + (rv.getTimeNano()/1000000) + " mili sec " + summaryMsg);
                     NaviRootWindow.getBridgeInformationPipe().currentStatusChanged(summaryMsg);

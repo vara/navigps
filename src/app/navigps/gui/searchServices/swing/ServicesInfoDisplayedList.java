@@ -59,7 +59,7 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
         list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
         
         JScrollPane scrollPane = new JScrollPane();
-        scrollPane.setBorder(new OvalBorder(5,5,5,5,0, 0,new Color(204,219,255)));
+        scrollPane.setBorder(new OvalBorder(5,5,5,5,10, 10,new Color(204,219,255)));
         scrollPane.setOpaque(false);
         scrollPane.getViewport().setOpaque(false);
         scrollPane.getViewport().setBorder(null);
@@ -76,7 +76,7 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
         scrollPane.setViewportView(list);
 
         jPanel1.add(scrollPane,BorderLayout.CENTER);
-        jPanel1.add(new JButton("test"),BorderLayout.NORTH);
+        //jPanel1.add(new JButton("test"),BorderLayout.NORTH);
 
         jScrollPane1.setBorder(null);
         jScrollPane1.setOpaque(false);
