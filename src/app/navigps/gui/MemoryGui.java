@@ -224,7 +224,7 @@ public class MemoryGui extends JComponent implements Runnable,
                 getVerboseStream().outputVerboseStream("Memory Monitor started");
 
             setLoopThread(true);
-            Thread thread = new Thread(this);
+            Thread thread = new Thread(this,getClass().getName());
             thread.setPriority(Thread.MIN_PRIORITY);
             thread.start();
             setStatusMonitor(MemoryGui.STARTED);
@@ -776,6 +776,7 @@ public class MemoryGui extends JComponent implements Runnable,
             putValue(Action.NAME,check(true));
         }
     }
+    
     private class ActionSetMul extends AbstractAction{
         private int keyUnit;
         public ActionSetMul(String name,int key){
