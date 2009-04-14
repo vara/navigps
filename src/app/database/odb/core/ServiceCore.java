@@ -62,4 +62,23 @@ public class ServiceCore {
     public void setOID(OID oid) {
         this.oid = oid;
     }
+/*
+    @Override
+    public boolean equals(Object obj) {
+
+        if(obj instanceof ServiceCore){
+            return hashCode() == obj.hashCode();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 67 * hash + (this.serviceAttributes != null ? this.serviceAttributes.hashCode() : 0);
+        hash = 67 * hash + (this.serviceDescription != null ? this.serviceDescription.hashCode() : 0);
+        hash = 67 * hash + (this.oid != null ? this.oid.hashCode() : 0);
+        return hash;
+    }
+*/
 }

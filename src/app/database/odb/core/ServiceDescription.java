@@ -162,4 +162,22 @@ public class ServiceDescription {
         if(city != null)
             this.serviceCity = city;
     }
+/*
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ServiceDescription){
+            return hashCode() == obj.hashCode();
+        }
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 3;
+        hash = 79 * hash + (this.serviceName != null ? this.serviceName.hashCode() : 0);
+        hash = 79 * hash + (this.category != null ? this.category.hashCode() : 0);
+        hash = 79 * hash + (this.serviceSubCategory != null ? this.serviceSubCategory.hashCode() : 0);
+        return hash;
+    }
+ */
 }

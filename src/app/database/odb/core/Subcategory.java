@@ -56,6 +56,21 @@ public class Subcategory {
     public String toString() {
         return "Subcategory: "+getName();
     }
+/*
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Subcategory){
+            return hashCode() == obj.hashCode();
+        }
+        return false;
+    }
 
-
+    @Override
+    public int hashCode() {
+        int hash = 5;
+        hash = 29 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 29 * hash + (this.category != null ? this.category.hashCode() : 0);
+        return hash;
+    }
+ */
 }

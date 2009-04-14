@@ -57,4 +57,21 @@ public class ServiceAttributes {
         String msg ="x: "+getX()+" y: "+getY();
         return msg;
     }
+/*
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof ServiceAttributes)
+            return hashCode() == obj.hashCode();
+        else return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 79 * hash + Float.floatToIntBits(this.x);
+        hash = 79 * hash + Float.floatToIntBits(this.y);
+        hash = 79 * hash + (this.sc != null ? this.sc.hashCode() : 0);
+        return hash;
+    }
+*/
 }
