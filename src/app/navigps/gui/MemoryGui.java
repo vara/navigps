@@ -1,7 +1,6 @@
 package app.navigps.gui;
 
-import app.navigps.utils.NaviLogger;
-import app.navigps.utils.OutputVerboseStream;
+import app.navigps.gui.detailspanel.AlphaJPanel;
 import app.navigps.utils.Utils;
 import java.awt.BasicStroke;
 import java.awt.Color;
@@ -24,13 +23,10 @@ import java.awt.font.LineMetrics;
 import java.awt.geom.AffineTransform;
 import java.awt.geom.GeneralPath;
 import java.awt.geom.Rectangle2D;
-import java.io.PrintStream;
-import java.util.logging.Level;
 import javax.swing.AbstractAction;
 import javax.swing.Action;
 import javax.swing.BorderFactory;
 import javax.swing.JCheckBoxMenuItem;
-import javax.swing.JComponent;
 import javax.swing.JMenuItem;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
@@ -39,7 +35,7 @@ import javax.swing.border.Border;
  *
  * @author Grzegorz (vara) Warywoda
  */
-public class MemoryGui extends JComponent implements Runnable,
+public class MemoryGui extends AlphaJPanel implements Runnable,
 						     MouseListener{
    
     public static final int B =  1;   
@@ -68,9 +64,7 @@ public class MemoryGui extends JComponent implements Runnable,
     
     private Border mainBorder = BorderFactory.createRaisedBevelBorder();    
     private Border mouseOnBorder = BorderFactory.createBevelBorder(BevelBorder.RAISED,new Color(210,210,210,255), Color.WHITE);   
-    
-    private OutputVerboseStream verboseStream = null;
-    
+        
     private boolean showText = true;
     private boolean showShadow = true;
     
@@ -80,17 +74,16 @@ public class MemoryGui extends JComponent implements Runnable,
 
     private Font textFont = new Font("Serif", Font.BOLD, 14);
 
-    public MemoryGui(OutputVerboseStream l){
-        verboseStream = l;
+    public MemoryGui(){
         init();
     }
     
     private void init(){
 		
-        NaviLogger.logger.log(Level.FINE, "Init Memory Gui");
+        //NaviLogger.logger.log(Level.FINE, "Init Memory Gui");
         chart = new Chart();
-        setBounds(0,1,getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint()+1);
-        setPreferredSize(new Dimension(getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint()+1));
+        setBounds(0,0,getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint());
+        setPreferredSize(new Dimension(getWidth(),getHeight()-1));
         setBorder(mainBorder);
         addMouseListener(this);
         setToolTipText("Click to force garbage colector !");
@@ -156,7 +149,7 @@ public class MemoryGui extends JComponent implements Runnable,
             //getVerboseStream().outputErrorVerboseStream("Painted Area "+maxWidthAreaPaint+" text width "+textBounds.getWidth()+" Scale "+scale);
             if(scale<1.0){                
                 setTextFont(Utils.createFitFont(getTextFont(), scale));
-                getVerboseStream().outputErrorVerboseStream("MemoryGui changed font size "+getTextFont().getSize());
+                OutputMessage.out("MemoryGui changed font size "+getTextFont().getSize());
             }
             
             GlyphVector gv = getTextFont().createGlyphVector(frc, info);
@@ -194,9 +187,8 @@ public class MemoryGui extends JComponent implements Runnable,
                 repaint();
                 Thread.sleep(getRefresh()*1000);
             }
-        } catch (InterruptedException ex) {
-            PrintStream pr;
-            NaviLogger.logger.log(Level.WARNING, getClass().getName() + "\n" + ex);
+        } catch (InterruptedException ex) {            
+            //NaviLogger.logger.log(Level.WARNING, getClass().getName() + "\n" + ex);
         }
     }
     
@@ -208,7 +200,7 @@ public class MemoryGui extends JComponent implements Runnable,
         if(isLoopThread()){
             setLoopThread(false);
             chart.resetBitmap();
-            getVerboseStream().outputVerboseStream("Memory Monitor stoped");
+            OutputMessage.out("Memory Monitor stoped");
             setStatusMonitor(MemoryGui.STOPED);
             repaint();
         }
@@ -220,8 +212,7 @@ public class MemoryGui extends JComponent implements Runnable,
     public void start(){
         if(!isLoopThread()){
 
-            if( getVerboseStream()!=null)
-                getVerboseStream().outputVerboseStream("Memory Monitor started");
+            OutputMessage.out("Memory Monitor started");
 
             setLoopThread(true);
             Thread thread = new Thread(this,getClass().getName());
@@ -236,11 +227,17 @@ public class MemoryGui extends JComponent implements Runnable,
      */
     public void pause(){
         setLoopThread(false);
-        if( getVerboseStream()!=null)
-            getVerboseStream().outputVerboseStream("Memory Monitor paused");
+        OutputMessage.out("Memory Monitor paused");
         setStatusMonitor(MemoryGui.PAUSED);
     }
-    
+
+    public void setDebug(boolean val){
+        OutputMessage.setDebug(val);
+    }
+
+    public boolean isDebug(boolean val){
+        return OutputMessage.isDebug();
+    }
     /**
      *
      * @param mode
@@ -496,21 +493,7 @@ public class MemoryGui extends JComponent implements Runnable,
      */
     protected void setMonitorPaused(boolean monitorpaused) {
         this.monitorPaused = monitorpaused;
-    }
-
-    /**
-     * @return the verboseStream
-     */
-    public OutputVerboseStream getVerboseStream() {
-        return verboseStream;
-    }
-
-    /**
-     * @param verboseStream the verboseStream to set
-     */
-    public void setVerboseStream(OutputVerboseStream verboseStream) {
-        this.verboseStream = verboseStream;
-    }
+    }    
 
     /**
      * @return the tPaint
@@ -619,8 +602,7 @@ public class MemoryGui extends JComponent implements Runnable,
          */
         public void setShowGrid(boolean showGrid) {
             this.showGrid = showGrid;
-            if( getVerboseStream()!=null)
-                getVerboseStream().outputVerboseStream("Monitor.grid show ="+showGrid);
+            OutputMessage.out("Monitor.grid show ="+showGrid);
         }
     }
     
@@ -787,6 +769,37 @@ public class MemoryGui extends JComponent implements Runnable,
         @Override
         public void actionPerformed(ActionEvent e) {
             setMul(keyUnit);
+        }
+    }
+
+    private static class OutputMessage{
+
+        private static boolean debug = true;
+
+        public static void out(String msg){
+            if(isDebug()){
+                System.out.println(msg);
+            }
+        }
+
+        public static void err(String msg){
+            if(isDebug()){
+                System.err.println(msg);
+            }
+        }
+
+        /**
+         * @return the debug
+         */
+        public static boolean isDebug() {
+            return debug;
+        }
+
+        /**
+         * @param aDebug the debug to set
+         */
+        public static void setDebug(boolean aDebug) {
+            debug = aDebug;
         }
     }
 }
