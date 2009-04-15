@@ -26,14 +26,10 @@ import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
 import java.awt.Container;
-import java.awt.FlowLayout;
-import java.awt.GradientPaint;
 import java.awt.Graphics;
-import java.awt.Graphics2D;
 import java.awt.GraphicsDevice;
 import java.awt.GridLayout;
 import java.awt.Insets;
-import java.awt.Rectangle;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.InputEvent;
@@ -69,7 +65,6 @@ import javax.swing.JLabel;
 import javax.swing.JMenu;
 import javax.swing.JMenuBar;
 import javax.swing.JMenuItem;
-import javax.swing.JPanel;
 import javax.swing.JToolBar;
 import javax.swing.KeyStroke;
 import javax.swing.SwingUtilities;
@@ -92,6 +87,8 @@ import app.database.odb.gui.DatabaseManager;
 import app.database.odb.utils.ODBConnection;
 import app.navigps.WindowInitialEvent;
 import app.navigps.WindowInitialListener;
+import app.navigps.gui.ToolBar.NaviToolBarPanel;
+import java.awt.FlowLayout;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
 import org.apache.batik.bridge.ViewBox;
@@ -110,7 +107,7 @@ import org.w3c.dom.svg.SVGSVGElement;
 public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemListener, WindowStateListener {
 
     private NaviGPSCore core;
-    private JPanel panelWithToolBars;
+    private NaviToolBarPanel panelWithToolBars;
     private StatusPanel statusPanel;
     private StatusInfoPanel statusInfoPanel = new StatusInfoPanel();
     private Action openSVGFileAction,  zoomOutAction,  zoomInAction,  zoomAction,  fitToPanelAction,  searchServicesAction;    
@@ -209,7 +206,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         //init docking RootWindow and create canvas with scrollBars
         createRootWindow();
         setDefaultLayout();
-        getContentPane().add(rootWindow, BorderLayout.CENTER);
+        getContentPane().add(rootWindow, BorderLayout.CENTER);        
         creatToolBars();	//must be before creatMenuBar()
 
         creatMenuBar();
@@ -408,19 +405,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
      */
     public void creatToolBars() {
 
-        panelWithToolBars = new JPanel(new FlowLayout(0, 0, 0)) {
-
-            @Override
-            public void paintComponent(Graphics g) {
-                super.paintComponent(g);
-                final Graphics2D g2 = (Graphics2D) g;
-                GradientPaint gradient1 = new GradientPaint(0.0f, (float) getHeight(), Color.white,
-                        0.0f, 8.5f, new Color(235, 245, 255));
-                Rectangle rec1 = new Rectangle(0, 0, getWidth(), getHeight());
-                g2.setPaint(gradient1);
-                g2.fill(rec1);
-            }
-        };
+        panelWithToolBars = new NaviToolBarPanel();
 
         toolBarFile = new JToolBar("ToolBar File");
         toolBarZoom = new JToolBar("ToolBar Zoom");
@@ -448,20 +433,23 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         toolBarZoom.add(new ToolBarButton(fitToPanelAction,
                 createNavigationIcon("fitToPanel32")));
 
-        toolBarMemMonitor.add(new MemoryGui(getVerboseStream()));
-        toolBarMemMonitor.setMargin(new Insets(4, 1, 4, 1));
+        toolBarMemMonitor.setLayout(new FlowLayout(FlowLayout.LEFT));
+        toolBarMemMonitor.add(new MemoryGui());
+        toolBarMemMonitor.setMargin(new Insets(0, 0, 0, 0));
+
+
         ToolBarToggleButton tb = new ToolBarToggleButton(searchServicesAction,
                 createNavigationIcon("searchServices32"));
         toolBarSerch.add(tb);
 
         ((SearchServicesAction) searchServicesAction).addToSelectableGroup(tb);
 
-        panelWithToolBars.add(toolBarMemMonitor, FlowLayout.LEFT);
-        panelWithToolBars.add(toolBarSerch, FlowLayout.LEFT);
-        panelWithToolBars.add(toolBarZoom, FlowLayout.LEFT);
-        panelWithToolBars.add(toolBarFile, FlowLayout.LEFT);
+        panelWithToolBars.add(toolBarMemMonitor);
+        panelWithToolBars.add(toolBarSerch);
+        panelWithToolBars.add(toolBarZoom);
+        panelWithToolBars.add(toolBarFile);
 
-        getContentPane().add(panelWithToolBars, BorderLayout.PAGE_START);
+        getContentPane().add(panelWithToolBars, BorderLayout.NORTH);
 
     }
 

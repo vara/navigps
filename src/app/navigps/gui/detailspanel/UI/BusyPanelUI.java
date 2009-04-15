@@ -58,7 +58,7 @@ public class BusyPanelUI extends PanelUI{
 
     private void updateText(Graphics2D g2,JComponent comp){
         String text = ((SimpleBusyPanel)comp).getText();
-        System.out.println("Text '"+text+"' internal text '"+sText+"'");
+        //System.out.println("Text '"+text+"' internal text '"+sText+"'");
         if(!text.equals(sText)){            
             gText = convertText(g2, comp, text);
             sText = text;
@@ -68,7 +68,7 @@ public class BusyPanelUI extends PanelUI{
 
     private void updateTextPosition(JComponent comp){
 
-        System.out.println("Update text !!");
+        //System.out.println("Update text !!");
         if(gText != null){
             int width = comp.getWidth();
             int height = comp.getHeight();
@@ -101,7 +101,7 @@ public class BusyPanelUI extends PanelUI{
 
     @Override
     public void paint(Graphics g, JComponent c) {
-        System.out.println("Paint "+getClass().getCanonicalName());
+        //System.out.println("Paint "+getClass().getCanonicalName());
         Graphics2D g2 = (Graphics2D)g.create();
         
         g2.setColor(c.getBackground());
