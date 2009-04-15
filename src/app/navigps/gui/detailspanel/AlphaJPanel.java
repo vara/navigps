@@ -84,7 +84,7 @@ public class AlphaJPanel extends JPanel implements AlphaInterface{
     protected void paintChildren(Graphics g) {
         Graphics2D g2 = (Graphics2D)g;
         g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, getAlpha()));
-        super.paintChildren(g);
+        super.paintChildren(g2);
     }
 
     /**

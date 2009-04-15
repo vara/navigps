@@ -5,6 +5,7 @@
 
 package app.navigps.gui.repaintmanager;
 
+import app.navigps.gui.detailspanel.AlphaInterface;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import java.awt.Container;
 import java.awt.Rectangle;
@@ -29,8 +30,8 @@ public class AlphaRepaintManager extends RepaintManager {
                 if (!parent.isVisible() || (parent.getPeer() == null)) {
                     return;
                 }
-                if (parent instanceof AlphaJPanel &&
-                        (((AlphaJPanel)parent).getAlpha() < 1f ||
+                if (parent instanceof AlphaInterface &&
+                        (((AlphaInterface)parent).getAlpha() < 1f ||
                         !parent.isOpaque())) {
                     x += lastDeltaX;
                     y += lastDeltaY;

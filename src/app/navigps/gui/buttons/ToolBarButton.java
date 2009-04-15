@@ -56,6 +56,8 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
             addMouseListener(this);
 
         addChangeListener(this);
+        setContentAreaFilled(false);
+        
     }
 
     private void updateMyUI(){
@@ -120,7 +122,7 @@ public class ToolBarButton extends JButton implements MouseListener,ChangeListen
             getIcon().paintIcon(this, g2,icox,icoy);
             g2.dispose();
         }else
-            super.paintComponent(g);	    
+            super.paintComponent(g);
     }
 
     @Override

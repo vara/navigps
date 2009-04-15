@@ -1,7 +1,6 @@
 package app.navigps.gui;
 
 import app.navigps.gui.VerboseTextPane.PanelForVerboseWindow;
-import app.navigps.gui.buttons.ToolBarButton;
 import app.navigps.NaviGPSCore;
 import app.navigps.gui.buttons.ToolBarToggleButton;
 import app.navigps.gui.displayItemsMap.DetailsPanel;
@@ -88,6 +87,8 @@ import app.database.odb.utils.ODBConnection;
 import app.navigps.WindowInitialEvent;
 import app.navigps.WindowInitialListener;
 import app.navigps.gui.ToolBar.NaviToolBarPanel;
+import app.navigps.gui.buttons.NewToolbarButton;
+import app.navigps.gui.buttons.NewToolbarToggleButton;
 import java.awt.FlowLayout;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
@@ -422,15 +423,15 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             }
         };
 
-        toolBarFile.add(new ToolBarButton(openSVGFileAction,
+        toolBarFile.add(new NewToolbarButton(openSVGFileAction,
                 createNavigationIcon("open32")));
-        toolBarZoom.add(new ToolBarButton(zoomInAction,
+        toolBarZoom.add(new NewToolbarButton(zoomInAction,
                 createNavigationIcon("zoomIn32")));
-        toolBarZoom.add(new ToolBarButton(zoomOutAction,
+        toolBarZoom.add(new NewToolbarButton(zoomOutAction,
                 createNavigationIcon("zoomOut32")));
-        toolBarZoom.add(new ToolBarToggleButton(zoomAction,
+        toolBarZoom.add(new NewToolbarToggleButton(zoomAction,
                 createNavigationIcon("zoom32")));
-        toolBarZoom.add(new ToolBarButton(fitToPanelAction,
+        toolBarZoom.add(new NewToolbarButton(fitToPanelAction,
                 createNavigationIcon("fitToPanel32")));
 
         toolBarMemMonitor.setLayout(new FlowLayout(FlowLayout.LEFT));
@@ -438,7 +439,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         toolBarMemMonitor.setMargin(new Insets(0, 0, 0, 0));
 
 
-        ToolBarToggleButton tb = new ToolBarToggleButton(searchServicesAction,
+        NewToolbarToggleButton tb = new NewToolbarToggleButton(searchServicesAction,
                 createNavigationIcon("searchServices32"));
         toolBarSerch.add(tb);
 

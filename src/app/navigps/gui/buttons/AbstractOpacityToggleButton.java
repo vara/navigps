@@ -1,3 +1,9 @@
+/*
+ * AbstractOpacityToggleButton.java
+ *
+ * Created on 2009-04-15, 19:47:16
+ */
+
 package app.navigps.gui.buttons;
 
 import app.navigps.gui.detailspanel.AlphaInterface;
@@ -6,21 +12,21 @@ import java.awt.Graphics;
 import java.awt.Graphics2D;
 import javax.swing.Action;
 import javax.swing.Icon;
-import javax.swing.JButton;
+import javax.swing.JToggleButton;
 
 /**
  *
- * @author Grzegorz (vara) Warywoda
+ * @author Grzegorz (wara) Warywoda
  */
-public abstract class AbstractOpacityJButton extends JButton implements AlphaInterface{
-    
+public abstract class AbstractOpacityToggleButton extends JToggleButton implements AlphaInterface{
+
     private float upperThresholdAlpha = 1f;
     private float alpha = 1f;
 
     /**
      *
      */
-    public AbstractOpacityJButton(){
+    public AbstractOpacityToggleButton(){
         super(null,null);
     }
 
@@ -28,27 +34,27 @@ public abstract class AbstractOpacityJButton extends JButton implements AlphaInt
      *
      * @param icon
      */
-    public AbstractOpacityJButton(Icon icon) {
+    public AbstractOpacityToggleButton(Icon icon) {
         this(null, icon);
     }
 
     /**
-     * Creates a opacity button with text.
+     * Creates a opacity toggle button with text.
      *
      * @param text  the text of the button
      */
-    public AbstractOpacityJButton(String text) {
+    public AbstractOpacityToggleButton(String text) {
         super(text);
     }
 
     /**
-     * Creates a Opacity button where properties are taken from the
+     * Creates a Opacity toggle button where properties are taken from the
      * <code>Action</code> supplied.
      *
      * @param a the <code>Action</code> used to specify the new button
      *
      */
-    public AbstractOpacityJButton(Action a) {
+    public AbstractOpacityToggleButton(Action a) {
         super(a);
     }
 
@@ -58,7 +64,7 @@ public abstract class AbstractOpacityJButton extends JButton implements AlphaInt
      * @param text  the text of the button
      * @param icon  the Icon image to display on the button
      */
-    public AbstractOpacityJButton(String text, Icon icon) {
+    public AbstractOpacityToggleButton(String text, Icon icon) {
        super(text, icon);
     }
 

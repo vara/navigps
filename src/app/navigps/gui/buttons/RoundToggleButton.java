@@ -1,3 +1,14 @@
+/*
+ * To change this template, choose Tools | Templates
+ * and open the template in the editor.
+ */
+
+/*
+ * RoundToggleButton.java
+ *
+ * Created on 2009-04-15, 19:51:30
+ */
+
 package app.navigps.gui.buttons;
 
 import app.navigps.gui.borders.EmptyOvalBorder;
@@ -12,11 +23,10 @@ import javax.swing.Action;
 
 /**
  *
- * @author Grzegorz (vara) Warywoda
+ * @author Grzegorz (wara) Warywoda
  */
-public class RoundButton extends OpacityButton{
-
-    private RoundRectangle2D visibleRec;
+public class RoundToggleButton extends AbstractOpacityToggleButton{
+private RoundRectangle2D visibleRec;
     private float roundX=0;
     private float roundY=0;
 
@@ -24,19 +34,19 @@ public class RoundButton extends OpacityButton{
      *
      * @param label
      */
-    public RoundButton(String label){
-	
+    public RoundToggleButton(String label){
+
         super(label);
         setFocusPainted(false);
         setBorder(null);
-        
+
     }
 
     /**
      *
      * @param a
      */
-    public RoundButton(Action a){
+    public RoundToggleButton(Action a){
         super(a);
         setFocusPainted(false);
         setBorder(null);
@@ -48,7 +58,7 @@ public class RoundButton extends OpacityButton{
      * @param arcw
      * @param arch
      */
-    public RoundButton(String label,float arcw,float arch){
+    public RoundToggleButton(String label,float arcw,float arch){
         this(label);
         roundX = arcw;
         roundY = arch;
@@ -77,7 +87,7 @@ public class RoundButton extends OpacityButton{
      * @param g
      */
     @Override
-    public void paintComponent(Graphics g){	
+    public void paintComponent(Graphics g){
 		super.paintComponent(g);
     }
 
@@ -86,7 +96,7 @@ public class RoundButton extends OpacityButton{
      * @param g
      */
     @Override
-    protected void paintBorder(Graphics g) {        
+    protected void paintBorder(Graphics g) {
         super.paintBorder(g);
     }
 
