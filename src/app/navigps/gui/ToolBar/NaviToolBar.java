@@ -97,13 +97,14 @@ public class NaviToolBar extends JToolBar{
             @Override
             public void timingEvent(float fraction) {
                 //System.out.println("timing event "+fraction);
-                //repaint();
+                //repaint();                
             }
 
             @Override
             public void end() {
                 //animatorCount--;
                 //repaint();
+                validate();
             }
 
             @Override
