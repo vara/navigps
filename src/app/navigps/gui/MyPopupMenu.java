@@ -4,11 +4,15 @@ import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.MouseEvent;
 import javax.swing.Icon;
 import javax.swing.JMenuItem;
 import javax.swing.JPopupMenu;
 import javax.swing.KeyStroke;
+import javax.swing.MenuElement;
+import javax.swing.MenuSelectionManager;
 import javax.swing.Timer;
+import javax.swing.event.MouseInputAdapter;
 
 /**
  *
@@ -19,6 +23,8 @@ public class MyPopupMenu extends JPopupMenu{
     private Timer closeTimer;
     private int closeDelay = 5000;
 
+    private PopupMouseListener mouseListenr = new PopupMouseListener();
+
     public MyPopupMenu(){
         this(null);
     }
@@ -27,6 +33,25 @@ public class MyPopupMenu extends JPopupMenu{
         super(title);
         setLightWeightPopupEnabled(true);
         setAlignmentX(100);
+
+        init();
+    }
+
+    private void init(){
+        initialTimer();
+        installListeners();
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+
+        uninstallMaouseListener();
+        closeTimer = null;
+        System.err.println("MyPopupMenu "+getName()+" finalize !!!");
+    }
+
+    private void initialTimer(){
 
         closeTimer = new Timer(closeDelay, new ActionListener() {
             @Override
@@ -37,6 +62,19 @@ public class MyPopupMenu extends JPopupMenu{
         });
 
         closeTimer.setRepeats(false);
+    }   
+
+
+    private void installListeners(){
+
+        addMouseListener(mouseListenr);
+        addMouseMotionListener(mouseListenr);
+    }
+
+    private void uninstallMaouseListener(){
+
+        removeMouseListener(mouseListenr);
+        removeMouseMotionListener(mouseListenr);
     }
 
     public void setTimeToClose(int closeInit){
@@ -53,9 +91,21 @@ public class MyPopupMenu extends JPopupMenu{
 
     @Override
     public void show(Component invoker, int x, int y) {
-        super.show(invoker, x, y);
-        closeTimer.start();
+        super.show(invoker, x, y);        
     }
+
+    @Override
+    protected void processMouseEvent(MouseEvent e) {
+        super.processMouseEvent(e);
+        //System.out.println("***"+e);
+    }
+
+    @Override
+    public void processMouseEvent(MouseEvent event, MenuElement[] path, MenuSelectionManager manager) {
+        super.processMouseEvent(event, path, manager);
+        System.out.println("***"+event);
+    }
+
 
 
     @Override
@@ -77,5 +127,30 @@ public class MyPopupMenu extends JPopupMenu{
         mi.setAccelerator(KeyStroke.getKeyStroke(skrot));
         mi.addActionListener(al);
         return mi;
-    }   
+    }
+
+    private class PopupMouseListener extends MouseInputAdapter{
+
+        @Override
+        public void mouseExited(MouseEvent e) {            
+            //System.err.println("MouseExited close timer start");
+            //Rectangle rec = getBounds();
+            //System.out.println(""+rec);
+            closeTimer.start();
+        }
+
+        @Override
+        public void mouseEntered(MouseEvent e) {
+            //System.err.println("MouseEntered close timer start");
+            if(closeTimer.isRunning()){
+                closeTimer.stop();
+            }
+        }
+
+        @Override
+        public void mouseMoved(MouseEvent e) {
+            super.mouseMoved(e);
+            //System.out.println(""+e);
+        }
+    }
 }

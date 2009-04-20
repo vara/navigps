@@ -12,20 +12,24 @@ package app.navigps.gui.ToolBar.Layout;
  */
 import java.awt.*;
 import java.util.*;
+import javax.swing.JToolBar;
+import org.jdesktop.animation.timing.Animator;
+import org.jdesktop.animation.timing.TimingTargetAdapter;
+import org.jdesktop.animation.timing.interpolation.PropertySetter;
 
-public class NaviToolbarLayout implements LayoutManager2,java.io.Serializable {
+public class NaviToolBarLayout implements LayoutManager2,java.io.Serializable {
 
-    private LinkedList arrayToolbars = new LinkedList();
+    Vector<JToolBar> arrayToolbars = new Vector<JToolBar>(5);
 
     private int hgap;
     private int vgap;
 
-    public NaviToolbarLayout(){
+    public NaviToolBarLayout(){
         this.hgap = 0;
         this.vgap = 0;
     }
 
-    public NaviToolbarLayout(int hgap,int vgap){
+    public NaviToolBarLayout(int hgap,int vgap){
         this.hgap = hgap;
         this.vgap = vgap;
     }
@@ -34,7 +38,7 @@ public class NaviToolbarLayout implements LayoutManager2,java.io.Serializable {
     public void addLayoutComponent(Component c, Object con) {
         synchronized (c.getTreeLock()) {
             c.setVisible(true);
-            arrayToolbars.add(c);
+            arrayToolbars.add((JToolBar)c);
             c.getParent().validate();
         }
     }
@@ -55,9 +59,6 @@ public class NaviToolbarLayout implements LayoutManager2,java.io.Serializable {
             int left = insets.left;
             int right = target.getWidth() - insets.right;
 
-            //int height = getPreferredDimension(arrayToolbars).height;
-
-
             placeComponents(target, arrayToolbars, left, top, right - left,
                       bottom);
         }
@@ -65,7 +66,7 @@ public class NaviToolbarLayout implements LayoutManager2,java.io.Serializable {
 
     // Returns the ideal width for a vertically oriented toolbar
     // and the ideal height for a horizontally oriented tollbar:
-    private Dimension getPreferredDimension(LinkedList comps) {
+    private Dimension getPreferredDimension(Vector comps) {
         int w = 0, h = 0;
         for (int i = 0; i < comps.size(); i++) {
             Component c = (Component) (comps.get(i));
@@ -76,44 +77,51 @@ public class NaviToolbarLayout implements LayoutManager2,java.io.Serializable {
         return new Dimension(w, h);
     }
 
-    private void placeComponents(Container target, LinkedList comps,
+    private void placeComponents(Container target, Vector comps,
                                int x, int y, int w, int h) {
         //System.out.println("x: "+x+" y: "+y+" w: "+w+" h: "+h);
-        int offset = 0;
+        //if(animatorCount != 0) return;
         Component c = null;
-        offset = x;
-
+        
+        int offset = x;
         int totalWidth = 0;
-        int cwidth=0;
-        int num=comps.size();
+        int compWidth  = 0;
+        int numOfComps=comps.size();
 
-        for (int i = 0; i < num; i++) {
-            c = (Component) (comps.get(i));
-            if(c.isVisible()){
-                int widthSwap=totalWidth;
-                int cwidthSwap=cwidth;
-                cwidth = c.getPreferredSize().width;
-                totalWidth += cwidth;
-                if (w < totalWidth && i != 0) {
-                    Component c0=(Component)(comps.get(i-1));
-                    Rectangle rec=c0.getBounds();
-                    c0.setBounds(rec.x,rec.y,w-widthSwap+cwidthSwap,rec.height);
-                    offset = x;
-                    y += h;
-                    totalWidth = cwidth;
-                }
-                //last component
-                if(i+1==num){
-                    System.out.println("cx: "+(x + offset)+" cy: "+y+" cw: "+(w-totalWidth+cwidth)+" ch: "+h);
-                    c.setBounds(x + offset, y, w-totalWidth+cwidth, h);
-                }else{
-                    c.setBounds(x + offset, y, cwidth, h);
-                    offset += cwidth;
-                }
+        for (int i = 0; i < numOfComps; i++) {
+            c = (Component) (comps.get(i));            
+            //System.err.println("Component name "+c.getName());
+            int widthSwap=totalWidth;
+            int compWidthSwap=compWidth;
+
+            compWidth = c.getPreferredSize().width;
+            totalWidth += compWidth;
+
+            if (w < totalWidth && i != 0) {
+                Component previousComp =(Component)(comps.get(i-1));
+                //System.out.println("previousComp "+previousComp);
+                Rectangle rec= previousComp.getBounds();
+                Rectangle newBounds = new Rectangle(rec.x,rec.y,w-widthSwap+compWidthSwap,rec.height);                
+                previousComp.setBounds(newBounds);
+                offset = x;
+                y += h;
+                totalWidth = compWidth;
+            }
+            //last component
+            if(i+1==numOfComps){
+                //System.out.println("cx: "+(x + offset)+" cy: "+y+" cw: "+(w-totalWidth+compWidth)+" ch: "+h);
+                
+                Rectangle newRec = new Rectangle(x + offset, y, w-totalWidth+compWidth, h);
+                c.setBounds(newRec);
+                
+            }else{
+                Rectangle newRec = new Rectangle(x + offset, y, compWidth, h);
+                c.setBounds(newRec);
+                offset += compWidth+hgap;
+                totalWidth+=hgap;
             }
         }
-
-    }
+    }   
 
     @Override
     public Dimension maximumLayoutSize(Container target) {
@@ -132,12 +140,25 @@ public class NaviToolbarLayout implements LayoutManager2,java.io.Serializable {
 
     @Override
     public void invalidateLayout(Container target) {
-        //System.out.println(getClass().getName()+" 'invalidateLayout'");
+        
+        System.out.println(getClass().getName()+" 'invalidateLayout'");
+        arrayToolbars.clear();
+        Component [] comps = target.getComponents();
+        Component c;
+        for (int i=0;i<comps.length;i++) {
+            c = comps[i];
+            if(c.isVisible()){
+                arrayToolbars.add((JToolBar)c);
+            }
+        }
+        //layoutContainer(target);
+        
     }
 
     @Override
     public void addLayoutComponent(String name, Component comp) {
         //System.out.println(getClass().getName()+" 'addLayoutComponent(String name, Component comp)'");
+
     }
 
     @Override

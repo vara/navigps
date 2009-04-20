@@ -30,6 +30,7 @@ import javax.swing.JCheckBoxMenuItem;
 import javax.swing.JMenuItem;
 import javax.swing.border.BevelBorder;
 import javax.swing.border.Border;
+import javax.swing.border.EmptyBorder;
 
 /**
  *
@@ -41,7 +42,8 @@ public class MemoryGui extends AlphaJPanel implements Runnable,
     public static final int B =  1;   
     public static final int KB = 1024;    
     public static final int MB = 1024*1024;  
-    public static final int GB = 1024*1024*1024;    
+    public static final int GB = 1024*1024*1024;
+    
     protected static final int STARTED=0;
     protected static final int STOPED=1;
     protected static final int PAUSED=2;
@@ -49,10 +51,12 @@ public class MemoryGui extends AlphaJPanel implements Runnable,
     
     private double mul = MemoryGui.MB;
     private String unitName = "MB";    
-    private Runtime runtime = Utils.getRuntime();    
+    private Runtime runtime = Utils.getRuntime();
+
     private int wPaint = 100;
     private int hpaint = 34;
     private float tPaint = 1.0f;
+
     private long freeMem = 0;
     private long totalMem = 0;
     private long maxMem = 0;
@@ -82,8 +86,10 @@ public class MemoryGui extends AlphaJPanel implements Runnable,
 		
         //NaviLogger.logger.log(Level.FINE, "Init Memory Gui");
         chart = new Chart();
-        setBounds(0,0,getWPaint()+(int)getTPaint(),getHPaint()+(int)getTPaint());
-        setPreferredSize(new Dimension(getWidth(),getHeight()-1));
+        setBounds(0,0,
+                getWPaint()+(int)getTPaint(),
+                getHPaint()+(int)getTPaint());
+        setPreferredSize(new Dimension(getWidth(),getHeight()));
         setBorder(mainBorder);
         addMouseListener(this);
         setToolTipText("Click to force garbage colector !");

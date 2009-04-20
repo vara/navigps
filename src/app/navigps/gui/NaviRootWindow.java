@@ -2,7 +2,6 @@ package app.navigps.gui;
 
 import app.navigps.gui.VerboseTextPane.PanelForVerboseWindow;
 import app.navigps.NaviGPSCore;
-import app.navigps.gui.buttons.ToolBarToggleButton;
 import app.navigps.gui.displayItemsMap.DetailsPanel;
 import app.navigps.gui.displayItemsMap.MainDetailsPanel;
 import app.navigps.gui.displayItemsMap.PanelWithBatikJTree;
@@ -21,6 +20,7 @@ import app.navigps.utils.OutputVerboseStream;
 import app.navigps.utils.Utils;
 import app.config.GUIConfiguration;
 import app.config.MainConfiguration;
+import app.database.odb.gui.DatabaseManager;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Component;
@@ -82,16 +82,18 @@ import net.infonode.docking.theme.ShapedGradientDockingTheme;
 import net.infonode.docking.util.DockingUtil;
 import net.infonode.docking.util.ViewMap;
 import net.infonode.util.Direction;
-import app.database.odb.gui.DatabaseManager;
 import app.database.odb.utils.ODBConnection;
 import app.navigps.WindowInitialEvent;
 import app.navigps.WindowInitialListener;
 import app.navigps.gui.ToolBar.NaviToolBarPanel;
+import app.navigps.gui.ToolBar.NaviToolBar;
 import app.navigps.gui.buttons.NewToolbarButton;
 import app.navigps.gui.buttons.NewToolbarToggleButton;
+import java.awt.Dialog;
 import java.awt.FlowLayout;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
+import javax.swing.JDialog;
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.gvt.CanvasGraphicsNode;
@@ -408,10 +410,10 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
 
         panelWithToolBars = new NaviToolBarPanel();
 
-        toolBarFile = new JToolBar("ToolBar File");
-        toolBarZoom = new JToolBar("ToolBar Zoom");
-        toolBarSerch = new JToolBar("ToolBar Serch");
-        toolBarMemMonitor = new JToolBar("Memory Monitor") {
+        toolBarFile = new NaviToolBar("ToolBar File");
+        toolBarZoom = new NaviToolBar("ToolBar Zoom");
+        toolBarSerch = new NaviToolBar("ToolBar Serch");
+        toolBarMemMonitor = new NaviToolBar("Memory Monitor") {
 
             @Override
             public void setVisible(boolean b) {
@@ -434,7 +436,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         toolBarZoom.add(new NewToolbarButton(fitToPanelAction,
                 createNavigationIcon("fitToPanel32")));
 
-        toolBarMemMonitor.setLayout(new FlowLayout(FlowLayout.LEFT));
+        toolBarMemMonitor.setLayout(new FlowLayout(FlowLayout.LEFT,1,1));
         toolBarMemMonitor.add(new MemoryGui());
         toolBarMemMonitor.setMargin(new Insets(0, 0, 0, 0));
 
@@ -483,9 +485,45 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
                     SwingUtilities.invokeLater(new Runnable() {
                         @Override
                         public void run() {
-                            DatabaseManager odb = new 
-                                    DatabaseManager(NaviRootWindow.this, false);
+                            final DatabaseManager odb = new
+                                  DatabaseManager(NaviRootWindow.this, false);
                             odb.setVisible(true);
+                            /*
+                            final JDialog ddd = new JDialog(NaviRootWindow.this,true){
+
+                                @Override
+                                protected void dialogInit() {
+                                    super.dialogInit();
+                                    final JDialog dialog = this;
+                                    getRootPane().getActionMap().put("close", new AbstractAction("close") {
+                                        @Override
+                                        public void actionPerformed(ActionEvent e) {
+                                            setVisible(false);
+                                            getToolkit().getSystemEventQueue().postEvent(
+                                                    new WindowEvent(dialog, WindowEvent.WINDOW_CLOSING));
+                                        }
+                                    });
+
+                                    getRootPane().getInputMap().put(KeyStroke.getKeyStroke(KeyEvent.VK_ESCAPE, 0), "close");
+                                }
+
+                                @Override
+                                public void dispose() {
+                                    super.dispose();
+                                    System.err.println("Dispose Dialog !!!!!!");
+                                }
+
+                                @Override
+                                protected void finalize() throws Throwable {
+                                    super.finalize();
+                                    System.err.println("Fianlize Dialog !!!");
+                                }
+
+
+                            };
+                            ddd.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
+                            ddd.setVisible(true);
+                            */
                         }
                     });
                 }else{
@@ -694,8 +732,8 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
     public void itemStateChanged(ItemEvent e) {
         JCheckBoxMenuItem mi = (JCheckBoxMenuItem) (e.getSource());
 
-        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);
-
+        boolean selected = (e.getStateChange() == ItemEvent.SELECTED);        
+        
         //Set the enabled state of the appropriate Action.
         if (mi == cbmOptionsForToolBars[0]) {
             toolBarFile.setVisible(selected);
@@ -708,8 +746,13 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
         } else if (mi == cbmOptionsForToolBars[4]) {
             panelWithToolBars.setVisible(selected);
             //stop working memory monitor when 'selected' == false
-            ((MemoryGui) toolBarMemMonitor.getComponentAtIndex(0)).setVisible(selected);
-        }
+            Component [] comps = toolBarMemMonitor.getComponents();
+            for (Component c : comps) {
+                if(c instanceof MemoryGui){
+                    ((MemoryGui)c).setVisible(selected);
+                }
+            }
+        }        
     }
     
     private static final Icon BUTTON_ICON = new Icon() {
