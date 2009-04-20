@@ -102,7 +102,12 @@ public class ODBConnection {
     }
 
     public static boolean isConnected(){
-        return Constants.getDbConnection() != null ? true : false;
+        try{
+            Constants.getDbConnection();
+        }catch(NullPointerException e){
+            return false;
+        }
+        return true;
     }
 
     protected static boolean checkFile(String databasePath, String fileName){

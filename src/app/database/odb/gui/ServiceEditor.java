@@ -9,6 +9,7 @@ import app.database.odb.core.ServiceCore;
 import app.database.odb.core.ServiceDescription;
 import app.database.odb.core.Subcategory;
 import app.database.odb.utils.Constants;
+import javax.swing.JDialog;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
@@ -20,24 +21,35 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
  * @author ACME
  */
 public class ServiceEditor extends javax.swing.JDialog {
-
-    private ODB odb = Constants.getDbConnection();
+    
     private ServiceCore sc;
 
     /** Creates new form ServiceFactory
      * @param parent
      * @param modal
      */
-    public ServiceEditor(java.awt.Frame parent, boolean modal) {
+    public ServiceEditor(JDialog parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
 
-    ServiceEditor(java.awt.Frame parent, boolean modal, ServiceCore sc) {
+    ServiceEditor(JDialog parent, boolean modal, ServiceCore sc) {
         super(parent, modal);
         this.sc = sc;
         initComponents();
         updateFields(sc);
+    }
+
+     @Override
+    public void dispose() {
+        super.dispose();
+        System.err.println("ServiceEditor method dispose !!!");
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.err.println("ServiceEditor method finalize !!!");
     }
 
     /** This method is called from within the constructor to
@@ -326,6 +338,15 @@ public class ServiceEditor extends javax.swing.JDialog {
     }// </editor-fold>//GEN-END:initComponents
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+        ODB odb = null;
+        try{
+            odb = Constants.getDbConnection();
+        }catch(NullPointerException ex){
+            System.err.println(""+ex.getMessage());
+            return;
+        }
+
         Category c = null;
         Vector v = new Vector();
         Subcategory s = null;
@@ -433,6 +454,15 @@ public class ServiceEditor extends javax.swing.JDialog {
     }
 
     private void fillCategoryCombo(ServiceCore sc) {
+
+        ODB odb = null;
+        try{
+            odb = Constants.getDbConnection();
+        }catch(NullPointerException ex){
+            System.err.println(""+ex.getMessage());
+            return;
+        }
+
         Vector v = new Vector();
         Objects categories = odb.getObjects(Category.class);
 
@@ -452,6 +482,15 @@ public class ServiceEditor extends javax.swing.JDialog {
     }
 
     private void fillSubcategoryCombo() {
+
+        ODB odb = null;
+        try{
+            odb = Constants.getDbConnection();
+        }catch(NullPointerException ex){
+            System.err.println(""+ex.getMessage());
+            return;
+        }
+
         Vector v = new Vector();
         IQuery query = new CriteriaQuery(Category.class, Where.equal("name", jComboBox1.getSelectedItem().toString()));
         Objects cat = odb.getObjects(query);

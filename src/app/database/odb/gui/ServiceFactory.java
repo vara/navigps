@@ -11,6 +11,7 @@ import app.database.odb.core.ServiceCore;
 import app.database.odb.core.ServiceDescription;
 import app.database.odb.core.Subcategory;
 import app.database.odb.utils.Constants;
+import javax.swing.JDialog;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.Objects;
 import org.neodatis.odb.core.query.IQuery;
@@ -21,20 +22,38 @@ import org.neodatis.odb.impl.core.query.criteria.CriteriaQuery;
  *
  * @author ACME
  */
-public class ServiceFactory extends javax.swing.JDialog {
-
-    private ODB odb = Constants.getDbConnection();
+public class ServiceFactory extends javax.swing.JDialog {    
 
     /** Creates new form ServiceFactory
      * @param parent
      * @param modal
      */
-    public ServiceFactory(java.awt.Frame parent, boolean modal) {
+    public ServiceFactory(JDialog parent, boolean modal) {
         super(parent, modal);
         initComponents();
     }
 
+    @Override
+    public void dispose() {
+        super.dispose();
+        System.err.println("ServiceFactory method dispose !!!");
+    }
+
+    @Override
+    protected void finalize() throws Throwable {
+        super.finalize();
+        System.err.println("ServiceFactory method finalize !!!");
+    }
+
     private void fillCategoryCombo() {
+        ODB odb = null;
+        try{
+            odb = Constants.getDbConnection();
+        }catch(NullPointerException ex){
+            System.err.println(""+ex.getMessage());
+            return;
+        }
+
         Vector v = new Vector();
         Objects categories = odb.getObjects(Category.class);
 
@@ -52,6 +71,15 @@ public class ServiceFactory extends javax.swing.JDialog {
     }
 
     private void fillSubcategoryCombo() {
+
+        ODB odb = null;
+        try{
+            odb = Constants.getDbConnection();
+        }catch(NullPointerException ex){
+            System.err.println(""+ex.getMessage());
+            return;
+        }
+
         Vector v = new Vector();
         Object objCategory = jComboBox1.getSelectedItem();
         if(objCategory == null){
@@ -383,6 +411,14 @@ public class ServiceFactory extends javax.swing.JDialog {
     }
 
     private void jButton1ActionPerformed(java.awt.event.ActionEvent evt) {//GEN-FIRST:event_jButton1ActionPerformed
+
+        ODB odb = null;
+        try{
+            odb = Constants.getDbConnection();
+        }catch(NullPointerException ex){
+            System.err.println(""+ex.getMessage());
+            return;
+        }
 
         if (jTextField4.getText().equalsIgnoreCase("") ||
                 jTextField5.getText().equalsIgnoreCase("") ||
