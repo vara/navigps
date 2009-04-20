@@ -141,7 +141,7 @@ public class NaviToolBarLayout implements LayoutManager2,java.io.Serializable {
     @Override
     public void invalidateLayout(Container target) {
         
-        System.out.println(getClass().getName()+" 'invalidateLayout'");
+        //System.out.println(getClass().getName()+" 'invalidateLayout'");
         arrayToolbars.clear();
         Component [] comps = target.getComponents();
         Component c;

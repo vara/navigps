@@ -9,20 +9,14 @@ package app.navigps.gui.ToolBar;
 import app.navigps.gui.ToolBar.Layout.NaviToolBarLayout;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import java.awt.Color;
-import java.awt.Cursor;
 import java.awt.Graphics;
 import javax.swing.border.EmptyBorder;
-import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.timing.TimingTargetAdapter;
-import org.jdesktop.animation.timing.interpolation.PropertySetter;
 
 /**
  *
  * @author Grzegorz (wara) Warywoda
  */
-public class NaviToolBarPanel extends AlphaJPanel{
-
-    private Animator animator;
+public class NaviToolBarPanel extends AlphaJPanel{    
 
     public NaviToolBarPanel(){
        super(new NaviToolBarLayout(2,2));

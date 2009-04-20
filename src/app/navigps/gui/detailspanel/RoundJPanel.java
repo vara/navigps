@@ -5,6 +5,7 @@ import app.navigps.gui.borders.RoundBorder;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.Insets;
+import java.awt.LayoutManager;
 import java.awt.Rectangle;
 import java.awt.geom.Area;
 import java.awt.geom.GeneralPath;
@@ -38,7 +39,15 @@ public class RoundJPanel extends AlphaJPanel{
         setBorder(new EmptyOvalBorder(recW,recH));
         setInnerCorners(recW, recH);
     }
+    public RoundJPanel(LayoutManager lm,float recW,float recH){        
+        this(recW,recH);
+        setLayout(lm);
+    }
 
+     public RoundJPanel(LayoutManager lm){
+        this();
+        setLayout(lm);
+    }
     /**
      *
      * @param g
