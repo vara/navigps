@@ -14,14 +14,15 @@ import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;
 import java.awt.Rectangle;
-import java.awt.geom.Area;
-import java.awt.geom.GeneralPath;
-import java.awt.geom.RoundRectangle2D;
 import javax.swing.JToolBar;
-import javax.swing.border.Border;
 import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.TimingTargetAdapter;
+import org.jdesktop.animation.timing.interpolation.Interpolator;
+import org.jdesktop.animation.timing.interpolation.KeyFrames;
+import org.jdesktop.animation.timing.interpolation.KeyTimes;
+import org.jdesktop.animation.timing.interpolation.KeyValues;
 import org.jdesktop.animation.timing.interpolation.PropertySetter;
+import org.jdesktop.animation.timing.interpolation.SplineInterpolator;
 
 /**
  *
@@ -30,9 +31,24 @@ import org.jdesktop.animation.timing.interpolation.PropertySetter;
 public class NaviToolBar extends JToolBar{
 
     private  Animator animator;
+    private int [] duration = {1000,500};
 
+    public static final int INITIAL_TOOLBAR_TIME = 0;
+    public static final int NORMAL_TOOLBAR_TIME = 0;
+
+    private int typeTime=1;
+    
     public NaviToolBar(String name){
         super(name);
+        init();
+    }
+    public NaviToolBar( int orientation ){
+        super(orientation);
+        init();
+    }
+
+    public NaviToolBar( String name , int orientation) {
+        super(name, orientation);
         init();
     }
 
@@ -43,19 +59,7 @@ public class NaviToolBar extends JToolBar{
     }
 
     @Override
-    protected void paintComponent(Graphics g) {
-        Border bord = getBorder();
-        if(bord instanceof OvalBorder){
-
-            OvalBorder ovb= (OvalBorder)bord;
-            RoundRectangle2D clip = new RoundRectangle2D.Double(-1,-1,
-                    getWidth()+1,getHeight()+1, ovb.getRecW(), ovb.getRecH());            
-            Area newClip = new Area(g.getClip());
-            Area visbClip = new Area(clip);
-            newClip.intersect(visbClip);
-            GeneralPath gpClip = new GeneralPath(newClip);
-            g.setClip(gpClip);
-        }
+    protected void paintComponent(Graphics g) {        
         super.paintComponent(g);
     }
 
@@ -73,46 +77,67 @@ public class NaviToolBar extends JToolBar{
 
     @Override
     public void setBounds(Rectangle r) {
-        animationBounds(this, r);
+        animationBounds(r,duration[getTypeTime()]);
     }
 
-    private void animationBounds(Component comp,Rectangle newrec){
-        Rectangle oldrec = comp.getBounds();//current position
+    private void animationBounds(Rectangle newrec,int duration){
+        Rectangle oldrec = getBounds();//current position
         if(newrec.equals(oldrec)){
             //System.out.println("the same rect, return");
             return;
         }
-        comp.setLocation(newrec.x, newrec.y);
+        setLocation(newrec.x, newrec.y);
         Dimension oldDim = new Dimension(oldrec.width, oldrec.height);
         Dimension newDim = new Dimension(newrec.width, newrec.height);
 
         if(animator != null && animator.isRunning()){
             animator.stop();
         }
+        Interpolator splines = new SplineInterpolator(0.40f, 0.00f, 0.00f, 1.00f);
+        KeyTimes times = new KeyTimes(.0f, 1.0f);
+        KeyValues values = KeyValues.create(oldDim,newDim);
+        KeyFrames frames = new KeyFrames(values,times, splines);
 
-        animator = PropertySetter.createAnimator(500,comp,"size",oldDim,newDim);
-        animator.setDeceleration(.7f);
+        animator = PropertySetter.createAnimator(duration,this,"size",frames);
+        //animator.setResolution(10);
+        animator.setDeceleration(.5f);
+        animator.setAcceleration(0.3f);
         animator.addTarget(new TimingTargetAdapter(){
 
             @Override
             public void timingEvent(float fraction) {
                 //System.out.println("timing event "+fraction);
-                //repaint();                
-            }
-
-            @Override
-            public void end() {
-                //animatorCount--;
                 //repaint();
                 validate();
             }
 
             @Override
+            public void end() {
+                //repaint();
+            }
+
+            @Override
             public void begin() {
-                //animatorCount++;
             }
 
         });
         animator.start();
+    }
+
+    /**
+     * @return the typeTime
+     */
+    public int getTypeTime() {
+        return typeTime;
+    }
+
+    /**
+     * @param typeTime the typeTime to set
+     */
+    public void setTypeTime(int typeTime) throws IllegalArgumentException{
+        if(typeTime <0 || typeTime > duration.length-1){
+            throw new IllegalArgumentException("argument must be >-1 and <"+(duration.length-1));
+        }
+        this.typeTime = typeTime;
     }
 }

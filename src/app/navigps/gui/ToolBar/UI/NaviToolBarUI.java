@@ -6,34 +6,53 @@
 
 package app.navigps.gui.ToolBar.UI;
 
+import app.navigps.gui.borders.OvalBorder;
+import app.navigps.utils.GraphicsUtilities;
 import app.navigps.utils.MetalUtils;
 import java.awt.AlphaComposite;
 import java.awt.Color;
 import java.awt.Component;
+import java.awt.Container;
 import java.awt.Dimension;
 import java.awt.Font;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.GraphicsConfiguration;
+import java.awt.GraphicsEnvironment;
 import java.awt.Image;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.awt.RenderingHints;
 import java.awt.Shape;
 import java.awt.Transparency;
+import java.awt.Window;
+import java.awt.event.MouseEvent;
 import java.awt.font.FontRenderContext;
 import java.awt.font.TextLayout;
 import java.awt.geom.AffineTransform;
-import java.lang.ref.WeakReference;
+import java.awt.geom.Area;
+import java.awt.geom.GeneralPath;
+import java.awt.geom.RoundRectangle2D;
+import java.awt.image.BufferedImage;
+import java.awt.image.ConvolveOp;
+import java.awt.image.Kernel;
 import javax.swing.JComponent;
+import javax.swing.JFrame;
 import javax.swing.JMenuBar;
 import javax.swing.JRootPane;
 import javax.swing.JToolBar;
+import javax.swing.RootPaneContainer;
 import javax.swing.SwingUtilities;
 import javax.swing.UIManager;
 
+import javax.swing.border.Border;
+import javax.swing.event.MouseInputListener;
 import javax.swing.plaf.*;
 import javax.swing.plaf.basic.*;
+import javax.swing.plaf.basic.BasicToolBarUI.DockingListener;
+import org.jdesktop.animation.timing.Animator;
+import org.jdesktop.animation.timing.TimingTargetAdapter;
+import org.jdesktop.animation.timing.interpolation.PropertySetter;
 
 /**
  *
@@ -49,10 +68,22 @@ public class NaviToolBarUI extends BasicToolBarUI{
 
     private String text = "NaviGPS";
 
+    private BufferedImage bi = null;
+
+    private ConvolveOp blurOp;
+
     @Override
     public void installUI(JComponent c) {
         super.installUI(c);
-        //setRolloverBorders(false);        
+        //setRolloverBorders(false);
+
+         float[] matrix = {
+                                0.111f, 0.111f, 0.111f,
+                                0.111f, 0.111f, 0.111f,
+                                0.111f, 0.111f, 0.111f,
+                           };
+
+        blurOp = new ConvolveOp(new Kernel(3, 3, matrix));
     }
     
     @Override
@@ -65,10 +96,37 @@ public class NaviToolBarUI extends BasicToolBarUI{
     }
 
     @Override
+    protected void floatAt(Point position, Point origin) {
+        super.floatAt(position, origin);
+        System.out.println("floatAt pos: "+position+" origin: "+origin);
+    }
+
+    @Override
+    protected void dragTo(Point position, Point origin) {
+        super.dragTo(position, origin);
+        System.out.println("dragTo pos: "+position+" origin: "+origin);
+    }
+
+
+
+    @Override
     public void update(Graphics g, JComponent c) {
         if (g == null) {
             throw new NullPointerException("graphics must be non-null");
         }
+
+        Border bord = c.getBorder();
+        if(bord instanceof OvalBorder){
+            OvalBorder ovb= (OvalBorder)bord;
+            RoundRectangle2D clip = new RoundRectangle2D.Double(0,0,
+                    c.getWidth(),c.getHeight(), ovb.getRecW(), ovb.getRecH());
+            Area newClip = new Area(g.getClip());
+            Area visbClip = new Area(clip);
+            newClip.intersect(visbClip);
+            GeneralPath gpClip = new GeneralPath(newClip);
+            g.setClip(gpClip);
+        }
+
         if (c.isOpaque() && (c.getBackground() instanceof UIResource) &&
                             ((JToolBar)c).getOrientation() ==
                       JToolBar.HORIZONTAL && UIManager.get(
@@ -195,4 +253,152 @@ public class NaviToolBarUI extends BasicToolBarUI{
     public void setPaintedText(boolean paintText) {
         this.paintedText = paintText;
     }
+
+    @Override
+    protected MouseInputListener createDockingListener(){
+        return new NaviDockingListener(toolBar);
+    }
+
+    protected void setDragOffset(Point p) {
+        if (!GraphicsEnvironment.isHeadless()) {
+            if (dragWindow == null) {
+                dragWindow = createDragWindow(toolBar);
+            }
+            dragWindow.setOffset(p);
+        }
+    }
+
+    @Override
+    public boolean canDock(Component c, Point p) {
+        boolean val =super.canDock(c, p);
+        System.out.println("can dock "+val);
+        return val;
+
+    }
+
+    @Override
+    public void setFloating(boolean b, Point p) {
+        if (toolBar.isFloatable()) {       
+
+            if (b){
+                if (dragWindow != null){
+                    Point destLoc = toolBar.getLocationOnScreen();
+                    Animator animator =
+                            PropertySetter.createAnimator(500, dragWindow, "location", destLoc);
+                    animator.addTarget(new TimingTargetAdapter(){
+                        @Override
+                        public void end() {
+                            dragWindow.setVisible(false);
+                        }
+
+                    });
+                    animator.start();
+                }
+                
+            }else {
+                if (dragWindow != null){
+                    dragWindow.setVisible(false);
+                }
+                System.out.println("point "+p);
+                Container dockingSource = toolBar.getParent();
+                if ( propertyListener != null )
+                    UIManager.removePropertyChangeListener( propertyListener );
+                Component target = dockingSource.getComponentAt(p);
+                if(target != null){
+                    Rectangle rec = target.getBounds();
+                    p.translate(rec.width/2, 0);
+                    if(!rec.contains(p)){
+                        return;
+                    }
+                }
+                int zLocation = dockingSource.getComponentZOrder(target);
+                dockingSource.add(toolBar,zLocation);
+                dockingSource.invalidate();
+                Container dockingSourceParent = dockingSource.getParent();
+                if (dockingSourceParent != null)
+                    dockingSourceParent.validate();
+                dockingSource.repaint();
+            }
+        }
+
+    }
+
+    @Override
+    protected JFrame createFloatingFrame(JToolBar toolbar) {
+        return (JFrame)null;
+    }
+
+    @Override
+    protected RootPaneContainer createFloatingWindow(JToolBar toolbar) {
+        return super.createFloatingWindow(toolbar);
+    }
+
+
+    @Override
+    protected void paintDragWindow(Graphics g) {
+        if(bi == null){
+            bi = GraphicsUtilities.
+                    createCompatibleTranslucentImage(toolBar.getWidth(),toolBar.getHeight());
+            Graphics gbi = bi.createGraphics();
+            toolBar.paint(gbi);
+            gbi.dispose();
+        }
+        
+        Graphics2D g2 = (Graphics2D)g;
+        g2.setComposite(AlphaComposite.getInstance(AlphaComposite.SRC_OVER, 0.6f));
+        g2.drawImage(blurOp.filter(bi, null), 0, 0, null);
+
+        System.err.println("Paint dragWindow");
+    }
+
+    @Override
+    protected DragWindow createDragWindow(JToolBar toolbar) {
+        return super.createDragWindow(toolbar);
+    }
+
+
+    
+    protected class NaviDockingListener extends DockingListener {
+        private boolean pressedInBumps = false;
+
+        public NaviDockingListener(JToolBar t) {
+            super(t);
+        }
+
+        @Override
+        public void mousePressed(MouseEvent e) {
+            super.mousePressed(e);
+                if (!toolBar.isEnabled()) {
+                    return;
+                }
+            pressedInBumps = false;
+            Rectangle bumpRect = new Rectangle();
+
+            if (toolBar.getOrientation() == JToolBar.HORIZONTAL) {
+                int x = MetalUtils.isLeftToRight(toolBar) ? 0 : toolBar.getSize().width-14;
+                    bumpRect.setBounds(x, 0, 14, toolBar.getSize().height);
+
+            } else {  // vertical
+                bumpRect.setBounds(0, 0, toolBar.getSize().width, 14);
+            }
+            if (bumpRect.contains(e.getPoint())) {
+                pressedInBumps = true;
+                Point dragOffset = e.getPoint();
+                if (!MetalUtils.isLeftToRight(toolBar)) {
+                    dragOffset.x -=
+                            (toolBar.getSize().width-toolBar.getPreferredSize().width);
+                }
+                setDragOffset(dragOffset);
+            }
+        }
+
+        @Override
+        public void mouseDragged(MouseEvent e) {
+            if (pressedInBumps) {
+                super.mouseDragged(e);
+            }
+        }
+    }
+
+
 }

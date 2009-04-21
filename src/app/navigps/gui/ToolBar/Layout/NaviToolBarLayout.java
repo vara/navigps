@@ -13,9 +13,6 @@ package app.navigps.gui.ToolBar.Layout;
 import java.awt.*;
 import java.util.*;
 import javax.swing.JToolBar;
-import org.jdesktop.animation.timing.Animator;
-import org.jdesktop.animation.timing.TimingTargetAdapter;
-import org.jdesktop.animation.timing.interpolation.PropertySetter;
 
 public class NaviToolBarLayout implements LayoutManager2,java.io.Serializable {
 
@@ -96,10 +93,10 @@ public class NaviToolBarLayout implements LayoutManager2,java.io.Serializable {
 
             compWidth = c.getPreferredSize().width;
             totalWidth += compWidth;
-
+            //System.out.println("Y: "+y);
             if (w < totalWidth && i != 0) {
                 Component previousComp =(Component)(comps.get(i-1));
-                //System.out.println("previousComp "+previousComp);
+                //System.out.println("previousComp "+previousComp.getName());
                 Rectangle rec= previousComp.getBounds();
                 Rectangle newBounds = new Rectangle(rec.x,rec.y,w-widthSwap+compWidthSwap,rec.height);                
                 previousComp.setBounds(newBounds);
