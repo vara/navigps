@@ -718,12 +718,12 @@ public class MemoryGui extends AlphaJPanel implements Runnable,
         }
 	
     }
-    @Override
-    public void setVisible(boolean val){
-        super.setVisible(val);
+
+    public void setWork(boolean val){
         if(!val) stop();
         else start();
     }
+    
     @Override
     public void mousePressed(MouseEvent e) {}
     @Override

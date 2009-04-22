@@ -749,7 +749,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             Component [] comps = toolBarMemMonitor.getComponents();
             for (Component c : comps) {
                 if(c instanceof MemoryGui){
-                    ((MemoryGui)c).setVisible(selected);
+                    ((MemoryGui)c).setWork(selected);
                 }
             }
         }        
@@ -1052,7 +1052,7 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             if (en) {
                 int count = canvaslayers.getComponentCountInLayer(SVGCanvasLayers.SEARCH_SERVICES_LAYER);
                 System.err.println("component count on SVGCanvasLayers.SEARCH_SERVICES_LAYER " + count);
-                canvaslayers.add(ss, SVGCanvasLayers.SEARCH_SERVICES_LAYER);
+                
             }
             String info = "Search services " + (en ? "enabled" : "disabled");
             svgListeners.currentStatusChanged(info);
