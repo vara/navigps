@@ -49,7 +49,15 @@ public class ServiceListModel extends AbstractListModel{
         arrayServices.addAll(vServiceCore);
         fireContentsChanged(this, 0,arrayServices.size()-1);
     }
-
+    public void removeElement(Object o){
+        if(o instanceof ServiceCore){
+            for (int i = 0; i < arrayServices.size(); i++) {
+                if(getElementAt(i).equals(o)){
+                    removeElementAt(i);
+                }
+            }
+        }
+    }
     public void removeElementAt(int index) {
        arrayServices.remove(index);
        fireIntervalRemoved(this, index, index);

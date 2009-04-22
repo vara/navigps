@@ -89,11 +89,11 @@ import app.navigps.gui.ToolBar.NaviToolBarPanel;
 import app.navigps.gui.ToolBar.NaviToolBar;
 import app.navigps.gui.buttons.NewToolbarButton;
 import app.navigps.gui.buttons.NewToolbarToggleButton;
-import java.awt.Dialog;
+import app.navigps.gui.repaintmanager.AlphaRepaintManager;
 import java.awt.FlowLayout;
 import java.util.LinkedList;
 import java.util.NoSuchElementException;
-import javax.swing.JDialog;
+import javax.swing.RepaintManager;
 import org.apache.batik.bridge.ViewBox;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.apache.batik.gvt.CanvasGraphicsNode;
@@ -163,6 +163,13 @@ public class NaviRootWindow extends JFrame implements WindowFocusListener, ItemL
             wi.initialCompleted(wec);
         }
 
+
+        RepaintManager rpm = RepaintManager.currentManager(this);
+        if(!(rpm instanceof AlphaRepaintManager)){
+            System.err.println("Install "+AlphaRepaintManager.class.getName());
+            AlphaRepaintManager manager = new AlphaRepaintManager();
+            RepaintManager.setCurrentManager(manager);
+        }
         //setLocationRelativeTo(null);
     }
 

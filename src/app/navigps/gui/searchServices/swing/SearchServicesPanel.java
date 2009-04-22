@@ -15,6 +15,7 @@ import app.navigps.utils.InvokeUtils.ReturnValue;
 import app.navigps.utils.NaviPoint;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.awt.event.ContainerEvent;
 import java.awt.event.MouseEvent;
 import java.util.Vector;
 import javax.swing.AbstractAction;
@@ -41,9 +42,11 @@ import app.navigps.gui.svgComponents.SVGCanvasLayers;
 import app.navigps.utils.NaviLogger;
 import app.navigps.utils.NaviUtilities;
 import java.awt.BorderLayout;
+import java.awt.Component;
 import java.awt.Insets;
 import java.awt.event.ComponentAdapter;
 import java.awt.event.ComponentEvent;
+import java.awt.event.ContainerListener;
 import java.util.logging.Level;
 import org.neodatis.odb.ODB;
 import org.neodatis.odb.OID;
@@ -64,6 +67,8 @@ public class SearchServicesPanel extends javax.swing.JPanel{
     //for test !!!
     private RoundWindow rWindow;
     private ServicesInfoDisplayedList servlistPanel = new ServicesInfoDisplayedList();
+
+    private boolean triggers;
 
     /** Creates new form SearchServicesPanel */
     public SearchServicesPanel() {        
@@ -105,6 +110,13 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                 addConnectionListener(new ODBConnectionListener());
     }
 
+    public void installTriggers(){
+        System.err.println(getClass().getName()+" triggers was installed: "+triggers);
+        if(!triggers){
+            addTriggersToDB();
+        }
+    }
+
     protected boolean addTriggersToDB(){
 
         ODB odb = Constants.getDbConnection();
@@ -114,9 +126,9 @@ public class SearchServicesPanel extends javax.swing.JPanel{
             odb.addUpdateTrigger(Category.class, new MyUpdateTriger());
             odb.addUpdateTrigger(ServiceCore.class,new MyUpdateTriger());
             odb.addDeleteTrigger(Category.class, new MyDeleteTriger());
-            return true;
+            return (triggers = true);
         }
-        return false;
+        return (triggers = false);
     }
 
     /** This method is called from within the constructor to
@@ -570,7 +582,20 @@ public class SearchServicesPanel extends javax.swing.JPanel{
             svgcl.add(servlistPanel.getAnimamtionLayer(), SVGCanvasLayers.POPUP_LAYER);
             servlistPanel.getAnimamtionLayer().setVisible(true);
             
+            svgcl.getServicesContainer().addContainerListener(new ContainerListener() {
 
+                @Override
+                public void componentAdded(ContainerEvent e) {
+                }
+
+                @Override
+                public void componentRemoved(ContainerEvent e) {
+                    if(rWindow.isVisible()){
+                        Component comp = e.getChild();
+                        servlistPanel.getListModel().removeElement(comp);
+                    }
+                }
+            });
             container.add(rWindow);            
             container.addComponentListener(new ComponentAdapter() {
                 @Override

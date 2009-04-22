@@ -9,7 +9,6 @@ package app.navigps.gui.ToolBar;
 import app.navigps.gui.ToolBar.Layout.NaviToolBarLayout;
 import app.navigps.gui.detailspanel.AlphaJPanel;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.event.ContainerEvent;
 import java.awt.event.ContainerListener;

@@ -21,7 +21,7 @@ public class NaviUtilities {
         if(parent != null){
             while((parent = parent.getParent())!=null){
                 if(parent instanceof SVGCanvasLayers){
-                    System.err.println("Found SVGCanvaaslayer");
+                    System.err.println("Found SVGCanvaslayer");
                     return (SVGCanvasLayers)parent;
                 }
             }

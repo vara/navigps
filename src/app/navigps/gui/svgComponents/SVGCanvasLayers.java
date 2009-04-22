@@ -1,27 +1,17 @@
-/*
- * To change this template, choose Tools | Templates
- * and open the template in the editor.
- */
-
 package app.navigps.gui.svgComponents;
 
 import app.navigps.gui.detailspanel.AlphaJPanel;
-import app.navigps.gui.detailspanel.RoundWindow;
-import app.navigps.gui.detailspanel.RoundWindowUtils;
 import app.navigps.gui.detailspanel.SimpleBusyPanel;
 import app.navigps.gui.svgComponents.Thumbnail.Thumbnail;
 import app.navigps.gui.svgComponents.Thumbnail.ThumbnailPanel;
 import java.awt.Color;
 import java.awt.Component;
-import java.awt.Container;
-import java.awt.event.ComponentAdapter;
-import java.awt.event.ComponentEvent;
 import javax.swing.JLayeredPane;
 import javax.swing.OverlayLayout;
 
 /**
  *
- * @author wara
+ * @author Gzregorz (vara) Warywoda
  */
 public class SVGCanvasLayers extends JLayeredPane{
 
@@ -43,7 +33,6 @@ public class SVGCanvasLayers extends JLayeredPane{
     public static final Integer THUMBNAIL_LAYER = new Integer(JLayeredPane.DEFAULT_LAYER+10);
 
     private Canvas svgCanvas;
-    private RoundWindow detailsPane;
 
     private AlphaJPanel componentContainer;
     private AlphaJPanel modalContainer;
@@ -72,18 +61,7 @@ public class SVGCanvasLayers extends JLayeredPane{
 
     private void createDefaultContainers(){
         modalContainer = new AlphaJPanel(null);
-        getModalContainer().setOpaque(false);
-        detailsPane = createRoundWindowProperties();
-        getModalContainer().add(getDetailsPane());
-        getModalContainer().addComponentListener(new ComponentAdapter() {
-            @Override
-            public void componentResized(ComponentEvent e) {
-                Container cont = RoundWindowUtils.getRoundWindowFromContainer((Container)e.getSource());
-                if(cont != null){
-                    ((RoundWindow)cont).updatePosition();
-                }
-            }
-        });
+        getModalContainer().setOpaque(false);        
 
         componentContainer = new AlphaJPanel(null);
         getComponentContainer().setOpaque(false);
@@ -119,17 +97,7 @@ public class SVGCanvasLayers extends JLayeredPane{
                      countSynchLayers+"\n****";
 
         System.out.println(msg);
-    }
-
-    private RoundWindow createRoundWindowProperties(){
-        RoundWindow rw = new RoundWindow();
-        rw.setDynamicRevalidate(true);
-        rw.setUpperThresholdAlpha(0.6f);
-        rw.setAlpha(0.0f);
-        rw.getContentPane().setUpperThresholdAlpha(0.75f);
-        rw.setVisible(false);
-        return rw;
-    }
+    }   
 
     private void createThumbnails(){
         Thumbnail thumb = new Thumbnail(svgCanvas);
@@ -212,13 +180,6 @@ public class SVGCanvasLayers extends JLayeredPane{
      */
     public void setServicesContainer(AlphaJPanel servicesContainer) {
         this.servicesContainer = servicesContainer;
-    }
-
-    /**
-     * @return the detailsPane
-     */
-    public RoundWindow getDetailsPane() {
-        return detailsPane;
     }
 
     /**

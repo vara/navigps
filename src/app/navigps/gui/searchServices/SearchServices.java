@@ -1,28 +1,21 @@
 package app.navigps.gui.searchServices;
 
-import app.navigps.gui.searchServices.swing.SearchServicesPanel;
-import app.navigps.gui.NaviRootWindow;
-import app.navigps.gui.detailspanel.RoundWindow;
-import app.navigps.gui.detailspanel.RoundWindowUtils;
+import app.navigps.gui.searchServices.swing.SearchServicesCoreGUI;
 import app.navigps.gui.svgComponents.Canvas;
 import app.navigps.gui.svgComponents.SVGCanvasLayers;
 import app.navigps.gui.svgComponents.SynchronizedSVGLayer;
 import app.navigps.utils.NaviPoint;
+import app.navigps.utils.NaviUtilities;
 import app.navigps.utils.Utils;
 import java.awt.BasicStroke;
 import java.awt.Color;
-import java.awt.Container;
+import java.awt.Component;
 import java.awt.Graphics;
 import java.awt.Graphics2D;
 import java.awt.RenderingHints;
-import java.awt.event.ActionEvent;
 import java.awt.event.MouseEvent;
 import java.awt.geom.Ellipse2D;
-import java.awt.BorderLayout;
 import java.awt.Rectangle;
-import java.awt.event.ActionListener;
-import java.beans.PropertyChangeEvent;
-import java.beans.PropertyChangeListener;
 import javax.swing.event.MouseInputAdapter;
 import org.apache.batik.dom.svg.SVGOMPoint;
 import org.w3c.dom.svg.SVGDocument;
@@ -42,67 +35,43 @@ public class SearchServices extends SynchronizedSVGLayer{
     private NaviPoint paintCurrentPos = new NaviPoint(0,0);
     private float paintRadius = 0;
 
-    private boolean enabled = false;
-
-    private RoundWindow roundWindowInstace;
+    private boolean enabled = false;   
     
-    private SearchServicesPanel guiForSearchServ = new SearchServicesPanel();
     private SSMouseEvents me = new SSMouseEvents();   
 
     private Rectangle visibleArea = new Rectangle(0, 0);
 
-    private ActionListener closeAction = new ActionListener() {
-                @Override
-                public void actionPerformed(ActionEvent e) {
-                    if(RoundWindow.CLOSE_WINDOW_ACTION == e.getID()){
-                        //System.err.println("id: "+e.getID());
-                        //setEnabledSearchServices(false);
-                        uninstall();
-                        enabled = false;
-                    }
-                }
-            };
-
-    private PropertyChangeListener removeContent = new PropertyChangeListener(){
-        @Override
-        public void propertyChange(PropertyChangeEvent evt) {
-            if (evt.getPropertyName().equals(ALPHA_CHANGE)) {
-                //System.out.println("new Alpa "+newAlpha);
-                if ( setAlpha( (java.lang.Float) evt.getNewValue()) ) {                    
-                        repaint(visibleArea);
-                }
-            }
-        }
-    };
+    private SearchServicesCoreGUI coreGUI;
 
     public SearchServices(Canvas canvas) {
-        super(canvas);
+        super(canvas);        
     }
 
     private void install() {
 
-        //svgCanvas.add(synch,BorderLayout.CENTER);
-        System.out.println("Mouse listeners "+svgCanvas.getMouseListeners().length);
-
-        svgCanvas.removeMouseMotionListener(me);
-        svgCanvas.removeMouseListener(me);
-
-
         svgCanvas.addMouseMotionListener(me);
         svgCanvas.addMouseListener(me);
-
-        System.out.println("Mouse listeners after "+svgCanvas.getMouseListeners().length);
-        if(roundWindowInstace != null){
-            roundWindowInstace.addPropertyChangeListener(removeContent);
-            roundWindowInstace.getWinBehavior().addEndAction(closeAction);
-            Container cont = roundWindowInstace.getContentPane();
-            cont.setLayout(new BorderLayout());
-            cont.add(guiForSearchServ,BorderLayout.CENTER);
-        }else{
-            // probably never will have a place
-            System.err.println(getClass().getCanonicalName()+" method [install] msg: [roundWindowInstace null]");
+        SVGCanvasLayers svgcl = NaviUtilities.getSVGCanvasLayers(svgCanvas);
+        if(svgcl != null){
+            Component [] comps = svgcl.getComponentsInLayer(SVGCanvasLayers.SEARCH_SERVICES_LAYER);
+            boolean add = true;
+            if(comps.length != 0){
+                for (Component c : comps) {
+                    if(c == this){
+                        add = false;
+                    }
+                }
+            }
+            if(add){
+                System.err.println("Add component to SVGCanvasLayers.SEARCH_SERVICES_LAYER");
+                svgcl.add(this, SVGCanvasLayers.SEARCH_SERVICES_LAYER);
+            }
+            
         }
-        System.out.println(getClass().getCanonicalName()+" [install components]");
+        
+        if(coreGUI == null){
+            coreGUI = new SearchServicesCoreGUI(this);
+        }        
     }
 
     public void uninstall(){      
@@ -110,58 +79,27 @@ public class SearchServices extends SynchronizedSVGLayer{
         svgCanvas.removeMouseMotionListener(me);
         svgCanvas.removeMouseListener(me);
         
-        roundWindowInstace.getContentPane().remove(guiForSearchServ);
-        roundWindowInstace.removePropertyChangeListener(removeContent);
+        //roundWindowInstace.getContentPane().remove(guiForSearchServ);
+        //roundWindowInstace.removePropertyChangeListener(removeContent);
         //roundWindowInstace.getWinBehavior().removeEndAction(closeAction);
+        /*
         Container parent = getParent();
         if(parent!=null){
             parent.remove(this);
             parent.repaint();
         }
+         */
         System.out.println(getClass().getCanonicalName()+" [uninstall components]");
     }
 
-    protected void installRoundWindow(RoundWindow rw) {
-
-        if (roundWindowInstace == null || !roundWindowInstace.equals(rw)) {
-            //System.out.println("Initial round window and fill content");
-            roundWindowInstace = rw;
-            roundWindowInstace.setIcon(NaviRootWindow.createNavigationIcon("searchServices32"));
-            roundWindowInstace.setDynamicRevalidate(true);
-            roundWindowInstace.setUpperThresholdAlpha(0.6f);
-            roundWindowInstace.setAlpha(0.0f);
-            roundWindowInstace.getContentPane().setUpperThresholdAlpha(0.75f);
-            roundWindowInstace.setTitle("Search Services");            
-            roundWindowInstace.setVisible(false);
-            roundWindowInstace.getDecoratePanel().setVisibleCloseButton(false);
-        } else {
-            System.out.println(getClass().getCanonicalName() + " [content roundWin no changed]");
-        }        
-    }
-
-    public void setEnabledSearchServices(boolean val){        
-        if (val) {
-            Container parent = svgCanvas.getParent();
-            enabled = true;
-            if (parent instanceof SVGCanvasLayers) {
-                Container cont = RoundWindowUtils.getRoundWindowFromContainer(parent);
-                if (cont != null) {
-                    installRoundWindow((RoundWindow) cont);
-                    install();
-                    roundWindowInstace.pack();
-                    roundWindowInstace.setEnabled(true);
-                }
-
-            } else {
-                String info = getClass().getCanonicalName() + " method init -> " +
-                        "parent SVGCanvasLayers no detect, details window will not be displayed !";
-                System.err.println(info);
-            }
-        } else {
-            roundWindowInstace.setEnabled(false);
-            //uninstall();
+    public void setEnabledSearchServices(boolean val){
+        enabled = val;
+        if (val) {      
+            install();
+        } else {            
+            uninstall();
         }
-
+        coreGUI.setVisible(enabled);
     }
     public boolean isEnabledSearchServices() {
         return enabled;
@@ -220,7 +158,7 @@ public class SearchServices extends SynchronizedSVGLayer{
                     Utils.getLocalPointFromDomElement(doc.getRootElement(),x,y);
             centerPoint.setLocation(svgPoint);
         }
-        guiForSearchServ.setCenterPoint(getCenterPoint());
+        coreGUI.getPanel().setCenterPoint(getCenterPoint());
     }
 
     public void setRadius(float r) {
@@ -243,8 +181,8 @@ public class SearchServices extends SynchronizedSVGLayer{
         setRadius((float)centerPoint.distance(getCurrentPosition()));
         paintRadius = (float)paintCenterPoint.distance(paintCurrentPos);
 
-        guiForSearchServ.setRadius(getRadius());
-        guiForSearchServ.setCurrentPos(getCurrentPosition());        
+        coreGUI.getPanel().setRadius(getRadius());
+        coreGUI.getPanel().setCurrentPos(getCurrentPosition());
     }
 
     @Override
@@ -263,6 +201,10 @@ public class SearchServices extends SynchronizedSVGLayer{
                                                             SSMouseEvents.REPAINT_GAP);
             needUpdate = false;
         }
+    }
+
+    public void repaintVisibleArea(){
+        repaint(visibleArea);
     }
 
     public NaviPoint getCenterPoint() {
@@ -302,7 +244,7 @@ public class SearchServices extends SynchronizedSVGLayer{
                 if(paintRadius < paintRadiusTmp ){
                     // we need repaint only a bigger(current) painted area
                     // only becouse we don't need twice (needRepaint sets on false)
-                    repaint(visibleArea);
+                    repaintVisibleArea();
                     needReapint = false;                    
                 }
                 //calculate repainted area
@@ -310,7 +252,7 @@ public class SearchServices extends SynchronizedSVGLayer{
                 //If user increment radius then we need repaint bigger area.
                 //This block has been used only if radius is incrementing
                 if(needReapint){
-                    repaint(visibleArea);                   
+                    repaintVisibleArea();
                 }
             }
         }

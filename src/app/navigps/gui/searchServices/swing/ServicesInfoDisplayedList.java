@@ -144,6 +144,8 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
 
         jPanel2.setOpaque(false);
 
+        jScrollPane1.setOpaque(false);
+
         jPanel3.setOpaque(false);
         jPanel3.setPreferredSize(new java.awt.Dimension(197, 140));
 
