@@ -5,7 +5,6 @@ import app.navigps.gui.repaintmanager.AlphaRepaintManager;
 import app.navigps.gui.borders.OvalBorder;
 import app.navigps.gui.borders.RoundBorder;
 import app.navigps.gui.detailspanel.LoacationManager.RightLocation;
-import app.navigps.utils.Utils;
 import java.awt.BorderLayout;
 import java.awt.Color;
 import java.awt.Container;
@@ -31,6 +30,7 @@ import org.jdesktop.animation.timing.Animator;
 import org.jdesktop.animation.timing.Animator.Direction;
 import org.jdesktop.animation.timing.Animator.RepeatBehavior;
 import org.jdesktop.animation.timing.TimingTarget;
+import org.jdesktop.animation.timing.interpolation.PropertySetter;
 
 /**
  * Created on 2008-12-08, 21:25:25
@@ -207,12 +207,25 @@ public class RoundWindow extends RoundJPanel
     @Override
     public void setEnabled(final boolean aFlag) {
         super.setEnabled(aFlag);
+        if(animator.isRunning()){
+            animator.stop();
+        }
+        if(aFlag){
+            animator = PropertySetter.createAnimator(500,this,"alphaToAllRootWindow",new Float [] {0.0f,1.0f});
+            
+        }else{
+            animator = PropertySetter.createAnimator(500,this,"alphaToAllRootWindow",new Float [] {1.0f,0.0f});
+        }
+        animator.addTarget(getWinBehavior());
+        animator.start();
+        /*
         SwingUtilities.invokeLater(new Runnable() {
             @Override
             public void run() {
                 displayPanel(aFlag);
             }
-        });        
+        });
+         */
     }
 
     /**
@@ -375,6 +388,9 @@ public class RoundWindow extends RoundJPanel
     public void setAlphaToAllRootWindow(float alpha){
         setAlphaBorder(alpha);
         setAlpha(alpha);
+        getContentPane().setAlpha(alpha);
+        getDecoratePanel().setAlpha(alpha);
+        repaint();
     }
     /**
      * @param dynamicRevalidate the dynamicRevalidate to set
@@ -540,6 +556,7 @@ public class RoundWindow extends RoundJPanel
         @Override
         public void timingEvent(float arg0) {
             //System.out.println(""+arg0);
+            /*
             if(arg0>0 && arg0<Math.max(getContentPane().getUpperThresholdAlpha(),
                                        getUpperThresholdAlpha())){
                 Color outerColor = ((OvalBorder)getRoundBorder()).getBorderColor();
@@ -551,8 +568,9 @@ public class RoundWindow extends RoundJPanel
                 getContentPane().setAlpha(arg0);
                 getDecoratePanel().setAlpha(arg0);
                 repaint(0,0,getWidth(),getHeight());
-            }else
-                animator.stop();
+            }else{}
+                //animator.stop();
+             */
         }
         @Override
         public void begin() {
@@ -574,7 +592,7 @@ public class RoundWindow extends RoundJPanel
             if(!isEnabled()){
                 setVisible(isEnabled());                
             }
-
+            System.out.println("******** "+getAlpha());
             final ActionEvent ae = new ActionEvent(this, currentAction, "end");            
             new Thread(new Runnable() {
                 @Override
