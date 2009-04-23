@@ -22,7 +22,7 @@ import org.w3c.dom.svg.SVGDocument;
 
 /**
  *
- * @author vara
+ * @author Grzegorz (vara) Warywoda
  */
 public class SearchServices extends SynchronizedSVGLayer{
 

@@ -208,13 +208,16 @@ public class RoundWindow extends RoundJPanel
     public void setEnabled(final boolean aFlag) {
         super.setEnabled(aFlag);
         if(animator.isRunning()){
-            animator.stop();
+            animator.cancel();
         }
+
         if(aFlag){
-            animator = PropertySetter.createAnimator(500,this,"alphaToAllRootWindow",new Float [] {0.0f,1.0f});
+            Float [] val = new Float[]{getAlpha(),getUpperThresholdAlpha()};
+            animator = PropertySetter.createAnimator(1500,this,"alphaToAllRootWindow",val);
             
         }else{
-            animator = PropertySetter.createAnimator(500,this,"alphaToAllRootWindow",new Float [] {1.0f,0.0f});
+            Float [] val = new Float[]{getAlpha(),0f};
+            animator = PropertySetter.createAnimator(1500,this,"alphaToAllRootWindow",val);
         }
         animator.addTarget(getWinBehavior());
         animator.start();
@@ -385,12 +388,18 @@ public class RoundWindow extends RoundJPanel
      *
      * @param alpha
      */
-    public void setAlphaToAllRootWindow(float alpha){
-        setAlphaBorder(alpha);
-        setAlpha(alpha);
-        getContentPane().setAlpha(alpha);
-        getDecoratePanel().setAlpha(alpha);
-        repaint();
+    public void setAlphaToAllRootWindow(final float alpha){
+        SwingUtilities.invokeLater(new Runnable() {
+
+            @Override
+            public void run() {
+                setAlphaBorder(alpha);
+                setAlpha(alpha);
+                getContentPane().setAlpha(alpha);
+                getDecoratePanel().setAlpha(alpha);
+                repaint(0,0,getWidth(),getHeight());
+            }
+        });
     }
     /**
      * @param dynamicRevalidate the dynamicRevalidate to set
