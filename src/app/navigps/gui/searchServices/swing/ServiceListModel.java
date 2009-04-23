@@ -1,9 +1,11 @@
 package app.navigps.gui.searchServices.swing;
 
 import app.database.odb.core.ServiceCore;
+import app.navigps.gui.svgComponents.DisplayObjects.ObjectService;
 import java.util.ArrayList;
 import java.util.Vector;
 import javax.swing.AbstractListModel;
+import org.neodatis.odb.OID;
 
 /**
  *
@@ -49,6 +51,7 @@ public class ServiceListModel extends AbstractListModel{
         arrayServices.addAll(vServiceCore);
         fireContentsChanged(this, 0,arrayServices.size()-1);
     }
+
     public void removeElement(Object o){
         if(o instanceof ServiceCore){
             for (int i = 0; i < arrayServices.size(); i++) {
@@ -56,18 +59,31 @@ public class ServiceListModel extends AbstractListModel{
                     removeElementAt(i);
                 }
             }
+        }else if(o instanceof ObjectService){
+            removeElement( ((ObjectService)o).getOID());
         }
     }
+
+    public void removeElement(OID o){
+        for (int i = 0; i < arrayServices.size(); i++) {
+            if( ((ServiceCore)getElementAt(i)).getOID().equals(o)){
+                removeElementAt(i);
+            }
+        }
+    }
+
     public void removeElementAt(int index) {
-       arrayServices.remove(index);
-       fireIntervalRemoved(this, index, index);
+        try{
+            arrayServices.remove(index);
+            fireContentsChanged(this, index, index);
+        }catch(IndexOutOfBoundsException e){}
     }
 
     public void removeAll(){
         int index = arrayServices.size()-1;
         arrayServices.clear();
         if(index >=0)
-            fireIntervalRemoved(this, 0, index);
+            fireContentsChanged(this, 0, index);
     }
 
     public boolean isEmpty(){
@@ -78,5 +94,4 @@ public class ServiceListModel extends AbstractListModel{
     public String toString() {
         return arrayServices.toString();
     }
-
 }

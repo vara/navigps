@@ -83,4 +83,20 @@ public class Category {
     public void setIcoPath(String icoPath) {
         this.icoPath = icoPath;
     }
+/*
+    @Override
+    public boolean equals(Object obj) {
+        if(obj instanceof Category)
+            return hashCode() == obj.hashCode();
+        return false;
+    }
+
+    @Override
+    public int hashCode() {
+        int hash = 7;
+        hash = 59 * hash + (this.name != null ? this.name.hashCode() : 0);
+        hash = 59 * hash + (this.subcategories != null ? this.subcategories.hashCode() : 0);
+        return hash;
+    }
+*/
 }

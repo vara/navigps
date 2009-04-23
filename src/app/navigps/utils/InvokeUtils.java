@@ -4,7 +4,7 @@ import java.lang.reflect.Method;
 
 /**
  *
- * @author wara
+ * @author Grzegorz (wara) Warywoda
  */
 public class InvokeUtils{
 
@@ -17,7 +17,25 @@ public class InvokeUtils{
     public static ReturnValue invokeWithTime(Object baseClass,String methodName){
         return invokeWithTime(baseClass, methodName, null,null);
     }
+   /*
+    public static ReturnValue invokeWithTime(Object baseClass,String methodName,
+            Object[] params){
+        Class [] paramsType = new Class[params.length];
 
+        for (int i = 0; i < params.length; i++) {
+            Object object = params[i];
+            paramsType [i] = object.getClass().getGenericSuperclass().getClass();
+            System.out.println("Type "+object.getClass().getGenericSuperclass());
+            System.out.println("isPrimitive "+object.getClass().isPrimitive());
+            System.out.println("isSynthetic "+object.getClass().isSynthetic());
+            System.out.println("isAnonymousClass "+object.getClass().isAnonymousClass());
+            System.out.println("isArray "+object.getClass().isArray());
+
+            System.out.println("--------------------");
+        }
+        return invokeWithTime(baseClass, methodName,paramsType,params);
+    }
+*/
     /**
      *
      * @param baseClass

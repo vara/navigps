@@ -39,6 +39,7 @@ import app.navigps.gui.detailspanel.LoacationManager.LeftLocation;
 import app.navigps.gui.detailspanel.RoundJPanel;
 import app.navigps.gui.detailspanel.RoundWindow;
 import app.navigps.gui.svgComponents.SVGCanvasLayers;
+import app.navigps.utils.BridgeForVerboseMode;
 import app.navigps.utils.NaviLogger;
 import app.navigps.utils.NaviUtilities;
 import java.awt.BorderLayout;
@@ -403,9 +404,12 @@ public class SearchServicesPanel extends javax.swing.JPanel{
                     //test reflection
                     ReturnValue rv = InvokeUtils.invokeWithTime(
                             new Search(), "searchCategoryRadius", pt, obj);
-                    if(rv.isMessage()){
-                        System.out.println(""+rv.getMessage());
+                    if(rv.isMessage()){                        
+                        rv.getMessage().printStackTrace
+                                (BridgeForVerboseMode.getInstance().getErrOutputStream());
+                        return;
                     }
+                    
                     Vector subResult = (Vector) rv.getRet();
                     
                     AbstractDisplayManager dm = getDisplayManager();
@@ -586,10 +590,12 @@ public class SearchServicesPanel extends javax.swing.JPanel{
 
                 @Override
                 public void componentAdded(ContainerEvent e) {
+                    System.out.println("add service "+e.getChild());
                 }
 
                 @Override
                 public void componentRemoved(ContainerEvent e) {
+                    System.out.println("remove service "+e.getChild());
                     if(rWindow.isVisible()){
                         Component comp = e.getChild();
                         servlistPanel.getListModel().removeElement(comp);

@@ -9,7 +9,6 @@ package app.navigps.gui.ToolBar;
 import app.navigps.gui.ToolBar.UI.NaviToolBarUI;
 import app.navigps.gui.borders.OvalBorder;
 import java.awt.Color;
-import java.awt.Component;
 import java.awt.Dimension;
 import java.awt.Graphics;
 import java.awt.Point;

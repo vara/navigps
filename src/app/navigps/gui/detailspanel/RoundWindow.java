@@ -363,7 +363,7 @@ public class RoundWindow extends RoundJPanel
         }else{
             this.remove(this.decorate);
         }
-        this.decoratedWindow = decorated;
+         this.decoratedWindow = decorated;
         revalidate();
     }
 
@@ -390,11 +390,11 @@ public class RoundWindow extends RoundJPanel
      */
     public void setAlphaToAllRootWindow(final float alpha){
         SwingUtilities.invokeLater(new Runnable() {
-
             @Override
             public void run() {
                 setAlphaBorder(alpha);
                 setAlpha(alpha);
+                getRoundWindowRootPane().setAlpha(alpha);
                 getContentPane().setAlpha(alpha);
                 getDecoratePanel().setAlpha(alpha);
                 repaint(0,0,getWidth(),getHeight());
@@ -586,6 +586,7 @@ public class RoundWindow extends RoundJPanel
             if(isEnabled())
                 setVisible(isEnabled());
 
+            System.out.println("******** RW 'start' alpha: "+getAlpha());
             final ActionEvent ae = new ActionEvent(this, currentAction, "start");
             new Thread(new Runnable() {
                 @Override
@@ -601,7 +602,7 @@ public class RoundWindow extends RoundJPanel
             if(!isEnabled()){
                 setVisible(isEnabled());                
             }
-            System.out.println("******** "+getAlpha());
+            System.out.println("******** RW 'end' alpha: "+getAlpha());
             final ActionEvent ae = new ActionEvent(this, currentAction, "end");            
             new Thread(new Runnable() {
                 @Override

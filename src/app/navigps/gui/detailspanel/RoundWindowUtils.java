@@ -22,7 +22,17 @@ public class RoundWindowUtils {
         SearchRoundWindow.search(container);
         return SearchRoundWindow.getRoundWindow();
     }
-    
+
+    public static RoundWindow getParentRoundWindow(Component comp){
+        RoundWindow instance = null;
+        for (Container cont = comp.getParent(); cont != null; cont = cont.getParent()) {
+            if(cont instanceof RoundWindow) {
+                instance = (RoundWindow)cont;
+            }
+        }
+        return instance;
+    }
+
     private static class SearchRoundWindow{
         private static Container roundWindow = null;
         private static boolean done = false;

@@ -69,7 +69,7 @@ public class Subcategory {
     public int hashCode() {
         int hash = 5;
         hash = 29 * hash + (this.name != null ? this.name.hashCode() : 0);
-        hash = 29 * hash + (this.category != null ? this.category.hashCode() : 0);
+        //hash = 29 * hash + (this.category != null ? this.category.hashCode() : 0);
         return hash;
     }
  */

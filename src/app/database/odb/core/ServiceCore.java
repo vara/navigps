@@ -77,7 +77,7 @@ public class ServiceCore {
         int hash = 3;
         hash = 67 * hash + (this.serviceAttributes != null ? this.serviceAttributes.hashCode() : 0);
         hash = 67 * hash + (this.serviceDescription != null ? this.serviceDescription.hashCode() : 0);
-        hash = 67 * hash + (this.oid != null ? this.oid.hashCode() : 0);
+        hash = 67 * hash + (this.oid != null ? (int) (this.oid.getObjectId() ^ (this.oid.getObjectId()) >>> 32) : 0);
         return hash;
     }
 */

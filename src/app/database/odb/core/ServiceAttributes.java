@@ -70,7 +70,7 @@ public class ServiceAttributes {
         int hash = 7;
         hash = 79 * hash + Float.floatToIntBits(this.x);
         hash = 79 * hash + Float.floatToIntBits(this.y);
-        hash = 79 * hash + (this.sc != null ? this.sc.hashCode() : 0);
+        //hash = 79 * hash + (this.sc != null ? this.sc.hashCode() : 0);
         return hash;
     }
 */

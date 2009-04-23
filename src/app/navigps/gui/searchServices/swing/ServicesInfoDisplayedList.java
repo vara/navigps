@@ -16,6 +16,8 @@ import app.database.odb.core.ServiceDescription;
 import app.navigps.gui.NaviRootWindow;
 import app.navigps.gui.Scrollbar.ui.LineScrollBarUI;
 import app.navigps.gui.borders.OvalBorder;
+import app.navigps.gui.detailspanel.RoundWindow;
+import app.navigps.gui.detailspanel.RoundWindowUtils;
 import app.navigps.gui.svgComponents.DisplayObjects.AbstractDisplayManager;
 import app.navigps.gui.svgComponents.DisplayObjects.ObjectService;
 import app.navigps.utils.Utils;
@@ -24,13 +26,16 @@ import java.awt.Color;
 import java.awt.Point;
 import java.awt.Rectangle;
 import java.util.Vector;
-import javax.swing.JButton;
+import javax.swing.AbstractListModel;
 import javax.swing.JComponent;
 import javax.swing.JList;
 import javax.swing.JScrollBar;
 import javax.swing.JScrollPane;
+import javax.swing.ListModel;
 import javax.swing.ListSelectionModel;
 import javax.swing.SwingUtilities;
+import javax.swing.event.ListDataEvent;
+import javax.swing.event.ListDataListener;
 import javax.swing.event.ListSelectionEvent;
 import javax.swing.event.ListSelectionListener;
 
@@ -40,7 +45,7 @@ import javax.swing.event.ListSelectionListener;
  */
 public class ServicesInfoDisplayedList extends javax.swing.JPanel {
 
-    private JList list;
+    private NaviDisplayList list;
     private AnimationImageLayer animLayer = new AnimationImageLayer();
 
     /** Creates new form ServicesInfoDisplayedList */
@@ -49,15 +54,16 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
 
         jPanel1.setLayout(new BorderLayout(5,5));
 
-        list = new JList(new ServiceListModel());
+        list = new NaviDisplayList(new ServiceListModel());
 
         list.setOpaque(false);
         list.setModel(new ServiceListModel());
         list.setCellRenderer(new ServiceListRenderer());
         list.setBorder(null);
-        list.addListSelectionListener(new MyListSelectionUpdater());     
-        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);
-        
+        list.addListSelectionListener(createdListSelectionListener());
+        list.getModel().addListDataListener(createdListDataListener());
+        list.setSelectionMode(ListSelectionModel.SINGLE_SELECTION);        
+
         JScrollPane scrollPane = new JScrollPane();
         scrollPane.setBorder(new OvalBorder(5,5,5,5,10, 10,new Color(204,219,255)));
         scrollPane.setOpaque(false);
@@ -306,7 +312,15 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
         this.animLayer = animLayer;
     }    // End of variables declaration
 
-    private class MyListSelectionUpdater implements ListSelectionListener {
+    protected MyListSelectionUpdater createdListSelectionListener(){
+        return new MyListSelectionUpdater();
+    }
+
+    protected NaviListDataListener createdListDataListener(){
+        return new NaviListDataListener();
+    }
+
+    protected class MyListSelectionUpdater implements ListSelectionListener {
         @Override
         public void valueChanged(ListSelectionEvent e) {
             JList lsm = (JList)e.getSource();
@@ -336,5 +350,38 @@ public class ServicesInfoDisplayedList extends javax.swing.JPanel {
 
             }
         }
+    }
+
+    protected class NaviListDataListener implements ListDataListener{
+
+        @Override
+        public void intervalAdded(ListDataEvent e) {
+        }
+
+        @Override
+        public void intervalRemoved(ListDataEvent e) {
+        }
+
+        @Override
+        public void contentsChanged(ListDataEvent e) {
+            AbstractListModel alm = (AbstractListModel)e.getSource();
+            int size = alm.getSize();
+            System.out.println("NaviListDataListener size of list "+size);
+            if(size == 0){
+                RoundWindow rw = RoundWindowUtils.getParentRoundWindow(ServicesInfoDisplayedList.this);
+                if(rw!=null){
+                    rw.setEnabled(false);
+                }
+            }
+        }
+
+    }
+
+    protected class NaviDisplayList extends JList{
+        public NaviDisplayList(ListModel lm){
+            super(lm);
+        }
+
+
     }
  }
