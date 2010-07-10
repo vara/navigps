@@ -8,6 +8,5 @@ build
 src/tests
 tests
 nbproject
-*.xml
 manifest.mf
 navigps.log*
